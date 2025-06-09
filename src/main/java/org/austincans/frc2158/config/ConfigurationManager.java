@@ -249,7 +249,7 @@ public final class ConfigurationManager<T extends Enum<T> & ConfigurationDescrip
         }
       };
     } catch (NoSuchFieldException e) {
-      throw new NullPointerException(); // TODO
+      throw new NullPointerException();
     }
   }
 }

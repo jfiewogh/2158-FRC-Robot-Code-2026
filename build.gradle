@@ -33,18 +33,6 @@ protobuf {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
-        }
-        proto {
-            srcDirs "trajectory_native/proto"
-        }
-    }
-}
-
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -178,7 +166,7 @@ test {
 // value to "true" to enable the sim GUI by default (this
 // is the standard WPILib behavior).
 wpi.sim.addGui().defaultEnabled = false
-wpi.sim.addDriverstation()
+wpi.sim.addDriverstation().defaultEnabled = true
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
@@ -307,4 +295,13 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
+}
+
+//Set the version for the current project:
+version = semver.version
+
+//Or in a multi project build set the version of all projects:
+def ver = semver.version
+allprojects {
+    version = ver
 }

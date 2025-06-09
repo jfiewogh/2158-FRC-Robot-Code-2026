@@ -284,10 +284,6 @@ public final class Constants {
     k15(0, 0, 0, 0, 30);
 
     private final Pose3d pose;
-    private final Pose2d leftAlignPose;
-    private final Pose2d rightAlignPose;
-    private final Pose2d sourceAlignPose;
-    private static final double kSourceAlignOffsetMeters = 0.02;
 
     private AprilTag(double x, double y, double z, double zRotation, double yRotation) {
 
@@ -298,26 +294,6 @@ public final class Constants {
               Units.inchesToMeters(z),
               new Rotation3d(
                   0, Units.degreesToRadians(yRotation), Units.degreesToRadians(zRotation)));
-
-      leftAlignPose =
-          pose.toPose2d()
-              .plus(
-                  new Transform2d(
-                      RobotConstants.kBumperLengthMeters / 2, -0.17, Rotation2d.k180deg));
-      rightAlignPose =
-          pose.toPose2d()
-              .plus(
-                  new Transform2d(
-                      RobotConstants.kBumperLengthMeters / 2, 0.16, Rotation2d.k180deg));
-      sourceAlignPose =
-          pose.toPose2d()
-              .plus(
-                  new Transform2d(
-                      RobotConstants.kBumperLengthMeters / 2 + kSourceAlignOffsetMeters,
-                      0,
-                      Rotation2d.k180deg));
-      // processorAlignPose = pose.toPose2d();
-      // bargeAlignPose = pose.toPose2d();
     }
 
     public Pose3d getPose() {

@@ -7,6 +7,7 @@
 
 package org.austincans.frc2158.math;
 
+import edu.wpi.first.math.MathUtil;
 import java.util.List;
 
 /*
@@ -277,6 +278,24 @@ public class CANMath {
 
   public static double radians_to_degrees(double radians) {
     return Math.toDegrees(radians);
+  }
+
+  public static boolean withinTolerance(double value, double target, double tolerance) {
+    return Math.abs(target - value) <= tolerance;
+  }
+
+  public static double modifyAxis(double value, double deadband) {
+
+    return modifyAxis(value, 1, deadband);
+  }
+
+  public static double modifyAxis(double value, int exponent, double deadband) {
+    // Deadband
+    value = MathUtil.applyDeadband(value, deadband);
+
+    value = Math.copySign(Math.pow(value, exponent), value);
+
+    return value;
   }
 
   /** Prevent this class from being instantiated. */
