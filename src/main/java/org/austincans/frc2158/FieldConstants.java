@@ -37,13 +37,10 @@ import lombok.RequiredArgsConstructor;
  * have a blue alliance origin.
  */
 public class FieldConstants {
+  public static final FieldType fieldType = FieldType.ANDYMARK; // FIT use Andymark fields
 
-  public static FieldType fieldType = FieldType.ANDYMARK; // FIT use Andymark field
-
-  public static final AprilTagFieldLayout aprilTags = AprilTagLayoutType.OFFICIAL.getLayout();
-
-  public static final double fieldLength = aprilTags.getFieldLength();
-  public static final double fieldWidth = aprilTags.getFieldWidth();
+  public static final double fieldLength = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
+  public static final double fieldWidth = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
   public static final double algaeDiameter = Units.inchesToMeters(16);
@@ -51,9 +48,15 @@ public class FieldConstants {
 
   public static class Processor {
     public static final Pose2d centerFace =
-        new Pose2d(aprilTags.getTagPose(16).get().getX(), 0, Rotation2d.fromDegrees(90));
+        new Pose2d(
+            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(16).get().getX(),
+            0,
+            Rotation2d.fromDegrees(90));
     public static final Pose2d opposingCenterFace =
-        new Pose2d(aprilTags.getTagPose(3).get().getX(), fieldWidth, Rotation2d.fromDegrees(-90));
+        new Pose2d(
+            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(3).get().getX(),
+            fieldWidth,
+            Rotation2d.fromDegrees(-90));
   }
 
   public static class Barge {
@@ -88,7 +91,6 @@ public class FieldConstants {
   }
 
   public static class Reef {
-
     public static final Distance inscribedRadius = Inches.of(65.491 / 2);
     public static final double faceLength = Units.inchesToMeters(36.792600);
     public static final Translation2d center =
@@ -104,12 +106,13 @@ public class FieldConstants {
 
     static {
       // Initialize faces
-      centerFaces[0] = aprilTags.getTagPose(18).get().toPose2d();
-      centerFaces[1] = aprilTags.getTagPose(19).get().toPose2d();
-      centerFaces[2] = aprilTags.getTagPose(20).get().toPose2d();
-      centerFaces[3] = aprilTags.getTagPose(21).get().toPose2d();
-      centerFaces[4] = aprilTags.getTagPose(22).get().toPose2d();
-      centerFaces[5] = aprilTags.getTagPose(17).get().toPose2d();
+      var aprilTagLayout = AprilTagLayoutType.OFFICIAL.getLayout();
+      centerFaces[0] = aprilTagLayout.getTagPose(18).get().toPose2d();
+      centerFaces[1] = aprilTagLayout.getTagPose(19).get().toPose2d();
+      centerFaces[2] = aprilTagLayout.getTagPose(20).get().toPose2d();
+      centerFaces[3] = aprilTagLayout.getTagPose(21).get().toPose2d();
+      centerFaces[4] = aprilTagLayout.getTagPose(22).get().toPose2d();
+      centerFaces[5] = aprilTagLayout.getTagPose(17).get().toPose2d();
 
       // Initialize branch positions
       for (int face = 0; face < 6; face++) {
@@ -204,7 +207,7 @@ public class FieldConstants {
 
   public static final double aprilTagWidth = Units.inchesToMeters(6.50);
   public static final int aprilTagCount = 22;
-  public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.OFFICIAL;
+  public static final AprilTagLayoutType defaultAprilTagType = AprilTagLayoutType.NO_BARGE;
 
   @Getter
   public enum AprilTagLayoutType {
@@ -215,9 +218,6 @@ public class FieldConstants {
     NONE("2025-none");
 
     AprilTagLayoutType(String name) {
-      if (fieldType == null) {
-        fieldType = FieldType.ANDYMARK; // Default to Andymark if not set
-      }
       if (Constants.disableHAL) {
         try {
           layout =
@@ -249,7 +249,8 @@ public class FieldConstants {
       try {
         layoutString = new ObjectMapper().writeValueAsString(layout);
       } catch (JsonProcessingException e) {
-        throw new RuntimeException("Failed to serialize AprilTag layout JSON " + toString());
+        throw new RuntimeException(
+            "Failed to serialize AprilTag layout JSON " + toString() + "for Northstar");
       }
     }
 

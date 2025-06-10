@@ -9,16 +9,38 @@ package org.austincans.frc2158.controllers;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import java.util.HashMap;
+import java.util.Optional;
 import org.austincans.frc2158.util.ConfigUtil;
+import org.austincans.frc2158.util.LoggedTracer;
 
 /**
  * Control REV Robotics Blinkin LED controller
  *
  * @author Austin Cans Robotics Team 2158
  */
+@SuppressWarnings("unused")
 public class BlinkinLEDController {
+
+  private BlinkinPattern disabledColor = BlinkinPattern.STROBE_GOLD;
+  private Optional<Alliance> alliance = Optional.empty();
+  private boolean lastEnabledAuto = false;
+  private double lastEnabledTime = 0.0;
+  private boolean estopped = false;
+  public boolean hpAttentionAlert = false;
+  public boolean endgameAlert = false;
+  public boolean lowBatteryAlert = false;
+  public boolean characterizationMode = false;
+  public boolean visionDisconnected = false;
+  public boolean ready = false;
+  private Notifier loadingNotifier;
+
+  public int loopCycleCount = 0;
+  private static final int minLoopCycleCount = 10;
+
   public enum BlinkinPattern {
     /*
      * Fixed Palette Pattern
@@ -238,5 +260,75 @@ public class BlinkinLEDController {
   /** Turn off LEDs */
   public void off() {
     setPattern(BlinkinPattern.BLACK);
+  }
+
+  public synchronized void periodic() {
+    // Update alliance color
+    if (DriverStation.isFMSAttached()) {
+      alliance = DriverStation.getAlliance();
+      disabledColor =
+          alliance
+              .map(alliance -> alliance == Alliance.Blue ? BlinkinPattern.BLUE : BlinkinPattern.RED)
+              .orElse(disabledColor);
+    }
+
+    // Update auto state
+    if (DriverStation.isEnabled()) {
+      lastEnabledAuto = DriverStation.isAutonomous();
+      lastEnabledTime = Timer.getTimestamp();
+    }
+
+    // Update estop state
+    if (DriverStation.isEStopped()) {
+      estopped = true;
+    }
+
+    // Exit during initial cycles
+    loopCycleCount += 1;
+    if (loopCycleCount < minLoopCycleCount) {
+      return;
+    }
+
+    // Stop loading notifier if running
+    loadingNotifier.stop();
+
+    // Select LED mode
+    off(); // Default to off
+    if (estopped) {
+      setPattern(BlinkinPattern.RED);
+    } else if (!DriverStation.isDisabled()) {
+      if (lowBatteryAlert) {
+        // Low battery
+        setPattern(BlinkinPattern.RED_ORANGE);
+      }
+
+      // Vision disconnected alert
+      if (visionDisconnected) {
+        setPattern(BlinkinPattern.STROBE_RED);
+      }
+
+    } else if (DriverStation.isAutonomous()) {
+      if (characterizationMode) {
+        setPattern(BlinkinPattern.SINELON_OCEAN_PALETTE);
+      } else {
+        setPattern(BlinkinPattern.COLOR_WAVES_FOREST_PALETTE);
+      }
+    }
+    // Ready alert
+    if (ready) {
+      setPattern(BlinkinPattern.STROBE_BLUE);
+    }
+
+    // Human player alert
+    if (hpAttentionAlert) {
+      setPattern(BlinkinPattern.STROBE_WHITE);
+    }
+
+    // Endgame alert
+    if (endgameAlert) {
+      setPattern(BlinkinPattern.SINELON_LAVA_PALETTE);
+    }
+    // Record cycle time
+    LoggedTracer.record("LEDs");
   }
 }

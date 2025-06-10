@@ -38,7 +38,7 @@ import org.austincans.frc2158.util.ConfigUtil;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
+  public static final double loopPeriodSecs = 0.02;
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   private static RobotType robotType = RobotBase.isReal() ? RobotType.COMPBOT : RobotType.SIMBOT;
