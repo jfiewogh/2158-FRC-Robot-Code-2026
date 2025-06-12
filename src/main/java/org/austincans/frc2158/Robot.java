@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import org.austincans.frc2158.Constants.RobotType;
 import org.austincans.frc2158.controllers.REVDigitController;
+import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2158.util.CanivoreReader;
 import org.austincans.frc2158.util.DummyLogReceiver;
 import org.austincans.frc2158.util.LoggedTracer;
@@ -238,6 +240,7 @@ public class Robot extends LoggedRobot {
   }
 
   /** This function is called periodically during all modes. */
+  @SuppressWarnings("unused")
   @Override
   public void robotPeriodic() {
     // Refresh all Phoenix signals
@@ -298,6 +301,32 @@ public class Robot extends LoggedRobot {
       canivoreErrorAlert.set(
           !canivoreErrorTimer.hasElapsed(canivoreErrorTimeThreshold)
               && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
+
+      /*
+       * This example of adding Limelight is very simple and may not be sufficient for on-field use.
+       * Users typically need to provide a standard deviation that scales with the distance to target
+       * and changes with number of tags available.
+       *
+       * This example is sufficient to show that vision integration is possible, though exact implementation
+       * of how to use vision should be tuned per-robot and to the team's specification.
+       */
+      boolean kUseLimelight = true;
+      if (kUseLimelight) {
+        LimelightHelpers.PoseEstimate llMeasurement;
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+          llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+        } else {
+          llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+        }
+        /*
+        if (llMeasurement != null) {
+          robotContainer
+              .getDrive()
+              .addVisionMeasurement(
+                  llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
+        }
+        */
+      }
     }
 
     // Log NT client list

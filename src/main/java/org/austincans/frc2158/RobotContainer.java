@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import org.austincans.frc2158.FieldConstants.AprilTagLayoutType;
 import org.austincans.frc2158.commands.DriveCommands;
@@ -53,7 +54,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 @ExtensionMethod({DoublePressTracker.class, TriggerUtil.class})
 public class RobotContainer {
   // Subsystems
-  private Drive drive;
+  @Getter private Drive drive;
   private final BlinkinLEDController leds = BlinkinLEDController.getInstance();
 
   // Controllers
