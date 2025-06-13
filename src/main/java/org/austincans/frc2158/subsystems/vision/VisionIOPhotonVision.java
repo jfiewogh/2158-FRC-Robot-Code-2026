@@ -33,6 +33,11 @@ public class VisionIOPhotonVision implements VisionIO {
     this.robotToCamera = robotToCamera;
   }
 
+  public VisionIOPhotonVision(String name, Object robotToCamera) {
+    camera = new PhotonCamera(name);
+    this.robotToCamera = (Transform3d) robotToCamera;
+  }
+
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();

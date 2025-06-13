@@ -37,11 +37,19 @@ import org.austincans.frc2158.subsystems.drive.ModuleIO;
 import org.austincans.frc2158.subsystems.drive.ModuleIOComp;
 import org.austincans.frc2158.subsystems.drive.ModuleIODev;
 import org.austincans.frc2158.subsystems.drive.ModuleIOSim;
+import org.austincans.frc2158.subsystems.vision.Vision;
+import org.austincans.frc2158.subsystems.vision.VisionConstants;
+import org.austincans.frc2158.subsystems.vision.VisionIO;
+import org.austincans.frc2158.subsystems.vision.VisionIOLimelight;
+import org.austincans.frc2158.subsystems.vision.VisionIOPhotonVision;
+import org.austincans.frc2158.subsystems.vision.VisionIOPhotonVisionSim;
 import org.austincans.frc2158.util.AllianceFlipUtil;
 import org.austincans.frc2158.util.DoublePressTracker;
 import org.austincans.frc2158.util.MirrorUtil;
 import org.austincans.frc2158.util.OverrideSwitches;
 import org.austincans.frc2158.util.TriggerUtil;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -84,6 +92,12 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  // Vision
+  @SuppressWarnings("unused")
+  private Vision vision;
+
+  private SwerveDriveSimulation driveSimulation = null;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -97,6 +111,13 @@ public class RobotContainer {
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[1]),
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[2]),
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[3]));
+          vision =
+              new Vision(
+                  drive,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOPhotonVision(VisionConstants.camera1Name, drive.getRotation()));
+
+          break;
         }
         case DEVBOT -> {
           drive =
@@ -106,8 +127,12 @@ public class RobotContainer {
                   new ModuleIODev(DriveConstants.moduleConfigsDev[1]),
                   new ModuleIODev(DriveConstants.moduleConfigsDev[2]),
                   new ModuleIODev(DriveConstants.moduleConfigsDev[3]));
+          vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
         }
         case SIMBOT -> {
+          driveSimulation =
+              new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+          SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
           drive =
               new Drive(
                   new GyroIO() {}, // Virtual
@@ -115,6 +140,20 @@ public class RobotContainer {
                   new ModuleIOSim(),
                   new ModuleIOSim(),
                   new ModuleIOSim());
+
+          vision =
+              new Vision(
+                  drive,
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera0Name,
+                      VisionConstants.robotToCamera0,
+                      driveSimulation::getSimulatedDriveTrainPose),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera1Name,
+                      VisionConstants.robotToCamera1,
+                      driveSimulation::getSimulatedDriveTrainPose));
+
+          break;
         }
         default -> throw new IllegalArgumentException("Unexpected value: " + Constants.getRobot());
       }
