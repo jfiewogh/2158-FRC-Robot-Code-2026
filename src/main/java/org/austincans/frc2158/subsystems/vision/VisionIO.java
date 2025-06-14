@@ -21,6 +21,20 @@ public interface VisionIO {
     public int[] tagIds = new int[0];
   }
 
+  @AutoLog
+  class AprilTagVisionIOInputs {
+    public double[] timestamps = new double[] {};
+    public double[][] frames = new double[][] {};
+    public long fps = 0;
+  }
+
+  @AutoLog
+  class ObjDetectVisionIOInputs {
+    public double[] timestamps = new double[] {};
+    public double[][] frames = new double[][] {};
+    public long fps = 0;
+  }
+
   /** Represents the angle to a simple target, not used for pose estimation. */
   record TargetObservation(Rotation2d tx, Rotation2d ty) {}
 
@@ -39,5 +53,12 @@ public interface VisionIO {
     PHOTONVISION
   }
 
+  default void updateInputs(
+      VisionIOInputs inputs,
+      AprilTagVisionIOInputs aprilTagInputs,
+      ObjDetectVisionIOInputs objDetectInputs) {}
+
   default void updateInputs(VisionIOInputs inputs) {}
+
+  default void setRecording(boolean active) {}
 }

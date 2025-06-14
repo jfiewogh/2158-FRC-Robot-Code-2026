@@ -38,11 +38,6 @@ import org.austincans.frc2158.subsystems.drive.ModuleIOComp;
 import org.austincans.frc2158.subsystems.drive.ModuleIODev;
 import org.austincans.frc2158.subsystems.drive.ModuleIOSim;
 import org.austincans.frc2158.subsystems.vision.Vision;
-import org.austincans.frc2158.subsystems.vision.VisionConstants;
-import org.austincans.frc2158.subsystems.vision.VisionIO;
-import org.austincans.frc2158.subsystems.vision.VisionIOLimelight;
-import org.austincans.frc2158.subsystems.vision.VisionIOPhotonVision;
-import org.austincans.frc2158.subsystems.vision.VisionIOPhotonVisionSim;
 import org.austincans.frc2158.util.AllianceFlipUtil;
 import org.austincans.frc2158.util.DoublePressTracker;
 import org.austincans.frc2158.util.MirrorUtil;
@@ -111,12 +106,13 @@ public class RobotContainer {
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[1]),
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[2]),
                   new ModuleIOComp(DriveConstants.moduleConfigsComp[3]));
+          /*
           vision =
               new Vision(
                   drive,
                   new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                   new VisionIOPhotonVision(VisionConstants.camera1Name, drive.getRotation()));
-
+          */
           break;
         }
         case DEVBOT -> {
@@ -127,7 +123,7 @@ public class RobotContainer {
                   new ModuleIODev(DriveConstants.moduleConfigsDev[1]),
                   new ModuleIODev(DriveConstants.moduleConfigsDev[2]),
                   new ModuleIODev(DriveConstants.moduleConfigsDev[3]));
-          vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+          // vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
         }
         case SIMBOT -> {
           driveSimulation =
@@ -140,19 +136,19 @@ public class RobotContainer {
                   new ModuleIOSim(),
                   new ModuleIOSim(),
                   new ModuleIOSim());
-
-          vision =
-              new Vision(
-                  drive,
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera0Name,
-                      VisionConstants.robotToCamera0,
-                      driveSimulation::getSimulatedDriveTrainPose),
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera1Name,
-                      VisionConstants.robotToCamera1,
-                      driveSimulation::getSimulatedDriveTrainPose));
-
+          /*
+                    vision =
+                        new Vision(
+                            drive,
+                            new VisionIOPhotonVisionSim(
+                                VisionConstants.camera0Name,
+                                VisionConstants.robotToCamera0,
+                                driveSimulation::getSimulatedDriveTrainPose),
+                            new VisionIOPhotonVisionSim(
+                                VisionConstants.camera1Name,
+                                VisionConstants.robotToCamera1,
+                                driveSimulation::getSimulatedDriveTrainPose));
+          */
           break;
         }
         default -> throw new IllegalArgumentException("Unexpected value: " + Constants.getRobot());

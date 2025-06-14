@@ -39,8 +39,9 @@ import lombok.RequiredArgsConstructor;
 public class FieldConstants {
   public static final FieldType fieldType = FieldType.ANDYMARK; // FIT use Andymark fields
 
-  public static final double fieldLength = AprilTagLayoutType.OFFICIAL.getLayout().getFieldLength();
-  public static final double fieldWidth = AprilTagLayoutType.OFFICIAL.getLayout().getFieldWidth();
+  public static AprilTagLayoutType defaultAprilTagLAyoutType = AprilTagLayoutType.OFFICIAL;
+  public static final double fieldLength = 17.748;
+  public static final double fieldWidth = 8.042;
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
   public static final double algaeDiameter = Units.inchesToMeters(16);
@@ -49,12 +50,12 @@ public class FieldConstants {
   public static class Processor {
     public static final Pose2d centerFace =
         new Pose2d(
-            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(16).get().getX(),
+            defaultAprilTagLAyoutType.getLayout().getTagPose(16).get().getX(),
             0,
             Rotation2d.fromDegrees(90));
     public static final Pose2d opposingCenterFace =
         new Pose2d(
-            AprilTagLayoutType.OFFICIAL.getLayout().getTagPose(3).get().getX(),
+            defaultAprilTagLAyoutType.getLayout().getTagPose(3).get().getX(),
             fieldWidth,
             Rotation2d.fromDegrees(-90));
   }
@@ -106,7 +107,7 @@ public class FieldConstants {
 
     static {
       // Initialize faces
-      var aprilTagLayout = AprilTagLayoutType.OFFICIAL.getLayout();
+      var aprilTagLayout = defaultAprilTagLAyoutType.getLayout();
       centerFaces[0] = aprilTagLayout.getTagPose(18).get().toPose2d();
       centerFaces[1] = aprilTagLayout.getTagPose(19).get().toPose2d();
       centerFaces[2] = aprilTagLayout.getTagPose(20).get().toPose2d();
@@ -218,6 +219,8 @@ public class FieldConstants {
     NONE("2025-none");
 
     AprilTagLayoutType(String name) {
+      Constants.disableHAL();
+      System.out.println("Processing AprilTag Layout for type: " + fieldType.getJsonFolder());
       if (Constants.disableHAL) {
         try {
           layout =
