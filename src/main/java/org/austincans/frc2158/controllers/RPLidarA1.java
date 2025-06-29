@@ -330,18 +330,30 @@ public class RPLidarA1 {
     // mSerialPort.setDTR();
   }
 
+  @SuppressWarnings("unchecked")
+  private static Optional<DeviceHealth> synchronizeDeviceHealth(Object o) {
+    synchronized (o) {
+      System.out.println("We now hold the lock of " + o);
+      return (Optional<DeviceHealth>) o;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Optional<DeviceInfo> synchronizeDeviceInfo(Object o) {
+    synchronized (o) {
+      System.out.println("We now hold the lock of " + o);
+      return (Optional<DeviceInfo>) o;
+    }
+  }
+
   public Optional<DeviceHealth> getHealth() {
     sendData(OutgoingPacket.GET_HEALTH, IncomingPacket.HEALTH, kSendTimeout);
-    synchronized (mLastDeviceHealth) {
-      return mLastDeviceHealth;
-    }
+    return synchronizeDeviceHealth(mLastDeviceHealth);
   }
 
   public Optional<DeviceInfo> getInfo() {
     sendData(OutgoingPacket.GET_INFO, IncomingPacket.INFO, kSendTimeout);
-    synchronized (mLastDeviceInfo) {
-      return mLastDeviceInfo;
-    }
+    return synchronizeDeviceInfo(mLastDeviceInfo);
   }
 
   private void readData() {
@@ -531,9 +543,7 @@ public class RPLidarA1 {
         new DeviceHealth(
             mReadBuffer[offset] & 0xFF,
             (mReadBuffer[offset + 1] & 0xFF) | ((mReadBuffer[offset + 2] & 0xFF) << 8));
-    synchronized (mLastDeviceHealth) {
-      mLastDeviceHealth = Optional.of(h);
-    }
+    mLastDeviceHealth = synchronizeDeviceHealth(Optional.of(h));
     return true;
   }
 
@@ -548,17 +558,16 @@ public class RPLidarA1 {
       serialNumber[i] = mReadBuffer[offset + i + 4];
     }
 
-    synchronized (mLastDeviceInfo) {
-      // AND by 0xFF to convert to signed integer from unsigned
-      mLastDeviceInfo =
-          Optional.of(
-              new DeviceInfo(
-                  mReadBuffer[offset] & 0xFF,
-                  mReadBuffer[offset + 1] & 0xFF,
-                  mReadBuffer[offset + 2] & 0xFF,
-                  mReadBuffer[offset + 3] & 0xFF,
-                  serialNumber));
-    }
+    // AND by 0xFF to convert to signed integer from unsigned
+    mLastDeviceInfo =
+        synchronizeDeviceInfo(
+            Optional.of(
+                new DeviceInfo(
+                    mReadBuffer[offset] & 0xFF,
+                    mReadBuffer[offset + 1] & 0xFF,
+                    mReadBuffer[offset + 2] & 0xFF,
+                    mReadBuffer[offset + 3] & 0xFF,
+                    serialNumber)));
     return true;
   }
 

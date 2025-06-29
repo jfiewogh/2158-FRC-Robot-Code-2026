@@ -9,13 +9,10 @@ package org.austincans.frc2158.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
@@ -30,14 +27,15 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import org.littletonrobotics.junction.Logger;
 
 /*
  * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
- * is an algorithm that uses a series of measurements observed over time, including statistical 
- * noise and other inaccuracies, to produce estimates of unknown variables that tend to be more 
- * accurate than those based on a single measurement, by estimating a joint probability 
- * distribution over the variables for each time-step. 
- * The filter is constructed as a mean squared error minimiser, but an alternative derivation of 
+ * is an algorithm that uses a series of measurements observed over time, including statistical
+ * noise and other inaccuracies, to produce estimates of unknown variables that tend to be more
+ * accurate than those based on a single measurement, by estimating a joint probability
+ * distribution over the variables for each time-step.
+ * The filter is constructed as a mean squared error minimiser, but an alternative derivation of
  * the filter is also provided showing how the filter relates to maximum likelihood statistics.
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
  */
@@ -150,7 +148,6 @@ public class Flywheel extends SubsystemBase {
         m_flywheel.setVoltage(nextVoltage);
       }
     }
-    
   }
 
   private double getEncoderRate() {
@@ -178,10 +175,10 @@ public class Flywheel extends SubsystemBase {
     m_loop.setNextR(VecBuilder.fill(velocity));
   }
 
-  /* 
+  /*
   SysId
   https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
-  Set Quasistatic 
+  Set Quasistatic
   */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     return m_SysIdRoutine.quasistatic(direction);
@@ -216,28 +213,30 @@ public class Flywheel extends SubsystemBase {
     if (getMotor() instanceof TalonFX) {
       TalonFX m_flywheel = (TalonFX) getMotor();
       // Unit: Volts
-      Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+      Logger.recordOutput(
+          "Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
       // Unit: Rotations
-      Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getPosition().getValueAsDouble());     
+      Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getPosition().getValueAsDouble());
     } else {
       // SparkFlex
       if (getMotor() instanceof SparkFlex) {
         SparkFlex m_flywheel = (SparkFlex) getMotor();
         // Unit: Volts
-        Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+        Logger.recordOutput(
+            "Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
         // Unit: Rotations
         Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getEncoder().getPosition());
       } else {
         // SparkMax
         SparkMax m_flywheel = (SparkMax) getMotor();
         // Unit: Volts
-        Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+        Logger.recordOutput(
+            "Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
         // Unit: Rotations
         Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getEncoder().getPosition());
       }
     }
     // Unit: Rotations Per Second
-    Logger.recordOutput(
-        "Flywheel/AngularVelocity", getEncoderRate() * 2.0 * Math.PI);
+    Logger.recordOutput("Flywheel/AngularVelocity", getEncoderRate() * 2.0 * Math.PI);
   }
 }

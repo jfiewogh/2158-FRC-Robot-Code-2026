@@ -62,7 +62,9 @@ public class Vision extends VirtualSubsystem {
   private final Map<Integer, Double> lastFrameTimes = new HashMap<>();
   private final Map<Integer, Double> lastTagDetectionTimes = new HashMap<>();
 
+  @SuppressWarnings("unused")
   private final double disconnectedTimeout = 0.5;
+
   private final Timer[] disconnectedTimers;
   private final Alert[] disconnectedAlerts;
 
@@ -316,6 +318,7 @@ public class Vision extends VirtualSubsystem {
                 objDetectInputs[instanceIndex]
                     .frames[objDetectInputs[instanceIndex].timestamps.length - 1];
             double largestSize = 0.0;
+            @SuppressWarnings("unused")
             Rotation2d angle = null;
             for (int i = 0; i < frame.length; i += 10) {
               if (frame[i + 1] > algaeDetectConfidenceThreshold) {
