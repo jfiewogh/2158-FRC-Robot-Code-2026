@@ -9,7 +9,13 @@ package org.austincans.frc2158.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
@@ -24,9 +30,22 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import org.littletonrobotics.junction.Logger;
 
+/*
+ * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
+ * is an algorithm that uses a series of measurements observed over time, including statistical 
+ * noise and other inaccuracies, to produce estimates of unknown variables that tend to be more 
+ * accurate than those based on a single measurement, by estimating a joint probability 
+ * distribution over the variables for each time-step. 
+ * The filter is constructed as a mean squared error minimiser, but an alternative derivation of 
+ * the filter is also provided showing how the filter relates to maximum likelihood statistics.
+ * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
+ */
 public class Flywheel extends SubsystemBase {
+  // Can be defined in config instead
+  public boolean isSparkMax = false;
+  public boolean isSparkFlex = true;
+  public boolean isTalonFX = false;
   // Volts per (radian per second)
   private static final double kFlywheelKv = 0.023; // TUNE this
 
@@ -44,6 +63,7 @@ public class Flywheel extends SubsystemBase {
       LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
+  // Use Nat to express a natural number as a java class
   private final KalmanFilter<N1, N1, N1> m_observer =
       new KalmanFilter<>(
           Nat.N1(),
@@ -65,7 +85,14 @@ public class Flywheel extends SubsystemBase {
   private final LinearSystemLoop<N1, N1, N1> m_loop =
       new LinearSystemLoop<>(m_flywheelPlant, m_controller, m_observer, 12.0, 0.020);
 
-  private TalonFX m_flywheel;
+  // CTRE
+  private TalonFX m_flywheel_tfx;
+  // REV
+  private SparkFlex m_flywheel_sf;
+  private SparkMax m_flywheel_sm;
+
+  // CAN ID port number
+  private int port;
 
   private final SysIdRoutine m_SysIdRoutine =
       new SysIdRoutine(
@@ -74,8 +101,25 @@ public class Flywheel extends SubsystemBase {
 
   /** Creates a new Flywheel. */
   public Flywheel(int port) {
-    m_flywheel = new TalonFX(port);
+    this.port = port;
     m_loop.reset(VecBuilder.fill(getEncoderRate()));
+  }
+
+  /** Get the object represented by motor class choosen */
+  public Object getMotor() {
+    int port = this.port;
+    if (isTalonFX) {
+      m_flywheel_tfx = new TalonFX(port);
+      return m_flywheel_tfx;
+    }
+    if (isSparkFlex) {
+      m_flywheel_sf = new SparkFlex(port, MotorType.kBrushless);
+      return m_flywheel_sf;
+    } else {
+      // SparkMax
+      m_flywheel_sm = new SparkMax(port, MotorType.kBrushless);
+      return m_flywheel_sm;
+    }
   }
 
   @Override
@@ -91,18 +135,54 @@ public class Flywheel extends SubsystemBase {
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
     double nextVoltage = m_loop.getU(0);
-    m_flywheel.setVoltage(nextVoltage);
+    // TalonFX
+    if (getMotor() instanceof TalonFX) {
+      TalonFX m_flywheel = (TalonFX) getMotor();
+      m_flywheel.setVoltage(nextVoltage);
+    } else {
+      // SparkFlex
+      if (getMotor() instanceof SparkFlex) {
+        SparkFlex m_flywheel = (SparkFlex) getMotor();
+        m_flywheel.setVoltage(nextVoltage);
+      } else {
+        // SparkMax
+        SparkMax m_flywheel = (SparkMax) getMotor();
+        m_flywheel.setVoltage(nextVoltage);
+      }
+    }
+    
   }
 
   private double getEncoderRate() {
-    double v = m_flywheel.getVelocity().getValueAsDouble();
+    double v = 0;
+    // TalonFX
+    if (getMotor() instanceof TalonFX) {
+      TalonFX m_flywheel = (TalonFX) getMotor();
+      v = m_flywheel.getVelocity().getValueAsDouble();
+    } else {
+      // SparkFlex
+      if (getMotor() instanceof SparkFlex) {
+        SparkFlex m_flywheel = (SparkFlex) getMotor();
+        v = m_flywheel.getEncoder().getVelocity();
+      } else {
+        // SparkMax
+        SparkMax m_flywheel = (SparkMax) getMotor();
+        v = m_flywheel.getEncoder().getVelocity();
+      }
+    }
     return v * 2.0 * Math.PI;
   }
 
+  /* Set Velocity */
   public void setVelocity(double velocity) {
     m_loop.setNextR(VecBuilder.fill(velocity));
   }
 
+  /* 
+  SysId
+  https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html
+  Set Quasistatic 
+  */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     return m_SysIdRoutine.quasistatic(direction);
   }
@@ -111,17 +191,53 @@ public class Flywheel extends SubsystemBase {
     return m_SysIdRoutine.dynamic(direction);
   }
 
+  /* Set Motor voltage */
   private void setVoltage(Voltage volts) {
-    m_flywheel.setVoltage(volts.in(Volts));
+    // TalonFX
+    if (getMotor() instanceof TalonFX) {
+      TalonFX m_flywheel = (TalonFX) getMotor();
+      m_flywheel.setVoltage(volts.in(Volts));
+    } else {
+      // SparkFlex
+      if (getMotor() instanceof SparkFlex) {
+        SparkFlex m_flywheel = (SparkFlex) getMotor();
+        m_flywheel.setVoltage(volts.in(Volts));
+      } else {
+        // SparkMax
+        SparkMax m_flywheel = (SparkMax) getMotor();
+        m_flywheel.setVoltage(volts.in(Volts));
+      }
+    }
   }
 
+  /* Log Flywheel voltage, angular position and agular velocity */
   private void logFlywheel(SysIdRoutineLog log) {
-    // Unit: Volts
-    Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
-    // Unit: Rotations
-    Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getPosition().getValueAsDouble());
+    // TalonFX
+    if (getMotor() instanceof TalonFX) {
+      TalonFX m_flywheel = (TalonFX) getMotor();
+      // Unit: Volts
+      Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+      // Unit: Rotations
+      Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getPosition().getValueAsDouble());     
+    } else {
+      // SparkFlex
+      if (getMotor() instanceof SparkFlex) {
+        SparkFlex m_flywheel = (SparkFlex) getMotor();
+        // Unit: Volts
+        Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+        // Unit: Rotations
+        Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getEncoder().getPosition());
+      } else {
+        // SparkMax
+        SparkMax m_flywheel = (SparkMax) getMotor();
+        // Unit: Volts
+        Logger.recordOutput("Flywheel/Voltage", m_flywheel.get() * RobotController.getBatteryVoltage());
+        // Unit: Rotations
+        Logger.recordOutput("Flywheel/AnglePosition", m_flywheel.getEncoder().getPosition());
+      }
+    }
     // Unit: Rotations Per Second
     Logger.recordOutput(
-        "Flywheel/AngularVelocity", m_flywheel.getVelocity().getValueAsDouble() * 2.0 * Math.PI);
+        "Flywheel/AngularVelocity", getEncoderRate() * 2.0 * Math.PI);
   }
 }
