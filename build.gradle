@@ -98,7 +98,8 @@ def includeDesktopSupport = true
 // Configuration for AdvantageKit
 repositories {
     mavenCentral()
-    mavenLocal()
+    gradlePluginPortal()
+    //mavenLocal()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://mvnrepository.com/artifact/org.yaml/snakeyaml' }
     maven { url = 'https://jitpack.io' }
