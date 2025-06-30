@@ -63,7 +63,7 @@ public class AIRobotInSimulation extends SubsystemBase {
               Units.inchesToMeters(2),
               3.5,
               1.2,
-              DCMotor.getFalcon500(1).withReduction(8.14),
+              DCMotor.getNeoVortex(1).withReduction(8.14),
               60,
               1), // Swerve module config
           0.6 // Track length and width
@@ -87,7 +87,8 @@ public class AIRobotInSimulation extends SubsystemBase {
 
     this.driveSimulation = new SwerveDriveSimulation(DRIVETRAIN_CONFIG, queeningPose);
     this.selfCtrlDriveSimulation = new SelfControlledSwerveDriveSimulation(this.driveSimulation);
-    SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+    SimulatedArena.getInstance()
+        .addDriveTrainSimulation(selfCtrlDriveSimulation.getDriveTrainSimulation());
   }
 
   public void buildBehaviorChooser(
