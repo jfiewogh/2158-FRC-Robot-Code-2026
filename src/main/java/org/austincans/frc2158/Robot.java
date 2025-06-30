@@ -37,6 +37,7 @@ import org.austincans.frc2158.util.NTClientLogger;
 import org.austincans.frc2158.util.PhoenixUtil;
 import org.austincans.frc2158.util.SystemTimeValidReader;
 import org.austincans.frc2158.util.VirtualSubsystem;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -418,9 +419,13 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    AIRobotInSimulation.startOpponentRobotSimulations();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+  }
 }
