@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import org.austincans.frc2158.util.LoggedTracer;
 
 /**
  * This is a simple example to show how the REV Color Sensor V3 can be used to detect pre-configured
@@ -60,6 +61,29 @@ public class ColorSensorController extends TimedRobot {
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);
+  }
+
+  /**
+   * Find a color match.
+   *
+   * @return the integer returned will be equal to the position in the color array passes to the
+   *     constructor. Will return -1 if the confidence in not high enough.
+   */
+  public int findColorMatch() {
+    int position = -1;
+    Color[] m_Colors = {kBlueTarget, kGreenTarget, kRedTarget, kYellowTarget};
+    Color detected = m_colorSensor.getColor();
+
+    for (int i = 0; i < m_Colors.length; i++) {
+      ColorMatchResult match = m_colorMatcher.matchClosestColor(detected);
+      if (match.color == m_Colors[i]) {
+        if (match.confidence >= getConfidence()) position = i;
+      }
+    }
+
+    if (position == -1) LoggedTracer.record("WARNING: No Color Found in CAN Utility Color Sensor");
+
+    return position;
   }
 
   /**

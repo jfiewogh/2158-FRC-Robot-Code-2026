@@ -150,6 +150,12 @@ public class CANMath {
     return boundAngleNeg180to180Degrees(to - from);
   }
 
+  /**
+   * Bound angle from 0 to 360 degrees
+   *
+   * @param angle The angle to be bounded
+   * @return The change in angle from the argument Always between 0 and 360
+   */
   public static double boundAngle0to360Degrees(double angle) {
     // Naive algorithm
     while (angle >= 360.0) {
@@ -161,6 +167,12 @@ public class CANMath {
     return angle;
   }
 
+  /**
+   * Bound angle from -180 to 180 degrees
+   *
+   * @param angle The angle to be bounded
+   * @return The change in angle from the argument Always between -180 and 180
+   */
   public static double boundAngleNeg180to180Degrees(double angle) {
     // Naive algorithm
     while (angle >= 180.0) {
@@ -172,6 +184,12 @@ public class CANMath {
     return angle;
   }
 
+  /**
+   * Bound angle from 0 to 2Pi radians
+   *
+   * @param angle The angle to be bounded
+   * @return The change in angle from the argument Always between 0 and 2Pi
+   */
   public static double boundAngle0to2PiRadians(double angle) {
     // Naive algorithm
     while (angle >= 2.0 * Math.PI) {
@@ -183,6 +201,12 @@ public class CANMath {
     return angle;
   }
 
+  /**
+   * Bound angle from -Pi to Pi radians
+   *
+   * @param angle The angle to be bounded
+   * @return The change in angle from the argument Always between -Pi and Pi
+   */
   public static double boundAngleNegPiToPiRadians(double angle) {
     // Naive algorithm
     while (angle >= Math.PI) {
@@ -217,6 +241,7 @@ public class CANMath {
     return a + (b - a) * x;
   }
 
+  /** Join strings together */
   public static String joinStrings(final String delim, final List<?> strings) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < strings.size(); ++i) {
@@ -298,6 +323,67 @@ public class CANMath {
     return value;
   }
 
+  /**
+   * Detects whether two values are within a certain range of each other.
+   *
+   * @param a the first value
+   * @param b the second value
+   * @param epsilon the range
+   * @return whether they are approximately equal according to the range
+   * @throws IllegalArgumentException if epsilon is negative
+   */
+  public static final boolean approxEquals(final double a, final double b, final double epsilon)
+      throws IllegalArgumentException {
+    if (epsilon < 0) throw new IllegalArgumentException("Epsilon must be positive");
+
+    if (a == b) return true;
+
+    return Math.abs(a - b) < epsilon;
+  }
+
+  /**
+   * Lerps two values by the given factor. Replacement for {@link
+   * edu.wpi.first.math.MathUtil#interpolate(double, double, double)} that does not restrict the
+   * multiplier to [0, 1]. Example: having values 4 and 7 and a factor of 1.33 gives 8, and having
+   * values 10 and 20 with a factor of 0.65 gives 16.5.
+   *
+   * @param a the first value
+   * @param b the second value
+   * @param f the multiplier of the difference
+   * @return the result of the lerp
+   */
+  public static final double lerp(final double a, final double b, final double f) {
+    return a + f * (b - a);
+  }
+
+  /**
+   * Maps a value from one range to another. Note: min and maxes can be swapped for easy flipping
+   * over a range.
+   *
+   * @param val the value to map
+   * @param in_min the initial range's minimum
+   * @param in_max the initial range's maximum
+   * @param out_min the output range's minimum
+   * @param out_max the output range's maximum
+   * @return the mapped value
+   */
+  public static final double map(
+      double val, double in_min, double in_max, double out_min, double out_max) {
+    return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  }
+
+  /** Helper function for quadratic equations: <code>ax^2 + bx + c</code> */
+  public static double quadratic(double x, double a, double b, double c) {
+    return a * x * x + b * x + c;
+  }
+
+  /** Helper function for logarithmic equations: <code>a * log(x - c) + b</code> */
+  public static double logarithm(double x, double a, double b, double c) {
+    return a * Math.log10(x - c) + b;
+  }
+
   /** Prevent this class from being instantiated. */
-  public CANMath() {}
+  public CANMath() {
+    throw new AssertionError("CANMath Utility class should not be instantiated!");
+  }
 }
