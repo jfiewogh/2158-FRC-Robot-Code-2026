@@ -110,17 +110,18 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    // Set up data receivers & replay source
-    switch (Constants.currentMode) {
+     // Set up data receivers & replay source
+    switch (Constants.getMode()) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new WPILOGWriter());
         break;
 
       case REPLAY:
