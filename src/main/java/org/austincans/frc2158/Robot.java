@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 05, 2025 at 17:57:47 CST
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
 package org.austincans.frc2158;
 
@@ -397,6 +397,9 @@ public class Robot extends LoggedRobot {
     inputPower.set(3.26);
     outputPower = table.getDoubleTopic("outputpower").publish();
     outputPower.set(2.65);
+  }
+
+  public void addPeriodicCallback(Runnable callback, double periodSeconds) {
   }
 
   public void robotInit() {

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 05, 2025 at 17:57:47 CST
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
 package org.austincans.frc2158;
 
@@ -52,7 +52,7 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   private static RobotType robotType = RobotBase.isReal() ? RobotType.COMPBOT : RobotType.SIMBOT;
-  public static final boolean tuningMode = false;
+  public static final boolean tuningMode = true;
 
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
