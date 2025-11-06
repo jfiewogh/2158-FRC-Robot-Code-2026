@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday August 17, 2025 at 08:59:14 CDT
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
 package org.austincans.frc2158;
 
@@ -22,6 +22,12 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -48,6 +54,7 @@ import org.austincans.frc2158.util.PhoenixUtil;
 import org.austincans.frc2158.util.SystemTimeValidReader;
 import org.austincans.frc2158.util.VirtualSubsystem;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnField;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -93,6 +100,32 @@ public class Robot extends LoggedRobot {
   private final Alert jitAlert =
       new Alert("Please wait to enable, JITing in progress.", AlertType.kWarning);
 
+  // Camera
+  BooleanPublisher cameraServer, frontLeft, frontRight, rearLeft, rearRight, llVision, pvVision;
+  // Lidar
+  BooleanPublisher lidarServer, frStatus, flStatus, rrStatus, rlStatus;
+  DoublePublisher frDistance, flDistance, rrDistance, rlDistance;
+  DoublePublisher frSignalStrength, flSignalStrength, rrSignalStrength, rlSignalStrength;
+  DoublePublisher frChipTemp, flChipTemp, rrChipTemp, rlChipTemp;
+  // Fan Control
+  DoublePublisher radioTempC, radioTempF, fanSpeed, fan1RPM, fan2RPM;
+  BooleanPublisher fanCtrlServer, fanStatus;
+  // Control
+  DoublePublisher initTime, cpuTemp, loadAvg, diskUsage;
+  BooleanPublisher ctrlStatus, pigpiod, audio;
+  // UPS
+  StringPublisher upsId, upsVersion;
+  DoublePublisher outputVoltage,
+      inputVoltage,
+      batteryVoltage,
+      mcuVoltage,
+      outputCurrent,
+      inputCurrent,
+      batteryCurrent,
+      temperature,
+      inputPower,
+      outputPower;
+
   public Robot() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -112,7 +145,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-     // Set up data receivers & replay source
+    // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
@@ -225,7 +258,148 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
 
     // Threads.setCurrentThreadPriority(true, 1);
+    createCameraEntries();
+    createLidarEntries();
+    createFanCtrlEntries();
+    createCtrlEntries();
+    createUPSEntries();
+  }
 
+  public void createCameraEntries() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("frc2158/camera");
+    frontRight = table.getBooleanTopic("frontright").publish();
+    frontRight.set(true);
+    frontLeft = table.getBooleanTopic("frontleft").publish();
+    frontLeft.set(true);
+    rearRight = table.getBooleanTopic("rearright").publish();
+    rearRight.set(true);
+    rearLeft = table.getBooleanTopic("rearleft").publish();
+    rearLeft.set(true);
+    llVision = table.getBooleanTopic("llvision").publish();
+    llVision.set(true);
+    pvVision = table.getBooleanTopic("pvvision").publish();
+    pvVision.set(true);
+
+    cameraServer = table.getBooleanTopic("server").publish();
+    cameraServer.set(true);
+  }
+
+  public void createLidarEntries() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("frc2158/lidar");
+    // Front Left
+    flStatus = table.getBooleanTopic("fllidarversion").publish();
+    flStatus.set(false);
+    flDistance = table.getDoubleTopic("fldistance").publish();
+    flDistance.set(12);
+    flSignalStrength = table.getDoubleTopic("flsignalstrength").publish();
+    flSignalStrength.set(500);
+    flChipTemp = table.getDoubleTopic("flchiptemp").publish();
+    flChipTemp.set(26);
+    // Front Right
+    frStatus = table.getBooleanTopic("frlidarversion").publish(); // Ready or Failure
+    frStatus.set(true);
+    frDistance = table.getDoubleTopic("frdistance").publish(); //   distance to target in cm
+    frDistance.set(12);
+    frSignalStrength =
+        table
+            .getDoubleTopic("frsignalstrength")
+            .publish(); // Signal strength (Amp): Distance value is unreliable when receiving signal
+    // is overexposure (Amp = 0xFFFF) or too low (Amp < 100 as 14)
+    frSignalStrength.set(500);
+    frChipTemp =
+        table
+            .getDoubleTopic("frchiptemp")
+            .publish(); // Chip Temperature (Temp): Celsius degree = Temp/8 - 256℃
+    frChipTemp.set(26);
+    // Rear Left
+    rlStatus = table.getBooleanTopic("rllidarversion").publish();
+    rlStatus.set(true);
+    rlDistance = table.getDoubleTopic("rldistance").publish();
+    rlDistance.set(28);
+    rlSignalStrength = table.getDoubleTopic("rlsignalstrength").publish();
+    rlSignalStrength.set(700);
+    rlChipTemp = table.getDoubleTopic("rlchiptemp").publish();
+    rlChipTemp.set(17);
+    // Rear Right
+    rrStatus = table.getBooleanTopic("rrlidarversion").publish();
+    rrStatus.set(false);
+    rrDistance = table.getDoubleTopic("rrdistance").publish();
+    rrDistance.set(12);
+    rrSignalStrength = table.getDoubleTopic("rrsignalstrength").publish();
+    rrSignalStrength.set(500);
+    rrChipTemp = table.getDoubleTopic("rrchiptemp").publish();
+    rrChipTemp.set(26);
+
+    lidarServer = table.getBooleanTopic("server").publish();
+    lidarServer.set(true);
+  }
+
+  public void createFanCtrlEntries() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("frc2158/fanctrl");
+    radioTempC = table.getDoubleTopic("radiotempc").publish();
+    radioTempC.set(25);
+    radioTempF = table.getDoubleTopic("radiotempf").publish();
+    radioTempF.set(77);
+    fanStatus = table.getBooleanTopic("fanstatus").publish();
+    fanStatus.set(false);
+    fanSpeed = table.getDoubleTopic("fanspeed").publish();
+    fanSpeed.set(0);
+    fan1RPM = table.getDoubleTopic("fan1rpm").publish();
+    fan1RPM.set(0);
+    fan2RPM = table.getDoubleTopic("fan2rpm").publish();
+    fan2RPM.set(0);
+
+    fanCtrlServer = table.getBooleanTopic("server").publish();
+    fanCtrlServer.set(true);
+  }
+
+  public void createCtrlEntries() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("frc2158/ctrl");
+    initTime = table.getDoubleTopic("inittime").publish();
+    initTime.set(481921.95);
+    ctrlStatus = table.getBooleanTopic("status").publish();
+    ctrlStatus.set(true);
+    pigpiod = table.getBooleanTopic("pigpiod").publish();
+    pigpiod.set(true);
+    cpuTemp = table.getDoubleTopic("cputemp").publish();
+    cpuTemp.set(43);
+    loadAvg = table.getDoubleTopic("loadavg").publish();
+    loadAvg.set(0.6);
+    diskUsage = table.getDoubleTopic("diskusage").publish();
+    diskUsage.set(13);
+    audio = table.getBooleanTopic("audio").publish();
+    audio.set(false);
+  }
+
+  public void createUPSEntries() {
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("frc2158/UPS");
+    upsId = table.getStringTopic("ID").publish();
+    upsId.set("0x46");
+    upsVersion = table.getStringTopic("version").publish();
+    upsVersion.set("1");
+    outputVoltage = table.getDoubleTopic("outputvoltage").publish();
+    outputVoltage.set(5.227);
+    inputVoltage = table.getDoubleTopic("inputvoltage").publish();
+    inputVoltage.set(12.218);
+    batteryVoltage = table.getDoubleTopic("batteryvoltage").publish();
+    batteryVoltage.set(8.190);
+    mcuVoltage = table.getDoubleTopic("mcuvoltage").publish();
+    mcuVoltage.set(3.313);
+    outputCurrent = table.getDoubleTopic("outputcurrent").publish();
+    outputCurrent.set(5.07);
+    inputCurrent = table.getDoubleTopic("inputcurrent").publish();
+    inputCurrent.set(2.67);
+    batteryCurrent = table.getDoubleTopic("batterycurrent").publish();
+    batteryCurrent.set(4);
+    temperature = table.getDoubleTopic("temperature").publish();
+    temperature.set(34);
+    inputPower = table.getDoubleTopic("inputpower").publish();
+    inputPower.set(3.26);
+    outputPower = table.getDoubleTopic("outputpower").publish();
+    outputPower.set(2.65);
+  }
+
+  public void addPeriodicCallback(Runnable callback, double periodSeconds) {
   }
 
   public void robotInit() {
@@ -434,11 +608,21 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationInit() {
     AIRobotInSimulation.startOpponentRobotSimulations();
+
+    SimulatedArena.getInstance().resetFieldForAuto();
+
+    SimulatedArena.getInstance().addGamePiece(new ReefscapeAlgaeOnField(new Translation2d(2, 2)));
   }
 
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
+
+    // Publish to telemetry using AdvantageKit
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
   }
 }
