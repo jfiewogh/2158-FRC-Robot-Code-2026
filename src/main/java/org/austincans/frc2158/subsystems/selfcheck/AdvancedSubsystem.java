@@ -67,8 +67,8 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   }
 
   private void setupCallbacks() {
-    Robot.addPeriodicCallback(this::checkForFaults, 0.25);
-    Robot.addPeriodicCallback(this::publishStatus, 1.0);
+    // Robot.addPeriodicCallback(this::checkForFaults, 0.25);
+    // Robot.addPeriodicCallback(this::publishStatus, 1.0);
   }
 
   private void publishStatus() {
@@ -177,5 +177,11 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
         }
       }
     }
+  }
+
+  @Override
+  public void periodic() {
+    checkForFaults();
+    publishStatus();
   }
 }

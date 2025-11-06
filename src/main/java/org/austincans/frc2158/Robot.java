@@ -399,9 +399,6 @@ public class Robot extends LoggedRobot {
     outputPower.set(2.65);
   }
 
-  public void addPeriodicCallback(Runnable callback, double periodSeconds) {
-  }
-
   public void robotInit() {
     // Initialize the REVDigit MXP Board
     // This is used to display the team number on the REVDigit
