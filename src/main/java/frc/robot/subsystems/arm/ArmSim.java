@@ -15,7 +15,7 @@
 //
 // Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-package org.austincans.frc2158.subsystems.arm;
+package frc.robot.subsystems.arm;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Visualization for the arm subsystem in simulation. */
-public class ArmSubsystemSim extends SubsystemBase {
+public class ArmSim extends SubsystemBase {
 
-    private final ArmSubsystem arm;
+    private final Arm arm;
 
     // Simulation display
     private final Mechanism2d mech;
@@ -51,7 +51,7 @@ public class ArmSubsystemSim extends SubsystemBase {
      *
      * @param armSubsystem The arm subsystem to visualize
      */
-    public ArmSubsystemSim(ArmSubsystem armSubsystem) {
+    public ArmSim(Arm armSubsystem) {
         this.arm = armSubsystem;
 
         // Get arm length from subsystem (in meters)

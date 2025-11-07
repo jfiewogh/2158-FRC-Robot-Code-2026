@@ -15,7 +15,7 @@
 //
 // Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-package org.austincans.frc2158.subsystems.arm;
+package frc.robot.subsystems.arm;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -41,7 +41,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Arm subsystem using SparkFlex with Vortex motor */
 @Logged
-public class ArmSubsystem extends SubsystemBase {
+public class Arm extends SubsystemBase {
 
     // Constants
     private final int canID = 1;
@@ -110,7 +110,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final SingleJointedArmSim armSim;
 
     /** Creates a new Arm Subsystem. */
-    public ArmSubsystem() {
+    public Arm() {
         // Initialize motor controller
         motor = new SparkFlex(canID, MotorType.kBrushless);
         config = new SparkFlexConfig();
