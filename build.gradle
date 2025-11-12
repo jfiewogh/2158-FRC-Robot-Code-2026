@@ -1,8 +1,11 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
-    id "com.peterabeles.gversion" version "1.10"
-    id("com.diffplug.spotless") version "7.0.0.BETA4"
+    id "com.peterabeles.gversion" version "1.10.3"
+    id 'com.github.jmongard.git-semver-plugin' version '0.16.0'
+    id "com.diffplug.spotless" version "6.25.0"
+    id "io.freefair.lombok" version "8.4"
+    id "com.google.protobuf" version "0.9.4"
 }
 
 java {
@@ -10,7 +13,43 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def ROBOT_MAIN_CLASS = "org.austincans.frc2158.Main"
+def grpcVersion = '1.61.0' // Update this to the latest gRPC version as needed
+def protobufVersion = '3.25.1'
+def getYear() {
+    return new Date().format('yyyy')
+}
+def getCurrentDate() {
+    return new Date().format("EEEE MMMM dd, yyyy 'at' HH:mm:ss zz")
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+        proto {
+            srcDirs "trajectory_native/proto"
+        }
+    }
+}
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -64,7 +103,15 @@ def includeDesktopSupport = true
 
 // Configuration for AdvantageKit
 repositories {
-    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+    //mavenLocal()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://mvnrepository.com/artifact/org.yaml/snakeyaml' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://github.com/warrenlp/VL53L1XRoborioJNI/raw/repository/maven' }
+    maven { url = 'https://mvnrepository.com/artifact/com.google.auto.value/auto-value' }
+    //maven { url = 'https://raw.githubusercontent.com/frc5431/TitanUtil/master/TitanUtil.json' }
 }
 
 task(replayWatch, type: JavaExec) {
@@ -95,9 +142,37 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.14'
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
+    implementation 'io.javalin:javalin:6.4.0'
+
+    def autoValueVersion = "1.11.0"
+    compileOnly("com.google.auto.value:auto-value-annotations:$autoValueVersion")
+    annotationProcessor("com.google.auto.value:auto-value:$autoValueVersion")
+
+    compileOnly 'org.jetbrains:annotations:24.1.0'                          // JetBrains annotation
+    compileOnly 'org.yaml:snakeyaml:2.0'
+    implementation 'org.yaml:snakeyaml:2.1'
+    implementation 'io.javalin:javalin:6.6.0'
+    implementation 'gov.nist.math:jama:1.0.3'
+    implementation 'com.google.auto.value:auto-value:1.11.0'
+    testImplementation 'com.google.truth:truth:1.1.3'
+    testImplementation 'org.yaml:snakeyaml:2.0'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-services:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "javax.annotation:javax.annotation-api:1.3.2"
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "com.google.guava:guava:31.1-jre"
+    implementation 'org.jgrapht:jgrapht-core:1.5.1'
+    //implementation 'com.github.frc5431:TitanUtil:2025.5.0'
 }
 
 test {
@@ -112,7 +187,7 @@ test {
 // value to "true" to enable the sim GUI by default (this
 // is the standard WPILib behavior).
 wpi.sim.addGui().defaultEnabled = true
-// wpi.sim.addDriverstation()
+wpi.sim.addDriverstation().defaultEnabled = false
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
@@ -126,6 +201,16 @@ jar {
     from sourceSets.main.allSource
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+javadoc {
+    configure(options) {
+        options.addBooleanOption("-allow-script-in-comments",true)
+        options.addStringOption("link", "https://github.wpilib.org/allwpilib/docs/release/java/")
+        options.header = "<script type=\"text/javascript\" async" +
+                "  src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML\">" +
+                "</script>"
+    }
 }
 
 // Configure jar and deploy tasks
@@ -142,11 +227,17 @@ tasks.withType(JavaCompile) {
 project.compileJava.dependsOn(createVersionFile)
 gversion {
     srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
+    classPackage = "org.austincans.frc2158"
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/New_York"
+    timeZone     = "America/Chicago"
     indent       = "  "
+}
+
+// Generate drive trajectories when building
+task(generateDriveTrajectories, dependsOn: "classes", type: JavaExec) {
+    mainClass = "org.austincans.frc2158.subsystems.drive.trajectory.GenerateTrajectories"
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 // Create commit with working changes on event branches
@@ -188,13 +279,16 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
+            exclude "**/build/**", "**/build-*/**", "src/main/java/org/austincans/frc2158/BuildConstants.java"
         }
+        importOrder('java', 'javax', 'org', 'com', 'edu', '') // or importOrderFile
         toggleOffOn()
-        palantirJavaFormat('2.39.0').formatJavadoc(true)
+        googleJavaFormat()
+        //palantirJavaFormat('2.39.0').formatJavadoc(true)
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
+        licenseHeader("// Copyright (c) ${getYear()} the ausTIN CANs\n// https://github.com/AusTINCANsProgrammingTeam\n//\n// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   \n// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           \"888                   .o8   \n//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo \n//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   \n//  888    \"     888`88b.    888                888`88b.    888   888  888   888 888   888   888   \n//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . \n// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   \"888\" \n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n//\n// Updated on ${getCurrentDate()}\n\n")
     }
     groovyGradle {
         target fileTree(".") {
@@ -209,17 +303,26 @@ spotless {
     json {
         target fileTree(".") {
             include "**/*.json"
-            exclude "**/build/**", "**/build-*/**"
+            exclude "**/build/**", "**/build-*/**", "**/.vscode/**", "**/.wpilib/**", "**/simgui**", "**/pathplanner/**", "**/vendordeps/**"
         }
         gson().indentWithSpaces(2)
     }
     format "misc", {
         target fileTree(".") {
             include "**/*.md", "**/.gitignore"
-            exclude "**/build/**", "**/build-*/**"
+            exclude "**/build/**", "**/build-*/**", "**/WPILib-License.md"
         }
         trimTrailingWhitespace()
         indentWithSpaces(2)
         endWithNewline()
     }
+}
+
+//Set the version for the current project:
+version = semver.version
+
+//Or in a multi project build set the version of all projects:
+def ver = semver.version
+allprojects {
+    version = ver
 }
