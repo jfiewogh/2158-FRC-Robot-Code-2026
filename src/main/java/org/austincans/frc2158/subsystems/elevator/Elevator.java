@@ -13,14 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 14:16:40 CST
+// Updated on Thursday November 13, 2025 at 17:00:51 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
-import org.austincans.frc2158.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
-import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
-
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -28,9 +24,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import lombok.Getter;
+import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /** Elevator subsystem using SparkFlex with Vortex motor */
-@Logged
 public class Elevator extends AdvancedSubsystem {
   // Constants
   private final double gearRatio = 15;
@@ -64,10 +61,10 @@ public class Elevator extends AdvancedSubsystem {
   // Profiled PID Controller
   private ProfiledPIDController profiledPIDController;
   private TrapezoidProfile.Constraints constraints;
-  
+
   // IO
   private ElevatorIO io;
-  private ElevatorIOInputs inputs;
+  private ElevatorIOInputsAutoLogged inputs;
 
   private ElevatorSim elevatorSim;
 
@@ -77,7 +74,8 @@ public class Elevator extends AdvancedSubsystem {
 
     profiledPIDController = new ProfiledPIDController(kP, kI, kD, constraints);
 
-    elevatorSim = new ElevatorSim(
+    elevatorSim =
+        new ElevatorSim(
             DCMotor.getNeoVortex(1), // Motor type
             gearRatio,
             5, // Carriage mass (kg)
@@ -115,14 +113,14 @@ public class Elevator extends AdvancedSubsystem {
   private void controlLoopFn() {
     switch (currentControlMode) {
       case POSITION:
-        double currentPos = getPosition();
+        double currentPos = inputs.position;
         double output = profiledPIDController.calculate(currentPos, targetPosition);
         double velocity = profiledPIDController.getSetpoint().velocity;
         double feedforwardOutput = feedforward.calculate(velocity);
         setVoltage(output + feedforwardOutput);
         break;
       case VELOCITY:
-        double currentVel = getVelocity();
+        double currentVel = inputs.velocity;
         double velOutput = profiledPIDController.calculate(currentVel, targetVelocity);
         double accel = profiledPIDController.getSetpoint().velocity - currentVel;
         double velFeedforwardOutput =
@@ -142,58 +140,10 @@ public class Elevator extends AdvancedSubsystem {
   /** Update simulation and telemetry. */
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
     controlLoopFn();
-  }
 
-  /**
-   * Get the current position in the selected unit.
-   *
-   * @return Position in selected unit
-   */
-  @Logged(name = "Position")
-  public double getPosition() {
-    // Rotations
-    return inputs.position / gearRatio;
-  }
-
-  /**
-   * Get the current velocity in rotations per second.
-   *
-   * @return Velocity in rotations per second
-   */
-  @Logged(name = "Velocity")
-  public double getVelocity() {
-    return inputs.velocity / gearRatio / 60.0; // Convert from RPM to RPS
-  }
-
-  /**
-   * Get the current applied voltage.
-   *
-   * @return Applied voltage
-   */
-  @Logged(name = "Voltage")
-  public double getVoltage() {
-    return inputs.voltage;
-  }
-
-  /**
-   * Get the current motor current.
-   *
-   * @return Motor current in amps
-   */
-  @Logged(name = "Current")
-  public double getCurrent() {
-    return inputs.current;
-  }
-
-  /**
-   * Get the current motor temperature.
-   *
-   * @return Motor temperature in Celsius
-   */
-  @Logged(name = "Temperature")
-  public double getTemperature() {
-    return inputs.temperatureC;
+    Logger.processInputs("Elevator", inputs);
   }
 
   /**
@@ -300,7 +250,7 @@ public class Elevator extends AdvancedSubsystem {
         })
         .until(
             () -> {
-              double currentHeight = getPosition() * (2.0 * Math.PI * drumRadius);
+              double currentHeight = inputs.velocity * (2.0 * Math.PI * drumRadius);
               return Math.abs(heightMeters - currentHeight) < 0.02; // 2cm tolerance
             });
   }
