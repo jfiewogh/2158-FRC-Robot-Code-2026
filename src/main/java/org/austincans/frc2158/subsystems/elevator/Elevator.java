@@ -33,36 +33,19 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import lombok.Getter;
+import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /** Elevator subsystem using SparkFlex with Vortex motor */
-@Logged
-public class ElevatorSubsystem extends SubsystemBase {
-
+public class Elevator extends AdvancedSubsystem {
   // Constants
-  private final int canID = 1;
   private final double gearRatio = 15;
   private final double kP = 1;
   private final double kI = 0;
   private final double kD = 0;
-  private final double maxVelocity = 1; // meters per second
-  private final double maxAcceleration = 1; // meters per second squared
-  private final boolean brakeMode = true;
   @Getter private final double minHeightMeters = 0;
   @Getter private final double maxHeightMeters = 2;
-
-  @SuppressWarnings("unused")
-  private final boolean enableStatorLimit = true;
-
-  private final double statorCurrentLimit = 40;
-
-  @SuppressWarnings("unused")
-  private final boolean enableSupplyLimit = false;
-
-  @SuppressWarnings("unused")
-  private final double supplyCurrentLimit = 40;
-
   private final double drumRadius = 0.0254; // meters
 
   // Feedforward
@@ -73,15 +56,6 @@ public class ElevatorSubsystem extends SubsystemBase {
           0, // kV
           0 // kA
           );
-
-  // Motor controller
-  private final SparkFlex motor;
-  private final RelativeEncoder encoder;
-
-  @SuppressWarnings("unused")
-  private final SparkClosedLoopController pidController;
-
-  private final SparkFlexConfig config;
 
   // Control mode
   public enum ControlMode {
@@ -98,33 +72,18 @@ public class ElevatorSubsystem extends SubsystemBase {
   private ProfiledPIDController profiledPIDController;
   private TrapezoidProfile.Constraints constraints;
 
-  // Simulation
-  private final ElevatorSim elevatorSim;
+  // IO
+  private ElevatorIO io;
+  private ElevatorIOInputsAutoLogged inputs;
+
+  private ElevatorSim elevatorSim;
 
   /** Creates a new Elevator Subsystem. */
-  public ElevatorSubsystem() {
-    // Initialize motor controller
-    motor = new SparkFlex(canID, MotorType.kBrushless);
-    config = new SparkFlexConfig();
-    config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+  public Elevator(ElevatorIO io) {
+    this.io = io;
 
-    // Configure encoder
-    encoder = motor.getEncoder();
-    encoder.setPosition(0);
+    profiledPIDController = new ProfiledPIDController(kP, kI, kD, constraints);
 
-    // Configure PID controller
-    pidController = motor.getClosedLoopController();
-    config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(kP, kI, kD);
-
-    // Set ramp rates
-
-    // Set current limits
-    config.smartCurrentLimit((int) statorCurrentLimit);
-
-    // Save configuration
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // Initialize simulation
     elevatorSim =
         new ElevatorSim(
             DCMotor.getNeoVortex(1), // Motor type
@@ -136,14 +95,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             true, // Simulate gravity
             0 // Starting height (m)
             );
-
-    // Initialize ProfiledPIDController
-    // Convert from meters to rotations for constraints
-    double maxVelocityRotations = maxVelocity / (2.0 * Math.PI * drumRadius);
-    double maxAccelerationRotations = maxAcceleration / (2.0 * Math.PI * drumRadius);
-
-    constraints = new TrapezoidProfile.Constraints(maxVelocityRotations, maxAccelerationRotations);
-    profiledPIDController = new ProfiledPIDController(kP, kI, kD, constraints);
   }
 
   /**
@@ -172,14 +123,14 @@ public class ElevatorSubsystem extends SubsystemBase {
   private void controlLoopFn() {
     switch (currentControlMode) {
       case POSITION:
-        double currentPos = getPosition();
+        double currentPos = inputs.position;
         double output = profiledPIDController.calculate(currentPos, targetPosition);
         double velocity = profiledPIDController.getSetpoint().velocity;
         double feedforwardOutput = feedforward.calculate(velocity);
         setVoltage(output + feedforwardOutput);
         break;
       case VELOCITY:
-        double currentVel = getVelocity();
+        double currentVel = inputs.velocity;
         double velOutput = profiledPIDController.calculate(currentVel, targetVelocity);
         double accel = profiledPIDController.getSetpoint().velocity - currentVel;
         double velFeedforwardOutput =
@@ -187,7 +138,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // Apply the combined PID output and feedforward to the motor
         double velocityVoltage = velOutput + velFeedforwardOutput;
-        motor.setVoltage(velocityVoltage);
+        io.setVoltage(velocityVoltage);
         break;
       case OPEN_LOOP:
       default:
@@ -199,75 +150,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   /** Update simulation and telemetry. */
   @Override
   public void periodic() {
+    io.updateInputs(inputs);
     controlLoopFn();
-  }
 
-  /** Update simulation. */
-  @Override
-  public void simulationPeriodic() {
-    // Set input voltage from motor controller to simulation
-    elevatorSim.setInput(getVoltage());
-
-    // Update simulation by 20ms
-    elevatorSim.update(0.020);
-
-    // Convert meters to motor rotations
-    double positionToRotations = (1 / (2.0 * Math.PI * drumRadius)) * gearRatio;
-    @SuppressWarnings("unused")
-    double motorPosition = elevatorSim.getPositionMeters() * positionToRotations;
-    @SuppressWarnings("unused")
-    double motorVelocity = elevatorSim.getVelocityMetersPerSecond() * positionToRotations;
-  }
-
-  /**
-   * Get the current position in the selected unit.
-   *
-   * @return Position in selected unit
-   */
-  @Logged(name = "Position")
-  public double getPosition() {
-    // Rotations
-    return encoder.getPosition() / gearRatio;
-  }
-
-  /**
-   * Get the current velocity in rotations per second.
-   *
-   * @return Velocity in rotations per second
-   */
-  @Logged(name = "Velocity")
-  public double getVelocity() {
-    return encoder.getVelocity() / gearRatio / 60.0; // Convert from RPM to RPS
-  }
-
-  /**
-   * Get the current applied voltage.
-   *
-   * @return Applied voltage
-   */
-  @Logged(name = "Voltage")
-  public double getVoltage() {
-    return motor.getAppliedOutput() * motor.getBusVoltage();
-  }
-
-  /**
-   * Get the current motor current.
-   *
-   * @return Motor current in amps
-   */
-  @Logged(name = "Current")
-  public double getCurrent() {
-    return motor.getOutputCurrent();
-  }
-
-  /**
-   * Get the current motor temperature.
-   *
-   * @return Motor temperature in Celsius
-   */
-  @Logged(name = "Temperature")
-  public double getTemperature() {
-    return motor.getMotorTemperature();
+    Logger.processInputs("Elevator", inputs);
   }
 
   /**
@@ -339,7 +225,7 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public void setVoltage(double voltage) {
     currentControlMode = ControlMode.OPEN_LOOP;
-    motor.setVoltage(voltage);
+    io.setVoltage(voltage);
   }
 
   /**
@@ -374,7 +260,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         })
         .until(
             () -> {
-              double currentHeight = getPosition() * (2.0 * Math.PI * drumRadius);
+              double currentHeight = inputs.velocity * (2.0 * Math.PI * drumRadius);
               return Math.abs(heightMeters - currentHeight) < 0.02; // 2cm tolerance
             });
   }
@@ -396,5 +282,11 @@ public class ElevatorSubsystem extends SubsystemBase {
    */
   public Command moveAtVelocityCommand(double velocityMetersPerSecond) {
     return run(() -> setVelocity(velocityMetersPerSecond));
+  }
+
+  @Override
+  protected Command systemCheckCommand() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'systemCheckCommand'");
   }
 }
