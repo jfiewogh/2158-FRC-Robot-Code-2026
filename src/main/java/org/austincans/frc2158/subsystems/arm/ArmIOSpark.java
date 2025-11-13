@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 12, 2025 at 18:18:23 CST
+// Updated on Thursday November 13, 2025 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -24,9 +24,6 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 public class ArmIOSpark implements ArmIO {
   /* Motor */
@@ -41,7 +38,7 @@ public class ArmIOSpark implements ArmIO {
   public ArmIOSpark() {
     // Initialize motor controller
     motor = new SparkFlex(canID, MotorType.kBrushless);
-    
+
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 12, 2025 at 18:18:23 CST
+// Updated on Thursday November 13, 2025 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 /** Visualization for the elevator subsystem in simulation. */
 public class ElevatorSubsystemSim extends SubsystemBase {
 
-  private final ElevatorSubsystem elevator;
+  private final Elevator elevator;
 
   // Simulation display
   private final Mechanism2d mech;
@@ -53,7 +53,7 @@ public class ElevatorSubsystemSim extends SubsystemBase {
    *
    * @param elevatorSubsystem The elevator subsystem to visualize
    */
-  public ElevatorSubsystemSim(ElevatorSubsystem elevatorSubsystem) {
+  public ElevatorSubsystemSim(Elevator elevatorSubsystem) {
     this.elevator = elevatorSubsystem;
 
     // Get elevator parameters from simulation

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 12, 2025 at 18:18:23 CST
+// Updated on Thursday November 13, 2025 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -173,7 +173,8 @@ public class Module extends AdvancedSubsystem {
                 .withTimeout(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.turnAbsolutePosition.getDegrees() < 70 || inputs.turnAbsolutePosition.getDegrees() > 110) {
+                  if (inputs.turnAbsolutePosition.getDegrees() < 70
+                      || inputs.turnAbsolutePosition.getDegrees() > 110) {
                     addFault(
                         "[System Check] Rotation Motor did not reach target position", false, true);
                   }
@@ -193,8 +194,7 @@ public class Module extends AdvancedSubsystem {
                   io.setDriveVelocity(0);
                 },
                 this),
-            Commands.waitSeconds(0.25)
-        )
+            Commands.waitSeconds(0.25))
         .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stop, this));
   }

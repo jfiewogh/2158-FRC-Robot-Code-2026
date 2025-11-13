@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 12, 2025 at 18:18:23 CST
+// Updated on Thursday November 13, 2025 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -448,6 +448,5 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                     || modules[2].getFaults().size() > 0
                     || modules[3].getFaults().size() > 0)
         .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
-
   }
 }
