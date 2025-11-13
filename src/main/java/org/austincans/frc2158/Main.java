@@ -1,33 +1,38 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
-package frc.robot;
+package org.austincans.frc2158;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * Do NOT add any static variables to this class, or any initialization at all. Unless you know what you are doing, do
- * not modify this file except to change the parameter class to the startRobot call.
+ * Do NOT add any static variables to this class, or any initialization at all. Unless you know what
+ * you are doing, do not modify this file except to change the parameter class to the startRobot
+ * call.
  */
 public final class Main {
-    private Main() {}
+  private Main() {}
 
-    /**
-     * Main initialization function. Do not perform any initialization here.
-     *
-     * <p>If you change your main robot class, change the parameter type.
-     */
-    public static void main(String... args) {
-        RobotBase.startRobot(Robot::new);
-    }
+  /**
+   * Main initialization function. Do not perform any initialization here.
+   *
+   * <p>If you change your main robot class, change the parameter type.
+   */
+  public static void main(String... args) {
+    RobotBase.startRobot(Robot::new);
+  }
 }

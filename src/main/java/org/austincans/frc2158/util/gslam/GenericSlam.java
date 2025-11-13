@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 05, 2025 at 18:44:58 CST
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
 package org.austincans.frc2158.util.gslam;
 
@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2158.Robot;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -115,8 +114,7 @@ public abstract class GenericSlam<G extends GenericSlam.SlamGoal> {
     lastGoal = getGoal();
 
     // Set alert
-    disconnected.set(
-        !motorConnectedDebouncer.calculate(inputs.data.motorConnected()) && !Robot.isJITing());
+    disconnected.set(!motorConnectedDebouncer.calculate(inputs.data.motorConnected()));
 
     // Check if at goal.
     if (!slammed) {

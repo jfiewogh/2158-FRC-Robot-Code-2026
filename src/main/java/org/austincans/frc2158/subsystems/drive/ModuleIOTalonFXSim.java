@@ -1,53 +1,58 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
-package frc.robot.subsystems.drive;
+package org.austincans.frc2158.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import frc.robot.util.PhoenixUtil;
 import java.util.Arrays;
+import org.austincans.frc2158.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
 /**
- * Physics sim implementation of module IO. The sim models are configured using a set of module constants from Phoenix.
- * Simulation is always based on voltage control.
+ * Physics sim implementation of module IO. The sim models are configured using a set of module
+ * constants from Phoenix. Simulation is always based on voltage control.
  */
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
-    private final SwerveModuleSimulation simulation;
+  private final SwerveModuleSimulation simulation;
 
-    public ModuleIOTalonFXSim(SwerveModuleConstants constants, SwerveModuleSimulation simulation) {
-        super(PhoenixUtil.regulateModuleConstantForSimulation(constants));
+  public ModuleIOTalonFXSim(SwerveModuleConstants constants, SwerveModuleSimulation simulation) {
+    super(PhoenixUtil.regulateModuleConstantForSimulation(constants));
 
-        this.simulation = simulation;
-        simulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveTalon));
+    this.simulation = simulation;
+    simulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveTalon));
 
-        simulation.useSteerMotorController(
-                new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(turnTalon, cancoder));
-    }
+    simulation.useSteerMotorController(
+        new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(turnTalon, cancoder));
+  }
 
-    @Override
-    public void updateInputs(ModuleIOInputs inputs) {
-        super.updateInputs(inputs);
+  @Override
+  public void updateInputs(ModuleIOInputs inputs) {
+    super.updateInputs(inputs);
 
-        // Update odometry inputs
-        inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
+    // Update odometry inputs
+    inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
 
-        inputs.odometryDrivePositionsRad = Arrays.stream(simulation.getCachedDriveWheelFinalPositions())
-                .mapToDouble(angle -> angle.in(Radians))
-                .toArray();
+    inputs.odometryDrivePositionsRad =
+        Arrays.stream(simulation.getCachedDriveWheelFinalPositions())
+            .mapToDouble(angle -> angle.in(Radians))
+            .toArray();
 
-        inputs.odometryTurnPositions = simulation.getCachedSteerAbsolutePositions();
-    }
+    inputs.odometryTurnPositions = simulation.getCachedSteerAbsolutePositions();
+  }
 }

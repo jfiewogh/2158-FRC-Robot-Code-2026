@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 05, 2025 at 18:44:58 CST
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
 package org.austincans.frc2158.util.gslam;
 
@@ -23,7 +23,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.austincans.frc2158.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -36,7 +35,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import org.austincans.frc2158.util.PhoenixUtil;
 
 public class GenericSlamIOKrakenFOC implements GenericSlamIO {
   // Hardware
@@ -77,16 +75,6 @@ public class GenericSlamIOKrakenFOC implements GenericSlamIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, position, velocity, appliedVoltage, supplyCurrent, torqueCurrent, temp);
     talon.optimizeBusUtilization(0, 1.0);
-
-    // Register signals for refresh
-    PhoenixUtil.registerSignals(
-        new CANBus(bus).isNetworkFD(),
-        position,
-        velocity,
-        appliedVoltage,
-        supplyCurrent,
-        torqueCurrent,
-        temp);
   }
 
   @Override

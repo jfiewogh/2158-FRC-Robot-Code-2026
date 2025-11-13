@@ -1,47 +1,53 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
-package frc.robot.subsystems.drive;
+package org.austincans.frc2158.subsystems.drive;
 
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.SPI;
 import java.util.Queue;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {
-    private final AHRS navX = new AHRS(NavXComType.kMXP_SPI, (byte) Drive.ODOMETRY_FREQUENCY);
-    private final Queue<Double> yawPositionQueue;
-    private final Queue<Double> yawTimestampQueue;
+  private final AHRS navX = new AHRS(SPI.Port.kMXP, (byte) Drive.ODOMETRY_FREQUENCY);
+  private final Queue<Double> yawPositionQueue;
+  private final Queue<Double> yawTimestampQueue;
 
-    public GyroIONavX() {
-        yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-        yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(navX::getYaw);
-    }
+  public GyroIONavX() {
+    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(navX::getYaw);
+  }
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.connected = navX.isConnected();
-        inputs.yawPosition = Rotation2d.fromDegrees(-navX.getYaw());
-        inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.connected = navX.isConnected();
+    inputs.yawPosition = Rotation2d.fromDegrees(-navX.getYaw());
+    inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
 
-        inputs.odometryYawTimestamps =
-                yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-        inputs.odometryYawPositions = yawPositionQueue.stream()
-                .map((Double value) -> Rotation2d.fromDegrees(-value))
-                .toArray(Rotation2d[]::new);
-        yawTimestampQueue.clear();
-        yawPositionQueue.clear();
-    }
+    inputs.odometryYawTimestamps =
+        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    inputs.odometryYawPositions =
+        yawPositionQueue.stream()
+            .map((Double value) -> Rotation2d.fromDegrees(-value))
+            .toArray(Rotation2d[]::new);
+    yawTimestampQueue.clear();
+    yawPositionQueue.clear();
+    inputs.imuRate = navX.getRate();
+  }
 }

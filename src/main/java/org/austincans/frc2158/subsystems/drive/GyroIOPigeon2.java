@@ -1,17 +1,21 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
-package frc.robot.subsystems.drive;
+package org.austincans.frc2158.subsystems.drive;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -22,40 +26,45 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.generated.TunerConstants;
 import java.util.Queue;
+import org.austincans.frc2158.generated.TunerConstants;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-    private final Pigeon2 pigeon =
-            new Pigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id, TunerConstants.DrivetrainConstants.CANBusName);
-    private final StatusSignal<Angle> yaw = pigeon.getYaw();
-    private final Queue<Double> yawPositionQueue;
-    private final Queue<Double> yawTimestampQueue;
-    private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
+  private final Pigeon2 pigeon =
+      new Pigeon2(
+          TunerConstants.DrivetrainConstants.Pigeon2Id,
+          TunerConstants.DrivetrainConstants.CANBusName);
+  private final StatusSignal<Angle> yaw = pigeon.getYaw();
+  private final Queue<Double> yawPositionQueue;
+  private final Queue<Double> yawTimestampQueue;
+  private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
 
-    public GyroIOPigeon2() {
-        pigeon.getConfigurator().apply(new Pigeon2Configuration());
-        pigeon.getConfigurator().setYaw(0.0);
-        yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
-        yawVelocity.setUpdateFrequency(50.0);
-        pigeon.optimizeBusUtilization();
-        yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-        yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
-    }
+  public GyroIOPigeon2() {
+    pigeon.getConfigurator().apply(new Pigeon2Configuration());
+    pigeon.getConfigurator().setYaw(0.0);
+    yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
+    yawVelocity.setUpdateFrequency(50.0);
+    pigeon.optimizeBusUtilization();
+    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
+  }
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
-        inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
-        inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
+    inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
+    inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
 
-        inputs.odometryYawTimestamps =
-                yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-        inputs.odometryYawPositions = yawPositionQueue.stream()
-                .map((Double value) -> Rotation2d.fromDegrees(value))
-                .toArray(Rotation2d[]::new);
-        yawTimestampQueue.clear();
-        yawPositionQueue.clear();
-    }
+    inputs.odometryYawTimestamps =
+        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    inputs.odometryYawPositions =
+        yawPositionQueue.stream()
+            .map((Double value) -> Rotation2d.fromDegrees(value))
+            .toArray(Rotation2d[]::new);
+    yawTimestampQueue.clear();
+    yawPositionQueue.clear();
+
+    inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
+  }
 }

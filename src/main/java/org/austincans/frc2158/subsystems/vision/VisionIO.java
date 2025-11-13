@@ -1,48 +1,53 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 12, 2025 at 18:18:23 CST
 
-package frc.robot.subsystems.vision;
+package org.austincans.frc2158.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
-    @AutoLog
-    class VisionIOInputs {
-        public boolean connected = false;
-        public TargetObservation latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
-        public PoseObservation[] poseObservations = new PoseObservation[0];
-        public int[] tagIds = new int[0];
-    }
+  @AutoLog
+  class VisionIOInputs {
+    public boolean connected = false;
+    public TargetObservation latestTargetObservation =
+        new TargetObservation(new Rotation2d(), new Rotation2d());
+    public PoseObservation[] poseObservations = new PoseObservation[0];
+    public int[] tagIds = new int[0];
+  }
 
-    /** Represents the angle to a simple target, not used for pose estimation. */
-    record TargetObservation(Rotation2d tx, Rotation2d ty) {}
+  /** Represents the angle to a simple target, not used for pose estimation. */
+  record TargetObservation(Rotation2d tx, Rotation2d ty) {}
 
-    /** Represents a robot pose sample used for pose estimation. */
-    record PoseObservation(
-            double timestamp,
-            Pose3d pose,
-            double ambiguity,
-            int tagCount,
-            double averageTagDistance,
-            PoseObservationType type) {}
+  /** Represents a robot pose sample used for pose estimation. */
+  record PoseObservation(
+      double timestamp,
+      Pose3d pose,
+      double ambiguity,
+      int tagCount,
+      double averageTagDistance,
+      PoseObservationType type) {}
 
-    enum PoseObservationType {
-        MEGATAG_1,
-        MEGATAG_2,
-        PHOTONVISION
-    }
+  enum PoseObservationType {
+    MEGATAG_1,
+    MEGATAG_2,
+    PHOTONVISION
+  }
 
-    default void updateInputs(VisionIOInputs inputs) {}
+  default void updateInputs(VisionIOInputs inputs) {}
 }
