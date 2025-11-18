@@ -22,10 +22,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
-    public double position = 0;
+    public double positionMeters = 0;
     public double voltage = 0;
     public double current = 0;
-    public double velocity = 0;
+    public double velocityMetersPerSecond = 0;
     public double temperatureC = 0;
   }
 

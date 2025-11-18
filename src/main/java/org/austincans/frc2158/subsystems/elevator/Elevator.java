@@ -33,6 +33,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import lombok.Getter;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -44,18 +45,19 @@ public class Elevator extends AdvancedSubsystem {
   private final double kP = 1;
   private final double kI = 0;
   private final double kD = 0;
-  @Getter private final double minHeightMeters = 0;
-  @Getter private final double maxHeightMeters = 2;
+  @Getter
+  private final double minHeightMeters = 0;
+  @Getter
+  private final double maxHeightMeters = 2;
   private final double drumRadius = 0.0254; // meters
 
   // Feedforward
-  private final ElevatorFeedforward feedforward =
-      new ElevatorFeedforward(
-          0, // kS
-          0, // kG
-          0, // kV
-          0 // kA
-          );
+  private final ElevatorFeedforward feedforward = new ElevatorFeedforward(
+      0, // kS
+      0, // kG
+      0, // kV
+      0 // kA
+  );
 
   // Control mode
   public enum ControlMode {
@@ -84,26 +86,28 @@ public class Elevator extends AdvancedSubsystem {
 
     profiledPIDController = new ProfiledPIDController(kP, kI, kD, constraints);
 
-    elevatorSim =
-        new ElevatorSim(
-            DCMotor.getNeoVortex(1), // Motor type
-            gearRatio,
-            5, // Carriage mass (kg)
-            drumRadius, // Drum radius (m)
-            minHeightMeters, // Min height (m)
-            maxHeightMeters, // Max height (m)
-            true, // Simulate gravity
-            0 // Starting height (m)
-            );
+    elevatorSim = new ElevatorSim(
+        DCMotor.getNeoVortex(1), // Motor type
+        gearRatio,
+        5, // Carriage mass (kg)
+        drumRadius, // Drum radius (m)
+        minHeightMeters, // Min height (m)
+        maxHeightMeters, // Max height (m)
+        true, // Simulate gravity
+        0 // Starting height (m)
+    );
   }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param positionRadians The position (angle) setpoint. This angle should be measured from the
-   *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
-   *     your encoder does not follow this convention, an offset should be added.
-   * @param velocityRadPerSec The velocity setpoint.
+   * @param positionRadians       The position (angle) setpoint. This angle should
+   *                              be measured from the
+   *                              horizontal (i.e. if the provided angle is 0, the
+   *                              arm should be parallel with the floor). If
+   *                              your encoder does not follow this convention, an
+   *                              offset should be added.
+   * @param velocityRadPerSec     The velocity setpoint.
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
    */
@@ -117,24 +121,24 @@ public class Elevator extends AdvancedSubsystem {
   }
 
   /**
-   * Control loop function that runs at a fixed frequency. This is used for SparkMAX and SparkFlex
+   * Control loop function that runs at a fixed frequency. This is used for
+   * SparkMAX and SparkFlex
    * controllers to implement closed-loop control outside of the main robot loop.
    */
   private void controlLoopFn() {
     switch (currentControlMode) {
       case POSITION:
-        double currentPos = inputs.position;
+        double currentPos = inputs.positionMeters;
         double output = profiledPIDController.calculate(currentPos, targetPosition);
         double velocity = profiledPIDController.getSetpoint().velocity;
         double feedforwardOutput = feedforward.calculate(velocity);
         setVoltage(output + feedforwardOutput);
         break;
       case VELOCITY:
-        double currentVel = inputs.velocity;
+        double currentVel = inputs.positionMeters;
         double velOutput = profiledPIDController.calculate(currentVel, targetVelocity);
         double accel = profiledPIDController.getSetpoint().velocity - currentVel;
-        double velFeedforwardOutput =
-            calculate(0, targetVelocity, accel); // No gravity compensation
+        double velFeedforwardOutput = calculate(0, targetVelocity, accel); // No gravity compensation
 
         // Apply the combined PID output and feedforward to the motor
         double velocityVoltage = velOutput + velFeedforwardOutput;
@@ -168,7 +172,7 @@ public class Elevator extends AdvancedSubsystem {
   /**
    * Set elevator position with acceleration.
    *
-   * @param position The target position in meters
+   * @param position     The target position in meters
    * @param acceleration The acceleration in meters per second squared
    */
   public void setPosition(double position, double acceleration) {
@@ -199,7 +203,7 @@ public class Elevator extends AdvancedSubsystem {
   /**
    * Set elevator velocity with acceleration.
    *
-   * @param velocity The target velocity in meters per second
+   * @param velocity     The target velocity in meters per second
    * @param acceleration The acceleration in meters per second squared
    */
   public void setVelocity(double velocity, double acceleration) {
@@ -255,12 +259,12 @@ public class Elevator extends AdvancedSubsystem {
    */
   public Command moveToHeightCommand(double heightMeters) {
     return run(() -> {
-          // Just set the position and let the profiled controller handle it
-          setPosition(heightMeters);
-        })
+      // Just set the position and let the profiled controller handle it
+      setPosition(heightMeters);
+    })
         .until(
             () -> {
-              double currentHeight = inputs.velocity * (2.0 * Math.PI * drumRadius);
+              double currentHeight = inputs.velocityMetersPerSecond * (2.0 * Math.PI * drumRadius);
               return Math.abs(heightMeters - currentHeight) < 0.02; // 2cm tolerance
             });
   }
@@ -285,8 +289,58 @@ public class Elevator extends AdvancedSubsystem {
   }
 
   @Override
-  protected Command systemCheckCommand() {
+  public Command systemCheckCommand() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'systemCheckCommand'");
+    return Commands.sequence(
+        Commands.runOnce(
+            () -> {
+              clearFaults();
+              setVelocity(0);
+              setHeightCommand(0.5);
+            },
+            this),
+        Commands.waitSeconds(0.3),
+        Commands.runOnce(
+            () -> {
+              if (inputs.velocityMetersPerSecond < 1) {
+                addFault(
+                    "[System Check] Rotation motor encoder velocity measured too slow",
+                    false,
+                    true);
+              }
+            },
+            this),
+        Commands.run(
+            () -> {
+              setPosition(1);
+            },
+            this)
+            .withTimeout(1.0),
+        Commands.runOnce(
+            () -> {
+              if (inputs.positionMeters < 0.95
+                  || inputs.positionMeters > 1.05) {
+                addFault(
+                    "[System Check] Rotation Motor did not reach target position", false, true);
+              }
+            },
+            this),
+        Commands.runOnce(
+            () -> {
+              moveAtVelocityCommand(1);
+            },
+            this),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(
+            () -> {
+              if (inputs.velocityMetersPerSecond < 0.95) {
+                addFault("[System Check] Drive motor encoder velocity too slow", false, true);
+              }
+              moveAtVelocityCommand(0);
+            },
+            this),
+        Commands.waitSeconds(0.25))
+        .until(() -> getFaults().size() > 0)
+        .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }

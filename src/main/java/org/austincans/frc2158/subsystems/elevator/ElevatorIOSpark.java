@@ -30,6 +30,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private final double maxVelocity = 1; // meters per second
   private final double maxAcceleration = 1; // meters per second squared
   private final double drumRadius = 0.0254; // meters
+  private final double gearRatio = 0;
   private final boolean brakeMode = true;
 
   private final SparkFlex motor;
@@ -70,10 +71,10 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    inputs.position = encoder.getPosition();
+    inputs.positionMeters = encoder.getPosition();
     inputs.voltage = motor.getBusVoltage();
     inputs.current = motor.getOutputCurrent();
-    inputs.velocity = encoder.getVelocity();
+    inputs.velocityMetersPerSecond = encoder.getVelocity() * gearRatio;
     inputs.temperatureC = motor.getMotorTemperature();
   }
 }
