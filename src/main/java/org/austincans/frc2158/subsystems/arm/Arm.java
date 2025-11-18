@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Tuesday November 18, 2025 at 15:59:53 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 
 public class Arm extends AdvancedSubsystem {
@@ -87,12 +86,18 @@ public class Arm extends AdvancedSubsystem {
     io.setVoltage(output + feedforwardOutput);
   }
 
+  /**
+   * @return Returns the position value divided by the gear ratio.
+   */
   public double getPosition() {
     return inputs.position / gearRatio;
   }
 
+  /**
+   * @return Returns Rotations per Second
+   */
   public double getVelocity() {
-    return inputs.position / gearRatio / 60.0; // Convert from RPM to RPS
+    return inputs.velocity / 60.0; // Convert from RPM to RPS
   }
 
   public void setVelocity(double velocityDegPerSec) {
@@ -247,8 +252,6 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < -15
                       || Units.rotationsToDegrees(getPosition()) > 15) {
-                  if (Units.rotationsToDegrees(getPosition()) < -15
-                      || Units.rotationsToDegrees(getPosition()) > 15) {
                     addFault("[System Check] Joint did not reach target position", false, true);
                   }
                 },
@@ -257,8 +260,6 @@ public class Arm extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Units.rotationsToDegrees(getPosition()) < 75
-                      || Units.rotationsToDegrees(getPosition()) > 115) {
                   if (Units.rotationsToDegrees(getPosition()) < 75
                       || Units.rotationsToDegrees(getPosition()) > 115) {
                     addFault("[System Check] Joint did not reach target position", false, true);
