@@ -13,12 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Thursday November 20, 2025 at 12:34:06 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -180,10 +179,6 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
 
   public void registerHardware(String label, com.ctre.phoenix6.hardware.Pigeon2 pigeon2) {
     hardware.add(new SelfCheckingPigeon2(label, pigeon2));
-  }
-
-  public void registerHardware(String label, CANCoder canCoder) {
-    hardware.add(new SelfCheckingCANCoder(label, canCoder));
   }
 
   public void registerHardware(String label, CANcoder canCoder) {
