@@ -1,0 +1,87 @@
+// Copyright (c) 2025 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Wednesday November 19, 2025 at 19:28:08 CST
+
+package org.austincans.frc2158.subsystems.intake;
+
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import org.austincans.frc2158.util.ConfigUtil;
+
+/** Add your docs here. */
+public class IntakeIOSparkFlex implements IntakeIO {
+  private final SparkFlex deployMotor;
+  private final SparkFlex intakeMotor;
+
+  private final SparkFlexConfig config;
+
+  private final RelativeEncoder deployEncoder;
+
+  private final SparkClosedLoopController deployController;
+
+  public IntakeIOSparkFlex() {
+    // Initialize motor controllers
+    deployMotor =
+        new SparkFlex(ConfigUtil.getConfigInt("intakeDeployMotorID1", 0), MotorType.kBrushless);
+    intakeMotor = new SparkFlex(ConfigUtil.getConfigInt("intakeMotorID1", 0), MotorType.kBrushless);
+
+    config = new SparkFlexConfig();
+    config.idleMode(deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD);
+    config.apply(closedLoop);
+
+    // Configure deployEncoder
+    deployEncoder = deployMotor.getEncoder();
+    deployEncoder.setPosition(0);
+
+    deployController = deployMotor.getClosedLoopController();
+
+    // Save configuration
+    deployMotor.configureAsync(
+        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  @Override
+  public void updateInputs(IntakeIOInputs inputs) {
+    inputs.voltage = deployMotor.getBusVoltage();
+    inputs.deployPosition = deployEncoder.getPosition();
+    inputs.deployTemperatureC = deployMotor.getMotorTemperature();
+    inputs.intakeTemperatureC = intakeMotor.getMotorTemperature();
+  }
+
+  @Override
+  public void setDeployPosition(double position) {
+    deployController.setReference(position, ControlType.kPosition);
+  }
+
+  @Override
+  public void setRelativeVelocity(double velocity) {
+    intakeMotor.set(velocity);
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    intakeMotor.setVoltage(voltage);
+  }
+}

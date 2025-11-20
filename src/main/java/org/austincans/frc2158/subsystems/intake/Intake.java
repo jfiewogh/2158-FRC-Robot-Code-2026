@@ -13,14 +13,37 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 18:38:54 CST
+// Updated on Wednesday November 19, 2025 at 19:28:08 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2158.util.ConfigUtil;
 
 public class Intake extends AdvancedSubsystem {
+  private final IntakeIO io;
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+
+  private final LaserCAN laserCAN = new LaserCAN(ConfigUtil.getConfigInt("intakeLaserCANID", 0));
+
+  public Intake(IntakeIO io) {
+    this.io = io;
+  }
+
+  public void setRelativeVelocity(double velocity) {
+    io.setRelativeVelocity(velocity);
+  }
+
+  public void setVoltage(double voltage) {
+    io.setVoltage(voltage);
+  }
+
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+  }
 
   public Command systemCheckCommand() {
     return null;

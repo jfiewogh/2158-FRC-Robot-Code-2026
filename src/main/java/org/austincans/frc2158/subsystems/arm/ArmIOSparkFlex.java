@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 18:38:54 CST
+// Updated on Wednesday November 19, 2025 at 19:28:08 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -49,7 +49,7 @@ public class ArmIOSparkFlex implements ArmIO {
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD).velocityFF(0);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD);
     config.apply(closedLoop);
 
     SoftLimitConfig softLimit =
@@ -75,11 +75,13 @@ public class ArmIOSparkFlex implements ArmIO {
     motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  @Override
   public void setVoltage(double voltage) {
     controller.setReference(voltage, ControlType.kVoltage);
   }
 
   // Encoder Values
+  @Override
   public void setPosition(double position) {
     setPosition(
         position,
@@ -97,6 +99,7 @@ public class ArmIOSparkFlex implements ArmIO {
     controller.setReference(position, ControlType.kPosition);
   }
 
+  @Override
   public void setVelocity(double velocity) {
     controller.setReference(velocity, ControlType.kVelocity);
   }
