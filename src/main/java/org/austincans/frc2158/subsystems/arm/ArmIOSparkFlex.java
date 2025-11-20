@@ -90,17 +90,13 @@ public class ArmIOSparkFlex implements ArmIO {
   public void setPosition(double position) {
     setPosition(
         position,
-        ConfigUtil.getConfigDouble("defaultArmVel", 5),
-        ConfigUtil.getConfigDouble("defaultArmAccel", 1));
+        ConfigUtil.getConfigDouble("defaultArmVel", 5));
   }
 
-  public void setPosition(double position, double velocityRadPerSec) {
-    setPosition(position, velocityRadPerSec, ConfigUtil.getConfigDouble("defaultArmAccel", 1));
-  }
 
-  public void setPosition(double position, double VelocityRadPerSec, double accelRadPerSecSquared) {
+  public void setPosition(double position, double VelocityRadPerSec) {
     feedforward.calculate(
-        Units.degreesToRadians(position), VelocityRadPerSec, accelRadPerSecSquared);
+        Units.degreesToRadians(position), VelocityRadPerSec);
     controller.setReference(position, ControlType.kPosition);
   }
 
