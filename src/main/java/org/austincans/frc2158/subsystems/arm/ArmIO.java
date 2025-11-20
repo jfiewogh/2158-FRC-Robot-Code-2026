@@ -13,14 +13,43 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday November 19, 2025 at 18:38:54 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
+  /*
+   * PID
+   * kP: Proportional
+   * kI: Integral
+   * kD: Derivative
+   */
+  public double kP = ConfigUtil.getConfigDouble("armkP", 0);
+  public double kI = ConfigUtil.getConfigDouble("armkI", 0);
+  public double kD = ConfigUtil.getConfigDouble("armkD", 0);
+
+  public TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(
+          ConfigUtil.getConfigDouble("armMaxVelocityRotations", 0),
+          ConfigUtil.getConfigDouble("armMaxAcceleration", 0));
+
+  /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
+  public double kS = ConfigUtil.getConfigDouble("armkS", 0);
+
+  public double kG = ConfigUtil.getConfigDouble("armkG", 0);
+  public double kV = ConfigUtil.getConfigDouble("armkV", 0);
+  public double kA = ConfigUtil.getConfigDouble("armkA", 0);
+  public final ArmFeedforward feedforward = new ArmFeedforward(kS, kG, kV, kA);
+  public ProfiledPIDController armPIDController =
+      new ProfiledPIDController(kP, kI, kD, constraints);
+
   @AutoLog
   class ArmIOInputs {
     public double velocity = 0;
@@ -33,6 +62,12 @@ public interface ArmIO {
   public default void updateInputs(ArmIOInputs inputs) {}
 
   public default void setVoltage(double voltage) {}
+
+  // Encoder Values
+  public default void setPosition(double position) {}
+
+  // Meters per second
+  public default void setVelocity(double velocity) {}
 
   public default void stopMotor() {}
 

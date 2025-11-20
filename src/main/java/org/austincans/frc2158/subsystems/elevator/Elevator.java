@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday November 18, 2025 at 15:59:53 CST
+// Updated on Wednesday November 19, 2025 at 18:38:54 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -176,6 +176,13 @@ public class Elevator extends AdvancedSubsystem {
       constraints = new TrapezoidProfile.Constraints(constraints.maxVelocity, maxAccelRotations);
       profiledPIDController.setConstraints(constraints);
     }
+  }
+
+  /**
+   * @return returns elevator position in meters
+   */
+  public double getPosition() {
+    return inputs.positionMeters;
   }
 
   /**
