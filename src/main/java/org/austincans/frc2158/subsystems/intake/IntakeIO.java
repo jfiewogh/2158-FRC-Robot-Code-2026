@@ -13,13 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 19:28:08 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -72,4 +74,8 @@ public interface IntakeIO {
 
   // degrees
   public default void setDeployPosition(double degrees) {}
+
+  public default List<SubsystemFault> checkForFaults() {
+    return null;
+  }
 }

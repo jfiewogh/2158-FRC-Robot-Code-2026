@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday November 18, 2025 at 15:59:53 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -24,6 +24,10 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class ElevatorIOSpark implements ElevatorIO {
   private int canID = 0;
@@ -34,6 +38,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private final boolean brakeMode = true;
 
   private final SparkFlex motor;
+  private final SelfCheckingSparkFlex motorSelfCheck;
   private final RelativeEncoder encoder;
   private SparkFlexConfig config;
 
@@ -50,6 +55,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   public ElevatorIOSpark() {
     motor = new SparkFlex(canID, MotorType.kBrushless);
+    motorSelfCheck = new SelfCheckingSparkFlex("Elevator Motor", motor);
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
@@ -76,5 +82,21 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.current = motor.getOutputCurrent();
     inputs.velocityMetersPerSecond = encoder.getVelocity() * gearRatio;
     inputs.temperatureC = motor.getMotorTemperature();
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = new ArrayList<>();
+
+    List<SubsystemFault> motorFaults = motorSelfCheck.checkForFaults();
+    if (motorFaults != null) {
+      faults.addAll(motorFaults);
+    }
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

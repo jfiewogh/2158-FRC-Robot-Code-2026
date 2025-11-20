@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 18:38:54 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -100,6 +100,7 @@ public class Arm extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    io.checkForFaults().forEach(this::addFault);
   }
 
   @Override

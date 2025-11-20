@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -23,7 +23,12 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -39,8 +44,12 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import java.util.ArrayList;
+import java.util.List;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
   protected final SwerveModuleConstants<
@@ -50,6 +59,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   protected final TalonFX driveTalon;
   protected final TalonFX turnTalon;
   protected final CANcoder cancoder;
+
+  private final SelfCheckingTalonFXPro driveTalonSelfCheck;
+  private final SelfCheckingTalonFXPro turnTalonSelfCheck;
 
   protected final VoltageOut voltageRequest = new VoltageOut(0);
   protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
@@ -87,6 +99,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.DrivetrainConstants.CANBusName);
     turnTalon = new TalonFX(constants.SteerMotorId, TunerConstants.DrivetrainConstants.CANBusName);
     cancoder = new CANcoder(constants.EncoderId, TunerConstants.DrivetrainConstants.CANBusName);
+
+    driveTalonSelfCheck = new SelfCheckingTalonFXPro("Swerve Module Drive Motor", driveTalon);
+    turnTalonSelfCheck = new SelfCheckingTalonFXPro("Swerve Module Drive Motor", turnTalon);
 
     // Configure drive motor
     var driveConfig = constants.DriveMotorInitialConfigs;
@@ -233,5 +248,26 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
           case TorqueCurrentFOC ->
               positionTorqueCurrentRequest.withPosition(rotation.getRotations());
         });
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = new ArrayList<>();
+
+    List<SubsystemFault> driveFaults = driveTalonSelfCheck.checkForFaults();
+    if (driveFaults != null) {
+      faults.addAll(driveFaults);
+    }
+
+    List<SubsystemFault> turnFaults = turnTalonSelfCheck.checkForFaults();
+    if (turnFaults != null) {
+      faults.addAll(turnFaults);
+    }
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

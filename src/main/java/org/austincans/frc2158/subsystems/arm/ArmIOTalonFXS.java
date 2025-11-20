@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 18:38:54 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -25,11 +25,15 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOTalonFXS implements ArmIO {
   /* Motor */
   private final TalonFXS motor;
+  private SelfCheckingTalonFXS motorSelfCheck;
   private final TalonFXSConfiguration config;
   private final CANcoder encoder;
 
@@ -44,6 +48,7 @@ public class ArmIOTalonFXS implements ArmIO {
   public ArmIOTalonFXS() {
     // Initialize motor controller
     motor = new TalonFXS(canID, ConfigUtil.getConfigString("armCANbus", ""));
+    motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
 
     config = new TalonFXSConfiguration();
     config.MotorOutput.NeutralMode = brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
@@ -90,5 +95,15 @@ public class ArmIOTalonFXS implements ArmIO {
     inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
     inputs.velocity = motor.getVelocity().getValueAsDouble();
     inputs.currentAmps = motor.getStatorCurrent().getValueAsDouble();
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = motorSelfCheck.checkForFaults();
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -26,8 +26,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingPigeon2;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
@@ -35,6 +38,7 @@ public class GyroIOPigeon2 implements GyroIO {
       new Pigeon2(
           TunerConstants.DrivetrainConstants.Pigeon2Id,
           TunerConstants.DrivetrainConstants.CANBusName);
+  private SelfCheckingPigeon2 pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
@@ -66,5 +70,10 @@ public class GyroIOPigeon2 implements GyroIO {
     yawPositionQueue.clear();
 
     inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    return pigeonSelfChecker.checkForFaults();
   }
 }

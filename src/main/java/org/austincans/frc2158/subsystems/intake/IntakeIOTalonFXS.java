@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 19:28:08 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -23,22 +23,31 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOTalonFXS implements IntakeIO {
   private final TalonFXS deployMotor;
-  private final TalonFXSConfiguration config;
-  private final CANcoder deployEncoder;
-
   private final TalonFXS intakeMotor;
 
+  private final SelfCheckingTalonFXS deployMotorSelfCheck;
+  private final SelfCheckingTalonFXS intakeMotorSelfCheck;
+
+  private final TalonFXSConfiguration config;
+  private final CANcoder deployEncoder;
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
   public IntakeIOTalonFXS() {
     // Initialize motor controller
     deployMotor = new TalonFXS(deployCanID, ConfigUtil.getConfigString("intakeCanbus", "2158"));
     intakeMotor = new TalonFXS(intakeCanID, ConfigUtil.getConfigString("intakeCanbus", "2158"));
+
+    deployMotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor", deployMotor);
+    intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);
 
     config = new TalonFXSConfiguration();
     config.MotorOutput.NeutralMode =
@@ -84,5 +93,26 @@ public class IntakeIOTalonFXS implements IntakeIO {
   @Override
   public void setDeployPosition(double degrees) {
     deployMotor.setControl(positionRequest.withPosition(degrees));
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = new ArrayList<>();
+
+    List<SubsystemFault> deployFault = deployMotorSelfCheck.checkForFaults();
+    if (deployFault != null) {
+      faults.addAll(deployFault);
+    }
+
+    List<SubsystemFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
+    if (intakeFault != null) {
+      faults.addAll(intakeFault);
+    }
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

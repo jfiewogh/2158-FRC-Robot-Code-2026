@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 19:28:08 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -27,17 +27,21 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOSparkFlex implements IntakeIO {
   private final SparkFlex deployMotor;
   private final SparkFlex intakeMotor;
+  private final SelfCheckingSparkFlex deployMotorSelfCheck;
+  private final SelfCheckingSparkFlex intakeMotorSelfCheck;
 
   private final SparkFlexConfig config;
-
   private final RelativeEncoder deployEncoder;
-
   private final SparkClosedLoopController deployController;
 
   public IntakeIOSparkFlex() {
@@ -45,6 +49,9 @@ public class IntakeIOSparkFlex implements IntakeIO {
     deployMotor =
         new SparkFlex(ConfigUtil.getConfigInt("intakeDeployMotorID1", 0), MotorType.kBrushless);
     intakeMotor = new SparkFlex(ConfigUtil.getConfigInt("intakeMotorID1", 0), MotorType.kBrushless);
+
+    deployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor", deployMotor);
+    intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
 
     config = new SparkFlexConfig();
     config.idleMode(deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
@@ -83,5 +90,26 @@ public class IntakeIOSparkFlex implements IntakeIO {
   @Override
   public void setVoltage(double voltage) {
     intakeMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = new ArrayList<>();
+
+    List<SubsystemFault> deployFault = deployMotorSelfCheck.checkForFaults();
+    if (deployFault != null) {
+      faults.addAll(deployFault);
+    }
+
+    List<SubsystemFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
+    if (intakeFault != null) {
+      faults.addAll(intakeFault);
+    }
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

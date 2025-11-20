@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 19, 2025 at 19:28:08 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -29,11 +29,15 @@ import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOSparkFlex implements ArmIO {
   /* Motor */
   private final SparkFlex motor;
+  private SelfCheckingSparkFlex selfCheckingMotor;
   private final RelativeEncoder encoder;
   private SparkFlexConfig config;
   private final SparkClosedLoopController controller;
@@ -45,6 +49,7 @@ public class ArmIOSparkFlex implements ArmIO {
   public ArmIOSparkFlex() {
     // Initialize motor controller
     motor = new SparkFlex(canID, MotorType.kBrushless);
+    selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motor);
 
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
@@ -111,5 +116,16 @@ public class ArmIOSparkFlex implements ArmIO {
     inputs.temperature = motor.getMotorTemperature();
     inputs.velocity = encoder.getVelocity();
     inputs.currentAmps = motor.getOutputCurrent();
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    List<SubsystemFault> faults = selfCheckingMotor.checkForFaults();
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
   }
 }

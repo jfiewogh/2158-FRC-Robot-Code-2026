@@ -13,10 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday November 18, 2025 at 15:59:53 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -32,4 +34,8 @@ public interface ElevatorIO {
   public default void setVoltage(double voltage) {}
 
   public default void updateInputs(ElevatorIOInputs inputs) {}
+
+  public default List<SubsystemFault> checkForFaults() {
+    return null;
+  }
 }

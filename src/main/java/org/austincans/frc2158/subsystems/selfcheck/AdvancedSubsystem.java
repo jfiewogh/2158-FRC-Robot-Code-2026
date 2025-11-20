@@ -13,13 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -161,12 +162,20 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     hardware.add(new SelfCheckingTalonFXPro(label, talon));
   }
 
+  public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFXS talon) {
+    hardware.add(new SelfCheckingTalonFXS(label, talon));
+  }
+
   public void registerHardware(String label, PWMMotorController pwmMotor) {
     hardware.add(new SelfCheckingPWMMotor(label, pwmMotor));
   }
 
   public void registerHardware(String label, SparkMax spark) {
     hardware.add(new SelfCheckingSparkMax(label, spark));
+  }
+
+  public void registerHardware(String label, SparkFlex spark) {
+    hardware.add(new SelfCheckingSparkFlex(label, spark));
   }
 
   public void registerHardware(String label, com.ctre.phoenix6.hardware.Pigeon2 pigeon2) {
