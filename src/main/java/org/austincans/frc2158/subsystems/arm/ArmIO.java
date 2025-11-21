@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -60,17 +60,21 @@ public interface ArmIO {
     public double temperature = 0;
   }
 
-  public default void updateInputs(ArmIOInputs inputs) {}
+  public void updateInputs(ArmIOInputs inputs);
 
   public default void setVoltage(double voltage) {}
+  ;
 
   // Encoder Values
   public default void setPosition(double position) {}
+  ;
 
   // Meters per second
   public default void setVelocity(double velocity) {}
+  ;
 
   public default void stopMotor() {}
+  ;
 
   public default List<SubsystemFault> checkForFaults() {
     return null;

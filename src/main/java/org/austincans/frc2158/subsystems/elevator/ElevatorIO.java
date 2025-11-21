@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -31,9 +31,9 @@ public interface ElevatorIO {
     public double temperatureC = 0;
   }
 
-  public default void setVoltage(double voltage) {}
+  public void setVoltage(double voltage);
 
-  public default void updateInputs(ElevatorIOInputs inputs) {}
+  public void updateInputs(ElevatorIOInputs inputs);
 
   public default List<SubsystemFault> checkForFaults() {
     return null;

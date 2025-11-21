@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -94,8 +94,6 @@ public class Arm extends AdvancedSubsystem {
   public Command setAngleCommand(double angleDegrees) {
     return new InstantCommand(() -> setAngle(angleDegrees));
   }
-
-  private String controlMode = "Position";
 
   @Override
   public void periodic() {

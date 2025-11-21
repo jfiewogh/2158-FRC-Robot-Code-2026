@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -88,30 +88,28 @@ public class ArmIOSparkFlex implements ArmIO {
   // Encoder Values
   @Override
   public void setPosition(double position) {
-    setPosition(
-        position,
-        ConfigUtil.getConfigDouble("defaultArmVel", 5));
+    setPosition(position, ConfigUtil.getConfigDouble("defaultArmVel", 5));
   }
 
-
   public void setPosition(double position, double VelocityRadPerSec) {
-    feedforward.calculate(
-        Units.degreesToRadians(position), VelocityRadPerSec);
+    feedforward.calculate(Units.degreesToRadians(position), VelocityRadPerSec);
     controller.setReference(position, ControlType.kPosition);
   }
 
-  @Override
   public void setVelocity(double velocity) {
     controller.setReference(velocity, ControlType.kVelocity);
   }
 
-  @Override
   public void updateInputs(ArmIOInputs inputs) {
     inputs.currentVoltage = motor.getBusVoltage();
     inputs.position = encoder.getPosition();
     inputs.temperature = motor.getMotorTemperature();
     inputs.velocity = encoder.getVelocity();
     inputs.currentAmps = motor.getOutputCurrent();
+  }
+
+  public void stopMotor() {
+    setVoltage(0);
   }
 
   @Override

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -86,6 +86,10 @@ public class ArmIOTalonFXS implements ArmIO {
   @Override
   public void setVelocity(double velocity) {
     motor.setControl(velocityRequest.withVelocity(velocity));
+  }
+
+  public void stopMotor() {
+    setVoltage(0);
   }
 
   @Override

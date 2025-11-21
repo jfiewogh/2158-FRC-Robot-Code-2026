@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Friday November 21, 2025 at 14:36:48 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -65,15 +65,15 @@ public interface IntakeIO {
     public double deployTemperatureC = 0;
   }
 
-  public default void updateInputs(IntakeIOInputs inputs) {}
+  public void updateInputs(IntakeIOInputs inputs);
 
   // rpm
-  public default void setRelativeVelocity(double velocity) {}
+  public void setRelativeVelocity(double velocity);
 
-  public default void setVoltage(double voltage) {}
+  public void setVoltage(double voltage);
 
   // degrees
-  public default void setDeployPosition(double degrees) {}
+  public void setDeployPosition(double degrees);
 
   public default List<SubsystemFault> checkForFaults() {
     return null;
