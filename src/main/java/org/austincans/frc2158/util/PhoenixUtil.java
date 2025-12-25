@@ -13,15 +13,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.util;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Seconds;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -44,6 +46,26 @@ public final class PhoenixUtil {
     for (int i = 0; i < maxAttempts; i++) {
       var error = command.get();
       if (error.isOK()) break;
+    }
+  }
+
+  /** Signals for synchronized refresh. */
+  private static BaseStatusSignal[] canivoreSignals = new BaseStatusSignal[0];
+
+  private static BaseStatusSignal[] rioSignals = new BaseStatusSignal[0];
+
+  /** Registers a set of signals for synchronized refresh. */
+  public static void registerSignals(boolean canivore, BaseStatusSignal... signals) {
+    if (canivore) {
+      BaseStatusSignal[] newSignals = new BaseStatusSignal[canivoreSignals.length + signals.length];
+      System.arraycopy(canivoreSignals, 0, newSignals, 0, canivoreSignals.length);
+      System.arraycopy(signals, 0, newSignals, canivoreSignals.length, signals.length);
+      canivoreSignals = newSignals;
+    } else {
+      BaseStatusSignal[] newSignals = new BaseStatusSignal[rioSignals.length + signals.length];
+      System.arraycopy(rioSignals, 0, newSignals, 0, rioSignals.length);
+      System.arraycopy(signals, 0, newSignals, rioSignals.length, signals.length);
+      rioSignals = newSignals;
     }
   }
 
@@ -126,8 +148,11 @@ public final class PhoenixUtil {
    * <h4>Note:This function is skipped when running on a real robot, ensuring no impact on constants
    * used on real robot hardware.</h4>
    */
-  public static SwerveModuleConstants regulateModuleConstantForSimulation(
-      SwerveModuleConstants<?, ?, ?> moduleConstants) {
+  public static SwerveModuleConstants<
+          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+      regulateModuleConstantForSimulation(
+          SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+              moduleConstants) {
     // Skip regulation if running on a real robot
     if (RobotBase.isReal()) return moduleConstants;
 

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -26,8 +26,14 @@ public interface GyroIO {
   @AutoLog
   public static class GyroIOInputs {
     public boolean connected = false;
-    public Rotation2d yawPosition = new Rotation2d();
+
+    public Rotation2d yawPosition = Rotation2d.kZero;
     public double yawVelocityRadPerSec = 0.0;
+    public Rotation2d pitchPosition = Rotation2d.kZero;
+    public double pitchVelocityRadPerSec = 0.0;
+    public Rotation2d rollPosition = Rotation2d.kZero;
+    public double rollVelocityRadPerSec = 0.0;
+
     public double[] odometryYawTimestamps = new double[] {};
     public double imuRate;
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};

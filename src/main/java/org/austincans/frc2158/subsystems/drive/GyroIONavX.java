@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -37,8 +37,14 @@ public class GyroIONavX implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = navX.isConnected();
+
+    // values are flipped because navX axes are opposite direction of those used by WPILib
     inputs.yawPosition = Rotation2d.fromDegrees(-navX.getYaw());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
+    inputs.pitchPosition = Rotation2d.fromDegrees(-navX.getPitch());
+    inputs.pitchVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroX());
+    inputs.rollPosition = Rotation2d.fromDegrees(-navX.getRoll());
+    inputs.rollVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroY());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();

@@ -13,12 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import java.util.Arrays;
 import org.austincans.frc2158.util.PhoenixUtil;
@@ -31,7 +33,10 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
   private final SwerveModuleSimulation simulation;
 
-  public ModuleIOTalonFXSim(SwerveModuleConstants constants, SwerveModuleSimulation simulation) {
+  public ModuleIOTalonFXSim(
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+          constants,
+      SwerveModuleSimulation simulation) {
     super(PhoenixUtil.regulateModuleConstantForSimulation(constants));
 
     this.simulation = simulation;

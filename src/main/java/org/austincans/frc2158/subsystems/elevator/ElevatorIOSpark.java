@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -30,11 +30,9 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class ElevatorIOSpark implements ElevatorIO {
-  private int canID = 0;
-  private final double maxVelocity = 1; // meters per second
-  private final double maxAcceleration = 1; // meters per second squared
-  private final double drumRadius = 0.0254; // meters
-  private final double gearRatio = 0;
+  // TODO: move constants to config
+
+  private final int canID = 0;
   private final boolean brakeMode = true;
 
   private final SparkFlex motor;
@@ -61,6 +59,11 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     // Configure encoder
     encoder = motor.getEncoder();
+    config.encoder.positionConversionFactor(
+        Math.PI * 2 * ElevatorConstants.drumRadius / ElevatorConstants.gearRatio);
+    config.encoder.velocityConversionFactor(
+        Math.PI * 2 * ElevatorConstants.drumRadius / (ElevatorConstants.gearRatio * 60.0));
+
     encoder.setPosition(0);
 
     // Set current limits
@@ -71,16 +74,17 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public void setVoltage(double voltage) {
+  public void runVoltage(double voltage) {
     motor.setVoltage(voltage);
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    inputs.positionMeters = encoder.getPosition();
+    inputs.heightMeters = encoder.getPosition();
+    inputs.velocityMetersPerSec = encoder.getVelocity();
+
     inputs.voltage = motor.getBusVoltage();
     inputs.current = motor.getOutputCurrent();
-    inputs.velocityMetersPerSecond = encoder.getVelocity() * gearRatio;
     inputs.temperatureC = motor.getMotorTemperature();
   }
 

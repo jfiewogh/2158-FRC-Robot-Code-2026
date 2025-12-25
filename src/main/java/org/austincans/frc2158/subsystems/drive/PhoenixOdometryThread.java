@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -119,6 +119,10 @@ public class PhoenixOdometryThread extends Thread {
 
   @Override
   public void run() {
+    // DO NOT COPY UNLESS YOU UNDERSTAND THE CONSEQUENCES
+    // https://docs.advantagekit.org/getting-started/template-projects/spark-swerve-template#real-time-thread-priority
+    // Threads.setCurrentThreadPriority(true, 1);
+
     while (true) {
       // Wait for updates from all signals
       signalsLock.lock();

@@ -13,37 +13,103 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.Robot;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2158.util.ConfigUtil;
+import org.austincans.frc2158.util.LoggedTracer;
+import org.austincans.frc2158.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Module extends AdvancedSubsystem {
+  private static final LoggedTunableNumber drivekS =
+      new LoggedTunableNumber("Drive/Module/DrivekS");
+  private static final LoggedTunableNumber drivekV =
+      new LoggedTunableNumber("Drive/Module/DrivekV");
+  private static final LoggedTunableNumber drivekT =
+      new LoggedTunableNumber("Drive/Module/DrivekT");
+  private static final LoggedTunableNumber drivekP =
+      new LoggedTunableNumber("Drive/Module/DrivekP");
+  private static final LoggedTunableNumber drivekD =
+      new LoggedTunableNumber("Drive/Module/DrivekD");
+  private static final LoggedTunableNumber turnkP = new LoggedTunableNumber("Drive/Module/TurnkP");
+  private static final LoggedTunableNumber turnkD = new LoggedTunableNumber("Drive/Module/TurnkD");
+
+  static {
+    switch (Constants.getRobot()) {
+      case COMPBOT, DEVBOT -> {
+        drivekS.initDefault(5.0);
+        drivekV.initDefault(0);
+        // Multiplied by desired wheelTorqueNm
+        drivekT.initDefault(DriveConstants.driveReduction / DCMotor.getKrakenX60Foc(1).KtNMPerAmp);
+        drivekP.initDefault(ConfigUtil.getConfigDouble("drivekP", 0.0));
+        drivekD.initDefault(ConfigUtil.getConfigDouble("drivekD", 0.0));
+        turnkP.initDefault(ConfigUtil.getConfigDouble("turnkP", 0.0));
+        turnkD.initDefault(ConfigUtil.getConfigDouble("turnkD", 0.0));
+      }
+      default -> {
+        drivekS.initDefault(0.014);
+        drivekV.initDefault(0.134);
+        drivekT.initDefault(0);
+        drivekP.initDefault(0.1);
+        drivekD.initDefault(0);
+        turnkP.initDefault(10.0);
+        turnkD.initDefault(0);
+      }
+    }
+  }
+
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
-  private final SwerveModuleConstants constants;
+  private final SwerveModuleConstants<
+          TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+      constants;
 
+  private SimpleMotorFeedforward ffModel;
+
+  // Connected debouncers
+  private final Debouncer driveMotorConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnMotorConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer turnEncoderConnectedDebouncer =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+
+  // Connection alerts
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
   private final Alert turnEncoderDisconnectedAlert;
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
-  public Module(ModuleIO io, int index, SwerveModuleConstants constants) {
+  public Module(
+      ModuleIO io,
+      int index,
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+          constants) {
     this.io = io;
     this.index = index;
     this.constants = constants;
+
+    ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
     driveDisconnectedAlert =
         new Alert(
             "Disconnected drive motor on module " + Integer.toString(index) + ".",
@@ -62,6 +128,17 @@ public class Module extends AdvancedSubsystem {
     io.checkForFaults().forEach(this::addFault);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
+    // Update tunable numbers
+    if (drivekS.hasChanged(hashCode()) || drivekV.hasChanged(hashCode())) {
+      ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
+    }
+    if (drivekP.hasChanged(hashCode()) || drivekD.hasChanged(hashCode())) {
+      io.setDrivePID(drivekP.get(), 0, drivekD.get());
+    }
+    if (turnkP.hasChanged(hashCode()) || turnkD.hasChanged(hashCode())) {
+      io.setTurnPID(turnkP.get(), 0, turnkD.get());
+    }
+
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
     odometryPositions = new SwerveModulePosition[sampleCount];
@@ -72,9 +149,15 @@ public class Module extends AdvancedSubsystem {
     }
 
     // Update alerts
-    driveDisconnectedAlert.set(!inputs.driveConnected);
-    turnDisconnectedAlert.set(!inputs.turnConnected);
-    turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
+    driveDisconnectedAlert.set(
+        !driveMotorConnectedDebouncer.calculate(inputs.driveConnected) && !Robot.isJITing());
+    turnDisconnectedAlert.set(
+        !turnMotorConnectedDebouncer.calculate(inputs.turnConnected) && !Robot.isJITing());
+    turnEncoderDisconnectedAlert.set(
+        !turnEncoderConnectedDebouncer.calculate(inputs.turnEncoderConnected) && !Robot.isJITing());
+
+    // Record cycle time
+    LoggedTracer.record("Drive/Module" + index);
   }
 
   /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
@@ -84,14 +167,32 @@ public class Module extends AdvancedSubsystem {
     state.cosineScale(inputs.turnAbsolutePosition);
 
     // Apply setpoints
-    io.setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
+    double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
+    io.setDriveVelocity(speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0));
+    io.setTurnPosition(state.angle);
+  }
+
+  /**
+   * Runs the module with the specified setpoint state and a setpoint wheel force used for
+   * torque-based feedforward.
+   */
+  public void runSetpoint(SwerveModuleState state, double wheelTorqueNm) {
+    // Optimize velocity setpoint
+    state.optimize(getAngle());
+    state.cosineScale(inputs.turnAbsolutePosition);
+
+    // Apply setpoints
+    double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
+    io.setDriveVelocity(
+        speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0),
+        ffModel.calculate(speedRadPerSec) + wheelTorqueNm * drivekT.get());
     io.setTurnPosition(state.angle);
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
   public void runCharacterization(double output) {
     io.setDriveOpenLoop(output);
-    io.setTurnPosition(new Rotation2d());
+    io.setTurnPosition(Rotation2d.kZero);
   }
 
   /** Disables all outputs to motors. */
@@ -143,6 +244,11 @@ public class Module extends AdvancedSubsystem {
   /** Returns the module velocity in rotations/sec (Phoenix native units). */
   public double getFFCharacterizationVelocity() {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
+  }
+
+  /* Sets brake mode to {@code enabled} */
+  public void setBrakeMode(boolean enabled) {
+    io.setBrakeMode(enabled);
   }
 
   @Override

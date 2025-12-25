@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -44,6 +44,13 @@ public class DriveConstants {
   /** Includes bumpers! */
   public static final double robotWidth =
       Units.inchesToMeters(28.0) + 2 * Units.inchesToMeters(2.0);
+
+  // Modules
+  public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
+  public static final double turnReduction = (150.0 / 7.0);
+
+  public static final double driveCurrentLimitAmps = 40; // placeholder
+  public static final double turnCurrentLimitAmps = 40; // placeholder
 
   public static final Translation2d[] moduleTranslations = {
     new Translation2d(trackWidthX / 2, trackWidthY / 2),

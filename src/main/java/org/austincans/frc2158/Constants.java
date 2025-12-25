@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158;
 
@@ -47,6 +47,8 @@ import org.austincans.frc2158.util.ConfigUtil;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static final double maxVoltage = 12;
 
   public static enum Mode {
     /** Running on a real robot. */

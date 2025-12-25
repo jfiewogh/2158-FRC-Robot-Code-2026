@@ -13,13 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.austincans.frc2158.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
@@ -34,8 +34,11 @@ public class GyroIOSim implements GyroIO {
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = true;
     inputs.yawPosition = gyroSimulation.getGyroReading();
-    inputs.yawVelocityRadPerSec =
-        Units.degreesToRadians(gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond));
+    inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
+    inputs.pitchPosition = Rotation2d.kZero;
+    inputs.pitchVelocityRadPerSec = 0.0;
+    inputs.rollPosition = Rotation2d.kZero;
+    inputs.rollVelocityRadPerSec = 0.0;
 
     inputs.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
     inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();

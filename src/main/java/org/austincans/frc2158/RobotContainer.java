@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday November 12, 2025 at 18:18:23 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158;
 
@@ -51,6 +51,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+
+  @SuppressWarnings("unused")
   private final Vision vision;
 
   private SwerveDriveSimulation driveSimulation = null;
@@ -68,6 +70,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
+                new DriveIOReal(),
                 new GyroIOPigeon2(),
                 new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
                 new ModuleIOTalonFXReal(TunerConstants.FrontRight),
@@ -89,6 +92,7 @@ public class RobotContainer {
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         drive =
             new Drive(
+                new DriveIOSim(driveSimulation),
                 new GyroIOSim(driveSimulation.getGyroSimulation()),
                 new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
                 new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
@@ -109,6 +113,7 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         drive =
             new Drive(
+                new DriveIO() {},
                 new GyroIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},

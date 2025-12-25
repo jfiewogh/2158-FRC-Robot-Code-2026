@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -23,17 +23,18 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
   @AutoLog
-  public static class ElevatorIOInputs {
-    public double positionMeters = 0;
-    public double voltage = 0;
-    public double current = 0;
-    public double velocityMetersPerSecond = 0;
-    public double temperatureC = 0;
+  public class ElevatorIOInputs {
+    boolean connected = false;
+    double heightMeters = 0.0;
+    double velocityMetersPerSec = 0.0;
+    double voltage = 0.0;
+    double current = 0.0;
+    double temperatureC = 0.0;
   }
 
-  public void setVoltage(double voltage);
-
   public void updateInputs(ElevatorIOInputs inputs);
+
+  public default void runVoltage(double volts) {}
 
   public default List<SubsystemFault> checkForFaults() {
     return null;

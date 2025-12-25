@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -29,14 +29,19 @@ public interface ModuleIO {
     public double drivePositionRad = 0.0;
     public double driveVelocityRadPerSec = 0.0;
     public double driveAppliedVolts = 0.0;
-    public double driveCurrentAmps = 0.0;
+    public double driveSupplyCurrentAmps = 0.0;
+    public double driveStatorCurrentAmps = 0.0;
+    public double driveTorqueCurrentAmps = 0.0;
 
     public boolean turnConnected = false;
     public boolean turnEncoderConnected = false;
-    public Rotation2d turnAbsolutePosition = new Rotation2d();
+    public Rotation2d turnAbsolutePosition = Rotation2d.kZero;
+    public Rotation2d turnPosition = Rotation2d.kZero;
     public double turnVelocityRadPerSec = 0.0;
     public double turnAppliedVolts = 0.0;
-    public double turnCurrentAmps = 0.0;
+    public double turnSupplyCurrentAmps = 0.0;
+    public double turnStatorCurrentAmps = 0.0;
+    public double turnTorqueCurrentAmps = 0.0;
 
     public double[] odometryTimestamps = new double[] {};
     public double[] odometryDrivePositionsRad = new double[] {};
@@ -55,8 +60,19 @@ public interface ModuleIO {
   /** Run the drive motor at the specified velocity. */
   default void setDriveVelocity(double velocityRadPerSec) {}
 
+  default void setDriveVelocity(double velocityRadPerSec, double feedforward) {}
+
   /** Run the turn motor to the specified rotation. */
   default void setTurnPosition(Rotation2d rotation) {}
+
+  /** Set P, I, and D gains for closed loop control on drive motor. */
+  public default void setDrivePID(double kP, double kI, double kD) {}
+
+  /** Set P, I, and D gains for closed loop control on turn motor. */
+  public default void setTurnPID(double kP, double kI, double kD) {}
+
+  /** Set brake mode on drive motor */
+  public default void setBrakeMode(boolean enabled) {}
 
   default List<SubsystemFault> checkForFaults() {
     return null;

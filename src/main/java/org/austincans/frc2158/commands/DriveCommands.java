@@ -51,6 +51,19 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
+  private enum OmegaMode {
+    POSITION,
+    SPEED
+  }
+
+  @SuppressWarnings("unused")
+  private static final OmegaMode omegaMode = OmegaMode.POSITION;
+  // if position, use joystickDriveAtAngle
+  // if speed, use joystickDrive
+
+  private static final double hasInputThreshold = 0.1;
+
+
   private DriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
@@ -67,6 +80,17 @@ public class DriveCommands {
         .getTranslation();
   }
 
+  public static void updateJoystickHasInput(
+      DoubleSupplier... suppliers) {
+    Drive.joystickHasInput = false;
+    for (DoubleSupplier supplier : suppliers) {
+      if (Math.abs(supplier.getAsDouble()) >= hasInputThreshold) {
+        Drive.joystickHasInput = true;
+        break;
+      }
+    }
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -74,15 +98,18 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaXSupplier,
+      DoubleSupplier omegaYSupplier) {
     return Commands.run(
         () -> {
+          updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+
           // Get linear velocity
           Translation2d linearVelocity =
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          double omega = MathUtil.applyDeadband(omegaXSupplier.getAsDouble(), DEADBAND);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
@@ -93,6 +120,7 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
+          
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
@@ -129,6 +157,9 @@ public class DriveCommands {
     // Construct command
     return Commands.run(
             () -> {
+              updateJoystickHasInput(xSupplier, ySupplier, 
+                () -> rotationSupplier.get().getCos(), () -> rotationSupplier.get().getSin());
+
               // Get linear velocity
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
