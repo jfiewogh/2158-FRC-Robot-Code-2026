@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158;
 
@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -131,11 +132,13 @@ public class AIRobotInSimulation extends SubsystemBase {
     behaviorChooser.addOption("Joystick Drive", joystickDrive(joystick));
 
     // Schedule the command when another behavior is selected
-    behaviorChooser.onChange((Command::schedule));
+    behaviorChooser.onChange(CommandScheduler.getInstance()::schedule);
 
     // Schedule the selected command when teleop starts
     RobotModeTriggers.teleop()
-        .onTrue(Commands.runOnce(() -> behaviorChooser.getSelected().schedule()));
+        .onTrue(
+            Commands.runOnce(
+                () -> CommandScheduler.getInstance().schedule(behaviorChooser.getSelected())));
 
     // Disable the robot when the user robot is disabled
     RobotModeTriggers.disabled().onTrue(disable.get());

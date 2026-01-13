@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -47,7 +47,7 @@ public class ArmIOTalonFXS implements ArmIO {
 
   public ArmIOTalonFXS() {
     // Initialize motor controller
-    motor = new TalonFXS(canID, ConfigUtil.getConfigString("armCANbus", ""));
+    motor = new TalonFXS(canID, ArmConstants.armCANBus);
     motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
 
     config = new TalonFXSConfiguration();

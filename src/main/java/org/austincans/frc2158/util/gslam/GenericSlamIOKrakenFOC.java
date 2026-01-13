@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.util.gslam;
 
@@ -23,6 +23,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.austincans.frc2158.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -54,7 +55,7 @@ public class GenericSlamIOKrakenFOC implements GenericSlamIO {
 
   public GenericSlamIOKrakenFOC(
       int id, String bus, int currentLimitAmps, boolean invert, double reduction) {
-    talon = new TalonFX(id, bus);
+    talon = new TalonFX(id, new CANBus(bus));
 
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.Inverted =

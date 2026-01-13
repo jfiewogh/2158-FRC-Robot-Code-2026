@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -42,6 +42,6 @@ public interface GyroIO {
   public default void updateInputs(GyroIOInputs inputs) {}
 
   public default List<SubsystemFault> checkForFaults() {
-    return null;
+    return List.of();
   }
 }

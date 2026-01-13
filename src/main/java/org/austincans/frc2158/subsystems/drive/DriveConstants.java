@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,16 +13,18 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import lombok.Builder;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Constants.RobotType;
+import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.util.swerve.ModuleLimits;
 
 // TODO Review with CAD Team
@@ -46,6 +48,9 @@ public class DriveConstants {
       Units.inchesToMeters(28.0) + 2 * Units.inchesToMeters(2.0);
 
   // Modules
+  public static final CANBus moduleCANBus =
+      new CANBus(TunerConstants.DrivetrainConstants.CANBusName);
+
   public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
   public static final double turnReduction = (150.0 / 7.0);
 

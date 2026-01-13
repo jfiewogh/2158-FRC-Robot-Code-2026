@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -54,7 +54,9 @@ public class DriveIOSim implements DriveIO {
     currentSetpoint =
         swerveSetpointGenerator.generateSetpoint(
             DriveConstants.moduleLimitsFree,
-            currentSetpoint,
+            currentSetpoint != null
+                ? currentSetpoint
+                : new SwerveSetpoint(new ChassisSpeeds(), getModuleStates()),
             discreteSpeeds,
             Constants.loopPeriodSecs);
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
@@ -68,6 +70,14 @@ public class DriveIOSim implements DriveIO {
     for (int i = 0; i < 4; i++) {
       modules[i].runSetpoint(setpointStates[i]);
     }
+  }
+
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
   }
 
   public void setModules(Module[] modules) {

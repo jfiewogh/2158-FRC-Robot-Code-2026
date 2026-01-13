@@ -13,19 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 11:38:34 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158;
 
-import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Degrees;
 import static org.austincans.frc2158.subsystems.vision.VisionConstants.*;
 import static org.austincans.frc2158.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +35,6 @@ import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -189,45 +185,6 @@ public class RobotContainer {
                 drive.setPose(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-
-    // Example Coral Placement Code
-    // TODO: delete these code for your own project
-    if (Constants.currentMode == Constants.Mode.SIM) {
-      // L4 placement
-      controller
-          .y()
-          .onTrue(
-              Commands.runOnce(
-                  () ->
-                      SimulatedArena.getInstance()
-                          .addGamePieceProjectile(
-                              new ReefscapeCoralOnFly(
-                                  driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                                  new Translation2d(0.4, 0),
-                                  driveSimulation
-                                      .getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                  driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                                  Meters.of(2),
-                                  MetersPerSecond.of(1.5),
-                                  Degrees.of(-80)))));
-      // L3 placement
-      controller
-          .b()
-          .onTrue(
-              Commands.runOnce(
-                  () ->
-                      SimulatedArena.getInstance()
-                          .addGamePieceProjectile(
-                              new ReefscapeCoralOnFly(
-                                  driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                                  new Translation2d(0.4, 0),
-                                  driveSimulation
-                                      .getDriveTrainSimulatedChassisSpeedsFieldRelative(),
-                                  driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                                  Meters.of(1.35),
-                                  MetersPerSecond.of(1.5),
-                                  Degrees.of(-60)))));
-    }
   }
 
   /**

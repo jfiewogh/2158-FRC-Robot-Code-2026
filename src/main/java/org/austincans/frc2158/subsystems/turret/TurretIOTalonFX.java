@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -54,14 +54,8 @@ public class TurretIOTalonFX implements TurretIO {
   private TurretIOInputs inputs;
 
   public TurretIOTalonFX() {
-    turretMotor =
-        new TalonFX(
-            ConfigUtil.getConfigInt("turretID", 0),
-            ConfigUtil.getConfigString("intakeCanbus", "2158"));
-    turretEncoder =
-        new CANcoder(
-            ConfigUtil.getConfigInt("turretEncoderID", 0),
-            ConfigUtil.getConfigString("intakeCanbus", "2158"));
+    turretMotor = new TalonFX(TurretConstants.turretMotorId, TurretConstants.turretCANBus);
+    turretEncoder = new CANcoder(TurretConstants.turretEncoderId, TurretConstants.turretCANBus);
     positionRequest = new PositionVoltage(0).withSlot(0);
     velocityRequest = new VelocityVoltage(0).withSlot(0);
 

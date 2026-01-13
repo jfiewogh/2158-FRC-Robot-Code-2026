@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 11:38:34 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -22,7 +22,9 @@ import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import java.util.Queue;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {
@@ -60,5 +62,11 @@ public class GyroIONavX implements GyroIO {
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
     inputs.imuRate = navX.getRate();
+  }
+
+  // TODO: add check for faults
+  @Override
+  public List<SubsystemFault> checkForFaults() {
+    return List.of();
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -52,6 +52,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Arrays;
@@ -495,10 +496,11 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  modules[0].getSystemCheckCommand().schedule();
-                  modules[1].getSystemCheckCommand().schedule();
-                  modules[2].getSystemCheckCommand().schedule();
-                  modules[3].getSystemCheckCommand().schedule();
+                  // TODO: seems like there is a better way to do this
+                  CommandScheduler.getInstance().schedule(modules[0].getSystemCheckCommand());
+                  CommandScheduler.getInstance().schedule(modules[1].getSystemCheckCommand());
+                  CommandScheduler.getInstance().schedule(modules[2].getSystemCheckCommand());
+                  CommandScheduler.getInstance().schedule(modules[3].getSystemCheckCommand());
                 },
                 this),
             // Hack to run module system checks since modules[] does not exist when this method is
