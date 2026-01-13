@@ -193,7 +193,11 @@ wpi.sim.addDriverstation().defaultEnabled = false
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
 jar {
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
     from sourceSets.main.allSource
     from('src') { into 'backup/src' }
     from('vendordeps') { into 'backup/vendordeps' }
@@ -276,7 +280,7 @@ createVersionFile.dependsOn(eventDeploy)
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
 spotless {
-    ratchetFrom('origin/advantage&maple+frc2158')
+    ratchetFrom('2026-import')
     java {
         target fileTree('.') {
             include '**/*.java'
