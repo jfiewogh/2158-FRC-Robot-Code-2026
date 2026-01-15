@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Thursday January 15, 2026 at 12:36:25 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -34,4 +34,7 @@ public class FlywheelConstants {
 
   /* SIM */
   public static final double JKgMetersSq = 0.001;
+  public static final double flywheelRadiusMeters = 0.1;
+
+  public static final double maxFlywheelRPM = 1000;
 }

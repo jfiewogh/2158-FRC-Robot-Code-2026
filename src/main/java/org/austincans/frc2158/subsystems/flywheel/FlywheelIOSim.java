@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Thursday January 15, 2026 at 12:36:25 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -21,8 +21,12 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.subsystems.sim.FlywheelViz;
 
 public class FlywheelIOSim implements FlywheelIO {
+  private final FlywheelViz flywheelViz =
+      new FlywheelViz(FlywheelConstants.flywheelRadiusMeters, 0.5);
+
   private final DCMotor plant = DCMotor.getNeoVortex(1);
   private final FlywheelSim sim =
       new FlywheelSim(
@@ -40,10 +44,17 @@ public class FlywheelIOSim implements FlywheelIO {
     inputs.appliedVolts = appliedVolts;
     inputs.velocityRPM = sim.getAngularVelocityRPM();
     inputs.temperatureC = 0;
+
+    flywheelViz.update(inputs.velocityRPM, true);
   }
 
   @Override
   public void runVoltage(double volts) {
     appliedVolts = volts;
+  }
+
+  @Override
+  public void runVelocity(double velocityRPM) {
+    appliedVolts = velocityRPM / FlywheelConstants.maxFlywheelRPM * Constants.maxVoltage;
   }
 }
