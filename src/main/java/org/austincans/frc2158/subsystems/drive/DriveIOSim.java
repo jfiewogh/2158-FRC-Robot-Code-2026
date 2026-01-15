@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 12:34:16 CST
+// Updated on Thursday January 15, 2026 at 11:35:20 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -42,10 +42,6 @@ public class DriveIOSim implements DriveIO {
     inputs.chassisSpeeds = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
   }
 
-  public void resetPose(Pose2d pose) {
-    simulation.setSimulationWorldPose(pose);
-  }
-
   @Override
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
@@ -72,15 +68,21 @@ public class DriveIOSim implements DriveIO {
     }
   }
 
+  @Override
+  public void setModules(Module[] modules) {
+    this.modules = modules;
+  }
+
+  @Override
+  public void resetPose(Pose2d pose) {
+    simulation.setSimulationWorldPose(pose);
+  }
+
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
       states[i] = modules[i].getState();
     }
     return states;
-  }
-
-  public void setModules(Module[] modules) {
-    this.modules = modules;
   }
 }
