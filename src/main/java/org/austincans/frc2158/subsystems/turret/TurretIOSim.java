@@ -21,12 +21,13 @@ import org.austincans.frc2158.Constants;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class TurretIOSim implements TurretIO {
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);
-  private final FlywheelSim sim =
-      new FlywheelSim(LinearSystemId.createFlywheelSystem(motorBase, 0.01, 1), motorBase);
+  private final DCMotorSim sim = new DCMotorSim(
+      LinearSystemId.createDCMotorSystem(motorBase, TurretConstants.rotationalInertiaMetersSq, TurretConstants.gearing),
+      motorBase);
 
   private double appliedVoltage = 0;
 
