@@ -1,16 +1,31 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Friday January 16, 2026 at 12:36:02 CST
+
 package org.austincans.frc2158.commands;
-
-import java.util.function.Supplier;
-
-import org.austincans.frc2158.subsystems.Flywheel;
-import org.austincans.frc2158.subsystems.hood.Hood;
-import org.austincans.frc2158.subsystems.turret.Turret;
-import org.austincans.frc2158.util.ShooterMath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
+import org.austincans.frc2158.subsystems.Flywheel;
+import org.austincans.frc2158.subsystems.hood.Hood;
+import org.austincans.frc2158.subsystems.turret.Turret;
+import org.austincans.frc2158.util.ShooterMath;
 
 public class TurretTracking extends Command {
 
@@ -18,23 +33,19 @@ public class TurretTracking extends Command {
   private final Flywheel flywheel;
   private final Hood hood;
   private final Supplier<Pose2d> robotPoseSupplier;
-  
-  private static final double FLYWHEEL_RADIUS = 0.0508; //meters
+
+  private static final double FLYWHEEL_RADIUS = 0.0508; // meters
   private static final double GEAR_RATIO = 1.0;
 
   private Translation2d target = new Translation2d();
 
-  private static final Translation2d TURRET_OFFSET =
-      new Translation2d(0, 0); // meters
+  private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
 
   private static final double SHOOTER_HEIGHT = 0.85; // meters
-  private static final double TARGET_HEIGHT = 2.05;  // meters
+  private static final double TARGET_HEIGHT = 2.05; // meters
 
   public TurretTracking(
-      Turret turret,
-      Flywheel flywheel,
-      Hood hood,
-      Supplier<Pose2d> robotPoseSupplier) {
+      Turret turret, Flywheel flywheel, Hood hood, Supplier<Pose2d> robotPoseSupplier) {
 
     this.turret = turret;
     this.flywheel = flywheel;
@@ -53,11 +64,9 @@ public class TurretTracking extends Command {
     Pose2d pose = robotPoseSupplier.get();
 
     Translation2d turretPos =
-        pose.getTranslation()
-            .plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
+        pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
 
-    Rotation2d aimAngle =
-        target.minus(turretPos).getAngle();
+    Rotation2d aimAngle = target.minus(turretPos).getAngle();
 
     turret.setDesiredAngleFieldRelative(aimAngle, pose);
 
@@ -70,12 +79,10 @@ public class TurretTracking extends Command {
     // meters/sec
     double exitVelocity =
         ShooterMath.calculateExitVelocity(
-            distance,
-            TARGET_HEIGHT - SHOOTER_HEIGHT,
-            hoodAngle.getRadians());
+            distance, TARGET_HEIGHT - SHOOTER_HEIGHT, hoodAngle.getRadians());
 
     if (!Double.isNaN(exitVelocity)) {
-      flywheel.setVelocity(exitVelocity/FLYWHEEL_RADIUS * GEAR_RATIO);
+      flywheel.setVelocity(exitVelocity / FLYWHEEL_RADIUS * GEAR_RATIO);
     }
   }
 

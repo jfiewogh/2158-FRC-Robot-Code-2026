@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Friday January 16, 2026 at 12:36:02 CST
 
 package org.austincans.frc2158.util;
 
@@ -37,6 +37,7 @@ public class ScoringLocation {
   /** Configuration object */
   public static final Distance P0 =
       Inches.of(ConfigUtil.getConfigDouble("ELEVATOR_DISTANCE_P0", 21.5)); // Algae 1
+
   public static final Distance P1 =
       Inches.of(ConfigUtil.getConfigDouble("ELEVATOR_DISTANCE_P1", 26.45)); // Coral l1
   public static final Distance P2 =

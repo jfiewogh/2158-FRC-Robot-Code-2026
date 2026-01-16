@@ -13,21 +13,23 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Friday January 16, 2026 at 12:36:02 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
-import org.austincans.frc2158.Constants;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.austincans.frc2158.Constants;
 
 public class TurretIOSim implements TurretIO {
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);
-  private final DCMotorSim sim = new DCMotorSim(
-      LinearSystemId.createDCMotorSystem(motorBase, TurretConstants.rotationalInertiaMetersSq, TurretConstants.gearing),
-      motorBase);
+  private final DCMotorSim sim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(
+              motorBase, TurretConstants.rotationalInertiaMetersSq, TurretConstants.gearing),
+          motorBase);
 
   private double appliedVoltage = 0;
 
@@ -43,10 +45,8 @@ public class TurretIOSim implements TurretIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadPerSec) {
-  }
+  public void setVelocity(double velocityRadPerSec) {}
 
   @Override
-  public void setDesiredAngle(double rad) {
-  }
+  public void setDesiredAngle(Rotation2d angle) {}
 }

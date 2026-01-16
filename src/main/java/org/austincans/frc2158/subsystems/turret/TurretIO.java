@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,16 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Friday January 16, 2026 at 12:36:02 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public interface TurretIO {
   @AutoLog

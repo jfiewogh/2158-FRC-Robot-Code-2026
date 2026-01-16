@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Friday January 16, 2026 at 12:36:02 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -22,9 +22,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
@@ -47,7 +44,7 @@ public class Turret extends AdvancedSubsystem {
     io.setVoltage(voltage);
   }
 
-  public void setTurretVelocity(double degPerSec){
+  public void setTurretVelocity(double degPerSec) {
     io.setVelocity(degPerSec);
   }
 
@@ -142,7 +139,10 @@ public class Turret extends AdvancedSubsystem {
    */
   public Command angleManualControl(DoubleSupplier angleControl) {
     return Commands.run(
-        () -> io.setDesiredAngle(Rotation2d.fromDegrees(getTurretAngle() + angleControl.getAsDouble() * 1)), this);
+        () ->
+            io.setDesiredAngle(
+                Rotation2d.fromDegrees(getTurretAngle() + angleControl.getAsDouble() * 1)),
+        this);
   }
 
   @Override
