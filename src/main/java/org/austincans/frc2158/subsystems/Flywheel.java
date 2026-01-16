@@ -60,6 +60,7 @@ public class Flywheel extends SubsystemBase {
   // Volts per (radian per second squared)
   private static final double kFlywheelKa = 0.001; // TUNE this
 
+
   // The plant holds a state-space model of our flywheel. This system has the following properties:
   //
   // States: [velocity], in radians per second.

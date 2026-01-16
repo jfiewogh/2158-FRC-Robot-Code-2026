@@ -22,6 +22,8 @@ import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 public interface TurretIO {
   @AutoLog
   class TurretIOInputs {
@@ -47,7 +49,7 @@ public interface TurretIO {
 
   public void setVoltage(double voltage);
 
-  public void setDesiredAngle(double angle);
+  public void setDesiredAngle(Rotation2d angle);
 
   public void setVelocity(double degPerSec);
 

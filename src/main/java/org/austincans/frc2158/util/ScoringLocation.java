@@ -37,7 +37,6 @@ public class ScoringLocation {
   /** Configuration object */
   public static final Distance P0 =
       Inches.of(ConfigUtil.getConfigDouble("ELEVATOR_DISTANCE_P0", 21.5)); // Algae 1
-
   public static final Distance P1 =
       Inches.of(ConfigUtil.getConfigDouble("ELEVATOR_DISTANCE_P1", 26.45)); // Coral l1
   public static final Distance P2 =
