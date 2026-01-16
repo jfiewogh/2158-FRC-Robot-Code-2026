@@ -280,7 +280,7 @@ createVersionFile.dependsOn(eventDeploy)
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
 spotless {
-    ratchetFrom('origin/advantage&maple+frc2158')
+    ratchetFrom('2026-import')
     java {
         target fileTree('.') {
             include '**/*.java'

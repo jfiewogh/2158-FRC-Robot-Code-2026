@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Tuesday January 13, 2026 at 11:38:34 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -43,8 +43,8 @@ public class IntakeIOTalonFXS implements IntakeIO {
 
   public IntakeIOTalonFXS() {
     // Initialize motor controller
-    deployMotor = new TalonFXS(deployCanID, ConfigUtil.getConfigString("intakeCanbus", "2158"));
-    intakeMotor = new TalonFXS(intakeCanID, ConfigUtil.getConfigString("intakeCanbus", "2158"));
+    deployMotor = new TalonFXS(deployCanID, IntakeConstants.intakeCANBus);
+    intakeMotor = new TalonFXS(intakeCanID, IntakeConstants.intakeCANBus);
 
     deployMotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);

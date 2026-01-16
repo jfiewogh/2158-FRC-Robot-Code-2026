@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -47,7 +47,6 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.Constants;
-import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -100,9 +99,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
           constants) {
     this.constants = constants;
 
-    driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.DrivetrainConstants.CANBusName);
-    turnTalon = new TalonFX(constants.SteerMotorId, TunerConstants.DrivetrainConstants.CANBusName);
-    cancoder = new CANcoder(constants.EncoderId, TunerConstants.DrivetrainConstants.CANBusName);
+    driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.moduleCANBus);
+    turnTalon = new TalonFX(constants.SteerMotorId, DriveConstants.moduleCANBus);
+    cancoder = new CANcoder(constants.EncoderId, DriveConstants.moduleCANBus);
 
     driveTalonSelfCheck = new SelfCheckingTalonFXPro("Swerve Module Drive Motor", driveTalon);
     turnTalonSelfCheck = new SelfCheckingTalonFXPro("Swerve Module Drive Motor", turnTalon);
@@ -293,10 +292,10 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
       faults.addAll(turnFaults);
     }
 
-    if (faults.isEmpty()) {
-      return null;
-    } else {
-      return faults;
-    }
+    // if (faults.isEmpty()) {
+    //   return null;
+    // } else {
+    return faults;
+    // }
   }
 }

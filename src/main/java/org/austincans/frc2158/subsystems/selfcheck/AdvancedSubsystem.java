@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,11 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:34:06 CST
+// Updated on Tuesday January 13, 2026 at 11:38:34 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
-import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -151,10 +150,6 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
       }
     }
     return worstStatus;
-  }
-
-  public void registerHardware(String label, BaseMotorController phoenixMotor) {
-    hardware.add(new SelfCheckingPhoenixMotor(label, phoenixMotor));
   }
 
   public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFX talon) {

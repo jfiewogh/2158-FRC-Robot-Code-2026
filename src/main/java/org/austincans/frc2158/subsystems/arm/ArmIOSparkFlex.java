@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,14 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -82,7 +82,7 @@ public class ArmIOSparkFlex implements ArmIO {
 
   @Override
   public void setVoltage(double voltage) {
-    controller.setReference(voltage, ControlType.kVoltage);
+    controller.setSetpoint(voltage, ControlType.kVoltage);
   }
 
   // Encoder Values
@@ -93,11 +93,11 @@ public class ArmIOSparkFlex implements ArmIO {
 
   public void setPosition(double position, double VelocityRadPerSec) {
     feedforward.calculate(Units.degreesToRadians(position), VelocityRadPerSec);
-    controller.setReference(position, ControlType.kPosition);
+    controller.setSetpoint(position, ControlType.kPosition);
   }
 
   public void setVelocity(double velocity) {
-    controller.setReference(velocity, ControlType.kVelocity);
+    controller.setSetpoint(velocity, ControlType.kVelocity);
   }
 
   public void updateInputs(ArmIOInputs inputs) {

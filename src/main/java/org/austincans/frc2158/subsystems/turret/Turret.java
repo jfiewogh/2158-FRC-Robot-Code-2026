@@ -30,8 +30,8 @@ import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class Turret extends AdvancedSubsystem {
-  private TurretIO io;
-  private TurretIOInputsAutoLogged inputs;
+  private final TurretIO io;
+  private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
   public Turret(TurretIO io) {
     this.io = io;

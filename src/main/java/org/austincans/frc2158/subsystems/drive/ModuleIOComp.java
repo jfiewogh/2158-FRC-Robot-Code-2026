@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 13, 2026 at 12:34:16 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -85,9 +85,9 @@ public class ModuleIOComp implements ModuleIO {
   private final StatusSignal<Current> turnTorqueCurrentAmps;
 
   public ModuleIOComp(ModuleConfig config) {
-    driveTalon = new TalonFX(config.driveMotorId(), "*");
-    turnTalon = new TalonFX(config.turnMotorId(), "*");
-    encoder = new CANcoder(config.encoderChannel(), "*");
+    driveTalon = new TalonFX(config.driveMotorId(), DriveConstants.moduleCANBus);
+    turnTalon = new TalonFX(config.turnMotorId(), DriveConstants.moduleCANBus);
+    encoder = new CANcoder(config.encoderChannel(), DriveConstants.moduleCANBus);
     encoderOffset = config.encoderOffset();
 
     // Configure drive motor
