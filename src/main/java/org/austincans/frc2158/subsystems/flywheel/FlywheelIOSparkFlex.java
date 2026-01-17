@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 16, 2026 at 12:36:02 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -29,11 +29,11 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class FlywheelIOSparkFlex implements FlywheelIO {
-  private final SparkFlex motor = new SparkFlex(FlywheelConstants.flywheelId, MotorType.kBrushless);
+  private final SparkFlex motor = new SparkFlex(FlywheelConstants.motorId, MotorType.kBrushless);
   private final SelfCheckingSparkFlex selfCheckMotor = new SelfCheckingSparkFlex("flywheel", motor);
 
   private final CANcoder encoder =
-      new CANcoder(FlywheelConstants.flywheelEncoderId, FlywheelConstants.canBus);
+      new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
   private final SparkClosedLoopController controller = motor.getClosedLoopController();
 
   public FlywheelIOSparkFlex() {}

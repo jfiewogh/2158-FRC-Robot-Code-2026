@@ -13,15 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 11:21:17 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import java.util.function.DoubleSupplier;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,25 +29,33 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
+import org.littletonrobotics.junction.Logger;
 
 // This simulation handles shooting fuel
 public class FlywheelSimViz {
   private final double radius;
   private final double shootingDelay;
   private final IntakeSimulation intakeSimulation;
+  private final DoubleSupplier hoodAngleRadSupplier;
 
   private final Timer timer = new Timer();
   private double lastShootingTime = 0;
 
-  public FlywheelSimViz(double radius, double shootingDelay, 
-    IntakeSimulation intakeSimulation, DoubleSupplier hoodAngleRadSupplier) {
+  public FlywheelSimViz(
+      double radius,
+      double shootingDelay,
+      IntakeSimulation intakeSimulation,
+      DoubleSupplier hoodAngleRadSupplier) {
     this.radius = radius;
     this.shootingDelay = shootingDelay;
     this.intakeSimulation = intakeSimulation;
+    this.hoodAngleRadSupplier = hoodAngleRadSupplier;
     timer.start();
   }
 
@@ -62,10 +69,11 @@ public class FlywheelSimViz {
 
       Pose2d robotPose = RobotState.getInstance().getEstimatedPose();
 
-      Distance initialHeight = Distance.ofBaseUnits(0.5, Meters);
+      Distance initialHeight = Distance.ofBaseUnits(TurretConstants.turretHeight, Meters);
       LinearVelocity launchingSpeed =
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
-      Angle shooterAngle = Angle.ofBaseUnits(70, Degrees); // TODO: should be based on hood angle
+      Angle shooterAngle = Angle.ofBaseUnits(hoodAngleRadSupplier.getAsDouble(), Radians);
+      Logger.recordOutput("FlywheelSim/ShooterAngleDeg", shooterAngle.in(Degrees));
 
       SimulatedArena.getInstance()
           .addGamePieceProjectile(

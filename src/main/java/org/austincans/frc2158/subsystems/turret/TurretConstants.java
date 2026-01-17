@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 16, 2026 at 12:36:02 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -29,6 +29,8 @@ public class TurretConstants {
       new CANBus(ConfigUtil.getConfigString("intakeCanbus", "2158"));
 
   public static final double gearing = 1;
+
+  public static final double turretHeight = 0.762;
 
   // Turret Sim
   public static final double rotationalInertiaMetersSq = 0.01;

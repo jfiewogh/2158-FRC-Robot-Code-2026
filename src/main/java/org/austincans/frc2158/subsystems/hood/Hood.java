@@ -13,17 +13,28 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 16, 2026 at 12:36:02 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
 
-public interface Hood {
-  void setAngle(Rotation2d angle);
+public class Hood {
+  private final HoodIO io;
 
-  Rotation2d getAngle();
+  public Hood(HoodIO io) {
+    this.io = io;
+  }
 
-  boolean atAngle();
+  public void setAngle(Rotation2d angle) {
+    io.setAngle(angle);
+  }
+
+  public Rotation2d getAngle() {
+    return io.getAngle();
+  }
+
+  public boolean atAngle() {
+    return io.atAngle();
+  }
 }

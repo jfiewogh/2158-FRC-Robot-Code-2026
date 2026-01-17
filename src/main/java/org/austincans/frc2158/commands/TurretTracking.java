@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 16, 2026 at 12:36:02 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.commands;
 
@@ -22,18 +22,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.function.Supplier;
-
-import org.austincans.frc2158.subsystems.Flywheel;
+import org.austincans.frc2158.subsystems.flywheel.Flywheel;
+import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.turret.Turret;
+import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.austincans.frc2158.util.ShooterMath;
 
 public class TurretTracking extends Command {
@@ -44,9 +42,9 @@ public class TurretTracking extends Command {
   private final Supplier<Pose2d> robotPoseSupplier;
   private final Supplier<ChassisSpeeds> robotVelSupplier;
 
-  private static final double FLYWHEEL_RADIUS = 0.0508; // meters
-  private static final double GEAR_RATIO = 1.0;
-  private static final double FLYWHEEL_MAXRPM = 0;
+  private static final double FLYWHEEL_RADIUS = FlywheelConstants.radiusMeters; // meters
+  private static final double GEAR_RATIO = FlywheelConstants.gearing;
+  private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
 
   private final Translation3d blueHubPose = new Translation3d(4.5974, 4.034536, 1.5748);
   private final Translation3d redHubPose = new Translation3d(11.938, 4.034536, 1.5748);
@@ -55,11 +53,15 @@ public class TurretTracking extends Command {
 
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
 
-  private static final double TURRET_HEIGHT = 0.85; // meters
+  private static final double TURRET_HEIGHT = TurretConstants.turretHeight; // meters
   private static final double TARGET_HEIGHT = 2.05; // meters
 
   public TurretTracking(
-      Turret turret, Flywheel flywheel, Hood hood, Supplier<Pose2d> robotPoseSupplier, Supplier<ChassisSpeeds> robotVelSupplier) {
+      Turret turret,
+      Flywheel flywheel,
+      Hood hood,
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<ChassisSpeeds> robotVelSupplier) {
 
     this.turret = turret;
     this.flywheel = flywheel;
@@ -81,18 +83,30 @@ public class TurretTracking extends Command {
 
     Translation2d turretPos =
         pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
-    if (DriverStation.getAlliance().get() == Alliance.Blue){
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
       hubPose = blueHubPose.toTranslation2d();
     } else {
       hubPose = redHubPose.toTranslation2d();
     }
+
     flywheel.setVelocity(FLYWHEEL_MAXRPM * 0.75);
-    hood.setAngle(Rotation2d.fromRadians(ShooterMath.calculateProjectileAngle(TURRET_HEIGHT, FLYWHEEL_MAXRPM * 0.75, turretPos.getDistance(hubPose), redHubPose.getZ())));
+    double shooterAngleRad =
+        ShooterMath.calculateProjectileAngle(
+            TURRET_HEIGHT,
+            Units.rotationsToRadians(FLYWHEEL_MAXRPM * 0.75) / 60 * FLYWHEEL_RADIUS,
+            turretPos.getDistance(hubPose),
+            redHubPose.getZ());
+    hood.setAngle(Rotation2d.fromRadians(shooterAngleRad));
+    System.out.println(shooterAngleRad);
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    flywheel.setVelocity(0);
   }
 
   @Override
   public boolean isFinished() {
-    flywheel.setVelocity(0);
     return false;
   }
 }

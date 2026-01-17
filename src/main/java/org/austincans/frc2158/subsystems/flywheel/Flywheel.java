@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 11:21:17 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -58,13 +58,13 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-      Commands.runOnce(() -> io.runVelocity(100)),
-      Commands.waitSeconds(0.3),
-      Commands.runOnce(() -> {
-        if (getRPM() < 95 || getRPM() > 105) {
-          addFault("[System Check] Flywheel did not reach desired velocity RPM");
-        }
-      })
-    );
+        Commands.runOnce(() -> io.runVelocity(100)),
+        Commands.waitSeconds(0.3),
+        Commands.runOnce(
+            () -> {
+              if (getRPM() < 95 || getRPM() > 105) {
+                addFault("[System Check] Flywheel did not reach desired velocity RPM");
+              }
+            }));
   }
 }

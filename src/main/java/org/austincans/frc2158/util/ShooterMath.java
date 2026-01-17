@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 16, 2026 at 12:36:02 CST
+// Updated on Saturday January 17, 2026 at 14:48:32 CST
 
 package org.austincans.frc2158.util;
 
@@ -39,36 +39,47 @@ public class ShooterMath {
     return Math.sqrt(numerator / denominator);
   }
 
-  // calculate projectile launch angle given (initial exitVelocity and height), (target height and distance)
-  public static double calculateProjectileAngle(double initHeight, double initSpeed, double targetDistance, double targetHeight) {
-    double deltaY = targetHeight - initHeight;
+  // calculate projectile launch angle given (initial exitVelocity and height), (target height and
+  // distance)
+  public static double calculateProjectileAngle(
+      double initHeight, double initSpeed, double targetDistance, double targetHeight) {
+    double yDisplacement = targetHeight - initHeight;
 
-    double a = (GRAVITY * Math.pow(targetDistance, 2)) / (2 * Math.pow(initSpeed, 2));
-    double b = targetDistance;
-    double c = - (deltaY + a);
-    
-    double discriminant = Math.pow(b,2) - 4*a*c;
-    
-    if (discriminant < 0){
-        return 0;
-    }
-    
-    double tan_theta1 = (-b + Math.sqrt(discriminant)) / (2*a);
-    double tan_theta2 = (-b - Math.sqrt(discriminant)) / (2*a);
-    
-    double angle1_rad = Math.atan(tan_theta1);
-    double angle2_rad = Math.atan(tan_theta2);
+    double pos_numerator =
+        Math.pow(initSpeed, 2)
+            + Math.sqrt(
+                Math.pow(initSpeed, 4)
+                    - GRAVITY
+                        * (GRAVITY * Math.pow(targetDistance, 2)
+                            + 2 * yDisplacement * Math.pow(initSpeed, 2)));
+    double neg_numerator =
+        Math.pow(initSpeed, 2)
+            - Math.sqrt(
+                Math.pow(initSpeed, 4)
+                    - GRAVITY
+                        * (GRAVITY * Math.pow(targetDistance, 2)
+                            + 2 * yDisplacement * Math.pow(initSpeed, 2)));
+
+    double denominator = GRAVITY * targetDistance;
+
+    double angle1_rad = Math.atan(pos_numerator / denominator);
+    double angle2_rad = Math.atan(neg_numerator / denominator);
 
     return Math.max(angle1_rad, angle2_rad);
   }
 
-  public static double calculateDragForce(double exitVelocityMeters, double objectAreaMeters){
+  public static double calculateDragForce(double exitVelocityMeters, double objectAreaMeters) {
     double dragForceNewtons = 0;
-    dragForceNewtons = (OBJECT_MASS) * (DRAG_COEFF) * (AIR_DENSITY) * Math.pow(exitVelocityMeters, 2) * (objectAreaMeters);
+    dragForceNewtons =
+        (OBJECT_MASS)
+            * (DRAG_COEFF)
+            * (AIR_DENSITY)
+            * Math.pow(exitVelocityMeters, 2)
+            * (objectAreaMeters);
     return dragForceNewtons / (OBJECT_MASS);
   }
 
-  public static double compensateForDrag(double dragForceNewtons, double time){ // TODO: Finish me
+  public static double compensateForDrag(double dragForceNewtons, double time) { // TODO: Finish me
     return 0;
   }
 }
