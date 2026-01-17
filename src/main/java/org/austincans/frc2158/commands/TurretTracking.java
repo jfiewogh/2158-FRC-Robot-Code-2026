@@ -20,9 +20,17 @@ package org.austincans.frc2158.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.function.Supplier;
+
 import org.austincans.frc2158.subsystems.Flywheel;
 import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.turret.Turret;
@@ -38,6 +46,10 @@ public class TurretTracking extends Command {
 
   private static final double FLYWHEEL_RADIUS = 0.0508; // meters
   private static final double GEAR_RATIO = 1.0;
+  private static final double FLYWHEEL_MAXRPM = 0;
+
+  private final Translation3d blueHubPose = new Translation3d(4.5974, 4.034536, 1.5748);
+  private final Translation3d redHubPose = new Translation3d(11.938, 4.034536, 1.5748);
 
   private Translation2d target = new Translation2d();
 
@@ -64,11 +76,18 @@ public class TurretTracking extends Command {
 
   @Override
   public void execute() {
+    Translation2d hubPose;
     Pose2d pose = robotPoseSupplier.get();
 
     Translation2d turretPos =
         pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
-    
+    if (DriverStation.getAlliance().get() == Alliance.Blue){
+      hubPose = blueHubPose.toTranslation2d();
+    } else {
+      hubPose = redHubPose.toTranslation2d();
+    }
+    flywheel.setVelocity(FLYWHEEL_MAXRPM * 0.75);
+    hood.setAngle(Rotation2d.fromRadians(ShooterMath.calculateProjectileAngle(TURRET_HEIGHT, FLYWHEEL_MAXRPM * 0.75, turretPos.getDistance(hubPose), redHubPose.getZ())));
   }
 
   @Override

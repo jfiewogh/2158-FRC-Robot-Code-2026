@@ -18,6 +18,7 @@
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 
 public interface Hood {
   void setAngle(Rotation2d angle);
