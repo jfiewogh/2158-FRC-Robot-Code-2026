@@ -18,11 +18,14 @@
 package org.austincans.frc2158.util;
 
 public class ShooterMath {
-
   private static final double GRAVITY = 9.80665;
 
-  // Calculate flywheel velocity given distance and setAngle (turret)
-  public static double calculateExitVelocity(
+  private static final double DRAG_COEFF = 0.91175;
+  private static final double AIR_DENSITY = 1.225; // kg/m^3
+  private static final double OBJECT_MASS = 0.227; // kg
+
+  // Calculate flywheel velocity given distance and hood angle
+  public static double calculateProjectileVelocity(
       double distanceMeters, double heightDifferenceMeters, double hoodAngleRadians) {
 
     double cos = Math.cos(hoodAngleRadians);
@@ -34,5 +37,38 @@ public class ShooterMath {
     if (denominator <= 0) return Double.NaN;
 
     return Math.sqrt(numerator / denominator);
+  }
+
+  // calculate projectile launch angle given (initial exitVelocity and height), (target height and distance)
+  public static double calculateProjectileAngle(double initHeight, double initSpeed, double targetDistance, double targetHeight) {
+    double deltaY = targetHeight - initHeight;
+
+    double a = (GRAVITY * Math.pow(targetDistance, 2)) / (2 * Math.pow(initSpeed, 2));
+    double b = targetDistance;
+    double c = - (deltaY + a);
+    
+    double discriminant = Math.pow(b,2) - 4*a*c;
+    
+    if (discriminant < 0){
+        return 0;
+    }
+    
+    double tan_theta1 = (-b + Math.sqrt(discriminant)) / (2*a);
+    double tan_theta2 = (-b - Math.sqrt(discriminant)) / (2*a);
+    
+    double angle1_rad = Math.atan(tan_theta1);
+    double angle2_rad = Math.atan(tan_theta2);
+
+    return Math.max(angle1_rad, angle2_rad);
+  }
+
+  public static double calculateDragForce(double exitVelocityMeters, double objectAreaMeters){
+    double dragForceNewtons = 0;
+    dragForceNewtons = (OBJECT_MASS) * (DRAG_COEFF) * (AIR_DENSITY) * Math.pow(exitVelocityMeters, 2) * (objectAreaMeters);
+    return dragForceNewtons / (OBJECT_MASS);
+  }
+
+  public static double compensateForDrag(double dragForceNewtons, double time){ // TODO: Finish me
+    return 0;
   }
 }
