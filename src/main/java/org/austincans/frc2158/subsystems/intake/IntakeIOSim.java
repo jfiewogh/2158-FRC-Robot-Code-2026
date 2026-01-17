@@ -13,24 +13,22 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 09:08:14 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158.subsystems.intake;
+
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.math.Angle;
-import org.austincans.frc2158.subsystems.sim.IntakeViz;
+import org.austincans.frc2158.subsystems.sim.IntakeSimViz;
 import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 
 public class IntakeIOSim implements IntakeIO {
-  private final IntakeViz intakeViz;
+  private final IntakeSimViz intakeSimViz;
 
   private final DCMotor deployMotor = DCMotor.getNeoVortex(1);
   private final DCMotor intakeMotor = DCMotor.getNeoVortex(1);
@@ -52,18 +50,8 @@ public class IntakeIOSim implements IntakeIO {
 
   private double intakeAppliedVolts;
 
-  private final IntakeSimulation intakeSimulation;
-
-  public IntakeIOSim(AbstractDriveTrainSimulation driveTrainSimulation) {
-    intakeSimulation = IntakeSimulation.OverTheBumperIntake(
-      "Fuel",
-      driveTrainSimulation,
-      Meters.of(0.7),
-      Meters.of(0.2),
-      IntakeSimulation.IntakeSide.BACK,
-      1);
-
-    intakeViz = new IntakeViz(intakeSimulation);
+  public IntakeIOSim(IntakeSimulation intakeSimulation) {
+    intakeSimViz = new IntakeSimViz(intakeSimulation);
   }
 
   @Override
@@ -91,7 +79,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.intakeVelocityRadPerSec = intakeSim.getAngularVelocity().in(RadiansPerSecond);
     inputs.intakeTemperatureC = 0;
 
-    intakeViz.update(inputs.intakeVelocityRadPerSec);
+    intakeSimViz.update(inputs.intakeVelocityRadPerSec);
   }
 
   @Override

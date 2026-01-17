@@ -13,27 +13,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 09:08:14 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
-import org.ironmaple.simulation.IntakeSimulation;
-
-public class IntakeViz {
-    private final IntakeSimulation intakeSimulation;
-
-    public IntakeViz(IntakeSimulation intakeSimulation) {
-        this.intakeSimulation = intakeSimulation;
-    }
-
-    public void update(double velocityRadPerSec) {
-
-        // TODO: move this to IntakeIOSim
-        // (only logged poses should be in here)
-        if (velocityRadPerSec > 0) {
-            intakeSimulation.startIntake();
-        } else {
-            intakeSimulation.stopIntake();
-        }
-    }
-}
+// This is used to visualize the intake deploy and retract
+public class IntakeViz {}

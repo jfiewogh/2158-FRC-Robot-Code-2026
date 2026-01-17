@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 09:08:14 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158;
 
@@ -45,5 +45,21 @@ public class KeyboardInput {
 
   public JoystickButton v() {
     return new JoystickButton(joystick0, 4);
+  }
+
+  public double leftX() {
+    return -joystick0.getRawAxis(0);
+  }
+
+  public double leftY() {
+    return -joystick0.getRawAxis(1);
+  }
+
+  public double rightX() {
+    return -joystick2.getRawAxis(0);
+  }
+
+  public double rightY() {
+    return -joystick2.getRawAxis(1);
   }
 }

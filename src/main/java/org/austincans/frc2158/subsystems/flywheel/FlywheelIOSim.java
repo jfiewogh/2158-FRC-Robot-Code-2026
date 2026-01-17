@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 09:08:14 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -24,11 +24,11 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.austincans.frc2158.Constants;
-import org.austincans.frc2158.subsystems.sim.FlywheelViz;
+import org.austincans.frc2158.subsystems.sim.FlywheelSimViz;
+import org.ironmaple.simulation.IntakeSimulation;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private final FlywheelViz flywheelViz =
-      new FlywheelViz(FlywheelConstants.flywheelRadiusMeters, 0.5);
+  private final FlywheelSimViz flywheelSimViz;
 
   private final DCMotor plant = DCMotor.getNeoVortex(1);
   private final FlywheelSim sim =
@@ -43,6 +43,10 @@ public class FlywheelIOSim implements FlywheelIO {
       new SimpleMotorFeedforward(FlywheelConstants.kS, FlywheelConstants.kV, FlywheelConstants.kA);
 
   private double appliedVolts;
+
+  public FlywheelIOSim(IntakeSimulation intakeSimulation) {
+    flywheelSimViz = new FlywheelSimViz(appliedVolts, appliedVolts, intakeSimulation);
+  }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
@@ -62,7 +66,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
     // TODO: whether it can shoot should be based on whether it has passed through indexer
     // (create Indexer subsystem and IndexerViz)
-    flywheelViz.update(inputs.velocityRPM, inputs.velocityRPM != 0);
+    flywheelSimViz.update(inputs.velocityRPM, inputs.velocityRPM > 100);
   }
 
   @Override

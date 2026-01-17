@@ -13,10 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 09:08:14 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.austincans.frc2158.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.math.Angle;
@@ -37,6 +39,7 @@ import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim;
 import org.austincans.frc2158.subsystems.intake.Intake;
 import org.austincans.frc2158.subsystems.intake.IntakeIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
@@ -66,6 +69,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    DoubleSupplier leftY = () -> -controller.getLeftY();
+    DoubleSupplier leftX = () -> -controller.getLeftX();
+    DoubleSupplier rightY = () -> -controller.getRightX();
+    DoubleSupplier rightX = () -> -controller.getRightY();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -109,14 +117,28 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
-        Flywheel flywheel = new Flywheel(new FlywheelIOSim());
-        Intake intake = new Intake(new IntakeIOSim());
+        IntakeSimulation intakeSimulation =
+            IntakeSimulation.OverTheBumperIntake(
+                "Fuel",
+                driveSimulation,
+                Meters.of(0.7),
+                Meters.of(0.2),
+                IntakeSimulation.IntakeSide.BACK,
+                20);
+        Intake intake = new Intake(new IntakeIOSim(intakeSimulation));
+
+        Flywheel flywheel = new Flywheel(new FlywheelIOSim(intakeSimulation));
 
         KeyboardInput keyboardInput = new KeyboardInput();
         keyboardInput.z().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
         keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
         keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));
-        keyboardInput.v().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.kNull)));
+        keyboardInput.v().whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(1)));
+
+        leftX = keyboardInput::leftX;
+        leftY = keyboardInput::leftY;
+        rightX = keyboardInput::rightX;
+        rightY = keyboardInput::rightY;
 
         break;
 
@@ -155,6 +177,9 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -166,15 +191,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX(),
-            () -> -controller.getRightY()));
-
     // Lock to 0° when A button is held
     controller
         .a()

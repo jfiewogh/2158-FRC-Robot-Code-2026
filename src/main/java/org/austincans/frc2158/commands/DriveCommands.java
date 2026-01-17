@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
+// Updated on Saturday January 17, 2026 at 11:21:17 CST
 
 package org.austincans.frc2158.commands;
 
@@ -58,11 +58,11 @@ public class DriveCommands {
 
   @SuppressWarnings("unused")
   private static final OmegaMode omegaMode = OmegaMode.POSITION;
+
   // if position, use joystickDriveAtAngle
   // if speed, use joystickDrive
 
   private static final double hasInputThreshold = 0.1;
-
 
   private DriveCommands() {}
 
@@ -80,8 +80,7 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  public static void updateJoystickHasInput(
-      DoubleSupplier... suppliers) {
+  public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
     Drive.joystickHasInput = false;
     for (DoubleSupplier supplier : suppliers) {
       if (Math.abs(supplier.getAsDouble()) >= hasInputThreshold) {
@@ -120,10 +119,10 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
-          
+
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
+                  && DriverStation.getAlliance().get() == Alliance.Blue;
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
@@ -157,8 +156,11 @@ public class DriveCommands {
     // Construct command
     return Commands.run(
             () -> {
-              updateJoystickHasInput(xSupplier, ySupplier, 
-                () -> rotationSupplier.get().getCos(), () -> rotationSupplier.get().getSin());
+              updateJoystickHasInput(
+                  xSupplier,
+                  ySupplier,
+                  () -> rotationSupplier.get().getCos(),
+                  () -> rotationSupplier.get().getSin());
 
               // Get linear velocity
               Translation2d linearVelocity =
