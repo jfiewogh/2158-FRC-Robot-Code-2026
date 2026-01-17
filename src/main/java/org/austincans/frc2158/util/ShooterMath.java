@@ -17,6 +17,10 @@
 
 package org.austincans.frc2158.util;
 
+import com.google.protobuf.DoubleValueOrBuilder;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
 
@@ -41,32 +45,53 @@ public class ShooterMath {
 
   // calculate projectile launch angle given (initial exitVelocity and height), (target height and
   // distance)
-  public static double calculateProjectileAngle(
-      double initHeight, double initSpeed, double targetDistance, double targetHeight) {
-    double yDisplacement = targetHeight - initHeight;
+public static double calculateProjectileAngle(
+    double initHeight, 
+    double initSpeed, 
+    double targetDistance, 
+    double targetHeight,
+    ChassisSpeeds robotVel){
 
-    double pos_numerator =
-        Math.pow(initSpeed, 2)
-            + Math.sqrt(
-                Math.pow(initSpeed, 4)
-                    - GRAVITY
-                        * (GRAVITY * Math.pow(targetDistance, 2)
-                            + 2 * yDisplacement * Math.pow(initSpeed, 2)));
-    double neg_numerator =
-        Math.pow(initSpeed, 2)
-            - Math.sqrt(
-                Math.pow(initSpeed, 4)
-                    - GRAVITY
-                        * (GRAVITY * Math.pow(targetDistance, 2)
-                            + 2 * yDisplacement * Math.pow(initSpeed, 2)));
+  double yDisplacement = targetHeight - initHeight;
 
-    double denominator = GRAVITY * targetDistance;
+  double effectiveDistance = targetDistance;
+  double effectiveSpeed = initSpeed;
+  
+  double angleEstimate = solveForAngle(effectiveDistance, effectiveSpeed, yDisplacement);
+  double time = effectiveDistance / (effectiveSpeed * Math.cos(angleEstimate));
+  
+  double lateralDrift = robotVel.vyMetersPerSecond * time;
+  effectiveDistance = Math.sqrt(
+      targetDistance * targetDistance + lateralDrift * lateralDrift);
+  effectiveSpeed = initSpeed - robotVel.vxMetersPerSecond;
+  
+  if (effectiveSpeed <= 0) return 0;
+  if(angleEstimate <= 0) return 0;
 
-    double angle1_rad = Math.atan(pos_numerator / denominator);
-    double angle2_rad = Math.atan(neg_numerator / denominator);
+  return solveForAngle(effectiveDistance, effectiveSpeed, yDisplacement);
+}
 
-    return Math.max(angle1_rad, angle2_rad);
-  }
+private static double solveForAngle(
+    double distance, double speed, double yDisplacement) {
+  
+  double discriminant = 
+      Math.pow(speed, 4)
+          - GRAVITY * (GRAVITY * Math.pow(distance, 2)
+              + 2 * yDisplacement * Math.pow(speed, 2));
+  
+  if (discriminant < 0) return Double.NaN;
+  
+  double sqrtDiscriminant = Math.sqrt(discriminant);
+  
+  double pos_numerator = Math.pow(speed, 2) + sqrtDiscriminant;
+  double neg_numerator = Math.pow(speed, 2) - sqrtDiscriminant;
+  double denominator = GRAVITY * distance;
+
+  double angle1_rad = Math.atan(pos_numerator / denominator);
+  double angle2_rad = Math.atan(neg_numerator / denominator);
+
+  return Math.max(angle1_rad, angle2_rad);
+}
 
   public static double calculateDragForce(double exitVelocityMeters, double objectAreaMeters) {
     double dragForceNewtons = 0;
