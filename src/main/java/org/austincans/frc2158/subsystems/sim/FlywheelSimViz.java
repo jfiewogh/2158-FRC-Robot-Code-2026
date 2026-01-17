@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 15:50:10 CST
+// Updated on Saturday January 17, 2026 at 17:14:59 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -87,7 +87,7 @@ public class FlywheelSimViz {
               new RebuiltFuelOnFly(
                   robotPose.getTranslation(),
                   new Translation2d(),
-                  RobotState.getInstance().getFieldVelocity(),
+                  RobotState.getInstance().getRobotVelocity(),
                   turretAngle.get(),
                   initialHeight,
                   launchingSpeed,

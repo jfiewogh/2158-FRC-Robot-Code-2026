@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 15:50:10 CST
+// Updated on Saturday January 17, 2026 at 17:14:59 CST
 
 package org.austincans.frc2158.commands;
 
@@ -54,7 +54,7 @@ public class TurretTracking extends Command {
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
 
   private static final double TURRET_HEIGHT = TurretConstants.turretHeight; // meters
-  private static final double TARGET_HEIGHT = 2.05; // meters
+  private static final double TARGET_HEIGHT = Units.inchesToMeters(72); // meters
 
   public TurretTracking(
       Turret turret,
@@ -78,31 +78,63 @@ public class TurretTracking extends Command {
 
   @Override
   public void execute() {
-    Translation2d hubPose;
+    Translation2d hubTranslation;
     Pose2d pose = robotPoseSupplier.get();
 
-    Translation2d turretPos =
+    Translation2d turretTranslation =
         pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
+
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      hubPose = blueHubPose.toTranslation2d();
+      hubTranslation = blueHubPose.toTranslation2d();
     } else {
-      hubPose = redHubPose.toTranslation2d();
+      hubTranslation = redHubPose.toTranslation2d();
     }
 
-    Rotation2d turretAngle =
-        Rotation2d.fromRadians(
-            Math.atan2(hubPose.getY() - turretPos.getY(), hubPose.getX() - turretPos.getX()));
-    turret.setDesiredAngleFieldRelative(turretAngle, pose);
-
     flywheel.setVelocity(FLYWHEEL_MAXRPM * 0.75);
-    double shooterAngleRad =
+
+    // Effective values
+
+    double effectiveVelocity =
+        Units.rotationsToRadians(FLYWHEEL_MAXRPM * 0.75) / 60 * FLYWHEEL_RADIUS;
+
+    double effectiveXYDistance = turretTranslation.getDistance(hubTranslation);
+
+    double effectivePitchRad =
         ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT,
-            Units.rotationsToRadians(FLYWHEEL_MAXRPM * 0.75) / 60 * FLYWHEEL_RADIUS,
-            turretPos.getDistance(hubPose),
-            redHubPose.getZ());
-    hood.setAngle(Rotation2d.fromRadians(shooterAngleRad));
-    System.out.println(shooterAngleRad);
+            TURRET_HEIGHT, effectiveVelocity, effectiveXYDistance, TARGET_HEIGHT);
+    System.out.println("first pitch: " + effectivePitchRad);
+
+    Rotation2d effectiveYaw =
+        Rotation2d.fromRadians(
+            Math.atan2(
+                hubTranslation.getY() - turretTranslation.getY(),
+                hubTranslation.getX() - turretTranslation.getX()));
+    System.out.println("first yaw: " + effectiveYaw.getRadians());
+
+    double effectiveXYVelocity = effectiveVelocity * Math.cos(effectivePitchRad);
+    double effectiveXVelocity = effectiveXYVelocity * effectiveYaw.getCos();
+    double effectiveYVelocity = effectiveXYVelocity * effectiveYaw.getSin();
+
+    // CALCULATE TURRET YAW
+
+    ChassisSpeeds robotSpeeds = robotVelSupplier.get();
+    double turretSpeedX = effectiveXVelocity - robotSpeeds.vxMetersPerSecond;
+    double turretSpeedY = effectiveYVelocity - robotSpeeds.vyMetersPerSecond;
+    double turretSpeed = Math.hypot(turretSpeedX, turretSpeedY);
+    Rotation2d turretYaw = Rotation2d.fromRadians(Math.atan2(turretSpeedY, turretSpeedX));
+    System.out.println("second yaw: " + turretYaw.getRadians());
+    turret.setDesiredAngleFieldRelative(turretYaw, pose);
+
+    // CALCULATE HOOD ANGLE
+
+    double time = effectiveXYDistance / effectiveXYVelocity;
+
+    double turretPitchRad =
+        ShooterMath.calculateProjectileAngle(
+            TURRET_HEIGHT, effectiveVelocity, turretSpeed * time, TARGET_HEIGHT);
+    System.out.println("second pitch: " + turretPitchRad);
+
+    hood.setAngle(Rotation2d.fromRadians(turretPitchRad));
   }
 
   @Override
