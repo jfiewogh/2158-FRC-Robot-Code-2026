@@ -65,6 +65,7 @@ public interface IntakeIO {
     public double deployPositionRad = 0;
     public double deployTemperatureC = 0;
     public double intakeMotorVoltage = 0;
+    public double intakeVelocityRadPerSec = 0;
     public double intakeTemperatureC = 0;
   }
 

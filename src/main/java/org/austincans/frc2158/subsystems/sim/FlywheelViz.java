@@ -56,6 +56,7 @@ public class FlywheelViz {
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
       Angle shooterAngle = Angle.ofBaseUnits(-70, Degrees); // TODO: should be based on hood angle
 
+      // TODO: move this to FlywheelIOSim
       SimulatedArena.getInstance()
           .addGamePieceProjectile(
               new RebuiltFuelOnFly(

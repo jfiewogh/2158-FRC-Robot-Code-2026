@@ -17,4 +17,23 @@
 
 package org.austincans.frc2158.subsystems.sim;
 
-public class IntakeViz {}
+import org.ironmaple.simulation.IntakeSimulation;
+
+public class IntakeViz {
+    private final IntakeSimulation intakeSimulation;
+
+    public IntakeViz(IntakeSimulation intakeSimulation) {
+        this.intakeSimulation = intakeSimulation;
+    }
+
+    public void update(double velocityRadPerSec) {
+
+        // TODO: move this to IntakeIOSim
+        // (only logged poses should be in here)
+        if (velocityRadPerSec > 0) {
+            intakeSimulation.startIntake();
+        } else {
+            intakeSimulation.stopIntake();
+        }
+    }
+}
