@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 14:48:32 CST
+// Updated on Saturday January 17, 2026 at 15:50:10 CST
 
 package org.austincans.frc2158.commands;
 
@@ -88,6 +88,11 @@ public class TurretTracking extends Command {
     } else {
       hubPose = redHubPose.toTranslation2d();
     }
+
+    Rotation2d turretAngle =
+        Rotation2d.fromRadians(
+            Math.atan2(hubPose.getY() - turretPos.getY(), hubPose.getX() - turretPos.getX()));
+    turret.setDesiredAngleFieldRelative(turretAngle, pose);
 
     flywheel.setVelocity(FLYWHEEL_MAXRPM * 0.75);
     double shooterAngleRad =

@@ -13,17 +13,19 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 14:48:32 CST
+// Updated on Saturday January 17, 2026 at 15:50:10 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2158.Constants;
+import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.sim.FlywheelSimViz;
 import org.ironmaple.simulation.IntakeSimulation;
 
@@ -37,29 +39,37 @@ public class FlywheelIOSim implements FlywheelIO {
               plant, FlywheelConstants.JKgMetersSq, FlywheelConstants.gearing),
           plant);
 
-  private final PIDController controller = new PIDController(1, 0, 0);
+  private final PIDController controller = new PIDController(5, 0, 0);
   private final SimpleMotorFeedforward feedforwardController =
       new SimpleMotorFeedforward(FlywheelConstants.kS, FlywheelConstants.kV, FlywheelConstants.kA);
 
   private double appliedVolts;
 
-  public FlywheelIOSim(IntakeSimulation intakeSimulation, DoubleSupplier hoodAngleRadSupplier) {
+  public FlywheelIOSim(
+      IntakeSimulation intakeSimulation,
+      DoubleSupplier hoodAngleRadSupplier,
+      Supplier<Rotation2d> turretAngle) {
     flywheelSimViz =
         new FlywheelSimViz(
-            FlywheelConstants.radiusMeters, 0.1, intakeSimulation, hoodAngleRadSupplier);
+            FlywheelConstants.radiusMeters,
+            0.1,
+            intakeSimulation,
+            hoodAngleRadSupplier,
+            turretAngle);
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.velocityRPM = sim.getAngularVelocityRPM();
 
-    double feedback =
-        controller.calculate(inputs.velocityRPM) / FlywheelConstants.maxRPM * Constants.maxVoltage;
-    double feedforward = feedforwardController.calculate(inputs.velocityRPM);
-    appliedVolts = feedback + feedforward;
+    // double feedback =
+    //     controller.calculate(inputs.velocityRPM) / FlywheelConstants.maxRPM *
+    // Constants.maxVoltage;
+    // double feedforward = feedforwardController.calculate(inputs.velocityRPM);
+    // appliedVolts = MathUtil.clamp(feedback + feedforward, -12, 12);
 
-    sim.setInputVoltage(appliedVolts);
-    sim.update(Constants.loopPeriodSecs);
+    // sim.setInputVoltage(appliedVolts);
+    // sim.update(Constants.loopPeriodSecs);
 
     inputs.appliedVolts = sim.getInputVoltage();
 
@@ -75,6 +85,6 @@ public class FlywheelIOSim implements FlywheelIO {
 
   @Override
   public void runVelocity(double velocityRPM) {
-    controller.setSetpoint(velocityRPM);
+    sim.setAngularVelocity(Units.rotationsToRadians(velocityRPM) / 60);
   }
 }

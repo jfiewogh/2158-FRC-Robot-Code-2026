@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 14:48:32 CST
+// Updated on Saturday January 17, 2026 at 15:50:10 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2158.util.ConfigUtil;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
@@ -35,7 +35,10 @@ public class Turret extends AdvancedSubsystem {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Turret", inputs);
+  }
 
   @Override
   public void simulationPeriodic() {}
@@ -54,7 +57,7 @@ public class Turret extends AdvancedSubsystem {
    * @return Absolute turret angle in degrees
    */
   public double getTurretAngle() {
-    return inputs.positionDeg * 360.0;
+    return inputs.positionDeg;
   }
 
   /**
@@ -108,12 +111,12 @@ public class Turret extends AdvancedSubsystem {
   public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Pose2d currentPose) {
     Rotation2d desiredAngle = fieldRelativeAngle.minus(currentPose.getRotation());
 
-    if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
-        && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
-      io.setDesiredAngle(desiredAngle);
-    } else {
-      io.setDesiredAngle(Rotation2d.fromDegrees(0));
-    }
+    // if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
+    //     && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
+    io.setDesiredAngle(fieldRelativeAngle);
+    // } else {
+    //   io.setDesiredAngle(Rotation2d.fromDegrees(0));
+    // }
   }
 
   /**
