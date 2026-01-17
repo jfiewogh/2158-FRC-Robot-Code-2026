@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Friday January 16, 2026 at 12:36:02 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -44,6 +44,10 @@ public class Turret extends AdvancedSubsystem {
     io.setVoltage(voltage);
   }
 
+  public void setTurretVelocity(double degPerSec) {
+    io.setVelocity(degPerSec);
+  }
+
   /**
    * Get the value of the absolute encoder
    *
@@ -59,7 +63,7 @@ public class Turret extends AdvancedSubsystem {
    * @param turretAngle Desired turret angle in degrees
    * @return Command to rotate turret to given angle
    */
-  public Command setTurretAngleCommand(double turretAngle) {
+  public Command setTurretAngleCommand(Rotation2d turretAngle) {
     return Commands.run(() -> io.setDesiredAngle(turretAngle), this);
   }
 
@@ -92,7 +96,7 @@ public class Turret extends AdvancedSubsystem {
    * @return Command to move turret to resting position
    */
   public Command turretRestingCommand() {
-    return Commands.run(() -> io.setDesiredAngle(0), this);
+    return Commands.run(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0)), this);
   }
 
   /**
@@ -102,13 +106,13 @@ public class Turret extends AdvancedSubsystem {
    * @param currentPose Current pose of the robot
    */
   public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Pose2d currentPose) {
-    double desiredAngle = fieldRelativeAngle.minus(currentPose.getRotation()).getDegrees();
+    Rotation2d desiredAngle = fieldRelativeAngle.minus(currentPose.getRotation());
 
-    if (desiredAngle < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
-        && desiredAngle > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
+    if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
+        && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
       io.setDesiredAngle(desiredAngle);
     } else {
-      io.setDesiredAngle(0);
+      io.setDesiredAngle(Rotation2d.fromDegrees(0));
     }
   }
 
@@ -135,7 +139,10 @@ public class Turret extends AdvancedSubsystem {
    */
   public Command angleManualControl(DoubleSupplier angleControl) {
     return Commands.run(
-        () -> io.setDesiredAngle(getTurretAngle() + angleControl.getAsDouble() * 1), this);
+        () ->
+            io.setDesiredAngle(
+                Rotation2d.fromDegrees(getTurretAngle() + angleControl.getAsDouble() * 1)),
+        this);
   }
 
   @Override
@@ -153,7 +160,7 @@ public class Turret extends AdvancedSubsystem {
                   io.setVelocity(0);
                 },
                 this),
-            Commands.runOnce(() -> io.setDesiredAngle(-20.0), this),
+            Commands.runOnce(() -> io.setDesiredAngle(Rotation2d.fromDegrees(-20.0)), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
@@ -162,7 +169,7 @@ public class Turret extends AdvancedSubsystem {
                   }
                 },
                 this),
-            Commands.runOnce(() -> io.setDesiredAngle(0.0), this),
+            Commands.runOnce(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0.0)), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {

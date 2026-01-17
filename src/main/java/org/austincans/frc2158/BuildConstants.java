@@ -5,7 +5,7 @@ package org.austincans.frc2158;
  */
 public final class BuildConstants {
   public static final String MAVEN_GROUP = "";
-  public static final String MAVEN_NAME = "2026RobotCode";
+  public static final String MAVEN_NAME = "2026RobotCode-1";
   public static final String VERSION = "0.0.14-SNAPSHOT";
   public static final int GIT_REVISION = 81;
   public static final String GIT_SHA = "d156e2fcbc195395c99bba1ad3aa154361a1bcee";

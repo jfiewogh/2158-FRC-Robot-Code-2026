@@ -58,13 +58,13 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> setVelocity(100)),
-        Commands.waitSeconds(0.3),
-        Commands.runOnce(
-            () -> {
-              if (getRPM() < 95 || getRPM() > 105) {
-                addFault("[System Check] Flywheel did not reach desired velocity RPM");
-              }
-            }));
+      Commands.runOnce(() -> io.runVelocity(100)),
+      Commands.waitSeconds(0.3),
+      Commands.runOnce(() -> {
+        if (getRPM() < 95 || getRPM() > 105) {
+          addFault("[System Check] Flywheel did not reach desired velocity RPM");
+        }
+      })
+    );
   }
 }
