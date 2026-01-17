@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 11:38:34 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -23,4 +23,12 @@ import org.austincans.frc2158.util.ConfigUtil;
 public class IntakeConstants {
   public static final CANBus intakeCANBus =
       new CANBus(ConfigUtil.getConfigString("intakeCanbus", "2158"));
+
+  // TODO: get from config
+
+  public static final double deployGearing = 1;
+  public static final double intakeGearing = 1; // placeholder
+
+  public static final double deployRotationalInertiaMetersSq = 0.01;
+  public static final double intakeRotationalInertiaMetersSq = 0.01;
 }

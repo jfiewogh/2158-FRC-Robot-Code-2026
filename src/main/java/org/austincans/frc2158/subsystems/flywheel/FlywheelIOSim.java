@@ -13,12 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 15, 2026 at 12:36:25 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.subsystems.sim.FlywheelViz;
@@ -34,18 +37,32 @@ public class FlywheelIOSim implements FlywheelIO {
               plant, FlywheelConstants.JKgMetersSq, FlywheelConstants.gearing),
           plant);
 
-  private double appliedVolts = 0;
+  private final ProfiledPIDController controller =
+      new ProfiledPIDController(2, 0, 0, new Constraints(FlywheelConstants.maxFlywheelRPM, 2000));
+  private final SimpleMotorFeedforward feedforwardController =
+      new SimpleMotorFeedforward(FlywheelConstants.kS, FlywheelConstants.kV, FlywheelConstants.kA);
+
+  private double appliedVolts;
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
+    inputs.velocityRPM = sim.getAngularVelocityRPM();
+
+    double feedback =
+        controller.calculate(inputs.velocityRPM)
+            / FlywheelConstants.maxFlywheelRPM
+            * Constants.maxVoltage;
+    double feedforward = feedforwardController.calculate(inputs.velocityRPM);
+    appliedVolts = feedback + feedforward;
+
     sim.setInputVoltage(appliedVolts);
     sim.update(Constants.loopPeriodSecs);
 
-    inputs.appliedVolts = appliedVolts;
-    inputs.velocityRPM = sim.getAngularVelocityRPM();
-    inputs.temperatureC = 0;
+    inputs.appliedVolts = sim.getInputVoltage();
 
-    flywheelViz.update(inputs.velocityRPM, true);
+    // TODO: whether it can shoot should be based on whether it has passed through indexer
+    // (create Indexer subsystem and IndexerViz)
+    flywheelViz.update(inputs.velocityRPM, inputs.velocityRPM != 0);
   }
 
   @Override
@@ -55,6 +72,6 @@ public class FlywheelIOSim implements FlywheelIO {
 
   @Override
   public void runVelocity(double velocityRPM) {
-    appliedVolts = velocityRPM / FlywheelConstants.maxFlywheelRPM * Constants.maxVoltage;
+    controller.setGoal(velocityRPM);
   }
 }

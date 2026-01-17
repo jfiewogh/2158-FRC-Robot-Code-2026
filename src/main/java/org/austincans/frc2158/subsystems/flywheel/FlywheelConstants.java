@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 15, 2026 at 12:36:25 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -23,8 +23,9 @@ public class FlywheelConstants {
   public static final double gearing = 1;
 
   // TODO: get from config
-  public static final double kV = 0.023;
-  public static final double kA = 0.001;
+  public static final double kS = 0;
+  public static final double kV = 0;
+  public static final double kA = 0;
 
   /* REAL */
   public static final int flywheelId = 0;
@@ -34,7 +35,7 @@ public class FlywheelConstants {
 
   /* SIM */
   public static final double JKgMetersSq = 0.001;
-  public static final double flywheelRadiusMeters = 0.1;
+  public static final double flywheelRadiusMeters = 0.0254;
 
   public static final double maxFlywheelRPM = 1000;
 }

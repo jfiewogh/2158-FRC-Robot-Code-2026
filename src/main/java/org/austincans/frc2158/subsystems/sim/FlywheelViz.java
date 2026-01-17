@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 15, 2026 at 12:36:25 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -30,7 +30,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import org.austincans.frc2158.RobotState;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
 public class FlywheelViz {
   private final double radius;
@@ -54,11 +54,11 @@ public class FlywheelViz {
       Distance initialHeight = Distance.ofBaseUnits(0.5, Meters);
       LinearVelocity launchingSpeed =
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
-      Angle shooterAngle = Angle.ofBaseUnits(60, Degrees); // TODO: should be based on hood angle
+      Angle shooterAngle = Angle.ofBaseUnits(-70, Degrees); // TODO: should be based on hood angle
 
       SimulatedArena.getInstance()
           .addGamePieceProjectile(
-              new ReefscapeAlgaeOnFly(
+              new RebuiltFuelOnFly(
                   robotPose.getTranslation(),
                   new Translation2d(),
                   RobotState.getInstance().getFieldVelocity(),

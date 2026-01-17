@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 12:34:16 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -27,8 +27,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
+import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
@@ -71,15 +73,16 @@ public class IntakeIOSparkFlex implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.voltage = deployMotor.getBusVoltage();
-    inputs.deployPosition = deployEncoder.getPosition();
+    inputs.deployMotorVoltage = deployMotor.getBusVoltage();
+    inputs.deployPositionRad = Units.rotationsToRadians(deployEncoder.getPosition());
     inputs.deployTemperatureC = deployMotor.getMotorTemperature();
+    inputs.intakeMotorVoltage = intakeMotor.getBusVoltage();
     inputs.intakeTemperatureC = intakeMotor.getMotorTemperature();
   }
 
   @Override
-  public void setDeployPosition(double position) {
-    deployController.setSetpoint(position, ControlType.kPosition);
+  public void setDeployAngle(Angle angle) {
+    deployController.setSetpoint(angle.toRotations(), ControlType.kPosition);
   }
 
   @Override

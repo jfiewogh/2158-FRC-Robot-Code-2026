@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 15, 2026 at 12:36:25 CST
+// Updated on Saturday January 17, 2026 at 09:08:14 CST
 
 package org.austincans.frc2158;
 
@@ -30,13 +30,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim;
+import org.austincans.frc2158.subsystems.intake.Intake;
+import org.austincans.frc2158.subsystems.intake.IntakeIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.Arena2025Reefscape;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -84,7 +87,7 @@ public class RobotContainer {
         break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        SimulatedArena.overrideInstance(new Arena2025Reefscape());
+        SimulatedArena.overrideInstance(new Arena2026Rebuilt());
 
         driveSimulation =
             new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
@@ -107,12 +110,13 @@ public class RobotContainer {
                     camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
         Flywheel flywheel = new Flywheel(new FlywheelIOSim());
+        Intake intake = new Intake(new IntakeIOSim());
 
         KeyboardInput keyboardInput = new KeyboardInput();
-        keyboardInput
-            .x()
-            .whileTrue(
-                Commands.runEnd(() -> flywheel.setVelocity(1000), () -> flywheel.setVelocity(0)));
+        keyboardInput.z().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
+        keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
+        keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));
+        keyboardInput.v().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.kNull)));
 
         break;
 
@@ -221,8 +225,6 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
   }
 }
