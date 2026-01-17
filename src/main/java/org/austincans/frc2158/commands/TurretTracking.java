@@ -92,6 +92,7 @@ public class TurretTracking extends Command {
 
   @Override
   public boolean isFinished() {
+    flywheel.setVelocity(0);
     return false;
   }
 }
