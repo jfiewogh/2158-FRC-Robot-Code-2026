@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 17:14:59 CST
+// Updated on Saturday January 17, 2026 at 18:50:30 CST
 
 package org.austincans.frc2158.commands;
 
@@ -90,51 +90,47 @@ public class TurretTracking extends Command {
       hubTranslation = redHubPose.toTranslation2d();
     }
 
-    flywheel.setVelocity(FLYWHEEL_MAXRPM * 0.75);
+    double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
+    flywheel.setVelocity(flywheelVelocityRPM);
 
-    // Effective values
+    // TOTAL VALUES
 
-    double effectiveVelocity =
-        Units.rotationsToRadians(FLYWHEEL_MAXRPM * 0.75) / 60 * FLYWHEEL_RADIUS;
+    double totalVelocity = Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
 
-    double effectiveXYDistance = turretTranslation.getDistance(hubTranslation);
+    double totalXYDistance = turretTranslation.getDistance(hubTranslation);
 
-    double effectivePitchRad =
+    double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT, effectiveVelocity, effectiveXYDistance, TARGET_HEIGHT);
-    System.out.println("first pitch: " + effectivePitchRad);
+            TURRET_HEIGHT, totalVelocity, totalXYDistance, TARGET_HEIGHT);
 
-    Rotation2d effectiveYaw =
+    Rotation2d totalYaw =
         Rotation2d.fromRadians(
             Math.atan2(
                 hubTranslation.getY() - turretTranslation.getY(),
                 hubTranslation.getX() - turretTranslation.getX()));
-    System.out.println("first yaw: " + effectiveYaw.getRadians());
 
-    double effectiveXYVelocity = effectiveVelocity * Math.cos(effectivePitchRad);
-    double effectiveXVelocity = effectiveXYVelocity * effectiveYaw.getCos();
-    double effectiveYVelocity = effectiveXYVelocity * effectiveYaw.getSin();
+    double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
+    double totalXVelocity = totalXYVelocity * totalYaw.getCos();
+    double totalYVelocity = totalXYVelocity * totalYaw.getSin();
 
-    // CALCULATE TURRET YAW
+    // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
 
     ChassisSpeeds robotSpeeds = robotVelSupplier.get();
-    double turretSpeedX = effectiveXVelocity - robotSpeeds.vxMetersPerSecond;
-    double turretSpeedY = effectiveYVelocity - robotSpeeds.vyMetersPerSecond;
-    double turretSpeed = Math.hypot(turretSpeedX, turretSpeedY);
-    Rotation2d turretYaw = Rotation2d.fromRadians(Math.atan2(turretSpeedY, turretSpeedX));
-    System.out.println("second yaw: " + turretYaw.getRadians());
-    turret.setDesiredAngleFieldRelative(turretYaw, pose);
+    double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
+    double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
+    double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
+    Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
+    turret.setDesiredAngleFieldRelative(turretAngle, pose);
 
-    // CALCULATE HOOD ANGLE
+    // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
 
-    double time = effectiveXYDistance / effectiveXYVelocity;
+    double totalTime = totalXYDistance / totalXYVelocity;
 
-    double turretPitchRad =
+    double hoodAngleRad =
         ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT, effectiveVelocity, turretSpeed * time, TARGET_HEIGHT);
-    System.out.println("second pitch: " + turretPitchRad);
+            TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
 
-    hood.setAngle(Rotation2d.fromRadians(turretPitchRad));
+    hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
   }
 
   @Override

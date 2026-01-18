@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 17:14:59 CST
+// Updated on Saturday January 17, 2026 at 18:50:30 CST
 
 package org.austincans.frc2158;
 
@@ -146,7 +146,11 @@ public class RobotContainer {
             .z()
             .whileTrue(
                 new TurretTracking(
-                    turret, flywheel, hood, drive::getPose, drive::getChassisSpeeds));
+                    turret,
+                    flywheel,
+                    hood,
+                    RobotState.getInstance()::getEstimatedPose,
+                    RobotState.getInstance()::getRobotVelocity));
         keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
         keyboardInput.c().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
         // keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));
