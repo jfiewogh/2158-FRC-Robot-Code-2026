@@ -4,13 +4,21 @@
 
 package org.austincans.frc2158.util;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 public class AutoPID {
   private static double target = 0;
   private static double loopInterval = 0; // Secs
   private static long startTime = 0;
   private static double minOutput = 0;
   private static double maxOutput = 0;
-  private static double cycles = 10;
+  private static double cycles = 20;
 
   private static int i;
   private static boolean output;
@@ -60,7 +68,7 @@ public class AutoPID {
   }
 
   // one cycle of the tuning loop
-  public static double tunePID(float input) {
+  public static double tunePID(double input) {
     // http://www.processcontrolstuff.net/wp-content/uploads/2015/02/relay_autot-2.pdf
     // https://en.wikipedia.org/wiki/Ziegler%E2%80%93Nichols_method
     // https://www.cds.caltech.edu/~murray/courses/cds101/fa04/caltech/am04_ch8-3nov04.pdf
@@ -139,7 +147,7 @@ public class AutoPID {
     return outputValue;
   }
 
-  public static boolean isFinished() {
+  public static boolean tunerFinished() {
     return (i >= cycles);
   }
 
@@ -147,47 +155,53 @@ public class AutoPID {
   public static int getCycle() {
     return i;
   }
-}
-/*
- * Steps to Use
- * 1. setTargetInputValue (the setpoint you will use in the future)
- * 2. setLoopInterval (the *realistic* time you expect to reach the setpoint)
- * 3. setOutputRange (the range of value for your system [0, 1], [0, 255])
- * 4. setZieglerMode (noOverShoot best)
- * 5. start with current time in microseconds
- */
 
-/*
- * setTargetInputValue(100);
- * setLoopInterval((long) 500000); // 500ms to micro
- * setOutputRange(0, 255);
- * setZieglerMode(ZieglerMode.noOverShoot);
- * 
- * // must call immediately before loop
- * // Must be called with the current time in microseconds
- * initLoopStart(RobotController.getFPGATime());
- * 
- * long microseconds;
- * while (!isFinished()) {
- * long prevMicroseconds = microseconds;
- * microseconds = RobotController.getFPGATime();
- * 
- * // (temperature, encoder position, velocity, etc)
- * double input = ReplaceWithClosedLoopInputValues;
- * double output = tunePID(input, microseconds);
- * ReplaceWithPIDOutputIntoClosedSystem(output);
- * 
- * // This loop must run at the same speed as the PID control loop
- * while (RobotController.getFPGATime() - microseconds < loopInterval){
- * Timer.delay(0); // Replace with average loop times for PID system
- * }
- * }
- * 
- * // Turn the output off here.
- * ReplaceWithPIDOutputIntoClosedSystem(0);
- * 
- * // Get PID values
- * double kp = getKp();
- * double ki = getKi();
- * double kd = getKd();
- */
+  public static Command runTuner(double setpointValue, long interval, double outputMin, double outputMax,
+      ZieglerMethod mode, Supplier<Double> encoderVals, Consumer<Double> pidOutput, Runnable stopMotors) {
+    return Commands.sequence(
+        Commands.runOnce(() -> {
+          setTargetInputValue(setpointValue);
+        }),
+        Commands.runOnce(() -> {
+          setLoopInterval(interval);
+        }),
+        Commands.runOnce(() -> {
+          setOutputRange(outputMin, outputMax);
+        }),
+        Commands.runOnce(() -> {
+          setZieglerMode(mode);
+        }),
+        Commands.runOnce(() -> {
+          initLoopStart(RobotController.getFPGATime());
+        }),
+        new Command() {
+          private long microseconds;
+
+          @Override
+          public void execute() {
+            microseconds = RobotController.getFPGATime();
+
+            // (temperature, encoder position, velocity, etc)
+            double input = encoderVals.get();
+            double output = tunePID(input);
+            pidOutput.accept(output);
+
+            // This loop must run at the same speed as the PID control loop
+            while (RobotController.getFPGATime() - microseconds < loopInterval) {
+              Timer.delay(loopInterval / 2); // Replace with average loop times for PID system
+            }
+          };
+
+          @Override
+          public boolean isFinished() {
+            return tunerFinished();
+          }
+        }).andThen(() -> {
+          stopMotors.run();
+        }).andThen(() -> {
+          System.out.println("P: " + kP);
+          System.out.println("I: " + kI);
+          System.out.println("D: " + kD);
+        });
+  }
+}
