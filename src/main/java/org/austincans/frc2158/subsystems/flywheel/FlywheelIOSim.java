@@ -13,16 +13,25 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import org.austincans.frc2158.Constants;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.austincans.frc2158.subsystems.sim.FlywheelSimViz;
+import org.ironmaple.simulation.IntakeSimulation;
 
 public class FlywheelIOSim implements FlywheelIO {
+  private final FlywheelSimViz flywheelSimViz;
+
   private final DCMotor plant = DCMotor.getNeoVortex(1);
   private final FlywheelSim sim =
       new FlywheelSim(
@@ -30,20 +39,52 @@ public class FlywheelIOSim implements FlywheelIO {
               plant, FlywheelConstants.JKgMetersSq, FlywheelConstants.gearing),
           plant);
 
-  private double appliedVolts = 0;
+  private final PIDController controller = new PIDController(5, 0, 0);
+  private final SimpleMotorFeedforward feedforwardController =
+      new SimpleMotorFeedforward(FlywheelConstants.kS, FlywheelConstants.kV, FlywheelConstants.kA);
+
+  private double appliedVolts;
+
+  public FlywheelIOSim(
+      IntakeSimulation intakeSimulation,
+      DoubleSupplier hoodAngleRadSupplier,
+      Supplier<Rotation2d> turretAngle) {
+    flywheelSimViz =
+        new FlywheelSimViz(
+            FlywheelConstants.radiusMeters,
+            0.1,
+            intakeSimulation,
+            hoodAngleRadSupplier,
+            turretAngle);
+  }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    sim.setInputVoltage(appliedVolts);
-    sim.update(Constants.loopPeriodSecs);
-
-    inputs.appliedVolts = appliedVolts;
     inputs.velocityRPM = sim.getAngularVelocityRPM();
-    inputs.temperatureC = 0;
+
+    // double feedback =
+    //     controller.calculate(inputs.velocityRPM) / FlywheelConstants.maxRPM *
+    // Constants.maxVoltage;
+    // double feedforward = feedforwardController.calculate(inputs.velocityRPM);
+    // appliedVolts = MathUtil.clamp(feedback + feedforward, -12, 12);
+
+    // sim.setInputVoltage(appliedVolts);
+    // sim.update(Constants.loopPeriodSecs);
+
+    inputs.appliedVolts = sim.getInputVoltage();
+
+    // TODO: whether it can shoot should be based on whether it has passed through indexer
+    // (create Indexer subsystem and IndexerViz)
+    flywheelSimViz.update(inputs.velocityRPM, inputs.velocityRPM > 100);
   }
 
   @Override
   public void runVoltage(double volts) {
     appliedVolts = volts;
+  }
+
+  @Override
+  public void runVelocity(double velocityRPM) {
+    sim.setAngularVelocity(Units.rotationsToRadians(velocityRPM) / 60);
   }
 }

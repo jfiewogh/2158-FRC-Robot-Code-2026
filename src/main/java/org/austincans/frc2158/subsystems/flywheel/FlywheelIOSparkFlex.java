@@ -13,15 +13,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -29,16 +23,20 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.units.Units;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class FlywheelIOSparkFlex implements FlywheelIO {
-  private final SparkFlex motor = new SparkFlex(FlywheelConstants.flywheelId, MotorType.kBrushless);
+  private final SparkFlex motor = new SparkFlex(FlywheelConstants.motorId, MotorType.kBrushless);
   private final SelfCheckingSparkFlex selfCheckMotor = new SelfCheckingSparkFlex("flywheel", motor);
-  
-  private final CANcoder encoder = new CANcoder(FlywheelConstants.flywheelEncoderId, FlywheelConstants.canBus);
+
+  private final CANcoder encoder =
+      new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
   private final SparkClosedLoopController controller = motor.getClosedLoopController();
 
-  public FlywheelIOSparkFlex() {
-  }
+  public FlywheelIOSparkFlex() {}
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {

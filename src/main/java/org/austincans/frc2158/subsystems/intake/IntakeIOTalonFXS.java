@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 11:38:34 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -23,8 +23,10 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
+import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
@@ -74,10 +76,11 @@ public class IntakeIOTalonFXS implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.voltage = intakeMotor.getMotorVoltage().getValueAsDouble();
-    inputs.intakeTemperatureC = intakeMotor.getDeviceTemp().getValueAsDouble();
+    inputs.deployMotorVoltage = deployMotor.getMotorVoltage().getValueAsDouble();
+    inputs.deployPositionRad = deployMotor.getPosition().getValue().in(Units.Radians);
     inputs.deployTemperatureC = deployMotor.getDeviceTemp().getValueAsDouble();
-    inputs.deployPosition = deployMotor.getPosition().getValueAsDouble();
+    inputs.intakeMotorVoltage = intakeMotor.getMotorVoltage().getValueAsDouble();
+    inputs.intakeTemperatureC = intakeMotor.getDeviceTemp().getValueAsDouble();
   }
 
   @Override
@@ -91,8 +94,8 @@ public class IntakeIOTalonFXS implements IntakeIO {
   }
 
   @Override
-  public void setDeployPosition(double degrees) {
-    deployMotor.setControl(positionRequest.withPosition(degrees));
+  public void setDeployAngle(Angle angle) {
+    deployMotor.setControl(positionRequest.withPosition(angle.toRotations()));
   }
 
   @Override

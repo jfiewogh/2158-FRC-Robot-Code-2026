@@ -13,25 +13,30 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import com.ctre.phoenix6.CANBus;
 
 public class FlywheelConstants {
-  public static final double gearing = 1;
-
   // TODO: get from config
-  public static final double kV = 0.023;
-  public static final double kA = 0.001;
+  public static final double kS = 0;
+  public static final double kV = 0;
+  public static final double kA = 0;
 
   /* REAL */
-  public static final int flywheelId = 0;
-  public static final int flywheelEncoderId = 0;
+  public static final int motorId = 0;
+  public static final int encoderId = 0;
 
   public static final CANBus canBus = new CANBus("*");
 
+  public static final double radiusMeters = 0.0508;
+
+  public static final double gearing = 1.0;
+
   /* SIM */
   public static final double JKgMetersSq = 0.001;
+
+  public static final double maxRPM = 2000;
 }

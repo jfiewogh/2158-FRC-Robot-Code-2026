@@ -13,25 +13,25 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 18:29:34 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.units.Units;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class FlywheelIOTalonFXS implements FlywheelIO {
-  private final TalonFXS motor =
-    new TalonFXS(FlywheelConstants.flywheelId, FlywheelConstants.canBus);
+  private final TalonFXS motor = new TalonFXS(FlywheelConstants.motorId, FlywheelConstants.canBus);
   private final SelfCheckingTalonFXS selfCheckMotor = new SelfCheckingTalonFXS("flywheel", motor);
 
-  private final CANcoder encoder = new CANcoder(FlywheelConstants.flywheelEncoderId, FlywheelConstants.canBus);
+  private final CANcoder encoder =
+      new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
 
   public FlywheelIOTalonFXS() {}
 

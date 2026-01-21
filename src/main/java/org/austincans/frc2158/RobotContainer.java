@@ -13,12 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 12:34:16 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.austincans.frc2158.subsystems.vision.VisionConstants.*;
-import static org.austincans.frc2158.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,12 +29,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
+import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
+import org.austincans.frc2158.subsystems.flywheel.Flywheel;
+import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim;
+import org.austincans.frc2158.subsystems.hood.Hood;
+import org.austincans.frc2158.subsystems.hood.HoodIOTest;
+import org.austincans.frc2158.subsystems.intake.Intake;
+import org.austincans.frc2158.subsystems.intake.IntakeIOSim;
+import org.austincans.frc2158.subsystems.turret.Turret;
+import org.austincans.frc2158.subsystems.turret.TurretIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -61,6 +73,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    DoubleSupplier leftY = () -> -controller.getLeftY();
+    DoubleSupplier leftX = () -> -controller.getLeftX();
+    DoubleSupplier rightY = () -> -controller.getRightX();
+    DoubleSupplier rightX = () -> -controller.getRightY();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -82,9 +99,10 @@ public class RobotContainer {
         break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        SimulatedArena.overrideInstance(new Arena2026Rebuilt());
 
         driveSimulation =
-            new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+            new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(14, 3, new Rotation2d()));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         drive =
             new Drive(
@@ -102,6 +120,46 @@ public class RobotContainer {
                     camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                 new VisionIOPhotonVisionSim(
                     camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+
+        IntakeSimulation intakeSimulation =
+            IntakeSimulation.OverTheBumperIntake(
+                "Fuel",
+                driveSimulation,
+                Meters.of(0.7),
+                Meters.of(0.2),
+                IntakeSimulation.IntakeSide.FRONT,
+                20);
+
+        Hood hood = new Hood(new HoodIOTest());
+        Turret turret = new Turret(new TurretIOSim());
+        Intake intake = new Intake(new IntakeIOSim(intakeSimulation));
+
+        Flywheel flywheel =
+            new Flywheel(
+                new FlywheelIOSim(
+                    intakeSimulation,
+                    () -> hood.getAngle().getRadians(),
+                    () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
+
+        KeyboardInput keyboardInput = new KeyboardInput();
+        keyboardInput
+            .z()
+            .whileTrue(
+                new TurretTracking(
+                    turret,
+                    flywheel,
+                    hood,
+                    RobotState.getInstance()::getEstimatedPose,
+                    RobotState.getInstance()::getRobotVelocity));
+        keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
+        keyboardInput.c().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
+        // keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));
+        keyboardInput.v().whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(1)));
+
+        leftX = keyboardInput::leftX;
+        leftY = keyboardInput::leftY;
+        rightX = keyboardInput::rightX;
+        rightY = keyboardInput::rightY;
 
         break;
 
@@ -140,6 +198,9 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -151,24 +212,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX(),
-            () -> -controller.getRightY()));
-
     // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -199,7 +251,7 @@ public class RobotContainer {
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
+    driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
@@ -210,8 +262,6 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
     Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
   }
 }
