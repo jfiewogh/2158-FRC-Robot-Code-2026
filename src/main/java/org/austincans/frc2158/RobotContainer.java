@@ -37,7 +37,7 @@ import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim;
 import org.austincans.frc2158.subsystems.hood.Hood;
-import org.austincans.frc2158.subsystems.hood.HoodIOTest;
+import org.austincans.frc2158.subsystems.hood.HoodIOSim;
 import org.austincans.frc2158.subsystems.intake.Intake;
 import org.austincans.frc2158.subsystems.intake.IntakeIOSim;
 import org.austincans.frc2158.subsystems.turret.Turret;
@@ -130,7 +130,7 @@ public class RobotContainer {
                 IntakeSimulation.IntakeSide.FRONT,
                 20);
 
-        Hood hood = new Hood(new HoodIOTest());
+        Hood hood = new Hood(new HoodIOSim());
         Turret turret = new Turret(new TurretIOSim());
         Intake intake = new Intake(new IntakeIOSim(intakeSimulation));
 
@@ -138,7 +138,7 @@ public class RobotContainer {
             new Flywheel(
                 new FlywheelIOSim(
                     intakeSimulation,
-                    () -> hood.getAngle().getRadians(),
+                    () -> hood.getAngle().toRadians(),
                     () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
         KeyboardInput keyboardInput = new KeyboardInput();

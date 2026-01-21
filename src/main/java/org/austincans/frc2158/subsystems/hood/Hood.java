@@ -17,6 +17,10 @@ public class Hood extends AdvancedSubsystem {
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
     private Angle angle;
 
+    public Hood(HoodIO io) {
+        this.io = io;
+    }
+
     Command runHoodMotorCommand(Angle angle) {
         return Commands.run((() -> io.setAngle(angle)));
     }
@@ -25,7 +29,7 @@ public class Hood extends AdvancedSubsystem {
         io.setAngleRotation2d(angle);
     }
 
-    public void setAngle(Angle angle){
+    public void setAngle(Angle angle) {
         io.setAngle(angle);
     }
 

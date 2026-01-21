@@ -1,49 +1,42 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.austincans.frc2158.subsystems.hood;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.austincans.frc2158.math.Angle;
-
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
+/** Add your docs here. */
 public class HoodIOSim implements HoodIO{
-    DCMotorSim hoodMotorSim = new DCMotorSim(null, null, null);
-    PIDController pid = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    public HoodIOSim(){}
+
+    Angle angle = Angle.fromDegrees(0);
 
     @Override
     public Angle getAngle() {
-        return Angle.fromRadians(Units.rotationsToRadians(hoodMotorSim.getAngularPositionRotations()));
-    }
-
-    public void setAngle(Angle setPointDegrees){
-        hoodMotorSim.setInput(pid.calculate(hoodMotorSim.getAngularPositionRad(),Units.degreesToRotations(setPointDegrees.toDegrees())));
+        return angle;
     }
 
     @Override
-    public void setAngleRotation2d(Rotation2d angle) {
-        hoodMotorSim.setInput(pid.calculate(hoodMotorSim.getAngularPositionRad(),Units.degreesToRotations(angle.getDegrees())));
+    public void setAngle(Angle setPointDegrees) {
+        angle = setPointDegrees;
+    }
+
+    @Override
+    public void setAngleRotation2d(Rotation2d setPoint) {
+        angle = Angle.fromDegrees(setPoint.getDegrees());
     }
 
     @Override
     public Rotation2d getAngleRotation2d() {
-        return Rotation2d.fromRadians(Units.rotationsToRadians(hoodMotorSim.getAngularPositionRotations()));
+        return Rotation2d.fromDegrees(angle.toDegrees());
     }
 
     @Override
     public boolean atAngle(Angle setPoint) {
-        if (getAngle() == setPoint){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return true;
     }
-
-    public void updateInputs(hoodIOInputs inputs){
-        inputs.hoodAngleDegrees = getAngle();
-        inputs.temperature = 0;
-        inputs.motorPosition = hoodMotorSim.getAngularPositionRotations();
-    }
-    
 }
