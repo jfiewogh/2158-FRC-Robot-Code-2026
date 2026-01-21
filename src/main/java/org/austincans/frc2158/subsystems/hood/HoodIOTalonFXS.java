@@ -30,7 +30,7 @@ public class HoodIOTalonFXS implements HoodIO{
         return Angle.fromDegrees(hoodMotor.getPosition().getValue().in(null));
     }
 
-    public void setHoodAngle(Angle setPointDegrees){
+    public void setAngle(Angle setPointDegrees){
         hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(setPointDegrees.toDegrees())));
     }
 

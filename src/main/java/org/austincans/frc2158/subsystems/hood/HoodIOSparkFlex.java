@@ -41,7 +41,7 @@ public class HoodIOSparkFlex implements HoodIO{
         hoodMotor.set(speed);
     }
 
-    public void setHoodAngle(Angle setPointDegrees){
+    public void setAngle(Angle setPointDegrees){
         controller.setSetpoint(Units.degreesToRotations(setPointDegrees.toDegrees()), ControlType.kPosition);
     }
 

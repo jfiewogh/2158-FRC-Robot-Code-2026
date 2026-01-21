@@ -2,13 +2,10 @@ package org.austincans.frc2158.subsystems.hood;
 
 import org.austincans.frc2158.math.Angle;
 
-import com.revrobotics.spark.SparkBase.ControlType;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
 public class HoodIOSim implements HoodIO{
     DCMotorSim hoodMotorSim = new DCMotorSim(null, null, null);
@@ -19,7 +16,7 @@ public class HoodIOSim implements HoodIO{
         return Angle.fromRadians(Units.rotationsToRadians(hoodMotorSim.getAngularPositionRotations()));
     }
 
-    public void setHoodAngle(Angle setPointDegrees){
+    public void setAngle(Angle setPointDegrees){
         hoodMotorSim.setInput(pid.calculate(hoodMotorSim.getAngularPositionRad(),Units.degreesToRotations(setPointDegrees.toDegrees())));
     }
 

@@ -5,6 +5,8 @@ import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 import org.austincans.frc2158.math.Angle;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,11 +18,15 @@ public class Hood extends AdvancedSubsystem {
     private Angle angle;
 
     Command runHoodMotorCommand(Angle angle) {
-        return Commands.run((() -> io.setHoodAngle(angle)));
+        return Commands.run((() -> io.setAngle(angle)));
     }
 
-    public void setAngle(Angle angle) {
-        io.setHoodAngle(angle);
+    public void setAngle(Rotation2d angle) {
+        io.setAngleRotation2d(angle);
+    }
+
+    public void setAngle(Angle angle){
+        io.setAngle(angle);
     }
 
     public Angle getAngle() {
@@ -50,7 +56,7 @@ public class Hood extends AdvancedSubsystem {
                         () -> {
                             clearFaults();
                             io.applyVolts(0);
-                            io.setHoodAngle(Angle.fromDegrees(10));
+                            io.setAngle(Angle.fromDegrees(10));
                         },
                         this),
                 Commands.waitSeconds(0.1),
@@ -66,7 +72,7 @@ public class Hood extends AdvancedSubsystem {
                         this),
                 Commands.run(
                         () -> {
-                            io.setHoodAngle(Angle.fromDegrees(20));
+                            io.setAngle(Angle.fromDegrees(20));
                         },
                         this)
                         .withTimeout(1.0),

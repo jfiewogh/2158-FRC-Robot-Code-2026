@@ -16,7 +16,7 @@ public interface HoodIO {
 
     public Angle getAngle();
     
-    default void setHoodAngle(Angle setPointDegrees) {}
+    public void setAngle(Angle setPointDegrees);
 
     default void runHoodMotor(double speed) {}
 
