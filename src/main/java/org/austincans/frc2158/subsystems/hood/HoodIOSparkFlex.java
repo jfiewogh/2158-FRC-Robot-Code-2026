@@ -1,11 +1,11 @@
 package org.austincans.frc2158.subsystems.hood;
-import org.austincans.frc2158.Constants.ControllerType;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class HoodIOSparkFlex implements HoodIO{
     private SparkFlex hoodMotor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);
+    private SelfCheckingSparkFlex hoodMotorCheck = new SelfCheckingSparkFlex("Hood Motor", hoodMotor);
     private RelativeEncoder motorEncoder = hoodMotor.getEncoder();
     SparkClosedLoopController controller = hoodMotor.getClosedLoopController();
 

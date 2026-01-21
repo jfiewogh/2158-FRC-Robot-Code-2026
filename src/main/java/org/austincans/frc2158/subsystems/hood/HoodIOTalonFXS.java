@@ -1,16 +1,16 @@
 package org.austincans.frc2158.subsystems.hood;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
+
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DutyCycle;
 
 public class HoodIOTalonFXS implements HoodIO{
     private TalonFXS hoodMotor = new TalonFXS(HoodConstants.talonMotorID);
+    private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", hoodMotor);
     private DutyCycleOut dc = new DutyCycleOut(0);
     TalonFXSConfiguration configs = new TalonFXSConfiguration();
 
