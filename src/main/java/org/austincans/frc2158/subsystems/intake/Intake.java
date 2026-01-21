@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,14 +13,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2158.controllers.LaserCAN;
+import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {
   private final IntakeIO io;
@@ -40,13 +43,18 @@ public class Intake extends AdvancedSubsystem {
     io.setVoltage(voltage);
   }
 
+  public void setDeployAngle(Angle angle) {
+    io.setDeployAngle(angle);
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addFault);
   }
 
   public Command systemCheckCommand() {
-    return null;
+    return Commands.runOnce(() -> {});
   }
 }

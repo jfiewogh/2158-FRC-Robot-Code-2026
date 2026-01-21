@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 12:34:16 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -27,6 +27,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,13 +89,13 @@ public class TurretIOTalonFX implements TurretIO {
     turretEncoder.setPosition(0);
   }
 
-  public void setDesiredAngle(double angleDegrees) {
+  public void setDesiredAngle(Rotation2d angleDegrees) {
     setDesiredAngle(angleDegrees, 0);
   }
 
-  public void setDesiredAngle(double angleDegrees, double acceleration) {
+  public void setDesiredAngle(Rotation2d angleDegrees, double acceleration) {
     // Convert degrees to rotations
-    double angleRadians = Units.degreesToRadians(angleDegrees);
+    double angleRadians = Units.degreesToRadians(angleDegrees.getDegrees());
     double positionRotations = angleRadians / (2.0 * Math.PI);
 
     double ffVolts = feedforward.calculate(inputs.velocityDegPerSec, acceleration);

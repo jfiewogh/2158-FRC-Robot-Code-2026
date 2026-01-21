@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -39,11 +39,6 @@ public class DriveIOReal implements DriveIO {
           });
 
   @Override
-  public void resetPose(Pose2d pose) {
-    RobotState.getInstance().resetPose(pose);
-  }
-
-  @Override
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.loopPeriodSecs);
@@ -67,20 +62,13 @@ public class DriveIOReal implements DriveIO {
     }
   }
 
-  private SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    for (int i = 0; i < 4; i++) {
-      states[i] = modules[i].getState();
-    }
-    return states;
-  }
-
   @Override
   public void updateInputs(DriveIOInputs inputs) {
     inputs.pose = RobotState.getInstance().getEstimatedPose();
     inputs.chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
   }
 
+  @Override
   public void setModules(Module[] modules) {
     this.modules = modules;
   }
@@ -88,5 +76,18 @@ public class DriveIOReal implements DriveIO {
   @Override
   public void updateSetpoint(SwerveSetpoint setpoint) {
     this.currentSetpoint = setpoint;
+  }
+
+  @Override
+  public void resetPose(Pose2d pose) {
+    RobotState.getInstance().resetPose(pose);
+  }
+
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
   }
 }

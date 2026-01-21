@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 13, 2026 at 12:34:16 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -24,7 +24,14 @@ public class TurretConstants {
   public static final int turretMotorId = ConfigUtil.getConfigInt("turretID", 0);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("turretEncoderID", 0);
 
+  // TODO: is CANBus name supposed to be intakeCanbus?
   public static final CANBus turretCANBus =
       new CANBus(ConfigUtil.getConfigString("intakeCanbus", "2158"));
-  // TODO: is CANBus name supposed to be intakeCanbus?
+
+  public static final double gearing = 1;
+
+  public static final double turretHeight = 0.762;
+
+  // Turret Sim
+  public static final double rotationalInertiaMetersSq = 0.01;
 }

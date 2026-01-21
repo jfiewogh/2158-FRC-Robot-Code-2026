@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Tuesday January 20, 2026 at 17:54:53 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -21,6 +21,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.List;
+import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
@@ -36,14 +37,15 @@ public interface IntakeIO {
    * kI: Integral
    * kD: Derivative
    */
-  public double kP = ConfigUtil.getConfigDouble("intakekP", 0);
+  public double kP = ConfigUtil.getConfigDouble("intakekP", 0.001);
   public double kI = ConfigUtil.getConfigDouble("intakekI", 0);
   public double kD = ConfigUtil.getConfigDouble("intakekD", 0);
 
+  public double maxVelocityRadPerSec = Math.PI;
   public TrapezoidProfile.Constraints constraints =
       new TrapezoidProfile.Constraints(
-          ConfigUtil.getConfigDouble("intakeMaxVelocityRotations", 0),
-          ConfigUtil.getConfigDouble("intakeMaxAcceleration", 0));
+          ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
+          ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
 
   /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
   public double kS = ConfigUtil.getConfigDouble("intakekS", 0);
@@ -59,10 +61,12 @@ public interface IntakeIO {
 
   @AutoLog
   public class IntakeIOInputs {
-    public double voltage = 0;
-    public double deployPosition = 0;
-    public double intakeTemperatureC = 0;
+    public double deployMotorVoltage = 0;
+    public double deployPositionRad = 0;
     public double deployTemperatureC = 0;
+    public double intakeMotorVoltage = 0;
+    public double intakeVelocityRadPerSec = 0;
+    public double intakeTemperatureC = 0;
   }
 
   public void updateInputs(IntakeIOInputs inputs);
@@ -73,9 +77,9 @@ public interface IntakeIO {
   public void setVoltage(double voltage);
 
   // degrees
-  public void setDeployPosition(double degrees);
+  public void setDeployAngle(Angle angle);
 
   public default List<SubsystemFault> checkForFaults() {
-    return null;
+    return List.of();
   }
 }
