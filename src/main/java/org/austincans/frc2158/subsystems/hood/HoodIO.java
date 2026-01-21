@@ -1,28 +1,31 @@
-// Copyright (c) 2026 the ausTIN CANs
-// https://github.com/AusTINCANsProgrammingTeam
-//
-// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
-// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
-//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
-//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
-//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
-//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
-// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-//
-// Updated on Tuesday January 20, 2026 at 17:54:53 CST
-
 package org.austincans.frc2158.subsystems.hood;
-
+import org.austincans.frc2158.math.Angle;
+import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public interface HoodIO {
-  void setAngle(Rotation2d angle);
+    @AutoLog
+    public class hoodIOInputs {
+        public Angle hoodAngleDegrees = Angle.fromDegrees(0);
+        public double temperature;
+        public double motorPosition;
+        public double hoodRadsPerSec;
+    }
 
-  Rotation2d getAngle();
+    public default void updateInputs(hoodIOInputs inputs) {}
 
-  boolean atAngle();
+    public Angle getAngle();
+    
+    default void setHoodAngle(Angle setPointDegrees) {}
+
+    default void runHoodMotor(double speed) {}
+
+    default void applyVolts(double volts) {}
+
+    public void setAngleRotation2d(Rotation2d angle);
+
+    public Rotation2d getAngleRotation2d();
+
+    public boolean atAngle(Angle setPoint);
+
 }
