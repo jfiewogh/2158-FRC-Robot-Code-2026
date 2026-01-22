@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158;
 
@@ -131,14 +131,14 @@ public class RobotContainer {
                 20);
 
         Hood hood = new Hood(new HoodIOTest());
-        Turret turret = new Turret(new TurretIOSim());
+        Turret turret = new Turret(new TurretIOSim(hood::getAngle));
         Intake intake = new Intake(new IntakeIOSim(intakeSimulation));
 
         Flywheel flywheel =
             new Flywheel(
                 new FlywheelIOSim(
                     intakeSimulation,
-                    () -> hood.getAngle().getRadians(),
+                    () -> hood.getAngle(),
                     () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
         KeyboardInput keyboardInput = new KeyboardInput();
@@ -153,7 +153,6 @@ public class RobotContainer {
                     RobotState.getInstance()::getRobotVelocity));
         keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
         keyboardInput.c().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
-        // keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));
         keyboardInput.v().whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(1)));
 
         leftX = keyboardInput::leftX;

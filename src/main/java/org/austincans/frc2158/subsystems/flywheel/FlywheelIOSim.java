@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -24,7 +24,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.sim.FlywheelSimViz;
 import org.ironmaple.simulation.IntakeSimulation;
@@ -47,15 +46,11 @@ public class FlywheelIOSim implements FlywheelIO {
 
   public FlywheelIOSim(
       IntakeSimulation intakeSimulation,
-      DoubleSupplier hoodAngleRadSupplier,
+      Supplier<Rotation2d> hoodAngleSupplier,
       Supplier<Rotation2d> turretAngle) {
     flywheelSimViz =
         new FlywheelSimViz(
-            FlywheelConstants.radiusMeters,
-            0.1,
-            intakeSimulation,
-            hoodAngleRadSupplier,
-            turretAngle);
+            FlywheelConstants.radiusMeters, 0.1, intakeSimulation, hoodAngleSupplier, turretAngle);
   }
 
   @Override

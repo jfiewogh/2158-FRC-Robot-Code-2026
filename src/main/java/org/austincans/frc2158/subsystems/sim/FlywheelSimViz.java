@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -30,7 +30,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
@@ -44,7 +43,7 @@ public class FlywheelSimViz {
   private final double radius;
   private final double shootingDelay;
   private final IntakeSimulation intakeSimulation;
-  private final DoubleSupplier hoodAngleRadSupplier;
+  private final Supplier<Rotation2d> hoodAngle;
   private final Supplier<Rotation2d> turretAngle;
 
   private final Timer timer = new Timer();
@@ -54,13 +53,13 @@ public class FlywheelSimViz {
       double radius,
       double shootingDelay,
       IntakeSimulation intakeSimulation,
-      DoubleSupplier hoodAngleRadSupplier,
-      Supplier<Rotation2d> turretAngle) {
+      Supplier<Rotation2d> hoodAngleSupplier,
+      Supplier<Rotation2d> turretAngleSupplier) {
     this.radius = radius;
     this.shootingDelay = shootingDelay;
     this.intakeSimulation = intakeSimulation;
-    this.hoodAngleRadSupplier = hoodAngleRadSupplier;
-    this.turretAngle = turretAngle;
+    hoodAngle = hoodAngleSupplier;
+    turretAngle = turretAngleSupplier;
     timer.start();
   }
 
@@ -77,7 +76,7 @@ public class FlywheelSimViz {
       Distance initialHeight = Distance.ofBaseUnits(TurretConstants.turretHeight, Meters);
       LinearVelocity launchingSpeed =
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
-      Angle shooterAngle = Angle.ofBaseUnits(hoodAngleRadSupplier.getAsDouble(), Radians);
+      Angle shooterAngle = Angle.ofBaseUnits(hoodAngle.get().getRadians(), Radians);
       Logger.recordOutput("FlywheelSim/ShooterAngleDeg", shooterAngle.in(Degrees));
 
       Logger.recordOutput("FlywheelSim/TurretAngleDeg", turretAngle.get().getDegrees());

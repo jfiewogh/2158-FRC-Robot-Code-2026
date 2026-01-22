@@ -13,8 +13,67 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
-public class TurretViz {}
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import java.util.function.Supplier;
+import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.subsystems.turret.TurretConstants;
+import org.littletonrobotics.junction.Logger;
+
+public class TurretViz {
+  private static final Rotation2d hoodDefaultAngle =
+      Rotation2d.fromDegrees(90 - (30.719897 + 8.868396) * 0.5);
+
+  double radius = Units.inchesToMeters(9.747475);
+
+  private final String key;
+
+  // TODO: move to constants
+  private final Translation3d[] modelTranslations =
+      new Translation3d[] {
+        new Translation3d(0, 0, TurretConstants.turretHeight),
+        new Translation3d(0, 0, TurretConstants.turretHeight),
+        new Translation3d(0.127981, 0, 0.106538 + TurretConstants.turretHeight)
+      };
+
+  private final Pose3d[] models = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
+
+  private final Supplier<Rotation2d> hoodAngle;
+
+  public TurretViz(String key, Supplier<Rotation2d> hoodAngle) {
+    this.key = key;
+    this.hoodAngle = hoodAngle;
+
+    models[0] = new Pose3d(modelTranslations[0], Rotation3d.kZero);
+  }
+
+  public void update(Rotation2d turretAngle) {
+    Pose2d drivePose = RobotState.getInstance().getEstimatedPose();
+
+    double yawRad = turretAngle.getRadians() - drivePose.getRotation().getRadians();
+
+    models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
+
+    double pitchRad =
+        Math.PI / 2 - hoodAngle.get().getRadians() - (Math.PI / 2 - hoodDefaultAngle.getRadians());
+
+    models[2] =
+        new Pose3d(
+            new Translation3d(modelTranslations[2].getX(), modelTranslations[2].getY(), 0)
+                .rotateBy(new Rotation3d(0, 0, yawRad))
+                .plus(new Translation3d(0, 0, modelTranslations[2].getZ())),
+            new Rotation3d(0, pitchRad, yawRad));
+
+    for (int i = 0; i < models.length; i++) {
+      Logger.recordOutput(key + "/Turret" + i, models[i]);
+    }
+  }
+}

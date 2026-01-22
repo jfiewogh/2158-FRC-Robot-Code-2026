@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -22,9 +22,13 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import java.util.function.Supplier;
 import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.subsystems.sim.TurretViz;
 
 public class TurretIOSim implements TurretIO {
+  private final TurretViz turretViz;
+
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);
   private final DCMotorSim sim =
       new DCMotorSim(
@@ -32,7 +36,12 @@ public class TurretIOSim implements TurretIO {
               motorBase, TurretConstants.rotationalInertiaMetersSq, TurretConstants.gearing),
           motorBase);
 
+  @SuppressWarnings("unused")
   private double appliedVoltage = 0;
+
+  public TurretIOSim(Supplier<Rotation2d> hoodAngle) {
+    turretViz = new TurretViz("SimComponents", hoodAngle);
+  }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
@@ -40,6 +49,8 @@ public class TurretIOSim implements TurretIO {
     sim.update(Constants.loopPeriodSecs);
 
     inputs.positionDeg = Units.radiansToDegrees(sim.getAngularPositionRad());
+
+    turretViz.update(Rotation2d.fromDegrees(inputs.positionDeg));
   }
 
   @Override

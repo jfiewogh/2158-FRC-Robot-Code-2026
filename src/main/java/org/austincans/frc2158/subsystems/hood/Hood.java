@@ -13,13 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 17, 2026 at 18:50:30 CST
+// Updated on Wednesday January 21, 2026 at 19:26:28 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
-public class Hood {
+public class Hood extends SubsystemBase {
   private final HoodIO io;
 
   public Hood(HoodIO io) {
@@ -36,5 +38,10 @@ public class Hood {
 
   public boolean atAngle() {
     return io.atAngle();
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("HoodAngleDeg", io.getAngle().getDegrees());
   }
 }
