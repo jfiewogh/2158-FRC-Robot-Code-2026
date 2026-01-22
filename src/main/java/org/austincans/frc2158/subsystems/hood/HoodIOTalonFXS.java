@@ -1,63 +1,79 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
+
 package org.austincans.frc2158.subsystems.hood;
-import org.austincans.frc2158.math.Angle;
-import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 
-public class HoodIOTalonFXS implements HoodIO{
-    private TalonFXS hoodMotor = new TalonFXS(HoodConstants.talonMotorID);
-    private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", hoodMotor);
-    private DutyCycleOut dc = new DutyCycleOut(0);
-    TalonFXSConfiguration configs = new TalonFXSConfiguration();
+public class HoodIOTalonFXS implements HoodIO {
+  private TalonFXS hoodMotor = new TalonFXS(HoodConstants.talonMotorID);
+  private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", hoodMotor);
+  private DutyCycleOut dc = new DutyCycleOut(0);
+  TalonFXSConfiguration configs = new TalonFXSConfiguration();
 
-    public HoodIOTalonFXS(){
-        configs.Slot0.kP = 1;
-        configs.Slot0.kI = 0;
-        configs.Slot0.kD = 10;
-        configs.Slot0.kV = 2;
+  public HoodIOTalonFXS() {
+    configs.Slot0.kP = 1;
+    configs.Slot0.kI = 0;
+    configs.Slot0.kD = 10;
+    configs.Slot0.kV = 2;
+  }
+
+  public void runHoodMotor(double speed) {
+    hoodMotor.set(speed);
+  }
+
+  @Override
+  public Angle getAngle() {
+    return Angle.fromDegrees(hoodMotor.getPosition().getValue().in(null));
+  }
+
+  public void setAngle(Angle setPointDegrees) {
+    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(setPointDegrees.toDegrees())));
+  }
+
+  @Override
+  public void setAngleRotation2d(Rotation2d angle) {
+    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(angle.getDegrees())));
+  }
+
+  @Override
+  public Rotation2d getAngleRotation2d() {
+    return Rotation2d.fromRadians(
+        Units.rotationsToRadians(hoodMotor.getPosition().getValue().in(null)));
+  }
+
+  @Override
+  public boolean atAngle(Angle setPoint) {
+    if (getAngle() == setPoint) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    public void runHoodMotor(double speed){
-        hoodMotor.set(speed);
-    }
-
-    @Override
-    public Angle getAngle() {
-        return Angle.fromDegrees(hoodMotor.getPosition().getValue().in(null));
-    }
-
-    public void setAngle(Angle setPointDegrees){
-        hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(setPointDegrees.toDegrees())));
-    }
-
-    @Override
-    public void setAngleRotation2d(Rotation2d angle) {
-        hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(angle.getDegrees())));
-    }
-
-    @Override
-    public Rotation2d getAngleRotation2d() {
-        return Rotation2d.fromRadians(Units.rotationsToRadians(hoodMotor.getPosition().getValue().in(null)));
-    }
-
-    @Override
-    public boolean atAngle(Angle setPoint){
-        if (getAngle() == setPoint){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public void updateInputs(hoodIOInputs inputs){
-        inputs.hoodAngleDegrees = getAngle();
-        inputs.temperature = hoodMotor.getDeviceTemp().getValueAsDouble();
-        inputs.motorPosition = hoodMotor.getPosition().getValue().in(null);
-    }
-
+  public void updateInputs(HoodIOInputs inputs) {
+    inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
+    inputs.temperature = hoodMotor.getDeviceTemp().getValueAsDouble();
+    inputs.motorPosition = hoodMotor.getPosition().getValue().in(null);
+  }
 }

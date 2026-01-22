@@ -13,22 +13,26 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 20, 2026 at 17:54:53 CST
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
-import org.austincans.frc2158.util.ConfigUtil;
-
 import com.ctre.phoenix6.CANBus;
+import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmConstants {
   public static double armLength = ConfigUtil.getConfigDouble("ARM_LENGTH", 0);
-  public static double armMaxRad = ConfigUtil.getConfigDouble("ARM_MAX_RAD", 0); // Max Forward Motor Movement in Radians
+  public static double armMaxRad =
+      ConfigUtil.getConfigDouble("ARM_MAX_RAD", 0); // Max Forward Motor Movement in Radians
   public static double armStartingPosition = ConfigUtil.getConfigDouble("ARM_STARTING_POSITION", 0);
-  public static double armForwardSoftLimit = ConfigUtil.getConfigDouble("ARM_FORWARD_SOFT_LIMIT", 0);
-  public static boolean armSoftLimitEnabled = ConfigUtil.getConfigBoolean("ARM_FORWARD_SOFT_LIMIT_ENABLED", false);
-  public static double armReverseSoftLimit = ConfigUtil.getConfigDouble("ARM_REVERSED_SOFT_LIMIT", 0);
-  public static boolean armReverseSoftLimitEnabled = ConfigUtil.getConfigBoolean("ARM_REVERSED_SOFT_LIMIT_ENALBED", false);
+  public static double armForwardSoftLimit =
+      ConfigUtil.getConfigDouble("ARM_FORWARD_SOFT_LIMIT", 0);
+  public static boolean armSoftLimitEnabled =
+      ConfigUtil.getConfigBoolean("ARM_FORWARD_SOFT_LIMIT_ENABLED", false);
+  public static double armReverseSoftLimit =
+      ConfigUtil.getConfigDouble("ARM_REVERSED_SOFT_LIMIT", 0);
+  public static boolean armReverseSoftLimitEnabled =
+      ConfigUtil.getConfigBoolean("ARM_REVERSED_SOFT_LIMIT_ENALBED", false);
   public static double defaultArmVel = ConfigUtil.getConfigDouble("ARM_DEFAULT_VELOCITY", 0);
   public static int armCurrentLimit = ConfigUtil.getConfigInt("ARM_CURRENT_LIMIT", 0);
   public static boolean armIsBrakeMode = ConfigUtil.getConfigBoolean("ARM_BRAKE_MODE", false);
@@ -45,6 +49,7 @@ public class ArmConstants {
   public static double kA = ConfigUtil.getConfigDouble("ARM_A", 0);
 
   public static double armMaxAcceleration = ConfigUtil.getConfigDouble("ARM_MAX_ACCELERATION", 0);
-  public static double armMaxVelocityRotations = ConfigUtil.getConfigDouble("ARM_MAX_VELOCITY_ROTATIONS", 0);
+  public static double armMaxVelocityRotations =
+      ConfigUtil.getConfigDouble("ARM_MAX_VELOCITY_ROTATIONS", 0);
   public static int armEncoderID = ConfigUtil.getConfigInt("ARM_ENCODER_ID", 0);
 }

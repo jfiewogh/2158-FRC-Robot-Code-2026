@@ -1,16 +1,28 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.util;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class AutoPID {
   private static double target = 0;
@@ -25,7 +37,6 @@ public class AutoPID {
   private static double outputValue;
   private static long time1, time2, timeAtHigherOscillation, timeAtLowerOscillation;
   private static double max, min;
-
   private static double kP, kI, kD;
   private static double pAverage, iAverage, dAverage;
 
@@ -156,52 +167,69 @@ public class AutoPID {
     return i;
   }
 
-  public static Command runTuner(double setpointValue, long interval, double outputMin, double outputMax,
-      ZieglerMethod mode, Supplier<Double> encoderVals, Consumer<Double> pidOutput, Runnable stopMotors) {
+  public static Command runTuner(
+      double setpointValue,
+      long interval,
+      double outputMin,
+      double outputMax,
+      ZieglerMethod mode,
+      Supplier<Double> encoderVals,
+      Consumer<Double> pidOutput,
+      Runnable stopMotors) {
     return Commands.sequence(
-        Commands.runOnce(() -> {
-          setTargetInputValue(setpointValue);
-        }),
-        Commands.runOnce(() -> {
-          setLoopInterval(interval);
-        }),
-        Commands.runOnce(() -> {
-          setOutputRange(outputMin, outputMax);
-        }),
-        Commands.runOnce(() -> {
-          setZieglerMode(mode);
-        }),
-        Commands.runOnce(() -> {
-          initLoopStart(RobotController.getFPGATime());
-        }),
-        new Command() {
-          private long microseconds;
+            Commands.runOnce(
+                () -> {
+                  setTargetInputValue(setpointValue);
+                }),
+            Commands.runOnce(
+                () -> {
+                  setLoopInterval(interval);
+                }),
+            Commands.runOnce(
+                () -> {
+                  setOutputRange(outputMin, outputMax);
+                }),
+            Commands.runOnce(
+                () -> {
+                  setZieglerMode(mode);
+                }),
+            Commands.runOnce(
+                () -> {
+                  initLoopStart(RobotController.getFPGATime());
+                }),
+            new Command() {
+              private long microseconds;
 
-          @Override
-          public void execute() {
-            microseconds = RobotController.getFPGATime();
+              @Override
+              public void execute() {
+                microseconds = RobotController.getFPGATime();
 
-            // (temperature, encoder position, velocity, etc)
-            double input = encoderVals.get();
-            double output = tunePID(input);
-            pidOutput.accept(output);
+                // (temperature, encoder position, velocity, etc)
+                double input = encoderVals.get();
+                double output = tunePID(input);
+                pidOutput.accept(output);
 
-            // This loop must run at the same speed as the PID control loop
-            while (RobotController.getFPGATime() - microseconds < loopInterval) {
-              Timer.delay(loopInterval / 2); // Replace with average loop times for PID system
-            }
-          };
+                // This loop must run at the same speed as the PID control loop
+                while (RobotController.getFPGATime() - microseconds < loopInterval) {
+                  Timer.delay(loopInterval / 2); // Replace with average loop times for PID system
+                }
+              }
+              ;
 
-          @Override
-          public boolean isFinished() {
-            return tunerFinished();
-          }
-        }).andThen(() -> {
-          stopMotors.run();
-        }).andThen(() -> {
-          System.out.println("P: " + kP);
-          System.out.println("I: " + kI);
-          System.out.println("D: " + kD);
-        });
+              @Override
+              public boolean isFinished() {
+                return tunerFinished();
+              }
+            })
+        .andThen(
+            () -> {
+              stopMotors.run();
+            })
+        .andThen(
+            () -> {
+              System.out.println("P: " + kP);
+              System.out.println("I: " + kI);
+              System.out.println("D: " + kD);
+            });
   }
 }

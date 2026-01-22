@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 20, 2026 at 17:54:53 CST
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -53,7 +53,8 @@ public class ArmIOSparkFlex implements ArmIO {
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
+    ClosedLoopConfig closedLoop =
+        new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     config.apply(closedLoop);
 
     SoftLimitConfig softLimit =
@@ -61,8 +62,7 @@ public class ArmIOSparkFlex implements ArmIO {
             .forwardSoftLimit(ArmConstants.armForwardSoftLimit)
             .forwardSoftLimitEnabled(ArmConstants.armSoftLimitEnabled)
             .reverseSoftLimit(ArmConstants.armReverseSoftLimit)
-            .reverseSoftLimitEnabled(
-                ArmConstants.armReverseSoftLimitEnabled);
+            .reverseSoftLimitEnabled(ArmConstants.armReverseSoftLimitEnabled);
     config.apply(softLimit);
 
     // Configure encoder

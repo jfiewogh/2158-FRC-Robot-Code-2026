@@ -13,11 +13,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 20, 2026 at 17:52:00 CST
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.commands;
-
-import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -112,7 +110,7 @@ public class TurretTracking extends Command {
     double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
             TURRET_HEIGHT, totalVelocity, totalXYDistance, TARGET_HEIGHT);
-    
+
     if (Double.isNaN(totalPitchRad)) {
       System.out.println("Cannot shoot into hub");
     } else {
@@ -144,10 +142,10 @@ public class TurretTracking extends Command {
       double hoodAngleRad =
           ShooterMath.calculateProjectileAngle(
               TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
-      
+
       if (Double.isNaN(hoodAngleRad)) {
         hoodAngleRad = hood.getAngle().getRotation2d().getRadians();
-      } else if (target.getTrans3d().getMeasureY() != Meters.of(4.034536)) {
+      } else if (target.getTrans3d().getY() != 4.034536) {
         hoodAngleRad = Math.PI / 2;
       }
 

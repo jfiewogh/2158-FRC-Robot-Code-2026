@@ -13,13 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 20, 2026 at 17:54:53 CST
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.util;
 
-import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
-
 import edu.wpi.first.math.util.Units;
+import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
@@ -92,11 +91,17 @@ public class ShooterMath {
   public static double calculateRPMLoss(double currentRPM) {
     double rotationalInertia = flywheelMassKg * Math.pow(FlywheelConstants.radiusMeters, 2);
 
-    double flywheelEnergy = 0.5 * rotationalInertia * Math.pow(Units.rotationsToRadians(currentRPM) / 60, 2);
-    double ballEnergy = (OBJECT_MASS * Math.pow(Units.rotationsToRadians(currentRPM) / 60 * FlywheelConstants.radiusMeters, 2)) / 2;
+    double flywheelEnergy =
+        0.5 * rotationalInertia * Math.pow(Units.rotationsToRadians(currentRPM) / 60, 2);
+    double ballEnergy =
+        (OBJECT_MASS
+                * Math.pow(
+                    Units.rotationsToRadians(currentRPM) / 60 * FlywheelConstants.radiusMeters, 2))
+            / 2;
     double totalEnergy = flywheelEnergy - ballEnergy;
 
-    double outputRPM =  Units.rotationsToRadians(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
+    double outputRPM =
+        Units.rotationsToRadians(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
 
     return outputRPM;
   }

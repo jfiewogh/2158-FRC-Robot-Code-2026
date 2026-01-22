@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,27 +13,26 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday November 21, 2025 at 14:36:48 CST
+// Updated on Thursday January 22, 2026 at 17:29:37 CST
 
 package org.austincans.frc2158.subsystems.arm;
-
-import java.util.List;
-
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   public TrapezoidProfile.Constraints constraints =
       new TrapezoidProfile.Constraints(
-          ArmConstants.armMaxVelocityRotations,
-          ArmConstants.armMaxAcceleration);
+          ArmConstants.armMaxVelocityRotations, ArmConstants.armMaxAcceleration);
 
   /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
-  public final ArmFeedforward feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
+  public final ArmFeedforward feedforward =
+      new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
+
   public ProfiledPIDController armPIDController =
       new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD, constraints);
 
