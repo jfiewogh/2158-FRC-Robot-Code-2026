@@ -32,7 +32,6 @@ import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOSparkFlex implements ArmIO {
   /* Motor */
@@ -42,9 +41,9 @@ public class ArmIOSparkFlex implements ArmIO {
   private SparkFlexConfig config;
   private final SparkClosedLoopController controller;
 
-  private int canID = ConfigUtil.getConfigInt("armID", 0);
-  private int statorCurrentLimit = ConfigUtil.getConfigInt("armCurrentLimit", 0);
-  private boolean brakeMode = ConfigUtil.getConfigBoolean("armIsBrakeMode", false);
+  private int canID = ArmConstants.armCANID;
+  private int statorCurrentLimit = ArmConstants.armCurrentLimit;
+  private boolean brakeMode = ArmConstants.armIsBrakeMode;
 
   public ArmIOSparkFlex() {
     // Initialize motor controller
@@ -54,16 +53,16 @@ public class ArmIOSparkFlex implements ArmIO {
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     config.apply(closedLoop);
 
     SoftLimitConfig softLimit =
         new SoftLimitConfig()
-            .forwardSoftLimit(ConfigUtil.getConfigDouble("armForwardSoftLimit", 0))
-            .forwardSoftLimitEnabled(ConfigUtil.getConfigBoolean("armSoftLimitEnabled", true))
-            .reverseSoftLimit(ConfigUtil.getConfigDouble("armReverseSoftLimit", 0))
+            .forwardSoftLimit(ArmConstants.armForwardSoftLimit)
+            .forwardSoftLimitEnabled(ArmConstants.armSoftLimitEnabled)
+            .reverseSoftLimit(ArmConstants.armReverseSoftLimit)
             .reverseSoftLimitEnabled(
-                ConfigUtil.getConfigBoolean("armReverseSoftLimitEnabled", false));
+                ArmConstants.armReverseSoftLimitEnabled);
     config.apply(softLimit);
 
     // Configure encoder
@@ -88,7 +87,7 @@ public class ArmIOSparkFlex implements ArmIO {
   // Encoder Values
   @Override
   public void setPosition(double position) {
-    setPosition(position, ConfigUtil.getConfigDouble("defaultArmVel", 5));
+    setPosition(position, ArmConstants.defaultArmVel);
   }
 
   public void setPosition(double position, double VelocityRadPerSec) {

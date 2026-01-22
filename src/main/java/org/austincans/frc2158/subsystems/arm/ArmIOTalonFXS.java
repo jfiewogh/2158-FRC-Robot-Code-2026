@@ -28,7 +28,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOTalonFXS implements ArmIO {
   /* Motor */
@@ -37,9 +36,9 @@ public class ArmIOTalonFXS implements ArmIO {
   private final TalonFXSConfiguration config;
   private final CANcoder encoder;
 
-  private int canID = ConfigUtil.getConfigInt("armID", 0);
-  private int statorCurrentLimit = ConfigUtil.getConfigInt("armCurrentLimit", 0);
-  private boolean brakeMode = ConfigUtil.getConfigBoolean("armIsBrakeMode", false);
+  private int canID = ArmConstants.armCANID;
+  private int statorCurrentLimit = ArmConstants.armCurrentLimit;
+  private boolean brakeMode = ArmConstants.armIsBrakeMode;
 
   private final VoltageOut voltageRequest = new VoltageOut(0);
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
@@ -53,16 +52,16 @@ public class ArmIOTalonFXS implements ArmIO {
     config = new TalonFXSConfiguration();
     config.MotorOutput.NeutralMode = brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
-    config.Slot0.kP = kP;
-    config.Slot0.kI = kI;
-    config.Slot0.kD = kD;
-    config.Slot0.kS = kS;
-    config.Slot0.kG = kG;
-    config.Slot0.kV = kV;
-    config.Slot0.kA = kA;
+    config.Slot0.kP = ArmConstants.kP;
+    config.Slot0.kI = ArmConstants.kI;
+    config.Slot0.kD = ArmConstants.kD;
+    config.Slot0.kS = ArmConstants.kS;
+    config.Slot0.kG = ArmConstants.kG;
+    config.Slot0.kV = ArmConstants.kV;
+    config.Slot0.kA = ArmConstants.kA;
 
     // Configure encoder
-    encoder = new CANcoder(ConfigUtil.getConfigInt("armEncoderID", 0));
+    encoder = new CANcoder(ArmConstants.armEncoderID);
 
     config.ExternalFeedback.FeedbackRemoteSensorID = encoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =

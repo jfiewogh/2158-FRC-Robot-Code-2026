@@ -27,12 +27,7 @@ import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 public class Arm extends AdvancedSubsystem {
   private ArmIO io;
   private ArmIOInputsAutoLogged inputs;
-  private double targetPosition = 0.0;
-  private double targetVelocity = 0.0;
-
-  private double maxVelocity = 0;
-  private double maxAcceleration = 0;
-  private double gearRatio = 0;
+  private double gearRatio = ArmConstants.armGearRatio;
 
   public Arm(ArmIO io) {
     this.io = io;

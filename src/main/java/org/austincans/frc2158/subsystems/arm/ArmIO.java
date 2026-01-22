@@ -17,39 +17,25 @@
 
 package org.austincans.frc2158.subsystems.arm;
 
+import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+import org.littletonrobotics.junction.AutoLog;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import java.util.List;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
-  /*
-   * PID
-   * kP: Proportional
-   * kI: Integral
-   * kD: Derivative
-   */
-  public double kP = ConfigUtil.getConfigDouble("armkP", 0);
-  public double kI = ConfigUtil.getConfigDouble("armkI", 0);
-  public double kD = ConfigUtil.getConfigDouble("armkD", 0);
-
   public TrapezoidProfile.Constraints constraints =
       new TrapezoidProfile.Constraints(
-          ConfigUtil.getConfigDouble("armMaxVelocityRotations", 0),
-          ConfigUtil.getConfigDouble("armMaxAcceleration", 0));
+          ArmConstants.armMaxVelocityRotations,
+          ArmConstants.armMaxAcceleration);
 
   /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
-  public double kS = ConfigUtil.getConfigDouble("armkS", 0);
-
-  public double kG = ConfigUtil.getConfigDouble("armkG", 0);
-  public double kV = ConfigUtil.getConfigDouble("armkV", 0);
-  public double kA = ConfigUtil.getConfigDouble("armkA", 0);
-  public final ArmFeedforward feedforward = new ArmFeedforward(kS, kG, kV, kA);
+  public final ArmFeedforward feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
   public ProfiledPIDController armPIDController =
-      new ProfiledPIDController(kP, kI, kD, constraints);
+      new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD, constraints);
 
   @AutoLog
   class ArmIOInputs {

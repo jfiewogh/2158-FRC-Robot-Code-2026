@@ -21,7 +21,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.frc2158.Constants;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOSim implements ArmIO {
   private final DCMotor neoVortex = DCMotor.getNeoVortex(1);
@@ -29,13 +28,13 @@ public class ArmIOSim implements ArmIO {
   private final SingleJointedArmSim armSim =
       new SingleJointedArmSim(
           neoVortex,
-          ConfigUtil.getConfigDouble("armGearing", 0),
+          ArmConstants.armGearRatio,
           0.001,
-          ConfigUtil.getConfigDouble("armLength", 0),
+          ArmConstants.armLength,
           0,
-          ConfigUtil.getConfigDouble("armMaxRad", 0),
+          ArmConstants.armMaxRad,
           true,
-          ConfigUtil.getConfigDouble("armStartingPosition", 0));
+          ArmConstants.armStartingPosition);
 
   private double armAppliedVolts;
 
