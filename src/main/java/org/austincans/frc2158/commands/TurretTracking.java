@@ -112,37 +112,47 @@ public class TurretTracking extends Command {
     double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
             TURRET_HEIGHT, totalVelocity, totalXYDistance, TARGET_HEIGHT);
+    
+    if (Double.isNaN(totalPitchRad)) {
+      System.out.println("Cannot shoot into hub");
+    } else {
+      flywheel.setVelocity(flywheelVelocityRPM);
 
-    Rotation2d totalYaw =
-        Rotation2d.fromRadians(
-            Math.atan2(
-                target.getTrans3d().getY() - turretTranslation.getY(),
-                target.getTrans3d().getX() - turretTranslation.getX()));
+      Rotation2d totalYaw =
+          Rotation2d.fromRadians(
+              Math.atan2(
+                  target.getTrans3d().getY() - turretTranslation.getY(),
+                  target.getTrans3d().getX() - turretTranslation.getX()));
 
-    double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
-    double totalXVelocity = totalXYVelocity * totalYaw.getCos();
-    double totalYVelocity = totalXYVelocity * totalYaw.getSin();
+      double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
+      double totalXVelocity = totalXYVelocity * totalYaw.getCos();
+      double totalYVelocity = totalXYVelocity * totalYaw.getSin();
 
-    // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
+      // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
 
-    ChassisSpeeds robotSpeeds = robotVelSupplier.get();
-    double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
-    double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
-    double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
-    Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
-    turret.setDesiredAngleFieldRelative(turretAngle, pose);
+      ChassisSpeeds robotSpeeds = robotVelSupplier.get();
+      double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
+      double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
+      double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
+      Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
+      turret.setDesiredAngleFieldRelative(turretAngle, pose);
 
-    // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
+      // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
 
-    double totalTime = totalXYDistance / totalXYVelocity;
+      double totalTime = totalXYDistance / totalXYVelocity;
 
-    double hoodAngleRad =
-        ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
-    if (target.getTrans3d().getMeasureY() != Meters.of(4.034536)) {
-      hoodAngleRad = Math.PI / 2;
+      double hoodAngleRad =
+          ShooterMath.calculateProjectileAngle(
+              TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
+      
+      if (Double.isNaN(hoodAngleRad)) {
+        hoodAngleRad = hood.getAngle().getRotation2d().getRadians();
+      } else if (target.getTrans3d().getMeasureY() != Meters.of(4.034536)) {
+        hoodAngleRad = Math.PI / 2;
+      }
+
+      hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
     }
-    hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
   }
 
   @Override

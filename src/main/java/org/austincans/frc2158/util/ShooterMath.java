@@ -17,12 +17,19 @@
 
 package org.austincans.frc2158.util;
 
+import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
+
+import edu.wpi.first.math.util.Units;
+
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
 
   private static final double DRAG_COEFF = 0.91175;
   private static final double AIR_DENSITY = 1.225; // kg/m^3
   private static final double OBJECT_MASS = 0.227; // kg
+  private static final double motorTorque = 3.65; // Nm
+  private static final double objectRadius = Units.inchesToMeters(5.91) / 2; // meters
+  private static final double flywheelMassKg = Units.lbsToKilograms(0.8);
 
   // Calculate flywheel velocity given distance and hood angle
   public static double calculateProjectileVelocity(
@@ -79,6 +86,19 @@ public class ShooterMath {
             * Math.pow(exitVelocityMeters, 2)
             * (objectAreaMeters);
     return dragForceNewtons / (OBJECT_MASS);
+  }
+
+  // Sim
+  public static double calculateRPMLoss(double currentRPM) {
+    double rotationalInertia = flywheelMassKg * Math.pow(FlywheelConstants.radiusMeters, 2);
+
+    double flywheelEnergy = 0.5 * rotationalInertia * Math.pow(Units.rotationsToRadians(currentRPM) / 60, 2);
+    double ballEnergy = (OBJECT_MASS * Math.pow(Units.rotationsToRadians(currentRPM) / 60 * FlywheelConstants.radiusMeters, 2)) / 2;
+    double totalEnergy = flywheelEnergy - ballEnergy;
+
+    double outputRPM =  Units.rotationsToRadians(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
+
+    return outputRPM;
   }
 
   public static double compensateForDrag(double dragForceNewtons, double time) { // TODO: Finish me
