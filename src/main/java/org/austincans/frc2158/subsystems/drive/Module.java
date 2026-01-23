@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Robot;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2158.util.ConfigUtil;
 import org.austincans.frc2158.util.LoggedTracer;
 import org.austincans.frc2158.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
@@ -60,10 +59,10 @@ public class Module extends AdvancedSubsystem {
         drivekV.initDefault(0);
         // Multiplied by desired wheelTorqueNm
         drivekT.initDefault(DriveConstants.driveReduction / DCMotor.getKrakenX60Foc(1).KtNMPerAmp);
-        drivekP.initDefault(ConfigUtil.getConfigDouble("drivekP", 0.0));
-        drivekD.initDefault(ConfigUtil.getConfigDouble("drivekD", 0.0));
-        turnkP.initDefault(ConfigUtil.getConfigDouble("turnkP", 0.0));
-        turnkD.initDefault(ConfigUtil.getConfigDouble("turnkD", 0.0));
+        drivekP.initDefault(DriveConstants.driveP);
+        drivekD.initDefault(DriveConstants.driveD);
+        turnkP.initDefault(DriveConstants.turnP);
+        turnkD.initDefault(DriveConstants.turnD);
       }
       default -> {
         drivekS.initDefault(0.014);
@@ -168,7 +167,7 @@ public class Module extends AdvancedSubsystem {
 
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
-    io.setDriveVelocity(speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0));
+    io.setDriveVelocity(speedRadPerSec * DriveConstants.speedConstant);
     io.setTurnPosition(state.angle);
   }
 
@@ -184,7 +183,7 @@ public class Module extends AdvancedSubsystem {
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
     io.setDriveVelocity(
-        speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0),
+        speedRadPerSec * DriveConstants.speedConstant,
         ffModel.calculate(speedRadPerSec) + wheelTorqueNm * drivekT.get());
     io.setTurnPosition(state.angle);
   }

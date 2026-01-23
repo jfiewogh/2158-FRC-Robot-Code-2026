@@ -42,7 +42,6 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
-import org.austincans.frc2158.util.ConfigUtil;
 import org.austincans.frc2158.util.PhoenixUtil;
 
 public class ModuleIODev implements ModuleIO {
@@ -98,9 +97,9 @@ public class ModuleIODev implements ModuleIO {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 =
         new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("drivekP", 0.0))
+            .withKP(DriveConstants.driveP)
             .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("drivekD", 0.0));
+            .withKD(DriveConstants.driveD);
     driveConfig.Feedback.SensorToMechanismRatio = driveReduction;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps;
     driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps;
@@ -114,9 +113,9 @@ public class ModuleIODev implements ModuleIO {
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.Slot0 =
         new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("turnkP", 0.0))
+            .withKP(DriveConstants.turnP)
             .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("turnkD", 0.0));
+            .withKD(DriveConstants.turnD);
     turnConfig.Feedback.SensorToMechanismRatio = turnReduction;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps;
