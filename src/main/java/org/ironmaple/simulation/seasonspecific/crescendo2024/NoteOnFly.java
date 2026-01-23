@@ -1,0 +1,80 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Friday January 23, 2026 at 11:47:19 CST
+
+package org.ironmaple.simulation.seasonspecific.crescendo2024;
+
+import static org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField.*;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import org.ironmaple.simulation.gamepieces.GamePieceProjectile;
+import org.ironmaple.utils.LegacyFieldMirroringUtils2024;
+
+public class NoteOnFly extends GamePieceProjectile {
+  public NoteOnFly(
+      Translation2d robotPosition,
+      Translation2d shooterPositionOnRobot,
+      ChassisSpeeds chassisSpeeds,
+      Rotation2d shooterFacing,
+      Distance initialHeight,
+      LinearVelocity launchingSpeed,
+      Angle shooterAngle) {
+    super(
+        CRESCENDO_NOTE_INFO,
+        robotPosition,
+        shooterPositionOnRobot,
+        chassisSpeeds,
+        shooterFacing,
+        initialHeight,
+        launchingSpeed,
+        shooterAngle);
+    super.withTouchGroundHeight(0.6);
+  }
+
+  public NoteOnFly asSpeakerShotNote(Runnable hitTargetCallBack) {
+    return (NoteOnFly)
+        super.withTargetPosition(
+                () ->
+                    LegacyFieldMirroringUtils2024.toCurrentAllianceTranslation(
+                        new Translation3d(0.25, 5.56, 2.3)))
+            .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
+            .withHitTargetCallBack(hitTargetCallBack);
+  }
+
+  public NoteOnFly asAmpShotNote(Runnable hitTargetCallBack) {
+    return (NoteOnFly)
+        super.withTargetPosition(
+                () ->
+                    LegacyFieldMirroringUtils2024.toCurrentAllianceTranslation(
+                        new Translation3d(1.83, 8.12, 0.95)))
+            .withTargetTolerance(new Translation3d(0.1, 0.6, 0.45))
+            .withHitTargetCallBack(hitTargetCallBack);
+  }
+
+  public NoteOnFly enableBecomeNoteOnFieldAfterTouchGround() {
+    return (NoteOnFly) super.enableBecomesGamePieceOnFieldAfterTouchGround();
+  }
+
+  public NoteOnFly disableBecomeNoteOnFieldAfterTouchGround() {
+    return (NoteOnFly) super.disableBecomesGamePieceOnFieldAfterTouchGround();
+  }
+}
