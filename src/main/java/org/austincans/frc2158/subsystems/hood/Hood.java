@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 17:29:37 CST
+// Updated on Thursday January 22, 2026 at 19:06:38 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -28,7 +28,6 @@ import org.littletonrobotics.junction.Logger;
 public class Hood extends AdvancedSubsystem {
   private HoodIO io;
   private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
-  private Angle angle;
 
   public Hood(HoodIO io) {
     this.io = io;

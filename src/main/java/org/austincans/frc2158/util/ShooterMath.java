@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 17:29:37 CST
+// Updated on Thursday January 22, 2026 at 19:06:38 CST
 
 package org.austincans.frc2158.util;
 
@@ -45,7 +45,8 @@ public class ShooterMath {
     return Math.sqrt(numerator / denominator);
   }
 
-  // calculate projectile launch angle given (initial exitVelocity and height), (target height and
+  // calculate projectile launch angle given (initial exitVelocity and height),
+  // (target height and
   // distance)
   public static double calculateProjectileAngle(
       double initHeight, double initSpeed, double targetDistance, double targetHeight) {
@@ -88,21 +89,20 @@ public class ShooterMath {
   }
 
   // Sim
-  public static double calculateRPMLoss(double currentRPM) {
+  public static double calculateRPMLoss(double flywheelVelocityRPM) {
     double rotationalInertia = flywheelMassKg * Math.pow(FlywheelConstants.radiusMeters, 2);
 
-    double flywheelEnergy =
-        0.5 * rotationalInertia * Math.pow(Units.rotationsToRadians(currentRPM) / 60, 2);
-    double ballEnergy =
-        (OBJECT_MASS
-                * Math.pow(
-                    Units.rotationsToRadians(currentRPM) / 60 * FlywheelConstants.radiusMeters, 2))
-            / 2;
+    double flywheelVelocityRadPerSec = Units.rotationsToRadians(flywheelVelocityRPM) / 60;
+    double flywheelEnergy = 0.5 * rotationalInertia * Math.pow(flywheelVelocityRadPerSec, 2);
+
+    double ballVelocityMetersPerSec =
+        Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FlywheelConstants.radiusMeters;
+    double ballEnergy = 0.5 * OBJECT_MASS * Math.pow(ballVelocityMetersPerSec, 2);
+
     double totalEnergy = flywheelEnergy - ballEnergy;
 
     double outputRPM =
-        Units.rotationsToRadians(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
-
+        Units.radiansToRotations(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
     return outputRPM;
   }
 

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 17:29:37 CST
+// Updated on Thursday January 22, 2026 at 19:06:38 CST
 
 package org.austincans.frc2158.commands;
 
@@ -91,19 +91,49 @@ public class TurretTracking extends Command {
     }
   }
 
+  private static final double[][] measuredExitSpeeds =
+      new double[][] {
+        // RPM, actual exit speed
+        {0, 0, 0}
+      };
+
+  // TODO: get value from measuredExitSpeeds
+  public static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
+    return Units.rotationsToRadians(ShooterMath.calculateRPMLoss(flywheelVelocityRPM))
+        / 60
+        * FLYWHEEL_RADIUS;
+  }
+
+  // TODO: get actual latency
+  private static final double latency = 0.02;
+
   @Override
   public void execute() {
-    Pose2d pose = robotPoseSupplier.get();
+    Pose2d robotPose = robotPoseSupplier.get();
+    ChassisSpeeds robotSpeeds = robotVelSupplier.get();
+
+    Translation2d futureRobotTranslation =
+        robotPose
+            .getTranslation()
+            .plus(
+                new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+                    .times(latency));
+    Rotation2d futureRobotRotation =
+        robotPose
+            .getRotation()
+            .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond))
+            .times(latency);
 
     Translation2d turretTranslation =
-        pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
+        futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
-    double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
-    flywheel.setVelocity(flywheelVelocityRPM);
+    double flywheelVelocityRPM = FLYWHEEL_MAXRPM;
+
+    flywheel.setVelocity(0);
 
     // TOTAL VALUES
 
-    double totalVelocity = Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
+    double totalVelocity = getActualExitVelocityMetersPerSec(flywheelVelocityRPM);
 
     double totalXYDistance = turretTranslation.getDistance(target.getTrans3d().toTranslation2d());
 
@@ -112,10 +142,8 @@ public class TurretTracking extends Command {
             TURRET_HEIGHT, totalVelocity, totalXYDistance, TARGET_HEIGHT);
 
     if (Double.isNaN(totalPitchRad)) {
-      System.out.println("Cannot shoot into hub");
+      System.out.println("Cannot shoot into hub (1)");
     } else {
-      flywheel.setVelocity(flywheelVelocityRPM);
-
       Rotation2d totalYaw =
           Rotation2d.fromRadians(
               Math.atan2(
@@ -128,12 +156,11 @@ public class TurretTracking extends Command {
 
       // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
 
-      ChassisSpeeds robotSpeeds = robotVelSupplier.get();
       double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
       double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
       double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
       Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
-      turret.setDesiredAngleFieldRelative(turretAngle, pose);
+      turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
 
       // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
 
@@ -144,12 +171,17 @@ public class TurretTracking extends Command {
               TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
 
       if (Double.isNaN(hoodAngleRad)) {
-        hoodAngleRad = hood.getAngle().getRotation2d().getRadians();
-      } else if (target.getTrans3d().getY() != 4.034536) {
-        hoodAngleRad = Math.PI / 2;
-      }
+        System.out.println("Cannot shoot into hub (2)");
+      } else {
+        if (target.getTrans3d().getY() != 4.034536) {
+          hoodAngleRad = Math.PI / 2;
+        }
 
-      hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
+        // Should run only if angle is possible
+        flywheel.setVelocity(flywheelVelocityRPM);
+        turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
+        hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
+      }
     }
   }
 

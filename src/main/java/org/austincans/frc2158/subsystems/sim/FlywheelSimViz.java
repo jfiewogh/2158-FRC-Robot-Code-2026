@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 17:29:37 CST
+// Updated on Thursday January 22, 2026 at 19:06:38 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -25,7 +25,6 @@ import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -33,6 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -70,7 +70,8 @@ public class FlywheelSimViz {
         && intakeSimulation.obtainGamePieceFromIntake()) {
       lastShootingTime = Timer.getFPGATimestamp();
 
-      double exitVelocityMetersPerSec = Units.rotationsToRadians(velocityRPM) / 60 * radius;
+      double exitVelocityMetersPerSec =
+          TurretTracking.getActualExitVelocityMetersPerSec(velocityRPM);
 
       Pose2d robotPose = RobotState.getInstance().getEstimatedPose();
 

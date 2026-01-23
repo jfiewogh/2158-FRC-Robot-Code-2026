@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 17:29:37 CST
+// Updated on Thursday January 22, 2026 at 19:06:38 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -82,11 +82,12 @@ public class Turret extends AdvancedSubsystem {
             / (2 * distance * distance);
     double angleOffset = Math.copySign(Math.acos(cosC), aimPointLeft);
 
-    setDesiredAngleFieldRelative(jointToTargetAngle.minus(new Rotation2d(angleOffset)), robotPose);
+    setDesiredAngleFieldRelative(
+        jointToTargetAngle.minus(new Rotation2d(angleOffset)), robotPose.getRotation());
   }
 
   public double getTurretVelocity() {
-    return inputs.velocityDegPerSec * 360.0;
+    return inputs.velocityDegPerSec;
   }
 
   public Command pointTurretToPositionCommand(Translation3d fieldPos, double aimPointLeft) {
@@ -108,8 +109,9 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Pose2d currentPose) {
-    Rotation2d desiredAngle = fieldRelativeAngle.minus(currentPose.getRotation());
+  public void setDesiredAngleFieldRelative(
+      Rotation2d fieldRelativeAngle, Rotation2d currentRotation) {
+    Rotation2d desiredAngle = fieldRelativeAngle.minus(currentRotation);
 
     // if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
     //     && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
@@ -129,7 +131,8 @@ public class Turret extends AdvancedSubsystem {
     return Commands.run(
         () ->
             setDesiredAngleFieldRelative(
-                Rotation2d.fromDegrees(fieldRelativeAngle), new Pose2d() // TODO: insert Swerve Pose
+                Rotation2d.fromDegrees(fieldRelativeAngle),
+                new Rotation2d() // TODO: insert Swerve Pose
                 ),
         this);
   }
@@ -154,7 +157,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.velocityDegPerSec * 360.0 < 5) {
+                  if (inputs.velocityDegPerSec < 5) {
                     addFault(
                         "[System Check] Turret absolute encoder velocity measured too slow",
                         false,
