@@ -13,9 +13,16 @@ public class KalmanFilter1D {
      * 3. Covariance = (Std. Deviation) ^2
      */
     
-    public KalmanFilter1D(double initialX, double initialP, double processNoise, double measurementNoise) {
-        this.estimatedPoses = initialX;
+    public KalmanFilter1D(double initialPose, double initialP, double processNoise, double measurementNoise) {
+        this.estimatedPoses = initialPose;
         this.covariance = initialP;
+        this.processsNoiseCovariance = processNoise;
+        this.measurementNoisesCovariance = measurementNoise;
+    }
+
+    public KalmanFilter1D(double initialPose, double processNoise, double measurementNoise) {
+        this.estimatedPoses = initialPose;
+        this.covariance = 0;
         this.processsNoiseCovariance = processNoise;
         this.measurementNoisesCovariance = measurementNoise;
     }
