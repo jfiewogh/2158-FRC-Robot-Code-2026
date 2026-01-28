@@ -23,13 +23,13 @@ import com.ctre.phoenix6.CANBus;
 
 public class FlywheelConstants {
   // TODO: get from config
-  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEELL_S", 0);  
-  public static final double kV = ConfigUtil.getConfigDouble("FLYWHEELL_V", 0);
-  public static final double kA = ConfigUtil.getConfigDouble("FLYWHEELL_A", 0);
+  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);  
+  public static final double kV = ConfigUtil.getConfigDouble("FLYWHEEL_V", 0);
+  public static final double kA = ConfigUtil.getConfigDouble("FLYWHEEL_A", 0);
 
   /* REAL */
-  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEELL_MOTOR_ID", 0);
-  public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEELL_ENCODER_ID", 0);
+  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);
+  public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEEL_ENCODER_ID", 0);
 
   public static final CANBus canBus = new CANBus("*");
 

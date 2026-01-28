@@ -28,9 +28,6 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface IntakeIO {
-  public final int deployCanID = ConfigUtil.getConfigInt("deployCanID", 0);
-  public final int intakeCanID = ConfigUtil.getConfigInt("intakeCanID", 0);
-
   /*
    * PID
    * kP: Proportional

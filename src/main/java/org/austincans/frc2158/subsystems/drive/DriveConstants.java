@@ -36,7 +36,7 @@ public class DriveConstants {
   public static final double trackWidthX = ConfigUtil.getConfigDouble("ROBOT_TRACK_WIDTH_X", 0);
   public static final double trackWidthY = ConfigUtil.getConfigDouble("ROBOT_TRACK_WIDTH_Y", 0);
   public static final double driveBaseRadius = Math.hypot(trackWidthX / 2, trackWidthY / 2);
-  public static final double maxLinearSpeed = ConfigUtil.getConfigDouble("ROBOT_MAX_LINEARA_SPEED", 0);
+  public static final double maxLinearSpeed = ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_SPEED", 0);
   public static final double maxAngularSpeed = maxLinearSpeed / driveBaseRadius;
   public static final double maxLinearAcceleration = ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_ACCELERATION", 0);
 
@@ -50,8 +50,8 @@ public class DriveConstants {
   public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
   public static final double turnReduction = (150.0 / 7.0);
 
-  public static final double driveCurrentLimitAmps = ConfigUtil.getConfigDouble("DRIVE_CURRET_LIMIT", 0); // placeholder
-  public static final double turnCurrentLimitAmps =  ConfigUtil.getConfigDouble("TURN_CURRET_LIMIT", 0); // placeholder
+  public static final double driveCurrentLimitAmps = ConfigUtil.getConfigDouble("DRIVE_CURRENT_LIMIT", 0); // placeholder
+  public static final double turnCurrentLimitAmps =  ConfigUtil.getConfigDouble("TURN_CURRENT_LIMIT", 0); // placeholder
 
   public static final Translation2d[] moduleTranslations = {
     new Translation2d(trackWidthX / 2, trackWidthY / 2),

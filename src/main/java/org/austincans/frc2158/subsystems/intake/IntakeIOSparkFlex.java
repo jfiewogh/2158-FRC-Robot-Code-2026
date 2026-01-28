@@ -49,8 +49,8 @@ public class IntakeIOSparkFlex implements IntakeIO {
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
     deployMotor =
-        new SparkFlex(ConfigUtil.getConfigInt("intakeDeployMotorID1", 0), MotorType.kBrushless);
-    intakeMotor = new SparkFlex(ConfigUtil.getConfigInt("intakeMotorID1", 0), MotorType.kBrushless);
+        new SparkFlex(IntakeConstants.deployMotorID, MotorType.kBrushless);
+    intakeMotor = new SparkFlex(IntakeConstants.intakeMotorID, MotorType.kBrushless);
 
     deployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);

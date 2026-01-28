@@ -33,19 +33,6 @@ public interface TurretIO {
     public double temperatureC = 0.0;
   }
 
-  /*
-   * PID
-   * kP: Proportional
-   * kI: Integral
-   * kD: Derivative
-   */
-  public double kP = ConfigUtil.getConfigDouble("turretkP", 0);
-  public double kI = ConfigUtil.getConfigDouble("turretkI", 0);
-  public double kD = ConfigUtil.getConfigDouble("turretkD", 0);
-  public double kV = ConfigUtil.getConfigDouble("turretkV", 0);
-  public double kS = ConfigUtil.getConfigDouble("turretkS", 0);
-  public double kA = ConfigUtil.getConfigDouble("turretkA", 0);
-
   public void setVoltage(double voltage);
 
   public void setDesiredAngle(Rotation2d angle);

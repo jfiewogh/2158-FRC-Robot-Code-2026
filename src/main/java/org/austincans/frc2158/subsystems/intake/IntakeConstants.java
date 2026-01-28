@@ -24,11 +24,14 @@ public class IntakeConstants {
   public static final CANBus intakeCANBus =
       new CANBus(ConfigUtil.getConfigString("intakeCanbus", "2158"));
 
-  // TODO: get from config
-
   public static final double deployGearing = 1;
   public static final double intakeGearing = 1; // placeholder
 
   public static final double deployRotationalInertiaMetersSq = 0.01;
   public static final double intakeRotationalInertiaMetersSq = 0.01;
+
+public static final int deployMotorID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0);
+public static final int intakeMotorID = ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 0);
+
+public static final int deployEncoderID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0);
 }

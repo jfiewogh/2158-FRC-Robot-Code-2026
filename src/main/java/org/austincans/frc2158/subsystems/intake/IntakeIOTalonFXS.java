@@ -29,7 +29,6 @@ import java.util.List;
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOTalonFXS implements IntakeIO {
@@ -45,8 +44,8 @@ public class IntakeIOTalonFXS implements IntakeIO {
 
   public IntakeIOTalonFXS() {
     // Initialize motor controller
-    deployMotor = new TalonFXS(deployCanID, IntakeConstants.intakeCANBus);
-    intakeMotor = new TalonFXS(intakeCanID, IntakeConstants.intakeCANBus);
+    deployMotor = new TalonFXS(IntakeConstants.deployMotorID, IntakeConstants.intakeCANBus);
+    intakeMotor = new TalonFXS(IntakeConstants.intakeMotorID, IntakeConstants.intakeCANBus);
 
     deployMotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);
@@ -63,7 +62,7 @@ public class IntakeIOTalonFXS implements IntakeIO {
     config.Slot0.kA = kA;
 
     // Configure encoder
-    deployEncoder = new CANcoder(ConfigUtil.getConfigInt("armEncoderID", 0));
+    deployEncoder = new CANcoder(IntakeConstants.deployEncoderID);
 
     config.ExternalFeedback.FeedbackRemoteSensorID = deployEncoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =

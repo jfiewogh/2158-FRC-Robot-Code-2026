@@ -44,10 +44,10 @@ public class TurretIOTalonFX implements TurretIO {
   // Feedforward
   private final ArmFeedforward feedforward =
       new ArmFeedforward(
-          kS, // kS
+          TurretConstants.kS, // kS
           0, // kG - Pivot doesn't need gravity compensation
-          kV, // kV
-          kA // kA
+          TurretConstants.kV, // kV
+          TurretConstants.kA // kA
           );
 
   private final PositionVoltage positionRequest;
@@ -63,20 +63,18 @@ public class TurretIOTalonFX implements TurretIO {
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     turretEncoderConfig = new CANcoderConfiguration();
 
-    motorConfig.Slot0.kP = kP;
-    motorConfig.Slot0.kI = kI;
-    motorConfig.Slot0.kD = kD;
-    motorConfig.Slot0.kV = kV;
-    motorConfig.Slot0.kS = kS;
-    motorConfig.Slot0.kA = kA;
+    motorConfig.Slot0.kP = TurretConstants.kP;
+    motorConfig.Slot0.kI = TurretConstants.kI;
+    motorConfig.Slot0.kD = TurretConstants.kD;
+    motorConfig.Slot0.kV = TurretConstants.kV;
+    motorConfig.Slot0.kS = TurretConstants.kS;
+    motorConfig.Slot0.kA = TurretConstants.kA;
 
-    motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = TurretConstants.forwardLimit;
     motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        ConfigUtil.getConfigDouble("turretSoftLimit", 0);
-    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        ConfigUtil.getConfigDouble("turretHardLimit", 0);
-
+        TurretConstants.turretForwardSoftLimit;
+    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = TurretConstants.reverseLimit;
+    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = TurretConstants.turretReverseSoftLimit;
     motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     motorConfig.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();

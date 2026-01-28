@@ -4,7 +4,7 @@ public class KalmanFilter1D {
     private double estimatedPoses; // Estimated pose
     private double covariance; 
     
-    private double processsNoiseCovariance; // Process noise covariance
+    private double processNoiseCovariance; // Process noise covariance
     private double measurementNoisesCovariance; // Measurement noise covariance
     /*
      * How to calculate Measurement Noise 
@@ -16,19 +16,19 @@ public class KalmanFilter1D {
     public KalmanFilter1D(double initialPose, double initialP, double processNoise, double measurementNoise) {
         this.estimatedPoses = initialPose;
         this.covariance = initialP;
-        this.processsNoiseCovariance = processNoise;
+        this.processNoiseCovariance = processNoise;
         this.measurementNoisesCovariance = measurementNoise;
     }
 
     public KalmanFilter1D(double initialPose, double processNoise, double measurementNoise) {
         this.estimatedPoses = initialPose;
         this.covariance = 0;
-        this.processsNoiseCovariance = processNoise;
+        this.processNoiseCovariance = processNoise;
         this.measurementNoisesCovariance = measurementNoise;
     }
     
     public void predict() {
-        this.covariance = this.covariance + this.processsNoiseCovariance;
+        this.covariance = this.covariance + this.processNoiseCovariance;
     }
     
     public void update(double measurement) {

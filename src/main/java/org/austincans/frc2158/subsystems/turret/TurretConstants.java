@@ -21,17 +21,29 @@ import com.ctre.phoenix6.CANBus;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class TurretConstants {
-  public static final int turretMotorId = ConfigUtil.getConfigInt("turretID", 0);
-  public static final int turretEncoderId = ConfigUtil.getConfigInt("turretEncoderID", 0);
+  public static final double kP = ConfigUtil.getConfigDouble("TURRET_P", 0);
+  public static final double kI = ConfigUtil.getConfigDouble("TURRET_I", 0);
+  public static final double kD = ConfigUtil.getConfigDouble("TURRET_D", 0);
+  public static final double kV = ConfigUtil.getConfigDouble("TURRET_V", 0);
+  public static final double kS = ConfigUtil.getConfigDouble("TURRET_S", 0);
+  public static final double kA = ConfigUtil.getConfigDouble("TURRET_A", 0);
+
+  public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
+  public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
   // TODO: is CANBus name supposed to be intakeCanbus?
-  public static final CANBus turretCANBus =
-      new CANBus(ConfigUtil.getConfigString("intakeCanbus", "2158"));
+  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158"));
 
-  public static final double gearing = 1;
+  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 0);
 
-  public static final double turretHeight = 0.762;
+  public static final double turretHeight = ConfigUtil.getConfigDouble("TURRET_HEIGHT", 0);
+
+  public static final boolean forwardLimit = true;
+  public static final boolean reverseLimit = true;
+  public static final double turretForwardSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final double turretReverseSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
 
   // Turret Sim
-  public static final double rotationalInertiaMetersSq = 0.01;
+  public static final double rotationalInertiaMetersSq = ConfigUtil
+      .getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
 }
