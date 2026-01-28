@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.ironmaple.simulation.gamepieces;
 
@@ -50,7 +50,7 @@ public class FuelBall extends GamePieceOnFieldSimulation3D {
   private static final double FRICTION = 0.9;
 
   /** Creation info factory. Note: We create a fresh shape per ball to support radius variance. */
-  private static GamePieceInfo3D createInfo(SimulatedArena3D arena) {
+  public static GamePieceInfo3D createInfo(SimulatedArena3D arena) {
     // Randomize radius by +/- 2%
     double variance = 1.0 + (Math.random() * 0.04 - 0.02);
     double radius = BASE_RADIUS_METERS * variance;

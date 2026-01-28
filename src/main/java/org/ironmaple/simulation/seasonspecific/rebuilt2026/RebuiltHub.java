@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -85,7 +85,7 @@ public class RebuiltHub extends Goal {
    * <h2>Creates an HUB of the specified color.</h2>
    *
    * @param arena The host arena of this HUB.
-   * @param isBlue Wether this is the blue HUB or the red one.
+   * @param isBlue Whether this is the blue HUB or the red one.
    */
   public RebuiltHub(Arena2026 arena, boolean isBlue) {
     super(

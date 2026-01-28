@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -24,14 +24,14 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.math.Angle;
-import org.austincans.frc2158.subsystems.sim.IntakeSimViz;
+import org.austincans.frc2158.subsystems.sim.IntakeSim;
 import org.ironmaple.simulation.IntakeSimulation;
 
 public class IntakeIOSim implements IntakeIO {
-  private final IntakeSimViz intakeSimViz;
+  private final IntakeSim intakeSim;
 
   private final DCMotor deployMotor = DCMotor.getNeoVortex(1);
-  private final DCMotor intakeMotor = DCMotor.getNeoVortex(1);
+  private final DCMotor rollerMotor = DCMotor.getNeoVortex(1);
 
   private final DCMotorSim deploySim =
       new DCMotorSim(
@@ -40,18 +40,18 @@ public class IntakeIOSim implements IntakeIO {
               IntakeConstants.deployRotationalInertiaMetersSq,
               IntakeConstants.deployGearing),
           deployMotor);
-  private final DCMotorSim intakeSim =
+  private final DCMotorSim rollerSim =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(
-              intakeMotor,
+              rollerMotor,
               IntakeConstants.intakeRotationalInertiaMetersSq,
               IntakeConstants.intakeGearing),
-          intakeMotor);
+          rollerMotor);
 
   private double intakeAppliedVolts;
 
   public IntakeIOSim(IntakeSimulation intakeSimulation) {
-    intakeSimViz = new IntakeSimViz(intakeSimulation);
+    intakeSim = new IntakeSim(intakeSimulation);
   }
 
   @Override
@@ -70,16 +70,16 @@ public class IntakeIOSim implements IntakeIO {
     deploySim.setInputVoltage(deployAppliedVolts);
     deploySim.update(Constants.loopPeriodSecs);
 
-    intakeSim.setInputVoltage(intakeAppliedVolts);
-    intakeSim.update(Constants.loopPeriodSecs);
+    rollerSim.setInputVoltage(intakeAppliedVolts);
+    rollerSim.update(Constants.loopPeriodSecs);
 
     inputs.deployMotorVoltage = deploySim.getInputVoltage();
     inputs.deployTemperatureC = 0;
-    inputs.intakeMotorVoltage = intakeSim.getInputVoltage();
-    inputs.intakeVelocityRadPerSec = intakeSim.getAngularVelocity().in(RadiansPerSecond);
+    inputs.intakeMotorVoltage = rollerSim.getInputVoltage();
+    inputs.intakeVelocityRadPerSec = rollerSim.getAngularVelocity().in(RadiansPerSecond);
     inputs.intakeTemperatureC = 0;
 
-    intakeSimViz.update(inputs.intakeVelocityRadPerSec);
+    rollerSim.update(inputs.intakeVelocityRadPerSec);
   }
 
   @Override

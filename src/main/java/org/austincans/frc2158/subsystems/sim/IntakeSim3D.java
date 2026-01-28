@@ -13,16 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
-import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.IntakeSimulation3D;
 
-public class IntakeSimViz {
-  private final IntakeSimulation intakeSimulation;
+public class IntakeSim3D {
+  private final IntakeSimulation3D intakeSimulation;
 
-  public IntakeSimViz(IntakeSimulation intakeSimulation) {
+  public IntakeSim3D(IntakeSimulation3D intakeSimulation) {
     this.intakeSimulation = intakeSimulation;
   }
 

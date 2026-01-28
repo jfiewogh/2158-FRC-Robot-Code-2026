@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -34,7 +34,6 @@ import java.util.function.Supplier;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.Logger;
 
@@ -81,16 +80,15 @@ public class FlywheelSimViz {
 
       Logger.recordOutput("FlywheelSim/TurretAngleDeg", turretAngle.get().getDegrees());
 
-      SimulatedArena.getInstance()
-          .addGamePieceProjectile(
-              new RebuiltFuelOnFly(
-                  robotPose.getTranslation(),
-                  new Translation2d(),
-                  RobotState.getInstance().getRobotVelocity(),
-                  turretAngle.get(),
-                  initialHeight,
-                  launchingSpeed,
-                  shooterAngle));
+      new RebuiltFuelOnFly(
+              robotPose.getTranslation(),
+              new Translation2d(),
+              RobotState.getInstance().getRobotVelocity(),
+              turretAngle.get(),
+              initialHeight,
+              launchingSpeed,
+              shooterAngle)
+          .launch();
     }
   }
 }

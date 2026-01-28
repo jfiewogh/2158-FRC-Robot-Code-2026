@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Friday January 23, 2026 at 11:47:19 CST
+// Updated on Tuesday January 27, 2026 at 19:20:07 CST
 
 package org.ironmaple.simulation;
 
@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation3D;
-import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation.GamePieceInfo;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D;
+import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D.GamePieceInfo3D;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
 
@@ -52,7 +52,7 @@ import org.ironmaple.simulation.motorsims.SimMotorConfigs;
  * projectiles.
  */
 public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
-  private final GamePieceInfo gamePieceInfo;
+  private final GamePieceInfo3D gamePieceInfo;
   private final AbstractDriveTrainSimulation3D driveTrainSimulation;
   private final Supplier<Pose3d> shooterPoseSupplier;
   private final List<MapleMotorSim> flywheelMotorSims = new ArrayList<>();
@@ -70,19 +70,19 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
    * @param gamePieceInfo the type of game piece this shooter handles
    * @return a new Builder instance
    */
-  public static Builder create(GamePieceInfo gamePieceInfo) {
+  public static Builder create(GamePieceInfo3D gamePieceInfo) {
     return new Builder(gamePieceInfo);
   }
 
   public static class Builder {
-    private final GamePieceInfo gamePieceInfo;
+    private final GamePieceInfo3D gamePieceInfo;
     private AbstractDriveTrainSimulation3D driveTrainSimulation;
     private Supplier<Pose3d> shooterPoseSupplier;
     private int capacity = 1;
     private final List<SimMotorConfigs> motors = new ArrayList<>();
     private IntakeSimulation3D intakeSource = null;
 
-    public Builder(GamePieceInfo gamePieceInfo) {
+    public Builder(GamePieceInfo3D gamePieceInfo) {
       this.gamePieceInfo = gamePieceInfo;
     }
 
@@ -125,7 +125,7 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
   }
 
   private ShooterSimulation3D(
-      GamePieceInfo gamePieceInfo,
+      GamePieceInfo3D gamePieceInfo,
       AbstractDriveTrainSimulation3D driveTrainSimulation,
       Supplier<Pose3d> shooterPoseSupplier,
       SimMotorConfigs... flywheelMotors) {
@@ -289,7 +289,7 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
         new GamePieceOnFieldSimulation3D.GamePieceInfo3D(
             gamePieceInfo.type(),
             shape,
-            gamePieceInfo.gamePieceMass(),
+            gamePieceInfo.mass(),
             0.8, // friction
             0.1, // linearDamping
             0.1, // angularDamping

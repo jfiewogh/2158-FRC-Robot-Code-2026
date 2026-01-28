@@ -45,6 +45,9 @@ sourceSets {
             srcDirs 'build/generated/source/proto/main/grpc'
             srcDirs 'build/generated/source/proto/main/java'
         }
+        resources {
+            srcDir 'src/main/resources'
+        }
         proto {
             srcDirs "trajectory_native/proto"
         }
@@ -179,7 +182,8 @@ dependencies {
     // 3D Physics Engine
     implementation "com.github.stephengold:Libbulletjme-Windows64:22.0.3"
     implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
-    implementation "com.github.stephengold:jolt-jni-Windows64:3.5.2"
+    implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
+    runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
 }
 
 test {
