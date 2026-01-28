@@ -24,6 +24,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -32,8 +33,8 @@ import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 public class ElevatorIOSpark implements ElevatorIO {
   // TODO: move constants to config
 
-  private final int canID = 0;
-  private final boolean brakeMode = true;
+  private final int canID = ElevatorConstants.canID;
+  private final boolean brakeMode = ElevatorConstants.brakeMode;
 
   private final SparkFlex motor;
   private final SelfCheckingSparkFlex motorSelfCheck;

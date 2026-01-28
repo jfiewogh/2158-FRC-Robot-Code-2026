@@ -19,6 +19,7 @@ ints:
     ARM_CAN_ID: 0
     ARM_ENCODER_ID: 0
     ARM_CURRENT_LIMIT: 0
+    ELEVATOR_CAN_ID: 0
 doubles:
   values:
     DRIVE_P: 0
@@ -51,6 +52,20 @@ doubles:
     ARM_MAX_ACCELERATION: 0
     ARM_FORWARD_SOFT_LIMIT: 0
 
+    ELEVATOR_P: 0
+    ELEVATOR_I: 0
+    ELEVATOR_D: 0
+    ELEVATOR_S: 0
+    ELEVATOR_G: 0
+    ELEVATOR_V: 0
+    ELEVATOR_A: 0
+    ELEVATOR_RATIO: 1 #13 rotations of motor results in one rotation
+    ELEVATOR_MAX_VELOCITY: 0 # Meters Per Sec
+    ELEVATOR_MAX_ACCELERATION: 0 # Meters Per Sec^2
+    ELEVATOR_MIN_HEIGHT: 0 # Meters
+    ELEVATAOR_MAX_HEIGHT: 0 # Meters
+    ELEVATOR_DRUM_RADIUS: 0.0254 # Meters
+
     ROBOT_BUMPER_FRONT_INCHES: 0
     ROBOT_BUMPER_RIGHT_INCHES: 0
     ROBOT_WHEEL_RADIUS_INCHES: 0
@@ -69,9 +84,12 @@ doubles:
 booleans:
   values:
     TUNING_MODE: false
+    
     ARM_BRAKE_MODE: false
     ARM_FORWARD_SOFT_LIMIT_ENABLED: false
     ARM_REVERSED_SOFT_LIMIT_ENALBED: false
+
+    ELEVATOR_BRAKE_MODE: true
 
     FL_ENCODER_INVERTED: false
     FL_TURN_INVERTED: true

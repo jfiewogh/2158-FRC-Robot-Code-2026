@@ -33,19 +33,19 @@ public class Elevator extends AdvancedSubsystem {
 
   private final ProfiledPIDController elevatorPID =
       new ProfiledPIDController(
-          2,
-          0,
-          0,
+          ElevatorConstants.elevatorP,
+          ElevatorConstants.elevatorI,
+          ElevatorConstants.elevatorD,
           new TrapezoidProfile.Constraints(
               ElevatorConstants.maxVelocityMetersPerSec,
               ElevatorConstants.maxAccelerationMetersPerSecSq));
 
   private final ElevatorFeedforward feedforward =
       new ElevatorFeedforward(
-          0.1, // kS
-          0.1, // kG
-          0.1, // kV
-          0.1 // kA
+          ElevatorConstants.elevatorS, // kS
+          ElevatorConstants.elevatorG, // kG
+          ElevatorConstants.elevatorV, // kV
+          ElevatorConstants.elevatorA // kA
           );
 
   public Elevator(ElevatorIO io) {

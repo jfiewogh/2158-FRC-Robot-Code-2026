@@ -17,28 +17,38 @@
 
 package org.austincans.frc2158.subsystems.elevator;
 
+import org.austincans.frc2158.util.ConfigUtil;
+
 public class ElevatorConstants {
-  public static final double maxVelocityMetersPerSec = 3;
-  public static final double maxAccelerationMetersPerSecSq = 3;
+  public static final double maxVelocityMetersPerSec = ConfigUtil.getConfigDouble("ELEVATOR_MAX_VELOCITY", 0);
+  public static final double maxAccelerationMetersPerSecSq = ConfigUtil.getConfigDouble("ELEVATOR_MAX_ACCELERATION", 0);
 
   // 13 rotations of motor results in one rotation
-  public static final double gearRatio = 13.0;
+  public static final double gearRatio = ConfigUtil.getConfigDouble("ELEVATOR_RATIO", 0);;
 
-  public static final double minHeightMeters = 0;
-  public static final double maxHeightMeters = 2;
+  public static final double minHeightMeters = ConfigUtil.getConfigDouble("ELEVATOR_MIN_HEIGHT", 0);
+  public static final double maxHeightMeters = ConfigUtil.getConfigDouble("ELEVATOR_MAX_HEIGHT", 0);
 
-  public static final double drumRadius = 0.0254;
+  public static final double drumRadius = ConfigUtil.getConfigDouble("ELEVATOR_DRUM_RADIUS", 0); // Meters
 
   public static final double minVoltage = -7;
 
   public static final double pidTolerance = 0.05;
+  public static final double elevatorP = ConfigUtil.getConfigDouble("ELEVATOR_P", 0);
+  public static final double elevatorI = ConfigUtil.getConfigDouble("ELEVATOR_I", 0);
+  public static final double elevatorD = ConfigUtil.getConfigDouble("ELEVATOR_D", 0);
+  public static final double elevatorS = ConfigUtil.getConfigDouble("ELEVATOR_S", 0);
+  public static final double elevatorG = ConfigUtil.getConfigDouble("ELEVATOR_G", 0);
+  public static final double elevatorV = ConfigUtil.getConfigDouble("ELEVATOR_V", 0);
+  public static final double elevatorA = ConfigUtil.getConfigDouble("ELEVATOR_A", 0);
+
+  public static final int canID = ConfigUtil.getConfigInt("ELEVATOR_CAN_ID", 0);
+
+  public static final boolean brakeMode = ConfigUtil.getConfigBoolean("ELEVATOR_BRAKE_MODE", false);
 
   public static enum ElevatorState {
-    GROUND(0),
-    L1(0.25),
-    L2(0.6),
-    L3(1.02),
-    L4(1.73562);
+    EXAMPLE_SETPOINT_1(0),
+    EXAMPLE_SETPOINT_2(0.25);
 
     private double setpointMeters;
 
@@ -50,12 +60,4 @@ public class ElevatorConstants {
       return setpointMeters;
     }
   }
-
-  // these may be wrong
-  public static final double[] stageHeights =
-      new double[] {
-        0.662178, // Stage 1
-        0.655828, // Stage 2
-        0.567614 // Stage 3
-      };
 }

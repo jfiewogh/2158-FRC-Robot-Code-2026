@@ -21,7 +21,7 @@ import com.ctre.phoenix6.CANBus;
 
 public class FlywheelConstants {
   // TODO: get from config
-  public static final double kS = 0;
+  public static final double kS = 0;  
   public static final double kV = 0;
   public static final double kA = 0;
 
