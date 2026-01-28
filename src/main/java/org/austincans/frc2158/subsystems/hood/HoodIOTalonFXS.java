@@ -32,10 +32,10 @@ public class HoodIOTalonFXS implements HoodIO {
   TalonFXSConfiguration configs = new TalonFXSConfiguration();
 
   public HoodIOTalonFXS() {
-    configs.Slot0.kP = 1;
-    configs.Slot0.kI = 0;
-    configs.Slot0.kD = 10;
-    configs.Slot0.kV = 2;
+    configs.Slot0.kP = HoodConstants.kP;
+    configs.Slot0.kI = HoodConstants.kI;
+    configs.Slot0.kD = HoodConstants.kD;
+    configs.Slot0.kV = HoodConstants.kV;
   }
 
   public void runHoodMotor(double speed) {

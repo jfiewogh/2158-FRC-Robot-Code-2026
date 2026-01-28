@@ -17,26 +17,28 @@
 
 package org.austincans.frc2158.subsystems.flywheel;
 
+import org.austincans.frc2158.util.ConfigUtil;
+
 import com.ctre.phoenix6.CANBus;
 
 public class FlywheelConstants {
   // TODO: get from config
-  public static final double kS = 0;  
-  public static final double kV = 0;
-  public static final double kA = 0;
+  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEELL_S", 0);  
+  public static final double kV = ConfigUtil.getConfigDouble("FLYWHEELL_V", 0);
+  public static final double kA = ConfigUtil.getConfigDouble("FLYWHEELL_A", 0);
 
   /* REAL */
-  public static final int motorId = 0;
-  public static final int encoderId = 0;
+  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEELL_MOTOR_ID", 0);
+  public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEELL_ENCODER_ID", 0);
 
   public static final CANBus canBus = new CANBus("*");
 
-  public static final double radiusMeters = 0.0508;
+  public static final double radiusMeters = ConfigUtil.getConfigDouble("FLYWHEEL_RADIUS", encoderId);
 
-  public static final double gearing = 1.0;
+  public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 0);
 
   /* SIM */
-  public static final double JKgMetersSq = 0.001;
+  public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 0);
 
-  public static final double maxRPM = 2000;
+  public static final double maxRPM = ConfigUtil.getConfigDouble("FLYWHEEL_MAX_RPM", JKgMetersSq);
 }

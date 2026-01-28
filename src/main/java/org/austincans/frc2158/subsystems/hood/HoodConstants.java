@@ -17,10 +17,13 @@
 
 package org.austincans.frc2158.subsystems.hood;
 
+import org.austincans.frc2158.util.ConfigUtil;
+
 public class HoodConstants {
-  static int flexMotorID = 10;
-  static int talonMotorID = 11;
-  static double kP;
-  static double kI;
-  static double kD;
+  static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARKFLEX_MOTOR_ID", 0);
+  static int talonMotorID = ConfigUtil.getConfigInt("HOOD_TALAON_ID", 0);
+  static double kP = ConfigUtil.getConfigDouble("HOOD_P", 0);
+  static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
+  static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
+  static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
 }
