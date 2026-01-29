@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158;
 
@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
+import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -45,11 +46,9 @@ import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
 import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.ShooterSimulation3D;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
-import org.ironmaple.simulation.gamepieces.FuelBall;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -157,25 +156,21 @@ public class RobotContainer {
         Flywheel flywheel =
             new Flywheel(
                 new FlywheelIOSim3D(
-                    ShooterSimulation3D.create(FuelBall.createInfo(SimulatedArena3D.getInstance())).build()));
-
-                // new FlywheelIOSim(
-                //     intakeSimulation,
-                //     () -> hood.getAngle(),
-                //     () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
+                    driveSimulation,
+                    intakeSimulation,
+                    hood::getAngle,
+                    () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
         KeyboardInput keyboardInput = new KeyboardInput();
-        // keyboardInput
-        // .z()
-        // .whileTrue(
-        // new TurretTracking(
-        // turret,
-        // flywheel,
-        // hood,
-        // RobotState.getInstance()::getEstimatedPose,
-        // RobotState.getInstance()::getRobotVelocity));
-        // keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
-        keyboardInput.c().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
+        keyboardInput
+            .z()
+            .whileTrue(
+                new TurretTracking(
+                    turret,
+                    flywheel,
+                    hood,
+                    RobotState.getInstance()::getEstimatedPose,
+                    RobotState.getInstance()::getRobotVelocity));
         keyboardInput
             .v()
             .whileTrue(

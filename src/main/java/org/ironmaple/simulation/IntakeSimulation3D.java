@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.ironmaple.simulation;
 
@@ -129,6 +129,7 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
 
     // Check for overlaps
     List<PhysicsBody> overlaps = physicsEngine.getOverlappingBodies(intakeShape, intakePose);
+    System.out.println("Number of overlaps: " + overlaps.size());
 
     // Debug logging (once per second, ~every 50 ticks at 50Hz)
     // if (subTickNum == 0) {
@@ -160,9 +161,9 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
         // Log what types of bodies we're finding (to debug if game pieces aren't being
         // recognized)
         if (subTickNum == 0) {
-          System.out.printf(
-              "[IntakeSimulation3D] Overlap detected but userData=%s (not a game piece)%n",
-              userData != null ? userData.getClass().getSimpleName() : "null");
+          // System.out.printf(
+          //     "[IntakeSimulation3D] Overlap detected but userData=%s (not a game piece)%n",
+          //     userData != null ? userData.getClass().getSimpleName() : "null");
         }
       }
     }

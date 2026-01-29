@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.ironmaple.simulation.gamepieces;
 
@@ -41,7 +41,7 @@ import org.ironmaple.simulation.physics.jolt.JoltPhysicsEngine;
  */
 public class FuelBall extends GamePieceOnFieldSimulation3D {
   // Physical Parameters
-  private static final String TYPE = "FUEL";
+  private static final String TYPE = "Fuel";
   private static final double BASE_RADIUS_METERS = 0.075;
   private static final Mass MASS = Units.Kilograms.of(0.23);
   private static final double LINEAR_DAMPING = 1.0;

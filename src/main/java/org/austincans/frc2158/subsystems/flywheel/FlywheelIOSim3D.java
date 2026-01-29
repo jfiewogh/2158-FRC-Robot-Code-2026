@@ -13,42 +13,44 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import java.util.function.Supplier;
-import org.austincans.frc2158.subsystems.sim.FlywheelSimViz3D;
+import org.austincans.frc2158.subsystems.sim.ShooterSim3D;
 import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.ShooterSimulation3D;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 
 public class FlywheelIOSim3D implements FlywheelIO {
-  private final ShooterSimulation3D shooterSim;
+  private final ShooterSim3D shooterSim;
 
-  public FlywheelIOSim3D(ShooterSimulation3D shooterSim) {
-    this.shooterSim = shooterSim;
+  private double velocityRPM;
+
+  public FlywheelIOSim3D(
+      SwerveDriveSimulation3D driveSimulation,
+      IntakeSimulation3D intakeSimulation,
+      Supplier<Rotation2d> hoodAngleSupplier,
+      Supplier<Rotation2d> turretAngle) {
+    shooterSim =
+        new ShooterSim3D(
+            FlywheelConstants.radiusMeters,
+            0.1,
+            driveSimulation,
+            intakeSimulation,
+            hoodAngleSupplier,
+            turretAngle);
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.velocityRPM = sim.getAngularVelocityRPM();
-    inputs.appliedVolts = sim.getInputVoltage();
-
-    // TODO: whether it can shoot should be based on whether it has passed through indexer
-    // (create Indexer subsystem and IndexerViz)
-    flywheelSimViz.update(inputs.velocityRPM, inputs.velocityRPM > 100);
+    inputs.velocityRPM = velocityRPM;
+    shooterSim.update(velocityRPM);
   }
 
   @Override
-  public void runVoltage(double volts) {}
-
-  @Override
   public void runVelocity(double velocityRPM) {
-    sim.setAngularVelocity(Units.rotationsToRadians(velocityRPM) / 60);
+    this.velocityRPM = velocityRPM;
   }
 }

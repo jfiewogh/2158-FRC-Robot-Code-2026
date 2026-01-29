@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.ironmaple.simulation;
 
@@ -683,6 +683,8 @@ public abstract class SimulatedArena3D implements Arena {
    */
   public void registerGamePiece(GamePieceOnFieldSimulation3D piece) {
     dynamicBodies.put(piece, piece.getPhysicsBody());
+
+    System.out.println("SIZE: " + dynamicBodies.size());
   }
 
   @Override

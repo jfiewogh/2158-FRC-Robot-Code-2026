@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -58,14 +58,10 @@ public class IntakeIOSim implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.deployPositionRad = deploySim.getAngularPositionRad();
 
-    // System.out.println(intakePIDController.getGoal().position - inputs.deployPositionRad);
-
     double deployAppliedVolts =
         intakePIDController.calculate(inputs.deployPositionRad)
             / (Math.PI * 2)
             * Constants.maxVoltage;
-
-    // System.out.println(deployAppliedVolts);
 
     deploySim.setInputVoltage(deployAppliedVolts);
     deploySim.update(Constants.loopPeriodSecs);
@@ -79,7 +75,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.intakeVelocityRadPerSec = rollerSim.getAngularVelocity().in(RadiansPerSecond);
     inputs.intakeTemperatureC = 0;
 
-    rollerSim.update(inputs.intakeVelocityRadPerSec);
+    intakeSim.update(inputs.intakeVelocityRadPerSec);
   }
 
   @Override

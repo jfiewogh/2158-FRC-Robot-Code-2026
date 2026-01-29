@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -48,7 +48,7 @@ public class IntakeIOSim3D implements IntakeIO {
               IntakeConstants.intakeGearing),
           rollerMotor);
 
-  private double intakeAppliedVolts;
+  private double rollerVelocityRadPerSec;
 
   public IntakeIOSim3D(IntakeSimulation3D intakeSimulation) {
     intakeSim = new IntakeSim3D(intakeSimulation);
@@ -58,19 +58,15 @@ public class IntakeIOSim3D implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.deployPositionRad = deploySim.getAngularPositionRad();
 
-    // System.out.println(intakePIDController.getGoal().position - inputs.deployPositionRad);
-
     double deployAppliedVolts =
         intakePIDController.calculate(inputs.deployPositionRad)
             / (Math.PI * 2)
             * Constants.maxVoltage;
 
-    // System.out.println(deployAppliedVolts);
-
     deploySim.setInputVoltage(deployAppliedVolts);
     deploySim.update(Constants.loopPeriodSecs);
 
-    rollerSim.setInputVoltage(intakeAppliedVolts);
+    rollerSim.setAngularVelocity(rollerVelocityRadPerSec);
     rollerSim.update(Constants.loopPeriodSecs);
 
     inputs.deployMotorVoltage = deploySim.getInputVoltage();
@@ -84,17 +80,14 @@ public class IntakeIOSim3D implements IntakeIO {
 
   @Override
   public void setRelativeVelocity(double velocity) {
-    intakeAppliedVolts = velocity * Constants.maxVoltage;
-  }
-
-  @Override
-  public void setVoltage(double voltage) {
-    intakeAppliedVolts = voltage;
+    rollerVelocityRadPerSec = velocity;
   }
 
   @Override
   public void setDeployAngle(Angle angle) {
-    System.out.println(angle.toRadians());
     intakePIDController.setGoal(angle.toRadians());
   }
+
+  @Override
+  public void setVoltage(double volts) {}
 }

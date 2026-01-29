@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.ironmaple.simulation;
 
@@ -28,6 +28,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -42,6 +43,7 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D.GamePieceInfo3D;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -256,6 +258,9 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
     Transform3d robotToShooter =
         new Transform3d(shooterPoseRelative.getTranslation(), shooterPoseRelative.getRotation());
     Pose3d shooterPoseWorld = robotPose.plus(robotToShooter);
+
+    Logger.recordOutput(
+        "ShooterYaw", Units.radiansToDegrees(shooterPoseWorld.getRotation().getZ()));
 
     // 2. Calculate Muzzle Velocity in World Frame
     double vMuzzle = velocity.in(edu.wpi.first.units.Units.MetersPerSecond);

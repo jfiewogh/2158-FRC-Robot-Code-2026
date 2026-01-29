@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -23,6 +23,7 @@ import org.austincans.frc2158.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 // Visualizes the elevator stages based on the given position in meters
+// This is for a three-stage elevator
 
 public class ElevatorViz {
   private final String key;

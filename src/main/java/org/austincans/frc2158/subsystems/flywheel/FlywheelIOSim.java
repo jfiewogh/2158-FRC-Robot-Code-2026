@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -25,11 +25,11 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import java.util.function.Supplier;
-import org.austincans.frc2158.subsystems.sim.FlywheelSimViz;
+import org.austincans.frc2158.subsystems.sim.ShooterSim;
 import org.ironmaple.simulation.IntakeSimulation;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private final FlywheelSimViz flywheelSimViz;
+  private final ShooterSim shooterSim;
 
   private final DCMotor plant = DCMotor.getNeoVortex(1);
   private final FlywheelSim sim =
@@ -48,8 +48,8 @@ public class FlywheelIOSim implements FlywheelIO {
       IntakeSimulation intakeSimulation,
       Supplier<Rotation2d> hoodAngleSupplier,
       Supplier<Rotation2d> turretAngle) {
-    flywheelSimViz =
-        new FlywheelSimViz(
+    shooterSim =
+        new ShooterSim(
             FlywheelConstants.radiusMeters, 0.1, intakeSimulation, hoodAngleSupplier, turretAngle);
   }
 
@@ -70,7 +70,7 @@ public class FlywheelIOSim implements FlywheelIO {
 
     // TODO: whether it can shoot should be based on whether it has passed through indexer
     // (create Indexer subsystem and IndexerViz)
-    flywheelSimViz.update(inputs.velocityRPM, inputs.velocityRPM > 100);
+    shooterSim.update(inputs.velocityRPM, inputs.velocityRPM > 100);
   }
 
   @Override

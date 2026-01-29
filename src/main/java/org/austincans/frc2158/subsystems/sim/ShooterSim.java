@@ -13,11 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday January 27, 2026 at 19:20:07 CST
+// Updated on Wednesday January 28, 2026 at 19:56:47 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -33,25 +32,24 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
-import org.ironmaple.simulation.IntakeSimulation3D;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import org.littletonrobotics.junction.Logger;
 
 // This simulation handles shooting fuel
-public class FlywheelSimViz3D {
+public class ShooterSim {
   private final double radius;
   private final double shootingDelay;
-  private final IntakeSimulation3D intakeSimulation;
+  private final IntakeSimulation intakeSimulation;
   private final Supplier<Rotation2d> hoodAngle;
   private final Supplier<Rotation2d> turretAngle;
 
   private final Timer timer = new Timer();
   private double lastShootingTime = 0;
 
-  public FlywheelSimViz3D(
+  public ShooterSim(
       double radius,
       double shootingDelay,
-      IntakeSimulation3D intakeSimulation,
+      IntakeSimulation intakeSimulation,
       Supplier<Rotation2d> hoodAngleSupplier,
       Supplier<Rotation2d> turretAngleSupplier) {
     this.radius = radius;
@@ -76,9 +74,6 @@ public class FlywheelSimViz3D {
       LinearVelocity launchingSpeed =
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
       Angle shooterAngle = Angle.ofBaseUnits(hoodAngle.get().getRadians(), Radians);
-      Logger.recordOutput("FlywheelSim/ShooterAngleDeg", shooterAngle.in(Degrees));
-
-      Logger.recordOutput("FlywheelSim/TurretAngleDeg", turretAngle.get().getDegrees());
 
       new RebuiltFuelOnFly(
               robotPose.getTranslation(),
