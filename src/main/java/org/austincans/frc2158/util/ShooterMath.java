@@ -17,8 +17,10 @@
 
 package org.austincans.frc2158.util;
 
-import edu.wpi.first.math.util.Units;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
 
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
@@ -29,6 +31,8 @@ public class ShooterMath {
   private static final double motorTorque = 3.65; // Nm
   private static final double objectRadius = Units.inchesToMeters(5.91) / 2; // meters
   private static final double flywheelMassKg = Units.lbsToKilograms(0.8);
+
+  private static double timestamp = 0;
 
   // Calculate flywheel velocity given distance and hood angle
   public static double calculateProjectileVelocity(
@@ -89,7 +93,7 @@ public class ShooterMath {
   }
 
   // Sim
-  public static double calculateRPMLoss(double flywheelVelocityRPM) {
+  public static double calculateRPMLoss(double flywheelVelocityRPM, double measuredVelocityRPM) {
     double rotationalInertia = flywheelMassKg * Math.pow(FlywheelConstants.radiusMeters, 2);
 
     double flywheelVelocityRadPerSec = Units.rotationsToRadians(flywheelVelocityRPM) / 60;
@@ -104,6 +108,35 @@ public class ShooterMath {
     double outputRPM =
         Units.radiansToRotations(Math.sqrt((2 * totalEnergy) / rotationalInertia)) * 60;
     return outputRPM;
+  }
+
+  public static double getCalculatedPower(double velocityRPM) {
+    return -0.0000544983 * Math.pow(velocityRPM, 2) + 0.370588 * velocityRPM;
+  }
+
+  public static double getCalculatedCurrent(double velocityRPM) {
+    return -0.0323529 * velocityRPM + 220;
+  }
+
+  private static final double e = 0.5;
+
+  public static double calculateRPMGain(double currentVelocityRPM) {
+    double deltaTime = timestamp - RobotController.getFPGATime();
+    timestamp = RobotController.getFPGATime();
+
+    double velocityRadPerSec = Units.rotationsToRadians(currentVelocityRPM) / 60; 
+
+    double calculatedPower = getCalculatedPower(velocityRadPerSec);
+    double power = e * calculatedPower;
+
+    double energy = power * deltaTime;
+    double angularAcceleration = energy / flywheelMassKg;
+
+    return currentVelocityRPM + angularAcceleration * timestamp;
+  }
+
+  public static double calculateE() {
+    return 0;
   }
 
   public static double compensateForDrag(double dragForceNewtons, double time) { // TODO: Finish me

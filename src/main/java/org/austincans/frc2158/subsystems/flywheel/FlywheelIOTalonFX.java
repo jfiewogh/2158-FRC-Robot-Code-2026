@@ -41,6 +41,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     inputs.appliedVolts = motor.getMotorVoltage().getValue().in(Units.Volts);
     inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
     inputs.temperatureC = motor.getDeviceTemp().getValue().in(Units.Celsius);
+    inputs.currentAmps =motor.getStatorCurrent().getValue().in(Units.Amps);
   }
 
   @Override

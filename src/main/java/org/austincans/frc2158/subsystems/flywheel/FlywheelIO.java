@@ -27,6 +27,7 @@ public interface FlywheelIO {
     public double appliedVolts = 0;
     public double velocityRPM = 0;
     public double temperatureC = 0;
+    public double currentAmps = 0;
   }
 
   public default void updateInputs(FlywheelIOInputs inputs) {}

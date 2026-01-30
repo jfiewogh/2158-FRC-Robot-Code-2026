@@ -43,6 +43,7 @@ public class FlywheelIOSparkFlex implements FlywheelIO {
     inputs.appliedVolts = motor.getBusVoltage();
     inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
     inputs.temperatureC = motor.getMotorTemperature();
+    inputs.currentAmps = motor.getOutputCurrent();
   }
 
   @Override
