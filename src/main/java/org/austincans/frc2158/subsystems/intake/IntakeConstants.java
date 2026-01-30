@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -30,8 +30,8 @@ public class IntakeConstants {
   public static final double deployRotationalInertiaMetersSq = 0.01;
   public static final double intakeRotationalInertiaMetersSq = 0.01;
 
-public static final int deployMotorID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0);
-public static final int intakeMotorID = ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 0);
+  public static final int deployMotorID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0);
+  public static final int intakeMotorID = ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 0);
 
-public static final int deployEncoderID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0);
+  public static final int deployEncoderID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0);
 }

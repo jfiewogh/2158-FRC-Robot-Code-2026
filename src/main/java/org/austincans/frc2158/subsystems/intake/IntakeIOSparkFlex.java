@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -33,7 +33,6 @@ import java.util.List;
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOSparkFlex implements IntakeIO {
@@ -48,8 +47,7 @@ public class IntakeIOSparkFlex implements IntakeIO {
 
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
-    deployMotor =
-        new SparkFlex(IntakeConstants.deployMotorID, MotorType.kBrushless);
+    deployMotor = new SparkFlex(IntakeConstants.deployMotorID, MotorType.kBrushless);
     intakeMotor = new SparkFlex(IntakeConstants.intakeMotorID, MotorType.kBrushless);
 
     deployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor", deployMotor);

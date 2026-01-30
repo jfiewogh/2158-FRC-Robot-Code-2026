@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class TurretIOTalonFX implements TurretIO {
   private TalonFX turretMotor;
@@ -74,7 +73,8 @@ public class TurretIOTalonFX implements TurretIO {
     motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
         TurretConstants.turretForwardSoftLimit;
     motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = TurretConstants.reverseLimit;
-    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = TurretConstants.turretReverseSoftLimit;
+    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        TurretConstants.turretReverseSoftLimit;
     motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     motorConfig.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();

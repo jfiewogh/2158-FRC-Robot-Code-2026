@@ -13,17 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
-import org.austincans.frc2158.util.ConfigUtil;
-
 import com.ctre.phoenix6.CANBus;
+import org.austincans.frc2158.util.ConfigUtil;
 
 public class FlywheelConstants {
   // TODO: get from config
-  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);  
+  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);
   public static final double kV = ConfigUtil.getConfigDouble("FLYWHEEL_V", 0);
   public static final double kA = ConfigUtil.getConfigDouble("FLYWHEEL_A", 0);
 
@@ -33,7 +32,8 @@ public class FlywheelConstants {
 
   public static final CANBus canBus = new CANBus("*");
 
-  public static final double radiusMeters = ConfigUtil.getConfigDouble("FLYWHEEL_RADIUS", encoderId);
+  public static final double radiusMeters =
+      ConfigUtil.getConfigDouble("FLYWHEEL_RADIUS", encoderId);
 
   public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 0);
 

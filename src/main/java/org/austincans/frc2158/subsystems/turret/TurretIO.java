@@ -13,14 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
-import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {

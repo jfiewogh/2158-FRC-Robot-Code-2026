@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -41,7 +41,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     inputs.appliedVolts = motor.getMotorVoltage().getValue().in(Units.Volts);
     inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
     inputs.temperatureC = motor.getDeviceTemp().getValue().in(Units.Celsius);
-    inputs.currentAmps =motor.getStatorCurrent().getValue().in(Units.Amps);
+    inputs.currentAmps = motor.getStatorCurrent().getValue().in(Units.Amps);
   }
 
   @Override

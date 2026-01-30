@@ -13,14 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.util;
 
-import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
@@ -93,7 +92,7 @@ public class ShooterMath {
   }
 
   // Sim
-  public static double calculateRPMLoss(double flywheelVelocityRPM, double measuredVelocityRPM) {
+  public static double calculateRPMLoss(double flywheelVelocityRPM) {
     double rotationalInertia = flywheelMassKg * Math.pow(FlywheelConstants.radiusMeters, 2);
 
     double flywheelVelocityRadPerSec = Units.rotationsToRadians(flywheelVelocityRPM) / 60;
@@ -124,7 +123,7 @@ public class ShooterMath {
     double deltaTime = timestamp - RobotController.getFPGATime();
     timestamp = RobotController.getFPGATime();
 
-    double velocityRadPerSec = Units.rotationsToRadians(currentVelocityRPM) / 60; 
+    double velocityRadPerSec = Units.rotationsToRadians(currentVelocityRPM) / 60;
 
     double calculatedPower = getCalculatedPower(velocityRadPerSec);
     double power = e * calculatedPower;

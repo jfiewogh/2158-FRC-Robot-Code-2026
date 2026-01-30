@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -96,10 +96,7 @@ public class ModuleIODev implements ModuleIO {
     // Configure drive motor
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 =
-        new Slot0Configs()
-            .withKP(DriveConstants.driveP)
-            .withKI(0)
-            .withKD(DriveConstants.driveD);
+        new Slot0Configs().withKP(DriveConstants.driveP).withKI(0).withKD(DriveConstants.driveD);
     driveConfig.Feedback.SensorToMechanismRatio = driveReduction;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps;
     driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps;
@@ -112,10 +109,7 @@ public class ModuleIODev implements ModuleIO {
     // Configure turn motor
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.Slot0 =
-        new Slot0Configs()
-            .withKP(DriveConstants.turnP)
-            .withKI(0)
-            .withKD(DriveConstants.turnD);
+        new Slot0Configs().withKP(DriveConstants.turnP).withKI(0).withKD(DriveConstants.turnD);
     turnConfig.Feedback.SensorToMechanismRatio = turnReduction;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps;

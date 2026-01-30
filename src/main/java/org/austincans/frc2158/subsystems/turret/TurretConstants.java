@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -40,10 +40,12 @@ public class TurretConstants {
 
   public static final boolean forwardLimit = true;
   public static final boolean reverseLimit = true;
-  public static final double turretForwardSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
-  public static final double turretReverseSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final double turretForwardSoftLimit =
+      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final double turretReverseSoftLimit =
+      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
 
   // Turret Sim
-  public static final double rotationalInertiaMetersSq = ConfigUtil
-      .getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
+  public static final double rotationalInertiaMetersSq =
+      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
 }

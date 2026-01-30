@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,23 +13,27 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class ElevatorConstants {
-  public static final double maxVelocityMetersPerSec = ConfigUtil.getConfigDouble("ELEVATOR_MAX_VELOCITY", 0);
-  public static final double maxAccelerationMetersPerSecSq = ConfigUtil.getConfigDouble("ELEVATOR_MAX_ACCELERATION", 0);
+  public static final double maxVelocityMetersPerSec =
+      ConfigUtil.getConfigDouble("ELEVATOR_MAX_VELOCITY", 0);
+  public static final double maxAccelerationMetersPerSecSq =
+      ConfigUtil.getConfigDouble("ELEVATOR_MAX_ACCELERATION", 0);
 
   // 13 rotations of motor results in one rotation
-  public static final double gearRatio = ConfigUtil.getConfigDouble("ELEVATOR_RATIO", 0);;
+  public static final double gearRatio = ConfigUtil.getConfigDouble("ELEVATOR_RATIO", 0);
+  ;
 
   public static final double minHeightMeters = ConfigUtil.getConfigDouble("ELEVATOR_MIN_HEIGHT", 0);
   public static final double maxHeightMeters = ConfigUtil.getConfigDouble("ELEVATOR_MAX_HEIGHT", 0);
 
-  public static final double drumRadius = ConfigUtil.getConfigDouble("ELEVATOR_DRUM_RADIUS", 0); // Meters
+  public static final double drumRadius =
+      ConfigUtil.getConfigDouble("ELEVATOR_DRUM_RADIUS", 0); // Meters
 
   public static final double minVoltage = -7;
 

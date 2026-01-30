@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,18 +13,19 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import org.austincans.frc2158.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 // Visualizes the elevator stages based on the given position in meters
 
 public class ElevatorViz {
+  private static final double[] stageHeights = {1, 1, 1};
+
   private final String key;
 
   private double[] stageDisplacements = new double[4];
@@ -65,7 +66,7 @@ public class ElevatorViz {
     // If delta is positive
     if (delta > 0) {
       while (delta != 0 && index <= 3) {
-        double stageHeight = ElevatorConstants.stageHeights[index - 1];
+        double stageHeight = stageHeights[index - 1];
         if (stageDisplacements[index] != stageHeight) {
           double result = stageDisplacements[index] + delta;
           // delta cannot be negative

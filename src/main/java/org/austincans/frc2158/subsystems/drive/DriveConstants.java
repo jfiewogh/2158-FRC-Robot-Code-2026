@@ -13,22 +13,20 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 22, 2026 at 19:06:38 CST
+// Updated on Thursday January 29, 2026 at 19:31:22 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
+import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import lombok.Builder;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Constants.RobotType;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.austincans.frc2158.util.swerve.ModuleLimits;
-
-import com.ctre.phoenix6.CANBus;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import lombok.Builder;
 
 // TODO Review with CAD Team
 public class DriveConstants {
@@ -36,12 +34,14 @@ public class DriveConstants {
   public static final double trackWidthX = ConfigUtil.getConfigDouble("ROBOT_TRACK_WIDTH_X", 0);
   public static final double trackWidthY = ConfigUtil.getConfigDouble("ROBOT_TRACK_WIDTH_Y", 0);
   public static final double driveBaseRadius = Math.hypot(trackWidthX / 2, trackWidthY / 2);
-  public static final double maxLinearSpeed = ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_SPEED", 0);
+  public static final double maxLinearSpeed =
+      ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_SPEED", 0);
   public static final double maxAngularSpeed = maxLinearSpeed / driveBaseRadius;
-  public static final double maxLinearAcceleration = ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_ACCELERATION", 0);
+  public static final double maxLinearAcceleration =
+      ConfigUtil.getConfigDouble("ROBOT_MAX_LINEAR_ACCELERATION", 0);
 
   /** Includes bumpers! */
-  public static final double robotWidth =  ConfigUtil.getConfigDouble("ROBOT_WIDTH", 0);
+  public static final double robotWidth = ConfigUtil.getConfigDouble("ROBOT_WIDTH", 0);
 
   // Modules
   public static final CANBus moduleCANBus =
@@ -50,8 +50,10 @@ public class DriveConstants {
   public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
   public static final double turnReduction = (150.0 / 7.0);
 
-  public static final double driveCurrentLimitAmps = ConfigUtil.getConfigDouble("DRIVE_CURRENT_LIMIT", 0); // placeholder
-  public static final double turnCurrentLimitAmps =  ConfigUtil.getConfigDouble("TURN_CURRENT_LIMIT", 0); // placeholder
+  public static final double driveCurrentLimitAmps =
+      ConfigUtil.getConfigDouble("DRIVE_CURRENT_LIMIT", 0); // placeholder
+  public static final double turnCurrentLimitAmps =
+      ConfigUtil.getConfigDouble("TURN_CURRENT_LIMIT", 0); // placeholder
 
   public static final Translation2d[] moduleTranslations = {
     new Translation2d(trackWidthX / 2, trackWidthY / 2),
@@ -60,7 +62,7 @@ public class DriveConstants {
     new Translation2d(-trackWidthX / 2, -trackWidthY / 2)
   };
 
-  public static final double wheelRadius = Units.inchesToMeters( ConfigUtil.getConfigDouble("c", 0));
+  public static final double wheelRadius = Units.inchesToMeters(ConfigUtil.getConfigDouble("c", 0));
 
   public static final ModuleLimits moduleLimitsFree =
       new ModuleLimits(maxLinearSpeed, maxLinearAcceleration, Units.degreesToRadians(1080.0));
@@ -142,14 +144,16 @@ public class DriveConstants {
         .encoderInverted(ConfigUtil.getConfigBoolean("BR_ENCODER_INVERTED", false))
         .build()
   };
-public static final double robotMassKG = ConfigUtil.getConfigDouble("ROBOT_MASS", 0);
-public static final double robotMOI = ConfigUtil.getConfigDouble("ROBOT_MOI", 0);;
-public static final double wheelCOF = ConfigUtil.getConfigDouble("ROBOT_COF", 0);;
-public static final double driveP = ConfigUtil.getConfigDouble("DRIVE_P", 0);
-public static final double driveD = ConfigUtil.getConfigDouble("DRIVE_D", 0);
-public static final double turnP = ConfigUtil.getConfigDouble("TURN_P", 0);
-public static final double turnD = ConfigUtil.getConfigDouble("TURN_D", 0);
-public static final double speedConstant = ConfigUtil.getConfigDouble("SPEED_CONSTANT", 0);
+  public static final double robotMassKG = ConfigUtil.getConfigDouble("ROBOT_MASS", 0);
+  public static final double robotMOI = ConfigUtil.getConfigDouble("ROBOT_MOI", 0);
+  ;
+  public static final double wheelCOF = ConfigUtil.getConfigDouble("ROBOT_COF", 0);
+  ;
+  public static final double driveP = ConfigUtil.getConfigDouble("DRIVE_P", 0);
+  public static final double driveD = ConfigUtil.getConfigDouble("DRIVE_D", 0);
+  public static final double turnP = ConfigUtil.getConfigDouble("TURN_P", 0);
+  public static final double turnD = ConfigUtil.getConfigDouble("TURN_D", 0);
+  public static final double speedConstant = ConfigUtil.getConfigDouble("SPEED_CONSTANT", 0);
 
   public static class PigeonConstants {
     public static final int id = Constants.getRobot() == RobotType.DEVBOT ? 3 : 30;
