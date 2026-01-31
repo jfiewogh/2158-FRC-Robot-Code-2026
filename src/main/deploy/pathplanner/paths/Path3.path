@@ -34,13 +34,27 @@
       "rotationDegrees": -45.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.4039702233250666,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 2.25,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "shoot",
-      "waypointRelativePos": 0.479404466501241,
-      "endWaypointRelativePos": 1.0,
+      "waypointRelativePos": 0.3821339950372231,
+      "endWaypointRelativePos": 0.6580645161290302,
       "command": {
         "type": "named",
         "data": {
@@ -67,5 +81,5 @@
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
