@@ -34,8 +34,8 @@
   "eventMarkers": [
     {
       "name": "runIntake",
-      "waypointRelativePos": 0.5866004962779189,
-      "endWaypointRelativePos": 0.9042183622828769,
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 0.8744416873449091,
       "command": {
         "type": "named",
         "data": {

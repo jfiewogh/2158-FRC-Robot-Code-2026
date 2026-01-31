@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.546559523804131,
-        "y": 5.481880952383464
+        "x": 7.298214285714287,
+        "y": 5.4170952380952375
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.414708990082827,
-        "y": 5.458790256290844
+        "x": 4.166363751992983,
+        "y": 5.394004542002618
       },
       "isLocked": false,
       "linkedName": "Path2End"
@@ -39,7 +39,7 @@
   "eventMarkers": [
     {
       "name": "shoot",
-      "waypointRelativePos": 0.6640198511166251,
+      "waypointRelativePos": 0.479404466501241,
       "endWaypointRelativePos": 1.0,
       "command": {
         "type": "named",
