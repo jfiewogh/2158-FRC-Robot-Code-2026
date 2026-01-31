@@ -13,10 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 29, 2026 at 17:14:42 CST
+// Updated on Saturday January 31, 2026 at 12:05:30 CST
 
 package org.austincans.frc2158;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -134,7 +135,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    if (RobotBase.isSimulation()) {}
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -166,6 +169,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    robotContainer.preloadSimulation();
     SimulatedArena3D.getInstance().placeGamePiecesOnField();
   }
 

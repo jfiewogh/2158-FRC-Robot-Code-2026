@@ -13,13 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 29, 2026 at 17:14:42 CST
+// Updated on Saturday January 31, 2026 at 11:48:15 CST
 
 package org.austincans.frc2158;
 
 import static org.austincans.frc2158.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -74,15 +75,18 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private IntakeSimulation3D intakeSimulation;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     DoubleSupplier leftY = () -> -controller.getLeftY();
     DoubleSupplier leftX = () -> -controller.getLeftX();
     DoubleSupplier rightY = () -> -controller.getRightX();
     DoubleSupplier rightX = () -> -controller.getRightY();
 
     switch (Constants.currentMode) {
-      case REAL:
+      case REAL -> {
         // Real robot, instantiate hardware IO implementations
         drive =
             new Drive(
@@ -98,10 +102,11 @@ public class RobotContainer {
                 drive,
                 new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                 new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-
-        break;
-      case SIM:
+      }
+      case SIM -> {
         // Sim robot, instantiate physics sim IO implementations
+
+        // Initialize Rebuilt Arena
         new Arena2026Rebuilt3D();
 
         driveSimulation = new SwerveDriveSimulation3D(Drive.mapleSimConfig, Pose2d.kZero);
@@ -128,7 +133,7 @@ public class RobotContainer {
         double intakeWidth = 0.5;
         double intakeHeight = 0.1;
         double intakeDepth = 0.1;
-        IntakeSimulation3D intakeSimulation =
+        intakeSimulation =
             new IntakeSimulation3D(
                 "Fuel",
                 driveSimulation,
@@ -161,30 +166,30 @@ public class RobotContainer {
                     hood::getAngle,
                     () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
+        Command intakeCommand =
+            Commands.runEnd(
+                () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+        Command shootCommand =
+            new TurretTracking(
+                turret,
+                flywheel,
+                hood,
+                RobotState.getInstance()::getEstimatedPose,
+                RobotState.getInstance()::getRobotVelocity);
+
         KeyboardInput keyboardInput = new KeyboardInput();
-        keyboardInput
-            .z()
-            .whileTrue(
-                new TurretTracking(
-                    turret,
-                    flywheel,
-                    hood,
-                    RobotState.getInstance()::getEstimatedPose,
-                    RobotState.getInstance()::getRobotVelocity));
-        keyboardInput
-            .v()
-            .whileTrue(
-                Commands.runEnd(
-                    () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0)));
+        keyboardInput.z().whileTrue(shootCommand);
+        keyboardInput.v().whileTrue(intakeCommand);
 
         leftX = keyboardInput::leftX;
         leftY = keyboardInput::leftY;
         rightX = keyboardInput::rightX;
         rightY = keyboardInput::rightY;
 
-        break;
-
-      default:
+        NamedCommands.registerCommand("runIntake", intakeCommand);
+        NamedCommands.registerCommand("shoot", shootCommand);
+      }
+      default -> {
         // Replayed robot, disable IO implementations
         drive =
             new Drive(
@@ -196,8 +201,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
-
-        break;
+      }
     }
 
     // Set up auto routines
@@ -218,6 +222,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("Auto"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
@@ -274,6 +279,10 @@ public class RobotContainer {
 
     driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
     SimulatedArena3D.getInstance().resetFieldForAuto();
+  }
+
+  public void preloadSimulation() {
+    
   }
 
   public void updateSimulation() {

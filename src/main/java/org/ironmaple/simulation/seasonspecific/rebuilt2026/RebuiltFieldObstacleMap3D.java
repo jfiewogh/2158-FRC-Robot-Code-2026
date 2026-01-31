@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 29, 2026 at 17:14:42 CST
+// Updated on Saturday January 31, 2026 at 12:05:30 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -76,13 +76,14 @@ public class RebuiltFieldObstacleMap3D extends SimulatedArena3D.FieldMap3D {
     // Blue Hub
     Translation2d blueHubPos = RebuiltHub.BLUE_HUB_POS.toTranslation2d();
     addObstacle(
-        "meshes/hub.obj", new Pose3d(blueHubPos.getX(), blueHubPos.getY(), 0, new Rotation3d()));
+        "meshes/hub.obj",
+        new Pose3d(blueHubPos.getX(), blueHubPos.getY(), Math.PI, new Rotation3d()));
 
     // Red Hub
     Translation2d redHubPos = RebuiltHub.RED_HUB_POS.toTranslation2d();
     addObstacle(
         "meshes/hub.obj",
-        new Pose3d(redHubPos.getX(), redHubPos.getY(), 0, new Rotation3d(0, 0, Math.PI)));
+        new Pose3d(redHubPos.getX(), redHubPos.getY(), 0, new Rotation3d(0, 0, 0)));
 
     // Blue Side Bumps
     // Blue Left (Top): 0 deg (Global Left is +Y)

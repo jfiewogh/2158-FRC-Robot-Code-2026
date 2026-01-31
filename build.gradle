@@ -124,6 +124,10 @@ task(replayWatch, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
@@ -186,8 +190,6 @@ dependencies {
     implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
     implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
     runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
-
-    implementation (group: 'com.aspose', name: 'aspose-words', version: '25.11', classifier: 'jdk17')
 }
 
 test {
