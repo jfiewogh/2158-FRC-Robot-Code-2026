@@ -34,6 +34,7 @@ import java.util.List;
 import org.austincans.frc2158.subsystems.vision.VisionIO.PoseObservationType;
 import org.littletonrobotics.junction.Logger;
 
+// Subsystem containing multiple cameras
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
   private final VisionIO[] io;

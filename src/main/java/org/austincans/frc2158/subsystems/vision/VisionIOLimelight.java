@@ -32,6 +32,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+
+// TODO: add object detection
+// results should be put into GameTrack
+
+
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
   private final Supplier<Rotation2d> rotationSupplier;
