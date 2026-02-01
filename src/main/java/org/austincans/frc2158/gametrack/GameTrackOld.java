@@ -15,7 +15,7 @@
 //
 // Updated on Wednesday December 24, 2025 at 21:41:23 CST
 
-package org.austincans.frc2158.subsystems;
+package org.austincans.frc2158.gametrack;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
@@ -41,7 +41,7 @@ import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightResult
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Detector;
 import org.ironmaple.simulation.SimulatedArena;
 
-public class GameTrack {
+public class GameTrackOld {
   // Create the constraints to use while pathfinding
   public static PathConstraints constraints =
       new PathConstraints(5.0, 3.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
