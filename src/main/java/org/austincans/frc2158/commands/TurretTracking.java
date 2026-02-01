@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.austincans.frc2158.commands;
 
@@ -23,8 +23,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -46,10 +44,7 @@ public class TurretTracking extends Command {
   private static final double GEAR_RATIO = FlywheelConstants.gearing;
   private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
 
-  private final Translation3d blueHubPose = new Translation3d(4.5974, 4.034536, 1.5748);
-  private final Translation3d redHubPose = new Translation3d(11.938, 4.034536, 1.5748);
-
-  private Translation2d target = new Translation2d();
+  private TrackingTargets target = TrackingTargets.redHub;
 
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
 
@@ -72,46 +67,78 @@ public class TurretTracking extends Command {
     addRequirements(turret, flywheel);
   }
 
-  public void setTarget(Translation2d target) {
+  public void setTarget(TrackingTargets target) {
     this.target = target;
   }
 
+  public enum TrackingTargets {
+    redHub(new Translation3d(11.938, 4.034536, 1.5748)),
+    blueHub(new Translation3d(4.5974, 4.034536, 1.5748)),
+    blueOutTrench(new Translation3d(4.625594, 0.632968, 0)),
+    blueDepotTrench(new Translation3d(4.625594, 7.436358, 0)),
+    redDepotTrench(new Translation3d(11.915394, 0.632968, 0)),
+    redLeftTrench(new Translation3d(11.915394, 7.436358, 0));
+
+    private final Translation3d targetTrans3d;
+
+    private TrackingTargets(
+        Translation3d target) { // Constructor must be private or package-private
+      this.targetTrans3d = target;
+    }
+
+    public Translation3d getTrans3d() { // Getter method
+      return this.targetTrans3d;
+    }
+  }
+
+  public static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
+    return Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
+  }
+
+  private static final double latency = 0.02;
+
   @Override
   public void execute() {
-    Translation2d hubTranslation;
-    Pose2d pose = robotPoseSupplier.get();
+    Pose2d robotPose = robotPoseSupplier.get();
+    ChassisSpeeds robotSpeeds = robotVelSupplier.get();
+
+    Translation2d futureRobotTranslation =
+        robotPose
+            .getTranslation()
+            .plus(
+                new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+                    .times(latency));
+    Rotation2d futureRobotRotation =
+        robotPose
+            .getRotation()
+            .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond))
+            .times(latency);
 
     Translation2d turretTranslation =
-        pose.getTranslation().plus(TURRET_OFFSET.rotateBy(pose.getRotation()));
-
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      hubTranslation = blueHubPose.toTranslation2d();
-    } else {
-      hubTranslation = redHubPose.toTranslation2d();
-    }
+        futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
     double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
 
+    flywheel.setVelocity(0);
+
     // TOTAL VALUES
 
-    double totalVelocity = Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
+    double totalVelocity = getActualExitVelocityMetersPerSec(flywheelVelocityRPM);
 
-    double totalXYDistance = turretTranslation.getDistance(hubTranslation);
+    double totalXYDistance = turretTranslation.getDistance(target.getTrans3d().toTranslation2d());
 
     double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
             TURRET_HEIGHT, totalVelocity, totalXYDistance, TARGET_HEIGHT);
 
     if (Double.isNaN(totalPitchRad)) {
-      System.out.println("Cannot shoot into hub");
+      System.out.println("Cannot shoot into hub (1)");
     } else {
-      flywheel.setVelocity(flywheelVelocityRPM);
-
       Rotation2d totalYaw =
           Rotation2d.fromRadians(
               Math.atan2(
-                  hubTranslation.getY() - turretTranslation.getY(),
-                  hubTranslation.getX() - turretTranslation.getX()));
+                  target.getTrans3d().getY() - turretTranslation.getY(),
+                  target.getTrans3d().getX() - turretTranslation.getX()));
 
       double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
       double totalXVelocity = totalXYVelocity * totalYaw.getCos();
@@ -119,12 +146,10 @@ public class TurretTracking extends Command {
 
       // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
 
-      ChassisSpeeds robotSpeeds = robotVelSupplier.get();
       double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
       double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
       double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
       Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
-      turret.setDesiredAngleFieldRelative(turretAngle, pose);
 
       // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
 
@@ -133,11 +158,19 @@ public class TurretTracking extends Command {
       double hoodAngleRad =
           ShooterMath.calculateProjectileAngle(
               TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, TARGET_HEIGHT);
-      if (Double.isNaN(hoodAngleRad)) {
-        hoodAngleRad = hood.getAngle().getRadians();
-      }
 
-      hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
+      if (Double.isNaN(hoodAngleRad)) {
+        System.out.println("Cannot shoot into hub (2)");
+      } else {
+        if (target.getTrans3d().getY() != 4.034536) {
+          hoodAngleRad = Math.PI / 2;
+        }
+
+        // Should run only if angle is possible
+        flywheel.setVelocity(flywheelVelocityRPM);
+        turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
+        hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
+      }
     }
   }
 

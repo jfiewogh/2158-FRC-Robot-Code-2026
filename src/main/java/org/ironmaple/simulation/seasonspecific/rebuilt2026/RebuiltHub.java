@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -96,7 +96,7 @@ public class RebuiltHub extends Goal {
         "Fuel",
         isBlue ? BLUE_HUB_POS : RED_HUB_POS,
         isBlue,
-        false);
+        true); // TODO: I don't know what this means
 
     this.arena = arena;
     StructPublisher<Pose3d> HubPosePublisher =

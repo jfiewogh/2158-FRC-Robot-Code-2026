@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 11:48:15 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.austincans.frc2158;
 
@@ -47,9 +47,9 @@ import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
 import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
+import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -107,7 +107,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
 
         // Initialize Rebuilt Arena
-        new Arena2026Rebuilt3D();
+        new Arena2026Rebuilt3D(PhysicsThreadConfig.DEFAULT, false);
 
         driveSimulation = new SwerveDriveSimulation3D(Drive.mapleSimConfig, Pose2d.kZero);
         driveSimulation.registerWithArena(
@@ -130,7 +130,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
-        double intakeWidth = 0.5;
+        double intakeWidth = Constants.RobotConstants.kBumperWidthMeters;
         double intakeHeight = 0.1;
         double intakeDepth = 0.1;
         intakeSimulation =
@@ -140,10 +140,10 @@ public class RobotContainer {
                 SimulatedArena3D.getInstance()
                     .getPhysicsEngine()
                     .createBoxShape(
-                        new Translation3d(intakeWidth / 2, intakeHeight / 2, intakeDepth / 2)),
+                        new Translation3d(intakeDepth / 2, intakeWidth / 2, intakeHeight / 2)),
                 new Transform3d(
                     DriveConstants.trackWidthX / 2 + intakeDepth / 2, 0, 0, Rotation3d.kZero),
-                20,
+                35,
                 SimulatedArena3D.getInstance());
 
         // OverTheBumperIntake(
@@ -222,7 +222,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("Auto"));
+    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
+    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
@@ -282,7 +283,7 @@ public class RobotContainer {
   }
 
   public void preloadSimulation() {
-    
+    intakeSimulation.addGamePiecesToIntake(20);
   }
 
   public void updateSimulation() {
@@ -295,8 +296,8 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/Fuel",
         SimulatedArena3D.getInstance().getGamePiecePosesArrayByType("Fuel"));
-    Logger.recordOutput(
-        "FieldSimulation/Fuel2D",
-        SimulatedArena.getInstance().getGamePiecePosesArrayByType("Fuel"));
+    // Logger.recordOutput(
+    //     "FieldSimulation/Fuel2D",
+    //     SimulatedArena.getInstance().getGamePiecePosesArrayByType("Fuel"));
   }
 }

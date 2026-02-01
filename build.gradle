@@ -115,8 +115,6 @@ repositories {
     maven { url = 'https://github.com/warrenlp/VL53L1XRoborioJNI/raw/repository/maven' }
     maven { url = 'https://mvnrepository.com/artifact/com.google.auto.value/auto-value' }
     //maven { url = 'https://raw.githubusercontent.com/frc5431/TitanUtil/master/TitanUtil.json' }
-
-    maven { url "https://repository.aspose.com/java/repo/" }
 }
 
 task(replayWatch, type: JavaExec) {
@@ -187,9 +185,12 @@ dependencies {
     implementation 'org.dyn4j:dyn4j:5.0.2'
     // 3D Physics Engine
     implementation "com.github.stephengold:Libbulletjme-Windows64:22.0.3"
-    implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
+    runtimeOnly "com.github.stephengold:Libbulletjme-Windows64:22.0.3:SpDebug"
+
     implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
     runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
+
+    implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
 }
 
 test {

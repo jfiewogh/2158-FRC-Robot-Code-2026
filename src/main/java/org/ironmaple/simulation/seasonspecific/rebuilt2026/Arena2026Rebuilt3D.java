@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -203,7 +203,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
             Kilograms.of(0.2), // map mass
             0.8, // friction
             1.0, // linear damping
-            4.0, // angular damping (high rolling resistance)
+            1.0, // angular damping (high rolling resistance)
             0.1 // restitution
             );
 

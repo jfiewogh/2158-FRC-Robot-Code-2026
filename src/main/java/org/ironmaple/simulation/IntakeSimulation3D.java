@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation;
 
@@ -124,12 +124,11 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
     if (!intakeRunning || gamePiecesInIntakeCount >= capacity) return;
 
     // Calculate current intake pose
-    Pose3d robotPose = drivetrain.getSimulatedDriveTrainPose3d();
+    Pose3d robotPose = drivetrain.getSimulatedDriveTrainPose3dGroundRelative();
     Pose3d intakePose = robotPose.plus(intakeOffset);
 
     // Check for overlaps
     List<PhysicsBody> overlaps = physicsEngine.getOverlappingBodies(intakeShape, intakePose);
-    System.out.println("Number of overlaps: " + overlaps.size());
 
     // Debug logging (once per second, ~every 50 ticks at 50Hz)
     // if (subTickNum == 0) {
@@ -236,5 +235,9 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
       return true;
     }
     return false;
+  }
+
+  public void addGamePiecesToIntake(int increment) {
+    gamePiecesInIntakeCount += increment;
   }
 }

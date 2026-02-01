@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation.drivesims;
 
@@ -452,15 +452,15 @@ public class SwerveDriveSimulation3D extends AbstractDriveTrainSimulation3D {
 
       // Log occasionally
       if (i == 0 && Math.random() < 0.01) {
-        System.out.println(
-            "Suspension: mountZ="
-                + mountPointZ
-                + " poseZ="
-                + pose3d.getZ()
-                + " grndClear="
-                + groundClearance
-                + " comH="
-                + comHeightAboveGround);
+        // System.out.println(
+        //     "Suspension: mountZ="
+        //         + mountPointZ
+        //         + " poseZ="
+        //         + pose3d.getZ()
+        //         + " grndClear="
+        //         + groundClearance
+        //         + " comH="
+        //         + comHeightAboveGround);
       }
 
       // Get raycast result (Sync mode: direct)

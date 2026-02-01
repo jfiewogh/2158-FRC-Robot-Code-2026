@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation;
 
@@ -288,15 +288,14 @@ public abstract class SimulatedArena3D implements Arena {
       config = threadConfig;
     }
 
-    this.physicsBackend = new org.ironmaple.simulation.physics.jolt.JoltBackend(config);
+    // this.physicsBackend = new org.ironmaple.simulation.physics.jolt.JoltBackend(config);
+    // this.physicsBackend.initialize();
+    // this.physicsEngine =
+    //     ((org.ironmaple.simulation.physics.jolt.JoltBackend) physicsBackend).getEngine();
+    this.physicsBackend = new org.ironmaple.simulation.physics.bullet.BulletBackend(config);
     this.physicsBackend.initialize();
     this.physicsEngine =
-        ((org.ironmaple.simulation.physics.jolt.JoltBackend) physicsBackend).getEngine();
-    // this.physicsBackend = new
-    // org.ironmaple.simulation.physics.bullet.BulletBackend(config);
-    // this.physicsBackend.initialize();
-    // this.physicsEngine = ((org.ironmaple.simulation.physics.bullet.BulletBackend)
-    // physicsBackend).getEngine();
+        ((org.ironmaple.simulation.physics.bullet.BulletBackend) physicsBackend).getEngine();
 
     // Set gravity (downward)
     physicsBackend.setGravity(new Translation3d(0, 0, -9.81));
@@ -684,7 +683,7 @@ public abstract class SimulatedArena3D implements Arena {
   public void registerGamePiece(GamePieceOnFieldSimulation3D piece) {
     dynamicBodies.put(piece, piece.getPhysicsBody());
 
-    System.out.println("SIZE: " + dynamicBodies.size());
+    // System.out.println("SIZE: " + dynamicBodies.size());
   }
 
   @Override

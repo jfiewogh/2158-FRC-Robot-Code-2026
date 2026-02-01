@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -92,7 +92,7 @@ public class ShooterSim3D {
 
         shooterSim.shoot(launchingSpeed, shooterAngle);
 
-        System.out.println("SHOT at " + exitVelocityMetersPerSec);
+        // System.out.println("SHOT at " + exitVelocityMetersPerSec);
       }
     }
   }

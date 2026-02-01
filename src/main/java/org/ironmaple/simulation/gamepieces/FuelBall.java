@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation.gamepieces;
 
@@ -45,7 +45,7 @@ public class FuelBall extends GamePieceOnFieldSimulation3D {
   private static final double BASE_RADIUS_METERS = 0.075;
   private static final Mass MASS = Units.Kilograms.of(0.23);
   private static final double LINEAR_DAMPING = 1.0;
-  private static final double ANGULAR_DAMPING = 4.0;
+  private static final double ANGULAR_DAMPING = 1.0;
   private static final double RESTITUTION = 0.15;
   private static final double FRICTION = 0.9;
 

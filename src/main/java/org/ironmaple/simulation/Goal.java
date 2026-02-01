@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 12:05:30 CST
+// Updated on Saturday January 31, 2026 at 16:59:54 CST
 
 package org.ironmaple.simulation;
 
@@ -159,6 +159,14 @@ public abstract class Goal implements SimulatedArena.Simulatable {
     if (gamePieceCount >= max) return; // Early exit if already at max
     /// Use list filtering for more efficient bulk checking.
     // Get all pieces of our type as a list.
+    arena.getGamePiecesByType(gamePieceType).stream()
+        .forEach(
+            gamePiece -> {
+              if (checkValidity(gamePiece)) {
+                System.out.println("Scored: " + gamePiece.getPose3d());
+              }
+            });
+
     arena.getGamePiecesByType(gamePieceType).stream()
         .filter(gamePiece -> checkGrounded(gamePiece))
         .filter(this::checkValidity)
