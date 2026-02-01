@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday January 31, 2026 at 16:59:54 CST
+// Updated on Sunday February 01, 2026 at 00:28:44 CST
 
 package org.austincans.frc2158;
 
@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
+import org.austincans.frc2158.commands.PathCommands;
 import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
@@ -180,6 +181,12 @@ public class RobotContainer {
         KeyboardInput keyboardInput = new KeyboardInput();
         keyboardInput.z().whileTrue(shootCommand);
         keyboardInput.v().whileTrue(intakeCommand);
+        keyboardInput
+            .x()
+            .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4, Rotation2d.kZero)));
+        keyboardInput
+            .c()
+            .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3, Rotation2d.kZero)));
 
         leftX = keyboardInput::leftX;
         leftY = keyboardInput::leftY;
