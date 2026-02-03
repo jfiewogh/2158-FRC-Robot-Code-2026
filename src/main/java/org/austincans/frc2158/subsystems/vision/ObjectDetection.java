@@ -15,7 +15,7 @@ public class ObjectDetection {
         this.className = className;
     }
 
-    public void calculateGamePiecePoses() {
+    public Pose3d[] calculateGamePiecePoses() {
         LimelightResults latestResults = LimelightHelpers.getLatestResults(limelightName);
         LimelightTarget_Detector[] detectorResults = latestResults.targets_Detector;
 
@@ -35,5 +35,7 @@ public class ObjectDetection {
                 System.out.println(yaw.getDegrees() + " " + pitch.getDegrees() + " " + size);
             }
         }
+
+        return new Pose3d[] {};
     }
 }
