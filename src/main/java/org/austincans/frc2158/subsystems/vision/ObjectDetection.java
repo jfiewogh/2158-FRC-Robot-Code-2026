@@ -2,40 +2,44 @@ package org.austincans.frc2158.subsystems.vision;
 
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightResults;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Detector;
-
+import org.austincans.frc2158.subsystems.vision.LimelightHelpers.RawDetection;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public class ObjectDetection {
-    private final String limelightName;
-    private final String className;
+    public enum GamePieceType {
+        // 2025
+        CORAL("Coral", 0.1),
+        ALGAE("Algae", 0.1),
+        // 2026
+        // TODO: name should be same as in detector model
+        FUEL("Fuels", Units.inchesToMeters(5.91 * 0.5));
 
-    public ObjectDetection(String limelightName, String className) {
-        this.limelightName = limelightName;
-        this.className = className;
-    }
+        private final String className;
+        private final double radiusMeters;
 
-    public Pose3d[] calculateGamePiecePoses() {
-        LimelightResults latestResults = LimelightHelpers.getLatestResults(limelightName);
-        LimelightTarget_Detector[] detectorResults = latestResults.targets_Detector;
-
-        Pose3d robotPose = LimelightHelpers.getBotPose3d(limelightName);
-
-        LimelightTarget_Detector closestResult = detectorResults[0];
-
-        for (LimelightTarget_Detector result : detectorResults) {
-            if (result.className == className) {
-                
-                // Use these values to calculate Pose3d
-                Rotation2d yaw = Rotation2d.fromDegrees(result.tx);
-                Rotation2d pitch = Rotation2d.fromDegrees(result.ty);
-
-                double size = result.ta;
-
-                System.out.println(yaw.getDegrees() + " " + pitch.getDegrees() + " " + size);
-            }
+        private GamePieceType(String className, double radiusMeters) {
+            this.className = className;
         }
 
-        return new Pose3d[] {};
+        public String getClassName() {
+            return className;
+        }
+
+        public double getRadiusMeters() {
+            return radiusMeters;
+        }
+    }
+
+    private final ObjectDetectionIO io;
+    private final ObjectDetectionIOInputsAutoLogged inputs;
+
+    public ObjectDetection(ObjectDetectionIO io) {
+        this.io = io;
+    }
+
+    public Pose3d[] getGamePiecePoses() {
+        return inputs.gamePiecePoses;
     }
 }

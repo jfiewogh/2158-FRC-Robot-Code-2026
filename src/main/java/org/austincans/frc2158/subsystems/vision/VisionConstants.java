@@ -77,6 +77,8 @@ public class VisionConstants {
   public static final LoggedTunableNumber timestampOffset =
       new LoggedTunableNumber("AprilTagVision/TimestampOffset", 0.0);
 
+    public static final double viewingAngleDeg = 120;
+
   private static int monoExposure = 2200;
   private static double monoGain = 17.5;
   private static double monoDenoise = 1.0;
@@ -215,6 +217,42 @@ public class VisionConstants {
       double gain,
       double denoise,
       double stdDevFactor) {}
+
+
+  public enum LimelightConfig {
+    LIMELIGHT_3(640, 480, 62.5, 48.9),
+    LIMELIGHT_3A(640, 480, 54.5, 42),
+    LIMELIGHT_3G(640, 480, 82, 56.2),
+    LIMELIGHT_4(640, 400, 82, 56.2);
+
+    private final int widthPixels;
+    private final int heightPixels;
+    private final double horizontalViewingAngleDeg;
+    private final double verticalViewingAngleDeg;
+
+    private LimelightConfig(int widthPixels, int heightPixels, double horizontalViewingAngleDeg, double verticalViewingAngleDeg) {
+      this.widthPixels = widthPixels;
+      this.heightPixels = heightPixels;
+      this.horizontalViewingAngleDeg = horizontalViewingAngleDeg;
+      this.verticalViewingAngleDeg = verticalViewingAngleDeg;
+    }    
+
+    public int getWidthPixels() {
+      return widthPixels;
+    }
+
+    public int getHeightPixels() {
+      return heightPixels;
+    }
+
+    public double getHorizontalViewingAngleRad() {
+      return Units.degreesToRadians(horizontalViewingAngleDeg);
+    }
+
+    public double getVerticalViewingAngleRad() {
+      return Units.degreesToRadians(verticalViewingAngleDeg);
+    }
+  }
 
   private VisionConstants() {}
 }
