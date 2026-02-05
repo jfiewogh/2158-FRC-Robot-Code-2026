@@ -5,9 +5,27 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Path1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path 1.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         },
         {
@@ -23,21 +41,15 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Path4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Path5"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Path6"
           }
         }
       ]

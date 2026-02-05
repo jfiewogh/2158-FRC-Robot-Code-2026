@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 01, 2026 at 00:28:44 CST
+// Updated on Wednesday February 04, 2026 at 19:50:18 CST
 
 package org.austincans.frc2158.commands;
 
@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
@@ -39,6 +40,7 @@ public class TurretTracking extends Command {
   private final Hood hood;
   private final Supplier<Pose2d> robotPoseSupplier;
   private final Supplier<ChassisSpeeds> robotVelSupplier;
+  private final BooleanSupplier containsFuel;
 
   private static final double FLYWHEEL_RADIUS = FlywheelConstants.radiusMeters; // meters
   private static final double GEAR_RATIO = FlywheelConstants.gearing;
@@ -56,13 +58,15 @@ public class TurretTracking extends Command {
       Flywheel flywheel,
       Hood hood,
       Supplier<Pose2d> robotPoseSupplier,
-      Supplier<ChassisSpeeds> robotVelSupplier) {
+      Supplier<ChassisSpeeds> robotVelSupplier,
+      BooleanSupplier containsFuel) {
 
     this.turret = turret;
     this.flywheel = flywheel;
     this.hood = hood;
     this.robotPoseSupplier = robotPoseSupplier;
     this.robotVelSupplier = robotVelSupplier;
+    this.containsFuel = containsFuel;
 
     addRequirements(turret, flywheel);
   }
@@ -181,6 +185,6 @@ public class TurretTracking extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return !containsFuel.getAsBoolean();
   }
 }

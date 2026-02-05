@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.298214285714287,
-        "y": 5.4170952380952375
+        "x": 7.486089387145466,
+        "y": 5.37173089872556
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.166363751992983,
-        "y": 5.394004542002618
+        "x": 4.354238853424162,
+        "y": 5.34864020263294
       },
       "isLocked": false,
       "linkedName": "Path2End"
@@ -50,19 +50,7 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "shoot",
-      "waypointRelativePos": 0.3821339950372231,
-      "endWaypointRelativePos": 0.6580645161290302,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "shoot"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -76,7 +64,7 @@
     "rotation": -27.84757825978831
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Mid Auto Paths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

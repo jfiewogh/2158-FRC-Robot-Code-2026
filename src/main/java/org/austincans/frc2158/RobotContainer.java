@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 01, 2026 at 00:28:44 CST
+// Updated on Wednesday February 04, 2026 at 19:50:18 CST
 
 package org.austincans.frc2158;
 
@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
-import org.austincans.frc2158.commands.PathCommands;
+import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
@@ -176,17 +176,19 @@ public class RobotContainer {
                 flywheel,
                 hood,
                 RobotState.getInstance()::getEstimatedPose,
-                RobotState.getInstance()::getRobotVelocity);
+                RobotState.getInstance()::getRobotVelocity,
+                () -> intakeSimulation.getGamePiecesInIntake() > 0);
 
         KeyboardInput keyboardInput = new KeyboardInput();
         keyboardInput.z().whileTrue(shootCommand);
         keyboardInput.v().whileTrue(intakeCommand);
-        keyboardInput
-            .x()
-            .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4, Rotation2d.kZero)));
-        keyboardInput
-            .c()
-            .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3, Rotation2d.kZero)));
+        // keyboardInput
+        //     .x()
+        //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4, Rotation2d.kZero)));
+        // keyboardInput
+        //     .c()
+        //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
+        // Rotation2d.kZero)));
 
         leftX = keyboardInput::leftX;
         leftY = keyboardInput::leftY;
@@ -195,6 +197,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("runIntake", intakeCommand);
         NamedCommands.registerCommand("shoot", shootCommand);
+        NamedCommands.registerCommand(
+            "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
       }
       default -> {
         // Replayed robot, disable IO implementations
@@ -229,8 +233,10 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
+    autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
