@@ -77,7 +77,7 @@ public class RebuiltFieldObstacleMap3D extends SimulatedArena3D.FieldMap3D {
     Translation2d blueHubPos = RebuiltHub.BLUE_HUB_POS.toTranslation2d();
     addObstacle(
         "meshes/hub.obj",
-        new Pose3d(blueHubPos.getX(), blueHubPos.getY(), Math.PI, new Rotation3d()));
+        new Pose3d(blueHubPos.getX(), blueHubPos.getY(), Math.PI, new Rotation3d(0, 0, Math.PI / 2)));
 
     // Red Hub
     Translation2d redHubPos = RebuiltHub.RED_HUB_POS.toTranslation2d();

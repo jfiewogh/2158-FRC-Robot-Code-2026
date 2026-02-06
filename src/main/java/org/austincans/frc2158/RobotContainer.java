@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.TurretCommands;
-import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -170,14 +169,13 @@ public class RobotContainer {
         Command intakeCommand =
             Commands.runEnd(
                 () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-        Command shootCommand =
-            new TurretTracking(
-                turret,
-                flywheel,
-                hood,
-                RobotState.getInstance()::getEstimatedPose,
-                RobotState.getInstance()::getRobotVelocity,
-                () -> intakeSimulation.getGamePiecesInIntake() > 0);
+        Command shootCommand = TurretCommands.shootToHub(
+            flywheel, 
+            turret, 
+            hood, 
+            false, 
+            () -> intakeSimulation.getGamePiecesInIntake() > 0
+        );
 
         KeyboardInput keyboardInput = new KeyboardInput();
         keyboardInput.z().whileTrue(shootCommand);

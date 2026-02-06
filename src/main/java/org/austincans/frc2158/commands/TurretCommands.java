@@ -27,6 +27,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
@@ -153,37 +154,52 @@ public class TurretCommands {
     }
   }
 
+  private static TrackingTargets getClosestTarget(Pose3d pose, TrackingTargets[] possibleTargets) {
+    Translation3d translation = pose.getTranslation();
+    TrackingTargets closestTarget = possibleTargets[0];
+    for (int i = 1; i < possibleTargets.length; i++) {
+      TrackingTargets target = possibleTargets[i];
+      double distance = translation.getDistance(target.getTranslation3d());
+      double currentClosestDistance = translation.getDistance(closestTarget.getTranslation3d());
+      if (distance < currentClosestDistance) {
+        closestTarget = target;
+      }
+    }
+    return closestTarget;
+  }
+
   private static TrackingTargets getShuttleTarget(boolean isBlue) {
     Pose3d robotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
-    Translation3d robotTranslation3d = robotPose.getTranslation();
-
     TrackingTargets[] possibleTargets;
     if (isBlue) {
-      // TODO: add blue shuttle positions
       possibleTargets =
           new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
     } else {
       possibleTargets =
           new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
     }
-
-    TrackingTargets closestTarget = possibleTargets[0];
-    for (int i = 1; i < possibleTargets.length; i++) {
-      TrackingTargets target = possibleTargets[i];
-      double distance = robotTranslation3d.getDistance(target.getTranslation3d());
-      double currentClosestDistance =
-          robotTranslation3d.getDistance(closestTarget.getTranslation3d());
-      if (distance < currentClosestDistance) {
-        closestTarget = target;
-      }
-    }
-    System.out.println(closestTarget.getTranslation3d());
-    return closestTarget;
+    return getClosestTarget(robotPose, possibleTargets);
   }
 
   public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue) {
     return Commands.defer(
         () -> Commands.run(() -> shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue))),
         Set.of());
+  }
+
+  public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue, BooleanSupplier containsFuel) {
+    if (isBlue) {
+      return Commands.run(() -> {
+        if (containsFuel.getAsBoolean()) {
+          shootToTarget(flywheel, turret, hood, TrackingTargets.blueHub);
+        }
+      });
+    } else {
+      return Commands.run(() -> {
+        if (containsFuel.getAsBoolean()) {
+          shootToTarget(flywheel, turret, hood, TrackingTargets.redHub);
+        }
+      });
+    }
   }
 }
