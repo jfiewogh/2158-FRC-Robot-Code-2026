@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 29, 2026 at 19:31:22 CST
+// Updated on Thursday February 05, 2026 at 19:51:21 CST
 
 package org.austincans.frc2158;
 
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
-import org.austincans.frc2158.commands.TurretTracking;
+import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -142,15 +142,8 @@ public class RobotContainer {
                     () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
         KeyboardInput keyboardInput = new KeyboardInput();
-        keyboardInput
-            .z()
-            .whileTrue(
-                new TurretTracking(
-                    turret,
-                    flywheel,
-                    hood,
-                    RobotState.getInstance()::getEstimatedPose,
-                    RobotState.getInstance()::getRobotVelocity));
+        keyboardInput.z().whileTrue(TurretCommands.shootToHub(flywheel, turret, hood, false, null));
+
         keyboardInput.x().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(0)));
         keyboardInput.c().whileTrue(Commands.runOnce(() -> flywheel.setVelocity(500)));
         // keyboardInput.c().whileTrue(Commands.runOnce(() -> intake.setDeployAngle(Angle.k90deg)));

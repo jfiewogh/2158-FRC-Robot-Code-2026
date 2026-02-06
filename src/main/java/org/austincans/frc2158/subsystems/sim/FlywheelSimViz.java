@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday January 29, 2026 at 19:31:22 CST
+// Updated on Thursday February 05, 2026 at 19:51:21 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.RobotState;
-import org.austincans.frc2158.commands.TurretTracking;
+import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
@@ -71,7 +71,7 @@ public class FlywheelSimViz {
       lastShootingTime = Timer.getFPGATimestamp();
 
       double exitVelocityMetersPerSec =
-          TurretTracking.getActualExitVelocityMetersPerSec(velocityRPM);
+          TurretCommands.getActualExitVelocityMetersPerSec(velocityRPM);
 
       Pose2d robotPose = RobotState.getInstance().getEstimatedPose();
 
