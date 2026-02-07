@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Path1"
+            "pathName": "Top 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Path2"
+            "pathName": "Top 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Path3"
+            "pathName": "Top 3"
           }
         }
       ]
