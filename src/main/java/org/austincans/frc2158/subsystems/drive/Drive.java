@@ -67,6 +67,7 @@ import org.austincans.frc2158.Constants.Mode;
 import org.austincans.frc2158.Robot;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.RobotState.VisionObservation;
+import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.subsystems.vision.Vision;
@@ -153,6 +154,12 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   public static boolean joystickHasInput = true;
 
+  public boolean isDriving(){
+    if (joystickHasInput == true){
+      return true;
+    }
+  }
+
   public Drive(
       DriveIO driveIO,
       GyroIO gyroIO,
@@ -224,6 +231,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   public void periodic() {
+    BlinkinLEDController.getInstance().driving = isDriving();
     driveIO.updateInputs(driveInputs);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);

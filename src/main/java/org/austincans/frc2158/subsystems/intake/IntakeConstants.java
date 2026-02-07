@@ -34,4 +34,5 @@ public class IntakeConstants {
   public static final int intakeMotorID = ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 0);
 
   public static final int deployEncoderID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0);
+  public static final int maxDistFromIntake = ConfigUtil.getConfigInt("lasarCan_Distance", 20);
 }

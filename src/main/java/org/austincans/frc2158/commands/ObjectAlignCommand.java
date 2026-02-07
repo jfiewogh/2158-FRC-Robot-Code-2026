@@ -18,6 +18,8 @@
 package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Classifier;
@@ -46,11 +48,14 @@ public class ObjectAlignCommand {
     targetLateralVelocity *= 0; // TODO: Replace with swerve max lateral speed
     targetLateralVelocity *= -1.0;
 
+
     drive.runVelocity(
         new ChassisSpeeds(
             targetLateralVelocity, // Forwards TODO: Replace with Driver Joystick?
             0, // Sideways TODO: Replace with Driver Joystick?
             targetAngularVelocity // Angular
             ));
+
+    BlinkinLEDController.getInstance().isAligned = true;
   }
 }

@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import java.util.HashMap;
 import java.util.Optional;
+
+import org.austincans.frc2158.ledConstants;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.austincans.frc2158.util.LoggedTracer;
 
@@ -35,7 +37,7 @@ import org.austincans.frc2158.util.LoggedTracer;
 @SuppressWarnings("unused")
 public class BlinkinLEDController {
 
-  private BlinkinPattern disabledColor = BlinkinPattern.STROBE_GOLD;
+  private BlinkinPattern disabledColor = BlinkinPattern.YELLOW;
   private Optional<Alliance> alliance = Optional.empty();
   private boolean lastEnabledAuto = false;
   private double lastEnabledTime = 0.0;
@@ -46,6 +48,16 @@ public class BlinkinLEDController {
   public boolean characterizationMode = false;
   public boolean visionDisconnected = false;
   public boolean ready = false;
+
+  public boolean readyToShoot = false;
+
+  public boolean intaked = false;
+  public boolean driving = false;
+  public boolean isShuttling = false; 
+  public boolean isClimbing = false;
+  public boolean isShooting = false;
+  public boolean isAligned = false;
+
   private Notifier loadingNotifier;
 
   public int loopCycleCount = 0;
@@ -291,6 +303,34 @@ public class BlinkinLEDController {
     // Update estop state
     if (DriverStation.isEStopped()) {
       estopped = true;
+    }
+
+    if (readyToShoot == true){
+      setPattern(ledConstants.readyToShootPattern);
+    }
+
+    if (intaked == true){
+      setPattern(ledConstants.intakedPattern);
+    }
+
+    if (driving == true){
+      setPattern(ledConstants.drivingPattern);
+    }
+
+    if (isShuttling == true){
+      setPattern(ledConstants.isShuttlingPattern);
+    }
+
+    if (isClimbing == true){
+      setPattern(ledConstants.climbingPattern);
+    }
+
+    if (isShooting == true){
+      setPattern(ledConstants.isShootingPattern);
+    }
+
+    if (isAligned == true){
+      setPattern(ledConstants.isAlignedPattern);
     }
 
     // Exit during initial cycles

@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.hood.Hood;
@@ -184,9 +185,13 @@ public class TurretCommands {
   // TODO: get alliance from DriverStation instead of boolean
   public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue) {
     return Commands.defer(
-        () -> Commands.run(() -> shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue))),
+        () -> Commands.run(() -> {
+          shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue));
+          BlinkinLEDController.getInstance().isShuttling = true;
+        }),
         Set.of());
   }
+
 
   // TODO: get alliance from DriverStation instead of boolean
   public static Command shootToHub(
