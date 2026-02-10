@@ -47,15 +47,15 @@ public interface ArmIO {
 
   public void updateInputs(ArmIOInputs inputs);
 
-  public default void setVoltage(double voltage) {}
+  public void setVoltage(double voltage)
   ;
 
   // Encoder Values
-  public default void setPosition(double position) {}
+  public void setPosition(double position)
   ;
 
   // Meters per second
-  public default void setVelocity(double velocity) {}
+  public void setVelocity(double velocity)
   ;
 
   public default void stopMotor() {}

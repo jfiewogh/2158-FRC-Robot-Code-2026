@@ -25,49 +25,51 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class AutoPID {
-  private static double target = 0;
-  private static double loopInterval = 0; // Secs
-  private static long startTime = 0;
-  private static double minOutput = 0;
-  private static double maxOutput = 0;
-  private static double cycles = 20;
+  private double target = 0;
+  private double loopInterval = 0; // Secs
+  private long startTime = 0;
+  private double minOutput = 0;
+  private double maxOutput = 0;
+  private double cycles = 20;
 
-  private static int i;
-  private static boolean output;
-  private static double outputValue;
-  private static long time1, time2, timeAtHigherOscillation, timeAtLowerOscillation;
-  private static double max, min;
-  private static double kP, kI, kD;
-  private static double pAverage, iAverage, dAverage;
+  private int i;
+  private boolean output;
+  private double outputValue;
+  private long time1, time2, timeAtHigherOscillation, timeAtLowerOscillation;
+  private double max, min;
+  private double kP, kI, kD;
+  private double pAverage, iAverage, dAverage;
 
-  public static enum ZieglerMethod {
+  public enum ZieglerMethod {
     noOverShoot, // Slowest, Safest
     lowOverShoot,
     classicPID, // Fastest high overshoot
   }
+  
+  public AutoPID(){}
 
-  private static ZieglerMethod ZieglerMode = ZieglerMethod.noOverShoot;
+  private ZieglerMethod ZieglerMode = ZieglerMethod.noOverShoot;
 
-  public static void setTargetInputValue(double value) {
+  public void setTargetInputValue(double value) {
     target = value;
   }
 
-  public static void setOutputRange(double minVal, double maxVal) {
+  public void setOutputRange(double minVal, double maxVal) {
     min = minVal;
     max = maxVal;
   }
 
-  public static void setZieglerMode(ZieglerMethod mode) {
+  public void setZieglerMode(ZieglerMethod mode) {
     ZieglerMode = mode;
   }
 
   // The amount of time in microseconds this PID loop is expected to run at in
   // practice
-  public static void setLoopInterval(long microSecondInterval) {
+  public void setLoopInterval(long microSecondInterval) {
     loopInterval = microSecondInterval;
   }
 
-  public static void initLoopStart(long time) {
+  public void initLoopStart(long time) {
     startTime = time;
     kP = 0;
     kI = 0;
@@ -79,7 +81,7 @@ public class AutoPID {
   }
 
   // one cycle of the tuning loop
-  public static double tunePID(double input) {
+  public double tunePID(double input) {
     // http://www.processcontrolstuff.net/wp-content/uploads/2015/02/relay_autot-2.pdf
     // https://en.wikipedia.org/wiki/Ziegler%E2%80%93Nichols_method
     // https://www.cds.caltech.edu/~murray/courses/cds101/fa04/caltech/am04_ch8-3nov04.pdf
@@ -158,20 +160,20 @@ public class AutoPID {
     return outputValue;
   }
 
-  public static boolean tunerFinished() {
+  public boolean tunerFinished() {
     return (i >= cycles);
   }
 
   // return number of tuning cycle
-  public static int getCycle() {
+  public int getCycle() {
     return i;
   }
 
-  public static Command runTuner(
+  public Command runTuner(
       double setpointValue,
-      long interval,
-      double outputMin,
-      double outputMax,
+      long loopCount,
+      double motorOutputMin,
+      double motorOutputMax,
       ZieglerMethod mode,
       Supplier<Double> encoderVals,
       Consumer<Double> pidOutput,
@@ -183,11 +185,11 @@ public class AutoPID {
                 }),
             Commands.runOnce(
                 () -> {
-                  setLoopInterval(interval);
+                  setLoopInterval(loopCount);
                 }),
             Commands.runOnce(
                 () -> {
-                  setOutputRange(outputMin, outputMax);
+                  setOutputRange(motorOutputMin, motorOutputMax);
                 }),
             Commands.runOnce(
                 () -> {

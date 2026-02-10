@@ -53,4 +53,7 @@ public class ArmIOSim implements ArmIO {
   public void setVoltage(double volts) {
     armAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
   }
+
+  public void setVelocity(double anglesPerSec){}
+  public void setPosition(double angle){}
 }
