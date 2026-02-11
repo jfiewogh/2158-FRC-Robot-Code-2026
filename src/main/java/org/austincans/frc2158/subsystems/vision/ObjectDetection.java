@@ -39,6 +39,10 @@ public class ObjectDetection {
         this.io = io;
     }
 
+    public Pose3d getNearestPose(){
+        return inputs.nearestPose;
+    }
+
     public Pose3d[] getGamePiecePoses() {
         return inputs.gamePiecePoses;
     }
