@@ -17,7 +17,7 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
     private final LimelightConfig config;
 
     // TODO: add to config
-    private static final Pose3d robotRelativeCameraPose = new Pose3d(
+    private static final Pose3d robotRelCameraPose = new Pose3d(
         new Translation3d(0, 0, 0), // meters
         new Rotation3d(0, 0, 0));
 
@@ -50,13 +50,12 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
         return new Translation3d(xDisplacementMeters, yDisplacementMeters, zDisplacementMeters);
     }
 
-    private Pose3d getFieldRelativeCameraPose(Pose3d robotPose) {
-        return new Pose3d(
-            robotPose.getTranslation().plus(robotRelativeCameraPose.getTranslation()),
-            robotPose.getRotation().plus(robotRelativeCameraPose.getRotation()));
+    private Pose3d getFieldRelCameraPose(Pose3d robotPose) {
+        return robotPose.plus(new Transform3d(
+            robotRelCameraPose.getTranslation(), robotRelCameraPose.getRotation()));
     }
 
-    private ArrayList<Pose3d> getFieldRelativeGamePiecePoses() {
+    private ArrayList<Pose3d> getFieldRelGamePiecePoses() {
         LimelightResults latestResults = LimelightHelpers.getLatestResults(limelightName);
         LimelightTarget_Detector[] detectorResults = latestResults.targets_Detector;
 
@@ -68,7 +67,7 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
             if (result.className == gamePieceType.getClassName()) {
                 Translation3d cameraRelativeGamePieceTranslation = getTranslationFromDetectorResult(result);
 
-                Pose3d fieldRelativeCameraPose = getFieldRelativeCameraPose(robotPose);
+                Pose3d fieldRelativeCameraPose = getFieldRelCameraPose(robotPose);
                 
                 Pose3d fieldRelativeGamePiecePose = fieldRelativeCameraPose.plus(
                     new Transform3d(cameraRelativeGamePieceTranslation, Rotation3d.kZero));
@@ -80,7 +79,7 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
 
     private Pose3d getNearestGamePiece() {
         Pose3d robotPose = LimelightHelpers.getBotPose3d(limelightName);
-        return robotPose.nearest(getFieldRelativeGamePiecePoses());
+        return robotPose.nearest(getFieldRelGamePiecePoses());
     }
 
     @Override

@@ -3,11 +3,13 @@ package org.austincans.frc2158.subsystems.vision;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightResults;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Detector;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.RawDetection;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-public class ObjectDetection {
+public class ObjectDetection extends SubsystemBase {
     public enum GamePieceType {
         // 2025
         CORAL("Coral", 0.1),
@@ -37,6 +39,12 @@ public class ObjectDetection {
 
     public ObjectDetection(ObjectDetectionIO io) {
         this.io = io;
+    }
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("ObjectDetection", inputs);
     }
 
     public Pose3d getNearestPose(){
