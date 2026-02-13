@@ -1,7 +1,5 @@
 package org.austincans.frc2158.subsystems.hood;
 
-import java.util.Map;
-
 import org.austincans.frc2158.controllers.LinearActuatorController;
 import org.austincans.frc2158.math.Angle;
 
