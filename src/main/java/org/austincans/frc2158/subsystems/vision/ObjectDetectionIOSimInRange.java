@@ -1,40 +1,58 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
+
 package org.austincans.frc2158.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena3D;
-import edu.wpi.first.math.geometry.Pose3d;
 
 public class ObjectDetectionIOSimInRange implements ObjectDetectionIO {
-    private final String gamePieceType;
-    private final double maxDistanceMeters;
-    private final Supplier<Pose3d> robotPoseSupplier;
+  private final String gamePieceType;
+  private final double maxDistanceMeters;
+  private final Supplier<Pose3d> robotPoseSupplier;
 
-    public ObjectDetectionIOSimInRange(String gamePieceType, double maxDistanceMeters, Supplier<Pose3d> robotPoseSupplier) {
-        this.gamePieceType = gamePieceType;
-        this.maxDistanceMeters = maxDistanceMeters;
-        this.robotPoseSupplier = robotPoseSupplier;
-    }
+  public ObjectDetectionIOSimInRange(
+      String gamePieceType, double maxDistanceMeters, Supplier<Pose3d> robotPoseSupplier) {
+    this.gamePieceType = gamePieceType;
+    this.maxDistanceMeters = maxDistanceMeters;
+    this.robotPoseSupplier = robotPoseSupplier;
+  }
 
-    private Pose3d[] getAllGamePiecePoses() {
-        return SimulatedArena3D.getInstance().getGamePiecePosesArrayByType(gamePieceType);
-    }
+  private Pose3d[] getAllGamePiecePoses() {
+    return SimulatedArena3D.getInstance().getGamePiecePosesArrayByType(gamePieceType);
+  }
 
-    private Pose3d[] getGamePiecePosesInRadius() {
-        Pose3d robotPose = robotPoseSupplier.get();
+  private Pose3d[] getGamePiecePosesInRadius() {
+    Pose3d robotPose = robotPoseSupplier.get();
 
-        ArrayList<Pose3d> gamePiecePoses = new ArrayList<Pose3d>();
-        for (Pose3d gamePiecePose : getAllGamePiecePoses()) {
-            double distance = robotPose.getTranslation().getDistance(gamePiecePose.getTranslation());
-            if (distance < maxDistanceMeters) {
-                gamePiecePoses.add(gamePiecePose);
-            }
-        }
-        return (Pose3d[]) gamePiecePoses.toArray();
+    ArrayList<Pose3d> gamePiecePoses = new ArrayList<Pose3d>();
+    for (Pose3d gamePiecePose : getAllGamePiecePoses()) {
+      double distance = robotPose.getTranslation().getDistance(gamePiecePose.getTranslation());
+      if (distance < maxDistanceMeters) {
+        gamePiecePoses.add(gamePiecePose);
+      }
     }
-    
-    @Override
-    public void updateInputs(ObjectDetectionIOInputs inputs) {
-        inputs.gamePiecePoses = getGamePiecePosesInRadius();
-    }
+    return gamePiecePoses.toArray(new Pose3d[0]);
+  }
+
+  @Override
+  public void updateInputs(ObjectDetectionIOInputs inputs) {
+    inputs.gamePiecePoses = getGamePiecePosesInRadius();
+  }
 }

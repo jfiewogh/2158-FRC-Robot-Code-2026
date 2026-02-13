@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 01, 2026 at 15:05:51 CST
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
 
 package org.austincans.frc2158.generated;
 
@@ -157,8 +157,8 @@ public class TunerConstants {
   private static final boolean kFrontLeftSteerMotorInverted = true;
   private static final boolean kFrontLeftEncoderInverted = false;
 
-  private static final Distance kFrontLeftXPos = Inches.of(20);
-  private static final Distance kFrontLeftYPos = Inches.of(20);
+  private static final Distance kFrontLeftXPos = Inches.of(10);
+  private static final Distance kFrontLeftYPos = Inches.of(10);
 
   // Front Right
   private static final int kFrontRightDriveMotorId = 1;

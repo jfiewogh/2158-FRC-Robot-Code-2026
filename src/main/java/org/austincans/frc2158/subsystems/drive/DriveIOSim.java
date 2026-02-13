@@ -13,11 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 01, 2026 at 15:05:51 CST
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2158.Constants;
@@ -38,7 +39,7 @@ public class DriveIOSim implements DriveIO {
 
   @Override
   public void updateInputs(DriveIOInputs inputs) {
-    inputs.pose = simulation.getSimulatedDriveTrainPose();
+    inputs.pose = new Pose3d(simulation.getSimulatedDriveTrainPose());
     inputs.chassisSpeeds = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
   }
 

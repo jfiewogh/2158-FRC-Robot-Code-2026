@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 01, 2026 at 15:05:51 CST
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -38,7 +38,7 @@ public class DriveIOSim3D implements DriveIO {
 
   @Override
   public void updateInputs(DriveIOInputs inputs) {
-    inputs.pose = simulation.getSimulatedDriveTrainPose();
+    inputs.pose = simulation.getSimulatedDriveTrainPose3dGroundRelative();
     inputs.chassisSpeeds = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
   }
 

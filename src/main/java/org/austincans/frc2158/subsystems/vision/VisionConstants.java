@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -77,7 +77,7 @@ public class VisionConstants {
   public static final LoggedTunableNumber timestampOffset =
       new LoggedTunableNumber("AprilTagVision/TimestampOffset", 0.0);
 
-    public static final double viewingAngleDeg = 120;
+  public static final double viewingAngleDeg = 120;
 
   private static int monoExposure = 2200;
   private static double monoGain = 17.5;
@@ -218,7 +218,6 @@ public class VisionConstants {
       double denoise,
       double stdDevFactor) {}
 
-
   public enum LimelightConfig {
     LIMELIGHT_3(640, 480, 62.5, 48.9),
     LIMELIGHT_3A(640, 480, 54.5, 42),
@@ -230,12 +229,16 @@ public class VisionConstants {
     private final double horizontalViewingAngleDeg;
     private final double verticalViewingAngleDeg;
 
-    private LimelightConfig(int widthPixels, int heightPixels, double horizontalViewingAngleDeg, double verticalViewingAngleDeg) {
+    private LimelightConfig(
+        int widthPixels,
+        int heightPixels,
+        double horizontalViewingAngleDeg,
+        double verticalViewingAngleDeg) {
       this.widthPixels = widthPixels;
       this.heightPixels = heightPixels;
       this.horizontalViewingAngleDeg = horizontalViewingAngleDeg;
       this.verticalViewingAngleDeg = verticalViewingAngleDeg;
-    }    
+    }
 
     public int getWidthPixels() {
       return widthPixels;
