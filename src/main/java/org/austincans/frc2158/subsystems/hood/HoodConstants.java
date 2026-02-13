@@ -17,6 +17,8 @@
 
 package org.austincans.frc2158.subsystems.hood;
 
+import java.util.TreeMap;
+
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class HoodConstants {
@@ -26,4 +28,5 @@ public class HoodConstants {
   static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
   static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
   static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
+  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACT_ID", 0);
 }

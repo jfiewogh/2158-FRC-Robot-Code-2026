@@ -17,44 +17,35 @@
 
 package org.austincans.frc2158.controllers;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // @author Austin Cans Robotics Team 2158
-public class LinearActuatorController {
-  private static final int linearActuatorDeviceID = 13;
-  private static SparkMax m_linearActuatorMotor;
-  private static LinearActuatorController m_linearActuatorController = null;
-  private SparkMaxConfig linearActuatorMotorConfig;
+public class LinearActuatorController extends SubsystemBase {
+  private static Servo linearActuator;
+  private REVDigitController controller = new REVDigitController();
+  private double speed = 0; // PWM in ms
 
-  //
-  public LinearActuatorController() {
-    m_linearActuatorController = getInstance();
+  // L16-100-35-6-R
+  public LinearActuatorController(int linearActuatorDeviceID) {
+    linearActuator = new Servo(linearActuatorDeviceID);
+    linearActuator.setBoundsMicroseconds(2, 0, 1, 0, 1);
   }
 
-  //
-  public LinearActuatorController getInstance() {
-    if (m_linearActuatorController == null) {
-      m_linearActuatorMotor = new SparkMax(linearActuatorDeviceID, MotorType.kBrushless);
-      linearActuatorMotorConfig = new SparkMaxConfig();
-      linearActuatorMotorConfig.softLimit.forwardSoftLimit(38.5).forwardSoftLimitEnabled(true);
-      linearActuatorMotorConfig.softLimit.reverseSoftLimit(0.0).reverseSoftLimitEnabled(true);
-      m_linearActuatorMotor.configure(
-          linearActuatorMotorConfig,
-          ResetMode.kResetSafeParameters,
-          PersistMode.kPersistParameters);
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
+
+  public double getPWM() {
+    return speed;
+  }
+
+  @Override
+  public void periodic() {
+    if (speed == 0) {
+      setSpeed(controller.getInstance().getPotentiometer() + 1);
+    } else {
+      setSpeed(speed);
     }
-    return m_linearActuatorController;
-  }
-
-  public void goUp() {
-    m_linearActuatorMotor.set(0.12);
-  }
-
-  public void goDown() {
-    m_linearActuatorMotor.set(-0.12);
   }
 }
