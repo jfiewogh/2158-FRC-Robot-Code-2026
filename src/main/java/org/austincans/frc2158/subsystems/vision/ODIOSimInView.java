@@ -20,45 +20,24 @@ package org.austincans.frc2158.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.function.Supplier;
+import org.austincans.frc2158.subsystems.vision.VisionConstants.LimelightConfig;
 import org.ironmaple.simulation.SimulatedArena3D;
 
-// NOTE: This can see past obstacles on field
-public class ObjectDetectionIOSimInViewCircle implements ObjectDetectionIO {
-  public enum SimCameraConfig {
-    LIMELIGHT_3(62.5, 48.9),
-    LIMELIGHT_3A(54.5, 42),
-    LIMELIGHT_3G(82, 56.2),
-    LIMELIGHT_4(82, 56.2);
-
-    private double horizontalFOVDeg;
-    private double verticalFOVDeg;
-
-    private SimCameraConfig(double horizontalFOVDeg, double verticalFOVDeg) {
-      this.horizontalFOVDeg = horizontalFOVDeg;
-      this.verticalFOVDeg = verticalFOVDeg;
-    }
-
-    public double getHorizontalFOVRad() {
-      return Units.degreesToRadians(horizontalFOVDeg);
-    }
-
-    public double getVerticalFOVRad() {
-      return Units.degreesToRadians(verticalFOVDeg);
-    }
-  }
-
+// NOTE: This can see through obstacles on field
+// This uses horizontal and vertical viewing angles
+// It does take into account the actual camera dimensions
+public class ODIOSimInView implements ODIO {
   private final String gamePieceType;
-  private final SimCameraConfig config;
+  private final LimelightConfig config;
   private final double maxDetectionDistanceMeters;
   private final Supplier<Pose3d> fieldRelRobotPoseSupplier;
   private final Supplier<Pose3d> robotRelCameraPoseSupplier;
 
-  public ObjectDetectionIOSimInViewCircle(
+  public ODIOSimInView(
       String gamePieceType,
-      SimCameraConfig config,
+      LimelightConfig config,
       double maxDetectionDistanceMeters,
       Supplier<Pose3d> fieldRelRobotPoseSupplier,
       Supplier<Pose3d> robotRelCameraPoseSupplier) {
@@ -91,9 +70,10 @@ public class ObjectDetectionIOSimInViewCircle implements ObjectDetectionIO {
     double y = robotRelGamePieceTranslation.getY();
     double z = robotRelGamePieceTranslation.getZ();
 
-    double yMaxRadius = x * Math.sin(config.getHorizontalFOVRad());
-    double zMaxRadius = x * Math.sin(config.getVerticalFOVRad());
+    double yMaxRadius = x * Math.sin(config.getHorizontalViewingAngleRad());
+    double zMaxRadius = x * Math.sin(config.getVerticalViewingAngleRad());
 
+    // Checks if in rectangle
     return Math.abs(y) < yMaxRadius && Math.abs(z) < zMaxRadius;
   }
 
