@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.RobotState;
-import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.hood.Hood;
@@ -68,7 +67,7 @@ public class TurretCommands {
   private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
 
   private static final double TURRET_HEIGHT = TurretConstants.turretHeight; // meters
-
+  public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
   public static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
@@ -187,7 +186,7 @@ public class TurretCommands {
     return Commands.defer(
         () -> Commands.run(() -> {
           shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue));
-          BlinkinLEDController.getInstance().isShuttling = true;
+          isShuttling = true;
         }),
         Set.of());
   }

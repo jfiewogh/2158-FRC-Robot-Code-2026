@@ -19,7 +19,7 @@ package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-import org.austincans.frc2158.controllers.BlinkinLEDController;
+import org.austincans.frc2158.subsystems.Led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Classifier;
@@ -56,6 +56,6 @@ public class ObjectAlignCommand {
             targetAngularVelocity // Angular
             ));
 
-    BlinkinLEDController.getInstance().isAligned = true;
+    LedIOBlinkin.getInstance().isAligned = true;
   }
 }

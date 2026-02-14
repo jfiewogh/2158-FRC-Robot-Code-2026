@@ -20,8 +20,8 @@ package org.austincans.frc2158.subsystems.flywheel;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.controllers.LaserCAN;
+import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -39,8 +39,8 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-  private LaserCAN lasarCan1 = new LaserCAN(0);
-  private LaserCAN laserCan2 = new LaserCAN(1);
+  private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
+  private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -60,8 +60,8 @@ public class Flywheel extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
 
-    BlinkinLEDController.getInstance().readyToShoot = readyToShoot();  
-    BlinkinLEDController.getInstance().isShooting = isShooting();
+    LedIOBlinkin.getInstance().readyToShoot = readyToShoot();  
+    LedIOBlinkin.getInstance().isShooting = isShooting();
   }
 
   public void setVelocity(double velocityRPM) {

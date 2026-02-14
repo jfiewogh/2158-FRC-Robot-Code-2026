@@ -31,7 +31,8 @@ public class FlywheelConstants {
   /* REAL */
   public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);
   public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEEL_ENCODER_ID", 0);
-
+  public static final int lasarCan1Id = ConfigUtil.getConfigInt("LASARCAN1_ID", 0);
+  public static final int lasarCan2Id = ConfigUtil.getConfigInt("LASARCAN2_ID", 1);
   public static final CANBus canBus = new CANBus("*");
 
   public static final double radiusMeters =

@@ -22,11 +22,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
+import static edu.wpi.first.units.Units.Value;
+
 import java.util.HashMap;
 import java.util.Optional;
 
 import org.austincans.frc2158.util.ConfigUtil;
 import org.austincans.frc2158.util.LoggedTracer;
+
 
 /**
  * Control REV Robotics Blinkin LED controller
@@ -34,7 +38,8 @@ import org.austincans.frc2158.util.LoggedTracer;
  * @author Austin Cans Robotics Team 2158
  */
 @SuppressWarnings("unused")
-public class LedIOBlinkin implements LedIO{
+public class LedIOBlinkin implements LedIO {
+  LedState state = LedState.IDLE;
   public enum BlinkinPattern {
     /*
      * Fixed Palette Pattern
@@ -161,64 +166,53 @@ public class LedIOBlinkin implements LedIO{
 
   private static LedIOBlinkin m_controller = null;
   private static Spark m_blinkin;
-  private static BlinkinPattern m_currentPattern;
-  private static HashMap<Alliance, BlinkinPattern[]> m_allianceColors =
-      new HashMap<Alliance, BlinkinPattern[]>();
-  private static final BlinkinPattern[] RED_ALLIANCE_PATTERNS = {
-    BlinkinPattern.RED,
-    BlinkinPattern.BREATH_RED,
-    BlinkinPattern.LIGHT_CHASE_RED,
-    BlinkinPattern.SHOT_RED,
-    BlinkinPattern.STROBE_RED
-  };
-  private static final BlinkinPattern[] BLUE_ALLIANCE_PATTERNS = {
-    BlinkinPattern.BLUE,
-    BlinkinPattern.BREATH_BLUE,
-    BlinkinPattern.LIGHT_CHASE_BLUE,
-    BlinkinPattern.SHOT_BLUE,
-    BlinkinPattern.STROBE_BLUE
-  };
+
   private Optional<Alliance> alliance;
   private Object disabledColor;
-    
-      private LedIOBlinkin() {
-    
-        m_blinkin = new Spark(ConfigUtil.getConfigInt("BLINKIN_LED_CONTROLLER_PORT", 0));
-    
-        m_allianceColors.put(Alliance.Red, RED_ALLIANCE_PATTERNS);
-        m_allianceColors.put(Alliance.Blue, BLUE_ALLIANCE_PATTERNS);
-      }
-    
-      public synchronized void periodic() {
-        // Update alliance color
-        if (DriverStation.isFMSAttached()) {
-          alliance = DriverStation.getAlliance();
-        disabledColor =
-          alliance
-              .map(alliance -> alliance == Alliance.Blue ? BlinkinPattern.BLUE : BlinkinPattern.RED)
-              .orElse((BlinkinPattern) disabledColor);
-    }
 
-    // Update estop state
-    if (DriverStation.isEStopped()) {
-      estopped = true;
-    }
+  private LedIOBlinkin() {
+    m_blinkin = new Spark(ConfigUtil.getConfigInt("BLINKIN_LED_CONTROLLER_PORT", 0));
   }
 
   @Override
   public void updateInputs(LedIOInputs inputs) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
-
+    inputs.state = this.state;
   }
 
   @Override
-  public void setPatterns(LedState state) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setPatterns'");
-    switch(state){
+  public void setPattern(LedState state) {
+    this.state = state;
+    switch (state) {
       case READYTOSHOOT:
-          
+        m_blinkin.set(BlinkinPattern.GREEN.value);
+        break;
+      case INTAKED:
+        m_blinkin.set(BlinkinPattern.RAINBOW_OCEAN_PALETTE.value);
+        break;
+      case DRIVING:
+        m_blinkin.set(BlinkinPattern.BLUE.value);
+        break;
+      case CLIMBING:
+        m_blinkin.set(BlinkinPattern.RAINBOW_FOREST_PALETTE.value);
+        break;
+      case SHUTTLING:
+        m_blinkin.set(BlinkinPattern.ORANGE.value);
+        break;
+      case ALIGNED:
+        m_blinkin.set(BlinkinPattern.GOLD.value);
+        break;
+      case NONE:
+        m_blinkin.set(BlinkinPattern.BLACK.value);
+        break;
+      case IDLE:
+        m_blinkin.set(BlinkinPattern.YELLOW.value);
+        break;
+      case SHOOTING:
+        m_blinkin.set(BlinkinPattern.RED.value);
+        break;
+      default:
+        m_blinkin.set(BlinkinPattern.BLACK.value);
+        break;
     }
   }
 }

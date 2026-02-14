@@ -20,9 +20,9 @@ package org.austincans.frc2158.subsystems.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-import org.austincans.frc2158.controllers.BlinkinLEDController;
 import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.Logger;
@@ -58,7 +58,7 @@ public class Intake extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addFault);
-    BlinkinLEDController.getInstance().intaked = ballIntaked();
+    LedIOBlinkin.getInstance().intaked = ballIntaked();
   }
 
   public Command systemCheckCommand() {
