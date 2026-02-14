@@ -31,22 +31,15 @@ import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
-  private final ObjectDetection nearestGamePiece;
+  final static double Kp = 0;
+  final static double Ki = 0;
+  final static double Kd = 0;
+  final static double maxVelocity = 5;
+  final static double maxAcceleration = 10;
+  static ProfiledPIDController pid = new ProfiledPIDController(
+      Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
 
-  final double Kp = 0;
-  final double Ki = 0;
-  final double Kd = 0;
-  final double maxVelocity = 5;
-  final double maxAcceleration = 10;
-  ProfiledPIDController pid =
-      new ProfiledPIDController(
-          Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
-
-  public LimelightHelpersCommands(ObjectDetection nearestGamePiece) {
-    this.nearestGamePiece = nearestGamePiece;
-  }
-
-  public void alignRobotToPose(Drive drive, Pose2d pose){
+  private static void alignRobotToPose(Drive drive, Pose2d pose) {
     drive.runVelocity(
         new ChassisSpeeds(
             0,
@@ -55,8 +48,8 @@ public class LimelightHelpersCommands {
                 drive.getPose().getRotation().getDegrees(), pose.getRotation().getDegrees())));
   }
 
-  public Command alignHeadingCommand(Drive drive) {
+  public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {
     return Commands.run(
-        () -> alignRobotToPose(drive, nearestGamePiece.getNearestPose().toPose2d()));
+        () -> alignRobotToPose(drive, objectDetection.getNearestPose().toPose2d()));
   }
 }

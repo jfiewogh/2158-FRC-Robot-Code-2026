@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
+import org.austincans.frc2158.commands.LimelightHelpersCommands;
 import org.austincans.frc2158.commands.PathCommands;
 import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
@@ -69,6 +70,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final Vision vision;
+  private ObjectDetection objectDetection;
 
   private SwerveDriveSimulation3D driveSimulation = null;
 
@@ -159,7 +161,7 @@ public class RobotContainer {
                 35,
                 SimulatedArena3D.getInstance());
 
-        new ObjectDetection(
+        objectDetection = new ObjectDetection(
             // new ObjectDetectionIOSimInRange(
             // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
             new ObjectDetectionIOSimInViewCircle(
@@ -202,6 +204,7 @@ public class RobotContainer {
 
           keyboardInput.z().whileTrue(shootCommand);
           keyboardInput.v().whileTrue(intakeCommand);
+          keyboardInput.c().whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
           keyboardInput
               .x()
               .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4, Rotation2d.kZero)));
