@@ -24,6 +24,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.util.Set;
+
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
@@ -31,7 +34,8 @@ import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
-  final static double Kp = 0;
+  
+  final static double Kp = 1;
   final static double Ki = 0;
   final static double Kd = 0;
   final static double maxVelocity = 5;
@@ -49,7 +53,10 @@ public class LimelightHelpersCommands {
   }
 
   public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {
-    return Commands.run(
-        () -> alignRobotToPose(drive, objectDetection.getNearestPose().toPose2d()));
+    return Commands.defer(() -> Commands.run(
+        () -> alignRobotToPose(drive, objectDetection.getNearestPose().toPose2d())).handleInterrupt(() -> drive.runVelocity(
+          new ChassisSpeeds(0,0,0)
+        )), Set.of(drive,objectDetection));
   }
+
 }
