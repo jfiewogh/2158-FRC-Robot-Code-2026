@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158;
 
@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
-import org.austincans.frc2158.commands.PathCommands;
 import org.austincans.frc2158.commands.TurretTracking;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
@@ -69,6 +68,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final Vision vision;
+
   private ObjectDetection objectDetection;
 
   private SwerveDriveSimulation3D driveSimulation = null;
@@ -160,15 +160,16 @@ public class RobotContainer {
                 35,
                 SimulatedArena3D.getInstance());
 
-        objectDetection = new ObjectDetection(
-            // new ObjectDetectionIOSimInRange(
-            // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-            new ODIOSimInView(
-                "Fuel",
-                LimelightConfig.LIMELIGHT_3G,
-                4,
-                driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                () -> new Pose3d()));
+        objectDetection =
+            new ObjectDetection(
+                // new ObjectDetectionIOSimInRange(
+                // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
+                new ODIOSimInView(
+                    "Fuel",
+                    LimelightConfig.LIMELIGHT_3G,
+                    4,
+                    driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
+                    () -> new Pose3d()));
 
         KeyboardInput keyboardInput = new KeyboardInput();
 
@@ -201,15 +202,19 @@ public class RobotContainer {
                   RobotState.getInstance()::getEstimatedPose,
                   RobotState.getInstance()::getRobotVelocity);
 
-          keyboardInput.z().whileTrue(shootCommand);
-          keyboardInput.v().whileTrue(intakeCommand);
-          keyboardInput.c().whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+          // keyboardInput.z().whileTrue(shootCommand);
+          // keyboardInput.v().whileTrue(intakeCommand);
           keyboardInput
-              .x()
-              .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4, Rotation2d.kZero)));
-          keyboardInput
-              .c()
-              .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3, Rotation2d.kZero)));
+              .z()
+              .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+          // keyboardInput
+          //     .x()
+          //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
+          // Rotation2d.kZero)));
+          // keyboardInput
+          //     .c()
+          //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
+          // Rotation2d.kZero)));
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);

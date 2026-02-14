@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -39,8 +39,7 @@ public class ODIOReal implements ODIO {
           new Translation3d(0, 0, 0), // meters
           new Rotation3d(0, 0, 0));
 
-  public ODIOReal(
-      String limelightName, GamePieceType gamePieceType, LimelightConfig config) {
+  public ODIOReal(String limelightName, GamePieceType gamePieceType, LimelightConfig config) {
     this.limelightName = limelightName;
     this.gamePieceType = gamePieceType;
     this.config = config;
@@ -107,6 +106,7 @@ public class ODIOReal implements ODIO {
 
   @Override
   public void updateInputs(ObjectDetectionIOInputs inputs) {
-    inputs.nearestPose = getNearestGamePiece();
+    inputs.gamePiecePoses = getFieldRelGamePiecePoses().toArray(new Pose3d[0]);
+    inputs.nearestGamePiecePose = getNearestGamePiece();
   }
 }

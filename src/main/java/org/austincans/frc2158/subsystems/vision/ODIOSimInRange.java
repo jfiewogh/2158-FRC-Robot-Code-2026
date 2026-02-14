@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -38,21 +38,24 @@ public class ODIOSimInRange implements ODIO {
     return SimulatedArena3D.getInstance().getGamePiecePosesArrayByType(gamePieceType);
   }
 
-  private Pose3d[] getGamePiecePosesInRadius() {
+  private ArrayList<Pose3d> getGamePiecePosesInView() {
     Pose3d robotPose = robotPoseSupplier.get();
 
     ArrayList<Pose3d> gamePiecePoses = new ArrayList<Pose3d>();
-    for (Pose3d gamePiecePose : getAllGamePiecePoses()) {
-      double distance = robotPose.getTranslation().getDistance(gamePiecePose.getTranslation());
+    for (Pose3d fieldRelGamePiecePose : getAllGamePiecePoses()) {
+      double distance =
+          robotPose.getTranslation().getDistance(fieldRelGamePiecePose.getTranslation());
       if (distance < maxDistanceMeters) {
-        gamePiecePoses.add(gamePiecePose);
+        gamePiecePoses.add(fieldRelGamePiecePose);
       }
     }
-    return gamePiecePoses.toArray(new Pose3d[0]);
+    return gamePiecePoses;
   }
 
   @Override
   public void updateInputs(ObjectDetectionIOInputs inputs) {
-    inputs.gamePiecePoses = getGamePiecePosesInRadius();
+    ArrayList<Pose3d> gamePiecePosesArrayList = getGamePiecePosesInView();
+    inputs.gamePiecePoses = gamePiecePosesArrayList.toArray(new Pose3d[0]);
+    inputs.nearestGamePiecePose = robotPoseSupplier.get().nearest(gamePiecePosesArrayList);
   }
 }

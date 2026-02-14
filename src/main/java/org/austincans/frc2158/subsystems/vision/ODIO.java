@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -23,8 +23,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ODIO {
   @AutoLog
   public class ObjectDetectionIOInputs {
-    public Pose3d nearestPose = new Pose3d();
-    public Pose3d[] gamePiecePoses = {};
+    public Pose3d nearestGamePiecePose = new Pose3d();
+    public Pose3d[] gamePiecePoses = new Pose3d[0];
   }
 
   public void updateInputs(ObjectDetectionIOInputs inputs);

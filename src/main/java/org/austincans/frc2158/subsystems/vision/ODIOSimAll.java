@@ -13,18 +13,24 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.function.Supplier;
+
 import org.ironmaple.simulation.SimulatedArena3D;
 
 public class ODIOSimAll implements ODIO {
   private final String gamePieceType;
+  private final Supplier<Pose3d> fieldRelRobotPoseSupplier;
 
-  public ODIOSimAll(String gamePieceType) {
+  public ODIOSimAll(String gamePieceType, Supplier<Pose3d> fieldRelRobotPoseSupplier) {
     this.gamePieceType = gamePieceType;
+    this.fieldRelRobotPoseSupplier = fieldRelRobotPoseSupplier;
   }
 
   private Pose3d[] getAllGamePiecePoses() {
@@ -34,5 +40,7 @@ public class ODIOSimAll implements ODIO {
   @Override
   public void updateInputs(ObjectDetectionIOInputs inputs) {
     inputs.gamePiecePoses = getAllGamePiecePoses();
+    ArrayList<Pose3d> gamePiecePosesArrayList = new ArrayList<Pose3d>(Arrays.asList(inputs.gamePiecePoses));
+    inputs.nearestGamePiecePose = fieldRelRobotPoseSupplier.get().nearest(gamePiecePosesArrayList);
   }
 }

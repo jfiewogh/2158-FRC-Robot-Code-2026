@@ -13,35 +13,30 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 12, 2026 at 19:07:37 CST
+// Updated on Saturday February 14, 2026 at 14:16:40 CST
 
 package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.Set;
-
-import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.drive.Drive;
-import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
-import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Classifier;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
-  
-  final static double Kp = 1;
-  final static double Ki = 0;
-  final static double Kd = 0;
-  final static double maxVelocity = 5;
-  final static double maxAcceleration = 10;
-  static ProfiledPIDController pid = new ProfiledPIDController(
-      Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
+
+  static final double Kp = 0.2;
+  static final double Ki = 0;
+  static final double Kd = 0;
+  static final double maxVelocity = 5;
+  static final double maxAcceleration = 10;
+  static ProfiledPIDController pid =
+      new ProfiledPIDController(
+          Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
 
   private static void alignRobotToPose(Drive drive, Pose2d pose) {
     drive.runVelocity(
@@ -53,10 +48,13 @@ public class LimelightHelpersCommands {
   }
 
   public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {
-    return Commands.defer(() -> Commands.run(
-        () -> alignRobotToPose(drive, objectDetection.getNearestPose().toPose2d())).handleInterrupt(() -> drive.runVelocity(
-          new ChassisSpeeds(0,0,0)
-        )), Set.of(drive,objectDetection));
+    return Commands.defer(
+        () ->
+            Commands.run(
+                () -> {
+                  System.out.println(objectDetection.getNearestGamePiecePose().toPose2d());
+                  alignRobotToPose(drive, objectDetection.getNearestGamePiecePose().toPose2d());
+                }),
+        Set.of(drive, objectDetection));
   }
-
 }
