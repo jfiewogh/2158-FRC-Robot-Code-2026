@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 12, 2026 at 19:07:37 CST
+// Updated on Saturday February 14, 2026 at 11:44:36 CST
 
 package org.austincans.frc2158;
 
@@ -29,6 +29,16 @@ public class KeyboardInput {
     joystick0 = new Joystick(0);
     joystick1 = new Joystick(1);
     joystick2 = new Joystick(2);
+  }
+
+  /* Joystick 0 */
+
+  public double leftX() {
+    return -joystick0.getRawAxis(0);
+  }
+
+  public double leftY() {
+    return -joystick0.getRawAxis(1);
   }
 
   public JoystickButton z() {
@@ -47,13 +57,37 @@ public class KeyboardInput {
     return new JoystickButton(joystick0, 4);
   }
 
-  public double leftX() {
-    return -joystick0.getRawAxis(0);
+  public double getLeftAxis2() {
+    return joystick0.getRawAxis(2);
   }
 
-  public double leftY() {
-    return -joystick0.getRawAxis(1);
+  /* Joystick 1 */
+
+  public double middleX() {
+    return -joystick1.getRawAxis(0);
   }
+
+  public double middleY() {
+    return -joystick1.getRawAxis(1);
+  }
+
+  public JoystickButton m() {
+    return new JoystickButton(joystick1, 1);
+  }
+
+  public JoystickButton comma() {
+    return new JoystickButton(joystick1, 2);
+  }
+
+  public JoystickButton period() {
+    return new JoystickButton(joystick1, 3);
+  }
+
+  public JoystickButton slash() {
+    return new JoystickButton(joystick1, 4);
+  }
+
+  /* Joystick 2 */
 
   public double rightX() {
     return -joystick2.getRawAxis(0);
@@ -61,5 +95,29 @@ public class KeyboardInput {
 
   public double rightY() {
     return -joystick2.getRawAxis(1);
+  }
+
+  public JoystickButton insert() {
+    return new JoystickButton(joystick2, 1);
+  }
+
+  public JoystickButton home() {
+    return new JoystickButton(joystick2, 2);
+  }
+
+  public JoystickButton pageUp() {
+    return new JoystickButton(joystick2, 3);
+  }
+
+  public JoystickButton delete() {
+    return new JoystickButton(joystick2, 4);
+  }
+
+  public JoystickButton end() {
+    return new JoystickButton(joystick2, 5);
+  }
+
+  public JoystickButton pageDown() {
+    return new JoystickButton(joystick2, 6);
   }
 }
