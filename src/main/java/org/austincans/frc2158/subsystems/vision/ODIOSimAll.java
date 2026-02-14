@@ -17,9 +17,22 @@
 
 package org.austincans.frc2158.subsystems.vision;
 
-// TODO: finish
-public class ObjectDetectionIOSimInViewRect implements ObjectDetectionIO {
+import edu.wpi.first.math.geometry.Pose3d;
+import org.ironmaple.simulation.SimulatedArena3D;
+
+public class ODIOSimAll implements ODIO {
+  private final String gamePieceType;
+
+  public ODIOSimAll(String gamePieceType) {
+    this.gamePieceType = gamePieceType;
+  }
+
+  private Pose3d[] getAllGamePiecePoses() {
+    return SimulatedArena3D.getInstance().getGamePiecePosesArrayByType(gamePieceType);
+  }
 
   @Override
-  public void updateInputs(ObjectDetectionIOInputs inputs) {}
+  public void updateInputs(ObjectDetectionIOInputs inputs) {
+    inputs.gamePiecePoses = getAllGamePiecePoses();
+  }
 }

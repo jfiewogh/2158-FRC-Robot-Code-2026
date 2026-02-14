@@ -49,7 +49,6 @@ import org.austincans.frc2158.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
-import org.austincans.frc2158.subsystems.vision.ObjectDetectionIOSimInViewCircle.SimCameraConfig;
 import org.ironmaple.simulation.IntakeSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
@@ -164,9 +163,9 @@ public class RobotContainer {
         objectDetection = new ObjectDetection(
             // new ObjectDetectionIOSimInRange(
             // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-            new ObjectDetectionIOSimInViewCircle(
+            new ODIOSimInView(
                 "Fuel",
-                SimCameraConfig.LIMELIGHT_3G,
+                LimelightConfig.LIMELIGHT_3G,
                 4,
                 driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
                 () -> new Pose3d()));

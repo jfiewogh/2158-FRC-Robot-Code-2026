@@ -28,7 +28,7 @@ import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget
 import org.austincans.frc2158.subsystems.vision.ObjectDetection.GamePieceType;
 import org.austincans.frc2158.subsystems.vision.VisionConstants.LimelightConfig;
 
-public class ObjectDetectionIOReal implements ObjectDetectionIO {
+public class ODIOReal implements ODIO {
   private final String limelightName;
   private final GamePieceType gamePieceType;
   private final LimelightConfig config;
@@ -39,7 +39,7 @@ public class ObjectDetectionIOReal implements ObjectDetectionIO {
           new Translation3d(0, 0, 0), // meters
           new Rotation3d(0, 0, 0));
 
-  public ObjectDetectionIOReal(
+  public ODIOReal(
       String limelightName, GamePieceType gamePieceType, LimelightConfig config) {
     this.limelightName = limelightName;
     this.gamePieceType = gamePieceType;

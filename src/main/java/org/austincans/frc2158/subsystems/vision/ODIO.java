@@ -20,7 +20,7 @@ package org.austincans.frc2158.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ObjectDetectionIO {
+public interface ODIO {
   @AutoLog
   public class ObjectDetectionIOInputs {
     public Pose3d nearestPose = new Pose3d();

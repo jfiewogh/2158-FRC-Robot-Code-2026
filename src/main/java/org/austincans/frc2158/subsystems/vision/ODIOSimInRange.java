@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena3D;
 
-public class ObjectDetectionIOSimInRange implements ObjectDetectionIO {
+public class ODIOSimInRange implements ODIO {
   private final String gamePieceType;
   private final double maxDistanceMeters;
   private final Supplier<Pose3d> robotPoseSupplier;
 
-  public ObjectDetectionIOSimInRange(
+  public ODIOSimInRange(
       String gamePieceType, double maxDistanceMeters, Supplier<Pose3d> robotPoseSupplier) {
     this.gamePieceType = gamePieceType;
     this.maxDistanceMeters = maxDistanceMeters;
