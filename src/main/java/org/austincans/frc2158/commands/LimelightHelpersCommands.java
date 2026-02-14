@@ -13,11 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 11:44:36 CST
+// Updated on Thursday February 12, 2026 at 19:07:37 CST
 
 package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -37,8 +38,6 @@ public class LimelightHelpersCommands {
   final double Kd = 0;
   final double maxVelocity = 5;
   final double maxAcceleration = 10;
-  static LimelightTarget_Classifier[] detections =
-      LimelightHelpers.getLatestResults("").targets_Classifier;
   ProfiledPIDController pid =
       new ProfiledPIDController(
           Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
@@ -47,17 +46,17 @@ public class LimelightHelpersCommands {
     this.nearestGamePiece = nearestGamePiece;
   }
 
-  public void alignRobotToAngle(Drive drive, Rotation2d goalDegrees) {
+  public void alignRobotToPose(Drive drive, Pose2d pose){
     drive.runVelocity(
         new ChassisSpeeds(
             0,
             0,
             pid.calculate(
-                RobotState.getInstance().getRotation().getDegrees(), goalDegrees.getDegrees())));
+                drive.getPose().getRotation().getDegrees(), pose.getRotation().getDegrees())));
   }
 
   public Command alignHeadingCommand(Drive drive) {
     return Commands.run(
-        () -> alignRobotToAngle(drive, nearestGamePiece.getNearestPose().toPose2d().getRotation()));
+        () -> alignRobotToPose(drive, nearestGamePiece.getNearestPose().toPose2d()));
   }
 }
