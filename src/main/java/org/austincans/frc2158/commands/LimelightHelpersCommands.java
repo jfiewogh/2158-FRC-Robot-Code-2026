@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 15, 2026 at 11:34:53 CST
+// Updated on Sunday February 15, 2026 at 11:44:15 CST
 
 package org.austincans.frc2158.commands;
 
@@ -30,7 +30,7 @@ import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
 
-  private static final double kP = 1.5;
+  private static final double kP = 3;
   private static final double kI = 0;
   private static final double kD = 0;
   private static final double maxVelocityRadPerSec = Math.PI;
