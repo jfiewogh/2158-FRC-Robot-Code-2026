@@ -74,6 +74,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.intakeMotorVoltage = rollerSim.getInputVoltage();
     inputs.intakeVelocityRadPerSec = rollerSim.getAngularVelocity().in(RadiansPerSecond);
     inputs.intakeTemperatureC = 0;
+    inputs.gamePiecesCount = intakeSim.getGamePiecesCount();
 
     intakeSim.update(inputs.intakeVelocityRadPerSec);
   }

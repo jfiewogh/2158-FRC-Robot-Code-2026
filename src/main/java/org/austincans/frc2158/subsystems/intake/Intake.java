@@ -57,4 +57,9 @@ public class Intake extends AdvancedSubsystem {
   public Command systemCheckCommand() {
     return Commands.runOnce(() -> {});
   }
+
+  // TODO: Change this because this only temporary
+  public int getGamePieceAmount() {
+    return inputs.gamePiecesCount;
+  }
 }

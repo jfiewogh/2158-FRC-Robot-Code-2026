@@ -67,6 +67,7 @@ public interface IntakeIO {
     public double intakeMotorVoltage = 0;
     public double intakeVelocityRadPerSec = 0;
     public double intakeTemperatureC = 0;
+    public int gamePiecesCount = 0;
   }
 
   public void updateInputs(IntakeIOInputs inputs);

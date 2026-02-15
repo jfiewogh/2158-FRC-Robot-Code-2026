@@ -33,4 +33,8 @@ public class IntakeSim {
       intakeSimulation.stopIntake();
     }
   }
+
+  public int getGamePiecesCount() {
+    return intakeSimulation.getGamePiecesAmount();
+  }
 }
