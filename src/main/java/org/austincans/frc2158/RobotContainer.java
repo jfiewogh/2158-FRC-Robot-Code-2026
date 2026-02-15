@@ -34,6 +34,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
+
+import org.austincans.frc2158.commands.AutonCommands;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
 import org.austincans.frc2158.commands.TurretCommands;
@@ -208,6 +210,8 @@ public class RobotContainer {
           keyboardInput
               .c()
               .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+
+          keyboardInput.m().onTrue(AutonCommands.alignDriveIntakeCommand(objectDetection, drive, intake));
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
