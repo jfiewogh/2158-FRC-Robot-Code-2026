@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
-import org.austincans.frc2158.commands.TurretTracking;
+import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -57,9 +57,12 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -81,7 +84,9 @@ public class RobotContainer {
 
   private IntakeSimulation3D intakeSimulation;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
 
     DoubleSupplier leftY = () -> -controller.getLeftY();
@@ -92,20 +97,19 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new DriveIOReal(),
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                (pose) -> {});
-        this.vision =
-            new Vision(
-                drive,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        drive = new Drive(
+            new DriveIOReal(),
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+            new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+            new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+            new ModuleIOTalonFXReal(TunerConstants.BackRight),
+            (pose) -> {
+            });
+        this.vision = new Vision(
+            drive,
+            new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+            new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
       }
       case SIM -> {
         // Sim robot, instantiate physics sim IO implementations
@@ -123,53 +127,49 @@ public class RobotContainer {
         driveSimulation.registerWithArena(
             SimulatedArena3D.getInstance(), new Pose2d(14, 3, new Rotation2d()));
 
-        drive =
-            new Drive(
-                new DriveIOSim3D(driveSimulation),
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+        drive = new Drive(
+            new DriveIOSim3D(driveSimulation),
+            new GyroIOSim(driveSimulation.getGyroSimulation()),
+            new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
+            new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
+            new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
+            new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
+            driveSimulation::setSimulationWorldPose);
 
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                new VisionIOPhotonVisionSim(
-                    camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+        vision = new Vision(
+            drive,
+            new VisionIOPhotonVisionSim(
+                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+            new VisionIOPhotonVisionSim(
+                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
         double intakeWidth = Constants.RobotConstants.kBumperWidthMeters;
         double intakeHeight = 0.1;
         double intakeDepth = 0.1;
-        intakeSimulation =
-            new IntakeSimulation3D(
-                "Fuel",
-                driveSimulation,
-                SimulatedArena3D.getInstance()
-                    .getPhysicsEngine()
-                    .createBoxShape(
-                        new Translation3d(intakeDepth / 2, intakeWidth / 2, intakeHeight / 2)),
-                new Transform3d(
-                    DriveConstants.trackWidthX / 2 + intakeDepth / 2,
-                    0,
-                    intakeHeight / 2,
-                    Rotation3d.kZero),
-                35,
-                SimulatedArena3D.getInstance());
+        intakeSimulation = new IntakeSimulation3D(
+            "Fuel",
+            driveSimulation,
+            SimulatedArena3D.getInstance()
+                .getPhysicsEngine()
+                .createBoxShape(
+                    new Translation3d(intakeDepth / 2, intakeWidth / 2, intakeHeight / 2)),
+            new Transform3d(
+                DriveConstants.trackWidthX / 2 + intakeDepth / 2,
+                0,
+                intakeHeight / 2,
+                Rotation3d.kZero),
+            35,
+            SimulatedArena3D.getInstance());
 
-        objectDetection =
-            new ObjectDetection(
-                // new ObjectDetectionIOSimInRange(
-                // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-                new ODIOSimInView(
-                    "Fuel",
-                    LimelightConfig.LIMELIGHT_3G,
-                    4,
-                    driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                    () -> new Pose3d()));
+        objectDetection = new ObjectDetection(
+            // new ObjectDetectionIOSimInRange(
+            // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
+            new ODIOSimInView(
+                "Fuel",
+                LimelightConfig.LIMELIGHT_3G,
+                4,
+                driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
+                () -> new Pose3d()));
 
         KeyboardInput keyboardInput = new KeyboardInput();
 
@@ -183,54 +183,42 @@ public class RobotContainer {
           Turret turret = new Turret(new TurretIOSim(hood::getAngle));
           Intake intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 
-          Flywheel flywheel =
-              new Flywheel(
-                  new FlywheelIOSim3D(
-                      driveSimulation,
-                      intakeSimulation,
-                      hood::getAngle,
-                      () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
+          Flywheel flywheel = new Flywheel(
+              new FlywheelIOSim3D(
+                  driveSimulation,
+                  intakeSimulation,
+                  hood::getAngle,
+                  () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
-          Command intakeCommand =
-              Commands.runEnd(
-                  () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-          Command shootCommand =
-              new TurretTracking(
-                  turret,
-                  flywheel,
-                  hood,
-                  RobotState.getInstance()::getEstimatedPose,
-                  RobotState.getInstance()::getRobotVelocity);
-        Command intakeCommand =
-            Commands.runEnd(
-                () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-        Command shootCommand = TurretCommands.shootToHub(
-            flywheel, 
-            turret, 
-            hood, 
-            false, 
-            () -> intakeSimulation.getGamePiecesInIntake() > 0
-        );
+          Command intakeCommand = Commands.runEnd(
+              () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+          Command shootCommand = TurretCommands.shootToHub(
+              flywheel,
+              turret,
+              hood,
+              false,
+              () -> intakeSimulation.getGamePiecesInIntake() > 0);
 
-          // keyboardInput.z().whileTrue(shootCommand);
-          // keyboardInput.v().whileTrue(intakeCommand);
-          // keyboardInput
-          //     .z()
-          //     .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
-        //   // keyboardInput
-        //   //     .x()
-        //   //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
+          keyboardInput.z().whileTrue(shootCommand);
+          keyboardInput.v().whileTrue(intakeCommand);
+
+          keyboardInput
+              .c()
+              .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+          // // keyboardInput
+          // // .x()
+          // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
           //
-        // Rotation2d.kZero)));
+          // Rotation2d.kZero)));
           // keyboardInput
-          //     .c()
-          //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
+          // .c()
+          // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
           // Rotation2d.kZero)));
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
-        NamedCommands.registerCommand(
-            "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
+          NamedCommands.registerCommand(
+              "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());
@@ -238,16 +226,24 @@ public class RobotContainer {
       }
       default -> {
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new DriveIO() {},
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-        vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+        drive = new Drive(
+            new DriveIO() {
+            },
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            (pose) -> {
+            });
+        vision = new Vision(drive, new VisionIO() {
+        }, new VisionIO() {
+        });
       }
     }
 
@@ -282,9 +278,11 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
@@ -302,16 +300,13 @@ public class RobotContainer {
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro / odometry
-    final Runnable resetGyro =
-        Constants.currentMode == Constants.Mode.SIM
-            ? () ->
-                drive.setPose(
-                    driveSimulation
-                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-            // simulation
-            : () ->
-                drive.setPose(
-                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+    final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
+        ? () -> drive.setPose(
+            driveSimulation
+                .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
+        // simulation
+        : () -> drive.setPose(
+            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
 
@@ -325,7 +320,8 @@ public class RobotContainer {
   }
 
   public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+    if (Constants.currentMode != Constants.Mode.SIM)
+      return;
 
     driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
     SimulatedArena3D.getInstance().resetFieldForAuto();
@@ -338,7 +334,8 @@ public class RobotContainer {
   }
 
   public void updateSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+    if (Constants.currentMode != Constants.Mode.SIM)
+      return;
 
     SimulatedArena3D.getInstance().simulationPeriodic();
     Logger.recordOutput(
