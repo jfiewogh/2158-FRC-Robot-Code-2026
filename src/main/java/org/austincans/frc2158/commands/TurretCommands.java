@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 04, 2026 at 19:50:18 CST
+// Updated on Sunday February 15, 2026 at 11:34:53 CST
 
 package org.austincans.frc2158.commands;
 
@@ -187,19 +187,22 @@ public class TurretCommands {
         Set.of());
   }
 
-  public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue, BooleanSupplier containsFuel) {
+  public static Command shootToHub(
+      Flywheel flywheel, Turret turret, Hood hood, boolean isBlue, BooleanSupplier containsFuel) {
     if (isBlue) {
-      return Commands.run(() -> {
-        if (containsFuel.getAsBoolean()) {
-          shootToTarget(flywheel, turret, hood, TrackingTargets.blueHub);
-        }
-      });
+      return Commands.run(
+          () -> {
+            if (containsFuel.getAsBoolean()) {
+              shootToTarget(flywheel, turret, hood, TrackingTargets.blueHub);
+            }
+          });
     } else {
-      return Commands.run(() -> {
-        if (containsFuel.getAsBoolean()) {
-          shootToTarget(flywheel, turret, hood, TrackingTargets.redHub);
-        }
-      });
+      return Commands.run(
+          () -> {
+            if (containsFuel.getAsBoolean()) {
+              shootToTarget(flywheel, turret, hood, TrackingTargets.redHub);
+            }
+          });
     }
   }
 }
