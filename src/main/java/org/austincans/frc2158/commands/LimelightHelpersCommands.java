@@ -52,7 +52,9 @@ public class LimelightHelpersCommands {
             0,
             0,
             pid.calculate(
-                drive.getPose().getRotation().getRadians(), pose.getRotation().getRadians())));
+                drive.getPose().getRotation().getRadians(), 
+                Math.atan2((pose.getX() - drive.getPose().getX()), (pose.getY() - drive.getPose().getY()))
+                )));
   }
 
   public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {
