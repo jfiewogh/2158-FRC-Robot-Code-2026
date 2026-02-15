@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 15, 2026 at 10:53:53 CST
+// Updated on Sunday February 15, 2026 at 11:15:12 CST
 
 package org.austincans.frc2158.commands;
 
@@ -30,7 +30,7 @@ import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
 
-  private static final double kP = 1;
+  private static final double kP = 1.5;
   private static final double kI = 0;
   private static final double kD = 0;
   private static final double maxVelocityRadPerSec = Math.PI;
@@ -52,9 +52,9 @@ public class LimelightHelpersCommands {
             0,
             0,
             pid.calculate(
-                drive.getPose().getRotation().getRadians(), 
-                Math.atan2((pose.getX() - drive.getPose().getX()), (pose.getY() - drive.getPose().getY()))
-                )));
+                drive.getPose().getRotation().getRadians(),
+                Math.atan2(
+                    pose.getY() - drive.getPose().getY(), pose.getX() - drive.getPose().getX()))));
   }
 
   public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {

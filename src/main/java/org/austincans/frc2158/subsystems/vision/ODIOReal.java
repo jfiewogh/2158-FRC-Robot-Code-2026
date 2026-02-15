@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 15, 2026 at 10:53:53 CST
+// Updated on Sunday February 15, 2026 at 11:15:12 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -101,7 +101,8 @@ public class ODIOReal implements ODIO {
 
   private Pose3d getNearestGamePiece() {
     Pose3d robotPose = LimelightHelpers.getBotPose3d(limelightName);
-    return robotPose.nearest(getFieldRelGamePiecePoses());
+    ArrayList<Pose3d> fieldRelGamePiecePoses = getFieldRelGamePiecePoses();
+    return fieldRelGamePiecePoses.size() > 0 ? robotPose.nearest(fieldRelGamePiecePoses) : null;
   }
 
   @Override
