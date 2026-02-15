@@ -187,7 +187,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         this::getChassisSpeeds,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(5, 0.0, 0.0), new PIDConstants(5, 0.0, 0.0)),
+            new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);

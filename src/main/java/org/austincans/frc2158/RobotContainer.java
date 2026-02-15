@@ -201,16 +201,27 @@ public class RobotContainer {
                   hood,
                   RobotState.getInstance()::getEstimatedPose,
                   RobotState.getInstance()::getRobotVelocity);
+        Command intakeCommand =
+            Commands.runEnd(
+                () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+        Command shootCommand = TurretCommands.shootToHub(
+            flywheel, 
+            turret, 
+            hood, 
+            false, 
+            () -> intakeSimulation.getGamePiecesInIntake() > 0
+        );
 
           // keyboardInput.z().whileTrue(shootCommand);
           // keyboardInput.v().whileTrue(intakeCommand);
-          keyboardInput
-              .z()
-              .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
           // keyboardInput
-          //     .x()
-          //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
-          // Rotation2d.kZero)));
+          //     .z()
+          //     .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+        //   // keyboardInput
+        //   //     .x()
+        //   //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
+          //
+        // Rotation2d.kZero)));
           // keyboardInput
           //     .c()
           //     .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
@@ -218,6 +229,8 @@ public class RobotContainer {
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
+        NamedCommands.registerCommand(
+            "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());
@@ -256,8 +269,10 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
+    autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));

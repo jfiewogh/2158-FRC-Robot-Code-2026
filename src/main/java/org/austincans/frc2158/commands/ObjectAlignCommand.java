@@ -18,6 +18,9 @@
 package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2158.subsystems.vision.LimelightHelpers.LimelightTarget_Classifier;
@@ -52,5 +55,9 @@ public class ObjectAlignCommand {
             0, // Sideways TODO: Replace with Driver Joystick?
             targetAngularVelocity // Angular
             ));
+  }
+
+  public Command alignToClosestObjectCommand(Drive drive){
+    return Commands.run(() -> alignToClosestObject(drive));
   }
 }
