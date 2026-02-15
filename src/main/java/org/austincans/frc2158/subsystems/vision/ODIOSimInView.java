@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 14:16:40 CST
+// Updated on Sunday February 15, 2026 at 10:53:53 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -91,6 +91,9 @@ public class ODIOSimInView implements ODIO {
   public void updateInputs(ObjectDetectionIOInputs inputs) {
     ArrayList<Pose3d> gamePiecePosesArrayList = getGamePiecePosesInView();
     inputs.gamePiecePoses = gamePiecePosesArrayList.toArray(new Pose3d[0]);
-    inputs.nearestGamePiecePose = fieldRelRobotPoseSupplier.get().nearest(gamePiecePosesArrayList);
+    inputs.nearestGamePiecePose =
+        inputs.gamePiecePoses.length > 0
+            ? fieldRelRobotPoseSupplier.get().nearest(gamePiecePosesArrayList)
+            : null;
   }
 }

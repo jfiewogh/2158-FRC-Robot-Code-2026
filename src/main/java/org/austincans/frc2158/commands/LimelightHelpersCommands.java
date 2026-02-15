@@ -13,32 +13,38 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 14, 2026 at 14:16:40 CST
+// Updated on Sunday February 15, 2026 at 10:53:53 CST
 
 package org.austincans.frc2158.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-
-import java.util.Set;
+import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class LimelightHelpersCommands {
 
-  static final double Kp = 0.2;
-  static final double Ki = 0;
-  static final double Kd = 0;
-  static final double maxVelocity = 5;
-  static final double maxAcceleration = 10;
-  static ProfiledPIDController pid =
+  private static final double kP = 1;
+  private static final double kI = 0;
+  private static final double kD = 0;
+  private static final double maxVelocityRadPerSec = Math.PI;
+  private static final double maxAccelerationRadPerSecSq = Math.PI * 2;
+  private static ProfiledPIDController pid =
       new ProfiledPIDController(
-          Kp, Ki, Kd, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
+          kP,
+          kI,
+          kD,
+          new TrapezoidProfile.Constraints(maxVelocityRadPerSec, maxAccelerationRadPerSecSq));
+
+  static {
+    pid.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   private static void alignRobotToPose(Drive drive, Pose2d pose) {
     drive.runVelocity(
@@ -46,19 +52,16 @@ public class LimelightHelpersCommands {
             0,
             0,
             pid.calculate(
-                drive.getPose().getRotation().getDegrees(), pose.getRotation().getDegrees())));
+                drive.getPose().getRotation().getRadians(), pose.getRotation().getRadians())));
   }
 
   public static Command alignHeadingCommand(Drive drive, ObjectDetection objectDetection) {
-    return Commands.defer(
-        () ->
-            Commands.run(
-                () -> {
-                  System.out.println(objectDetection.getNearestGamePiecePose().toPose2d());
-                  if (objectDetection.getGamePiecePoses().length != 0){
-                    alignRobotToPose(drive, objectDetection.getNearestGamePiecePose().toPose2d());
-                  }
-                }),
-        Set.of(drive, objectDetection));
+    Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
+    return Commands.run(
+        () -> {
+          if (nearestGamePiecePoseSupplier.get() != null) {
+            alignRobotToPose(drive, nearestGamePiecePoseSupplier.get().toPose2d());
+          }
+        });
   }
 }
