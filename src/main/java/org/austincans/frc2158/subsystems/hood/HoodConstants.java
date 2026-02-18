@@ -29,4 +29,6 @@ public class HoodConstants {
   static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
   static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
   static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACT_ID", 0);
+
+  static final boolean potentiometer = false;
 }

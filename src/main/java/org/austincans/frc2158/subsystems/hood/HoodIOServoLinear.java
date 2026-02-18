@@ -6,14 +6,16 @@ import org.austincans.frc2158.math.Angle;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
-public class HoodIOLinearActuator implements HoodIO{
+public class HoodIOServoLinear implements HoodIO{
     HoodIOInputs inputs;
     LinearActuatorController linearActuator;
     InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
     Angle currentAngle = Angle.fromDegrees(0);
-    public HoodIOLinearActuator(){
+    public HoodIOServoLinear(){
         this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
         angles.put(0.0,0.0); // Angles [0, 90], Position [0, 1]
+
+        if (HoodConstants.potentiometer == true);
     }
 
     @Override

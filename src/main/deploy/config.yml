@@ -1,5 +1,9 @@
 ints:
   values:
+    # 0s Master (Radio, Roborio, Carnivore, Pidgeon)
+    # 10s Camera
+    # 20s Subsystems
+    # 30s Swerve
     FL_DRIVE_ID: 0
     FL_TURN_ID: 0
     FL_ENCODER_ID: 0
@@ -20,16 +24,20 @@ ints:
     ARM_ENCODER_ID: 0
     ARM_CURRENT_LIMIT: 0
     ELEVATOR_CAN_ID: 0
-    FLYWHEEL_MOTOR_ID: 0
+    LEFT_FLYWHEEL_MOTOR_ID: 22
+    RIGHT_FLYWHEEL_MOTOR_ID: 23
     FLYWHEEL_ENCODER_ID: 0
     HOOD_SPARK_FLEX_MOTOR_ID: 0
     HOOD_TALON_ID: 0
     HOOD_LINEAR_ACT_ID: 0
-    INTAKE_DEPLOY_ID: 0
-    INTAKE_MOTOR_ID: 0
+    INTAKE_DEPLOY_ID_1: 26
+    INTAKE_DEPLOY_ID_2: 27
+    INTAKE_MOTOR_ID: 25
     INTAKE_DEPLOY_ENCODER_ID: 0
-    TURRET_MOTOR_ID: 0
-    TURRET_ENCODER_ID: 0
+    SPINDEXER_MOTOR_ID: 20
+    INDEXER_MOTOR_ID: 21
+    TURRET_MOTOR_ID: 24
+    TURRET_ENCODER_ID: 25
 doubles:
   values:
     DRIVE_P: 0
