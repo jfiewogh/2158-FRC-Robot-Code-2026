@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 15, 2026 at 11:44:15 CST
+// Updated on Wednesday February 18, 2026 at 20:17:49 CST
 
 package org.ironmaple.simulation.seasonspecific.reefscape2025;
 

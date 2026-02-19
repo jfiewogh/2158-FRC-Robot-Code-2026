@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 15, 2026 at 11:44:15 CST
+// Updated on Wednesday February 18, 2026 at 20:17:49 CST
 
 package org.austincans.frc2158;
 
@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
-
 import org.austincans.frc2158.commands.AutonCommands;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
@@ -211,7 +210,9 @@ public class RobotContainer {
               .c()
               .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
 
-          keyboardInput.m().onTrue(AutonCommands.alignDriveIntakeCommand(objectDetection, drive, intake));
+          keyboardInput
+              .m()
+              .onTrue(AutonCommands.alignDriveIntakeCommand(objectDetection, drive, intake));
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
