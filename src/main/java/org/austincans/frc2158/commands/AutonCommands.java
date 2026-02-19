@@ -85,34 +85,35 @@ public class AutonCommands {
 
   public static Command driveToPoseCommand(Drive drive, ObjectDetection objectDetection) {
     Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
-    Pose3d pose = nearestGamePiecePoseSupplier.get();
-    if (pose == null) {
+
+    
+
+    if (nearestGamePiecePoseSupplier.get() == null) {
       return Commands.none();
     }
 
-    Logger.recordOutput("nearest pose", pose.getTranslation().toTranslation2d());
+    Logger.recordOutput("nearest pose", nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d());
 
-    return AutoBuilder.pathfindToPose(
+    return Commands.defer(
+        () -> AutoBuilder.pathfindToPose(
             new Pose2d(
-                pose.getTranslation().toTranslation2d(),
+                nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d(),
                 Rotation2d.fromRadians(
                     Math.atan2(
-                        pose.getY() - drive.getPose().getY(),
-                        pose.getX() - drive.getPose().getX()))),
+                        nearestGamePiecePoseSupplier.get().getY() - drive.getPose().getY(),
+                        nearestGamePiecePoseSupplier.get().getX() - drive.getPose().getX()))),
             constraints)
         .onlyWhile(
             () ->
                 !Drive.joystickHasInput
-                    && pose != null
-                    && pose.getTranslation()
+                    && nearestGamePiecePoseSupplier.get() != null
+                    && nearestGamePiecePoseSupplier.get().getTranslation()
                             .getDistance(new Translation3d(drive.getPose().getTranslation()))
-                        > 0.05);
-    // return Commands.run(
-    // () -> {
-    // if (nearestGamePiecePoseSupplier.get() != null) {
-    // driveToPose(drive, nearestGamePiecePoseSupplier.get().toPose2d());
-    // }
-    // });
+                        > 0.05),
+        null
+     );
+
+     
   }
 
   public static Command alignDriveIntakeCommand(
