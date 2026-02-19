@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class AutonCommands {
     private static final double maxVelocityMetersPerSec = 5;
     private static final double maxAccelerationMetersPerSecSq = 10;
-    private static ProfiledPIDController drivePID = new ProfiledPIDController(1.5,0.0,0.0,new TrapezoidProfile.Constraints(maxVelocityMetersPerSec, maxAccelerationMetersPerSecSq));
+    private static ProfiledPIDController drivePIDX = new ProfiledPIDController(1.5,0.0,0.0,new TrapezoidProfile.Constraints(maxVelocityMetersPerSec, maxAccelerationMetersPerSecSq));
+    private static ProfiledPIDController drivePIDY = new ProfiledPIDController(1.5,0.0,0.0,new TrapezoidProfile.Constraints(maxVelocityMetersPerSec, maxAccelerationMetersPerSecSq));
 
     private static final double maxVelocityRadPerSec = Math.PI;
     private static final double maxAccelerationRadPerSecSq = Math.PI * 2;
@@ -31,8 +32,8 @@ public class AutonCommands {
 
     private static void driveToPose(Drive drive, Pose2d pose) {
         ChassisSpeeds speed = ChassisSpeeds.fromFieldRelativeSpeeds(
-            drivePID.calculate(drive.getPose().getX(), pose.getX()),
-            drivePID.calculate(drive.getPose().getY(), pose.getY()),
+            drivePIDX.calculate(drive.getPose().getX(), pose.getX()),
+            drivePIDY.calculate(drive.getPose().getY(), pose.getY()),
             rotationPID.calculate(drive.getPose().getRotation().getRadians(),
             Math.atan2(pose.getY() - drive.getPose().getY(), pose.getX() - drive.getPose().getX())),
             drive.getRotation());
