@@ -85,14 +85,9 @@ public class AutonCommands {
 
   public static Command driveToPoseCommand(Drive drive, ObjectDetection objectDetection) {
     Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
+    Supplier<Pose2d> drivePos = () -> drive.getPose();
 
-    
-
-    if (nearestGamePiecePoseSupplier.get() == null) {
-      return Commands.none();
-    }
-
-    Logger.recordOutput("nearest pose", nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d());
+    // Logger.recordOutput("nearest pose", nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d());
 
     return Commands.defer(
         () -> AutoBuilder.pathfindToPose(
@@ -100,15 +95,15 @@ public class AutonCommands {
                 nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d(),
                 Rotation2d.fromRadians(
                     Math.atan2(
-                        nearestGamePiecePoseSupplier.get().getY() - drive.getPose().getY(),
-                        nearestGamePiecePoseSupplier.get().getX() - drive.getPose().getX()))),
+                        nearestGamePiecePoseSupplier.get().getY() - drivePos.get().getY(),
+                        nearestGamePiecePoseSupplier.get().getX() - drivePos.get().getX()))),
             constraints)
         .onlyWhile(
             () ->
                 !Drive.joystickHasInput
                     && nearestGamePiecePoseSupplier.get() != null
                     && nearestGamePiecePoseSupplier.get().getTranslation()
-                            .getDistance(new Translation3d(drive.getPose().getTranslation()))
+                            .getDistance(new Translation3d(drivePos.get().getTranslation()))
                         > 0.05),
         null
      );
