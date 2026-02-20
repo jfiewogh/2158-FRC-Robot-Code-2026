@@ -102,7 +102,7 @@ public class RobotContainer {
         SimulatedArena.overrideInstance(new Arena2026Rebuilt());
 
         driveSimulation =
-            new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(14, 3, new Rotation2d()));
+            new SwerveDriveSimulation(Drive.getMapleSimConfig(), new Pose2d(14, 3, new Rotation2d()));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         drive =
             new Drive(
