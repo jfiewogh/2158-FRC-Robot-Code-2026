@@ -39,6 +39,7 @@ public class Flywheel extends AdvancedSubsystem {
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   @Override

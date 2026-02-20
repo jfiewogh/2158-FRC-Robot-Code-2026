@@ -30,6 +30,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -120,5 +122,10 @@ public class ArmIOSparkFlex implements ArmIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public List<SelfChecking> getHardware(){
+    return List.of(selfCheckingMotor);
   }
 }

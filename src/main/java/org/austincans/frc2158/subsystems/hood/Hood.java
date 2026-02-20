@@ -31,6 +31,7 @@ public class Hood extends AdvancedSubsystem {
 
   public Hood(HoodIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   Command runHoodMotorCommand(Angle angle) {

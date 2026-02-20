@@ -18,6 +18,8 @@
 package org.austincans.frc2158.subsystems.flywheel;
 
 import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -37,6 +39,10 @@ public interface FlywheelIO {
   public default void runVelocity(double velocityRPM) {}
 
   public default List<SubsystemFault> checkForFaults() {
-    return null;
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware(){
+    return List.of();
   }
 }

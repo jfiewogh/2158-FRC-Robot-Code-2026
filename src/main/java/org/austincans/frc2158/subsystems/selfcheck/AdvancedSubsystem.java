@@ -156,6 +156,10 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     hardware.add(new SelfCheckingTalonFXPro(label, talon));
   }
 
+  public void registerHardware(SelfChecking item){
+    hardware.add(item);
+  }
+
   public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFXS talon) {
     hardware.add(new SelfCheckingTalonFXS(label, talon));
   }

@@ -31,6 +31,7 @@ public class Arm extends AdvancedSubsystem {
 
   public Arm(ArmIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   /**

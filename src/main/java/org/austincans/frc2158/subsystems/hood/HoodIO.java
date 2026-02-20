@@ -18,7 +18,12 @@
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+
+import java.util.List;
+
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface HoodIO {
@@ -45,4 +50,12 @@ public interface HoodIO {
   public Rotation2d getAngleRotation2d();
 
   public boolean atAngle(Angle setPoint);
+
+  public default List<SubsystemFault> checkForFaults() {
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware() {
+    return List.of();
+  }
 }

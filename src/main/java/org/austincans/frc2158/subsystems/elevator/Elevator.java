@@ -50,6 +50,7 @@ public class Elevator extends AdvancedSubsystem {
 
   public Elevator(ElevatorIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
     elevatorPID.setTolerance(ElevatorConstants.pidTolerance);
   }
 

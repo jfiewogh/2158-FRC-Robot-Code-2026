@@ -31,6 +31,7 @@ import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -93,6 +94,11 @@ public class IntakeIOSparkFlex implements IntakeIO {
     intakeMotor.setVoltage(voltage);
   }
 
+  @Override
+  public List<SelfChecking> getHardware() {
+    return List.of(deployMotorSelfCheck, intakeMotorSelfCheck);
+  }
+    
   @Override
   public List<SubsystemFault> checkForFaults() {
     List<SubsystemFault> faults = new ArrayList<>();

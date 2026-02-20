@@ -33,6 +33,7 @@ public class Intake extends AdvancedSubsystem {
 
   public Intake(IntakeIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   public void setRelativeVelocity(double velocity) {
