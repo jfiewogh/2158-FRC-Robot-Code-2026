@@ -19,8 +19,10 @@ package org.austincans.frc2158.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
 import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.Logger;
@@ -34,6 +36,10 @@ public class Intake extends AdvancedSubsystem {
   public Intake(IntakeIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+  }
+
+  public boolean ballIntaked(){
+    return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
   }
 
   public void setRelativeVelocity(double velocity) {
@@ -53,6 +59,7 @@ public class Intake extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addFault);
+    LedIOBlinkin.getInstance().intaked = ballIntaked();
   }
 
   public Command systemCheckCommand() {

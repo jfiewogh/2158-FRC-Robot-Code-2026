@@ -67,7 +67,7 @@ public class TurretCommands {
   private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
 
   private static final double TURRET_HEIGHT = TurretConstants.turretHeight; // meters
-
+  public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
   public static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
@@ -184,9 +184,13 @@ public class TurretCommands {
   // TODO: get alliance from DriverStation instead of boolean
   public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue) {
     return Commands.defer(
-        () -> Commands.run(() -> shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue))),
+        () -> Commands.run(() -> {
+          shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue));
+          isShuttling = true;
+        }),
         Set.of());
   }
+
 
   // TODO: get alliance from DriverStation instead of boolean
   public static Command shootToHub(
