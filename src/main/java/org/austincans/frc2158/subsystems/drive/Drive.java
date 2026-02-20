@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -127,7 +127,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                   KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
                   WHEEL_COF));
 
-  @AutoLogOutput private boolean velocityMode = false;
+  @AutoLogOutput private boolean velocityMode = true;
   @AutoLogOutput private boolean brakeModeEnabled = true;
 
   private final DriveIO driveIO;

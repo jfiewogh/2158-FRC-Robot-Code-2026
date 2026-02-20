@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -69,7 +69,7 @@ public class Module extends AdvancedSubsystem {
         drivekS.initDefault(0.014);
         drivekV.initDefault(0.134);
         drivekT.initDefault(0);
-        drivekP.initDefault(0.1);
+        drivekP.initDefault(1);
         drivekD.initDefault(0);
         turnkP.initDefault(10.0);
         turnkD.initDefault(0);
@@ -108,6 +108,9 @@ public class Module extends AdvancedSubsystem {
     this.io = io;
     this.index = index;
     this.constants = constants;
+
+    io.setDrivePID(drivekP.get(), 0, drivekD.get());
+    io.setTurnPID(turnkP.get(), 0, turnkD.get());
 
     ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());
     driveDisconnectedAlert =

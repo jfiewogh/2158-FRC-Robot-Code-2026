@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -36,8 +36,8 @@ public class ModuleIOSim implements ModuleIO {
 
   private boolean driveClosedLoop = false;
   private boolean turnClosedLoop = false;
-  private PIDController driveController = new PIDController(0, 0, 0);
-  private PIDController turnController = new PIDController(0, 0, 0);
+  private PIDController driveController = new PIDController(1, 0, 0);
+  private PIDController turnController = new PIDController(1, 0, 0);
   private double driveFFVolts = 0;
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;

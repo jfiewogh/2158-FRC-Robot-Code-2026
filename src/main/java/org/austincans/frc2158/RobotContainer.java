@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158;
 
@@ -212,7 +212,9 @@ public class RobotContainer {
 
           keyboardInput
               .m()
-              .onTrue(AutonCommands.alignDriveIntakeCommand(objectDetection, drive, intake));
+              .onTrue(
+                  AutonCommands.alignDriveIntakeCommand(
+                      objectDetection, drive, intake, leftX, leftY, rightX, rightY));
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
