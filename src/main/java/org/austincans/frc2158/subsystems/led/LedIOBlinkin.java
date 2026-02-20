@@ -171,7 +171,7 @@ public class LedIOBlinkin implements LedIO {
   private Object disabledColor;
 
   private LedIOBlinkin() {
-    m_blinkin = new Spark(ConfigUtil.getConfigInt("BLINKIN_LED_CONTROLLER_PORT", 0));
+    m_blinkin = new Spark(LedConstants.blinkinID);
   }
 
   @Override
