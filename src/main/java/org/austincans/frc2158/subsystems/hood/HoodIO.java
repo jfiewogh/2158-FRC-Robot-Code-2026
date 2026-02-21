@@ -27,11 +27,24 @@ import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface HoodIO {
-  void setAngle(Rotation2d angle);
+  @AutoLog
+  public class HoodIOInputs {
+    public double hoodAngleDeg;
+    public double temperature;
+    public double motorPosition;
+  }
 
-  Rotation2d getAngle();
+  public void updateInputs(HoodIOInputs inputs);
 
-  public boolean atAngle(Angle setPoint);
+  public void setAngle(Angle angle);
+
+  public void setAngleRotation2d(Rotation2d angle);
+
+  public Angle getAngle();
+
+  public Rotation2d getAngleRotation2d();
+
+  public boolean atAngle(Angle setpoint);
 
   public default List<SubsystemFault> checkForFaults() {
     return List.of();

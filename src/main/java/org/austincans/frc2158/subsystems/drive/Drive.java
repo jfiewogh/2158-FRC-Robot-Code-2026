@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -61,7 +61,6 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import lombok.Setter;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Constants.Mode;
@@ -158,9 +157,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static boolean joystickHasInput = true;
 
   public boolean isDriving(){
-    if (joystickHasInput == true){
-      return true;
-    }
+    return joystickHasInput;
   }
 
   public Drive(
@@ -235,7 +232,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   public void periodic() {
-    LedIOBlinkin.getInstance().driving = isDriving();
     driveIO.updateInputs(driveInputs);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -468,10 +464,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     return driveInputs.pose.toPose2d();
   }
 
-  public Supplier<Pose2d> getPoseSupplier() {
-    return this::getPose;
-  }
-
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -535,26 +527,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                 && modules[1].getCurrentCommand() == null
                 && modules[2].getCurrentCommand() == null
                 && modules[3].getCurrentCommand() == null),
-        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
-        Commands.waitSeconds(2.0),
-        Commands.runOnce(
-            () -> {
-              runVelocity(new ChassisSpeeds());
-              if (-gyroInputs.imuRate < Units.radiansToDegrees(0.3)) {
-                addFault("[System Check] IMU rate too low", false, true);
-              }
-            },
-            this),
-        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, -0.5))),
-        Commands.waitSeconds(2.0),
-        Commands.runOnce(
-            () -> {
-              runVelocity(new ChassisSpeeds());
-              if (-gyroInputs.imuRate > Units.radiansToDegrees(-0.3)) {
-                addFault("[System Check] IMU rate too low", false, true);
-              }
-            },
-            this))
+        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))))
         .until(
             () -> getFaults().size() > 0
                 || modules[0].getFaults().size() > 0

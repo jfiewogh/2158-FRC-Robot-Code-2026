@@ -39,7 +39,6 @@ import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
 import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
-import org.austincans.frc2158.subsystems.Led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim3D;
@@ -200,9 +199,7 @@ public class RobotContainer {
               TurretCommands.shootToHub(
                   flywheel,
                   turret,
-                  hood,
-                  false,
-                  () -> intakeSimulation.getGamePiecesInIntake() > 0);
+                  hood);
 
           keyboardInput.z().whileTrue(shootCommand);
           keyboardInput.v().whileTrue(intakeCommand);
@@ -229,7 +226,7 @@ public class RobotContainer {
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
           NamedCommands.registerCommand(
-              "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
+              "shuttle", TurretCommands.shuttle(flywheel, turret, hood));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());

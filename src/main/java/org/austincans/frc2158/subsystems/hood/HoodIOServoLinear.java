@@ -7,15 +7,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class HoodIOServoLinear implements HoodIO{
-    HoodIOInputs inputs;
     LinearActuatorController linearActuator;
     InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
     Angle currentAngle = Angle.fromDegrees(0);
     public HoodIOServoLinear(){
         this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
-        angles.put(0.0,0.0); // Angles [0, 90], Position [0, 1]
+        angles.put(0.0,0.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
 
-        if (HoodConstants.potentiometer == true);
+        // if (HoodConstants.potentiometer == true);
+    }
+
+    @Override
+    public void updateInputs(HoodIOInputs inputs) {
+        inputs.hoodAngleDeg = currentAngle.getRotation2d().getDegrees();
     }
 
     @Override
@@ -41,8 +45,8 @@ public class HoodIOServoLinear implements HoodIO{
     }
 
     @Override
-    public boolean atAngle(Angle setPoint) {
-        return currentAngle.toDegrees() == setPoint.toDegrees();
+    public boolean atAngle(Angle setpoint) {
+        return currentAngle.toDegrees() == setpoint.toDegrees();
     }
 
 }

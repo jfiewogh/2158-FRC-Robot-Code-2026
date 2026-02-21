@@ -19,6 +19,7 @@ package org.austincans.frc2158.commands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,17 +27,25 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.austincans.frc2158.commands.TurretCommands.TrackingTargets;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
+import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.intake.Intake;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.littletonrobotics.junction.Logger;
 
 public class AutonCommands {
@@ -106,8 +115,7 @@ public class AutonCommands {
       Intake intake, ObjectDetection detection, Drive drive, double distance) {
     Supplier<Pose3d> target = detection.getNearestGamePiecePoseSupplier();
     Supplier<Pose2d> drivePose = drive.getPoseSupplier();
-    Command command =
-        Commands.run(
+    return Commands.run(
                 () -> {
                   if (target.get() != null
                       && getDistanceBetweenPoses(target.get().toPose2d(), drivePose.get())
@@ -117,40 +125,55 @@ public class AutonCommands {
                     intake.setRelativeVelocity(0);
                   }
                   Logger.recordOutput("intake duration", time.getAsDouble() - intakeStartTime);
-                })
+                }, intake)
             .beforeStarting(() -> intakeStartTime = time.getAsDouble())
             .onlyWhile(() -> target.get() != null);
-    command.addRequirements(intake);
-    return command;
   }
 
-  public static Command pathfindToPoseCommand(Drive drive, ObjectDetection objectDetection) {
+  public static Command pathfindToPoseCommand(Pose2d pose) {
+    return Commands.run(() -> AutoBuilder.pathfindToPose(pose, constraints));
+  }
+
+  public static Command pathfindToNearestGamePieceCommand(Drive drive, ObjectDetection objectDetection) {
     Supplier<Pose3d> targetPoseSupplier = objectDetection.getNearestGamePiecePoseSupplier();
-    Supplier<Pose2d> currentPoseSupplier = drive.getPoseSupplier();
+    Supplier<Pose2d> currentPoseSupplier = drive::getPose;
     return Commands.defer(
-            () ->
-                AutoBuilder.pathfindToPose(
+            () -> 
+                pathfindToPoseCommand(
                     new Pose2d(
                         targetPoseSupplier.get().getTranslation().toTranslation2d(),
                         Rotation2d.fromRadians(
                             Math.atan2(
                                 targetPoseSupplier.get().getY() - currentPoseSupplier.get().getY(),
                                 targetPoseSupplier.get().getX()
-                                    - currentPoseSupplier.get().getX()))),
-                    constraints),
+                                    - currentPoseSupplier.get().getX())))),
             Set.of(drive))
         .onlyIf(() -> targetPoseSupplier.get() != null)
         .onlyWhile(
             () ->
-                !Drive.joystickHasInput
-                    && targetPoseSupplier.get() != null
-                    && getDistanceBetweenPoses(
-                            targetPoseSupplier.get().toPose2d(), currentPoseSupplier.get())
-                        > pathfindEndDistanceMeters);
+                targetPoseSupplier.get() != null
+                && getDistanceBetweenPoses(
+                        targetPoseSupplier.get().toPose2d(), currentPoseSupplier.get())
+                    > pathfindEndDistanceMeters);
   }
 
-  public static Command driveToHubAndShoot(Drive drive, Turret turret, Flywheel flywheel){
-    return Commands.parallel()
+  public static Command driveToHubAndShoot(Drive drive, Turret turret, Flywheel flywheel, Hood hood, ObjectDetection detection, double allianceZone){
+    Alliance alliance = DriverStation.getAlliance().get();
+    BooleanSupplier inAllianceZone;
+    if (alliance != null){
+      if (alliance == Alliance.Blue){
+          inAllianceZone = () -> drive.getPoseSupplier().get().getX() < allianceZone;
+      }
+      else {
+          inAllianceZone = () -> drive.getPoseSupplier().get().getX() > allianceZone;
+      }
+    } else {
+      return Commands.none();
+    }
+    return Commands.parallel(
+      TurretCommands.shootToHub(flywheel, turret, hood).onlyIf(inAllianceZone),
+      findPathToPose()
+    );
   }
 
   public static Command driveToAndIntakeGamePieces(
@@ -160,8 +183,9 @@ public class AutonCommands {
             Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers)),
             runIntakeCommand(intake, objectDetection, drive, intakeDistanceMeters),
             Commands.sequence(
-                pathfindToPoseCommand(drive, objectDetection),
+                pathfindToNearestGamePieceCommand(drive, objectDetection),
                 driveToNearestGamePieceCommand(drive, objectDetection, intake)))
+        .until(() -> Drive.joystickHasInput)
         .handleInterrupt(
             () -> {
               intake.setRelativeVelocity(0);

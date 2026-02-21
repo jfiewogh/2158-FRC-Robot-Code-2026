@@ -17,7 +17,6 @@
 
 package org.austincans.frc2158.subsystems.hood;
 
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -62,9 +61,9 @@ public class HoodIOSparkFlex implements HoodIO {
     hoodMotor.set(speed);
   }
 
-  public void setAngle(Angle setPointDegrees) {
+  public void setAngle(Angle setpoint) {
     controller.setSetpoint(
-        Units.degreesToRotations(setPointDegrees.toDegrees()), ControlType.kPosition);
+        Units.degreesToRotations(setpoint.toDegrees()), ControlType.kPosition);
   }
 
   public void updateInputs(HoodIOInputs inputs) {

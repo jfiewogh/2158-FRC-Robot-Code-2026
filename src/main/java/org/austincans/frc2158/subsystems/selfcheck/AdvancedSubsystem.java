@@ -152,12 +152,12 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     return worstStatus;
   }
 
-  public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFX talon) {
-    hardware.add(new SelfCheckingTalonFXPro(label, talon));
-  }
-
   public void registerHardware(SelfChecking item){
     hardware.add(item);
+  }
+
+  public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFX talon) {
+    hardware.add(new SelfCheckingTalonFXPro(label, talon));
   }
 
   public void registerHardware(String label, com.ctre.phoenix6.hardware.TalonFXS talon) {

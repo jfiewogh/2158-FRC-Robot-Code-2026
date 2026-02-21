@@ -4,12 +4,7 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
-
 import java.util.Map;
-
-import org.austincans.frc2158.subsystems.led.LedIOBlinkin.BlinkinPattern;
-import org.checkerframework.checker.units.qual.m;
-
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -20,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Color;
 public class LedIOAddressableLed implements LedIO {
     public AddressableLED m_led = new AddressableLED(LedConstants.PWMPort);
     public AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LedConstants.numOfLeds);
+    LedState state = LedState.IDLE;
 
     public void LedIOAddressableLed() {
         m_led.setLength(m_ledBuffer.getLength());
@@ -53,8 +49,8 @@ public class LedIOAddressableLed implements LedIO {
 
     @Override
     public void updateInputs(LedIOInputs inputs) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
+        setPattern(state);
+        inputs.state = state;
     }
 
     @Override

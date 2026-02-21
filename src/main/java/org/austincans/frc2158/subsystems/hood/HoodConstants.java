@@ -16,14 +16,14 @@
 // Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.subsystems.hood;
-
 import java.util.TreeMap;
-
+import org.austincans.frc2158.util.ConfigUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class HoodConstants {
   static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);
   static int talonMotorID = ConfigUtil.getConfigInt("HOOD_TALON_ID", 0);
+  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACTUATOR_ID", 0);
   static double kP = ConfigUtil.getConfigDouble("HOOD_P", 0);
   static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
   static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);

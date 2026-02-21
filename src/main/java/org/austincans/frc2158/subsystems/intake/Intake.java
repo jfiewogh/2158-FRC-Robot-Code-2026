@@ -38,7 +38,7 @@ public class Intake extends AdvancedSubsystem {
     io.getHardware().forEach(e -> registerHardware(e));
   }
 
-  public boolean ballIntaked(){
+  public boolean distanceSensorActive(){
     return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
   }
 
@@ -59,15 +59,9 @@ public class Intake extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addFault);
-    LedIOBlinkin.getInstance().intaked = ballIntaked();
   }
 
   public Command systemCheckCommand() {
     return Commands.runOnce(() -> {});
-  }
-
-  // TODO: Change this because this only temporary
-  public int getGamePieceAmount() {
-    return inputs.gamePiecesCount;
   }
 }

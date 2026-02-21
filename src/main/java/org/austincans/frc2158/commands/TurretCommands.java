@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Thursday February 19, 2026 at 20:08:44 CST
 
 package org.austincans.frc2158.commands;
 
@@ -35,6 +35,9 @@ import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.austincans.frc2158.util.ShooterMath;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import java.util.Optional;
 
 public class TurretCommands {
   public enum TrackingTargets {
@@ -168,10 +171,10 @@ public class TurretCommands {
     return closestTarget;
   }
 
-  private static TrackingTargets getShuttleTarget(boolean isBlue) {
+  private static TrackingTargets getShuttleTarget(Alliance alliance) {
     Pose3d robotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
     TrackingTargets[] possibleTargets;
-    if (isBlue) {
+    if (alliance == Alliance.Blue) {
       possibleTargets =
           new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
     } else {
@@ -181,33 +184,27 @@ public class TurretCommands {
     return getClosestTarget(robotPose, possibleTargets);
   }
 
-  public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, boolean isBlue) {
-    return Commands.defer(
-        () -> Commands.run(() -> {
-          shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue));
-          isShuttling = true;
-        }),
-        Set.of());
+  public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
+      return Commands.defer(
+          () -> Commands.run(() -> {
+            shootToTarget(flywheel, turret, hood, getShuttleTarget(alliance.get()));
+            isShuttling = true;
+          }),
+          Set.of());
+    }
+    return Commands.none();
   }
 
   public static Command shootToHub(
-      Flywheel flywheel, Turret turret, Hood hood, boolean isBlue, BooleanSupplier containsFuel) {
-    if (isBlue) {
+      Flywheel flywheel, Turret turret, Hood hood) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isPresent()) {
       return Commands.run(
-              () -> {
-                if (containsFuel.getAsBoolean()) {
-                  shootToTarget(flywheel, turret, hood, TrackingTargets.blueHub);
-                }
-              })
-          .handleInterrupt(() -> flywheel.setVelocity(0));
-    } else {
-      return Commands.run(
-              () -> {
-                if (containsFuel.getAsBoolean()) {
-                  shootToTarget(flywheel, turret, hood, TrackingTargets.redHub);
-                }
-              })
+              () -> shootToTarget(flywheel, turret, hood, alliance.get() == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub))
           .handleInterrupt(() -> flywheel.setVelocity(0));
     }
+    return Commands.none();
   }
 }
