@@ -68,6 +68,7 @@ import org.austincans.frc2158.Robot;
 import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.RobotState.VisionObservation;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.subsystems.vision.Vision;
 import org.austincans.frc2158.util.LocalADStarAK;
@@ -81,51 +82,55 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   // TunerConstants doesn't include these constants, so they are declared locally
-  static final double ODOMETRY_FREQUENCY =
-      new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
-  public static final double DRIVE_BASE_RADIUS =
+  static final double ODOMETRY_FREQUENCY = new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD()
+      ? 250.0
+      : 100.0;
+  public static final double DRIVE_BASE_RADIUS = Math.max(
       Math.max(
-          Math.max(
-              Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-              Math.hypot(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY)),
-          Math.max(
-              Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-              Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
+          Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+          Math.hypot(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY)),
+      Math.max(
+          Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+          Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = 74.088;
-  private static final double ROBOT_MOI = 6.883;
-  private static final double WHEEL_COF = 1.2;
-  public static final RobotConfig PP_CONFIG =
-      new RobotConfig(
-          ROBOT_MASS_KG,
-          ROBOT_MOI,
-          new ModuleConfig(
-              TunerConstants.FrontLeft.WheelRadius,
-              TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-              WHEEL_COF,
-              DCMotor.getKrakenX60Foc(1)
-                  .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
-              TunerConstants.FrontLeft.SlipCurrent,
-              1),
-          getModuleTranslations());
+  private static final double ROBOT_MASS_KG = DriveConstants.robotMassKG;
+  private static final double ROBOT_MOI = DriveConstants.robotMOI;
+  private static final double WHEEL_COF = DriveConstants.wheelCOF;
+  public static final RobotConfig PP_CONFIG = new RobotConfig(
+      ROBOT_MASS_KG,
+      ROBOT_MOI,
+      new ModuleConfig(
+          TunerConstants.FrontLeft.WheelRadius,
+          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+          WHEEL_COF,
+          DCMotor.getKrakenX60Foc(1)
+              .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
+          TunerConstants.FrontLeft.SlipCurrent,
+          1),
+      getModuleTranslations());
 
-  public static final DriveTrainSimulationConfig mapleSimConfig =
-      DriveTrainSimulationConfig.Default()
-          .withRobotMass(Kilograms.of(ROBOT_MASS_KG))
-          .withCustomModuleTranslations(getModuleTranslations())
-          .withGyro(COTS.ofPigeon2())
-          .withSwerveModule(
-              new SwerveModuleSimulationConfig(
-                  DCMotor.getKrakenX60(1),
-                  DCMotor.getFalcon500(1),
-                  TunerConstants.FrontLeft.DriveMotorGearRatio,
-                  TunerConstants.FrontLeft.SteerMotorGearRatio,
-                  Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
-                  Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
-                  Meters.of(TunerConstants.FrontLeft.WheelRadius),
-                  KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-                  WHEEL_COF));
+  private static DriveTrainSimulationConfig mapleSimConfig = null;
+
+  public static DriveTrainSimulationConfig getMapleSimConfig() {
+    if (mapleSimConfig != null)
+      return mapleSimConfig;
+
+    return mapleSimConfig = DriveTrainSimulationConfig.Default()
+        .withRobotMass(Kilograms.of(ROBOT_MASS_KG))
+        .withCustomModuleTranslations(getModuleTranslations())
+        .withGyro(COTS.ofPigeon2())
+        .withSwerveModule(new SwerveModuleSimulationConfig(
+            DCMotor.getKrakenX60(1),
+            DCMotor.getFalcon500(1),
+            TunerConstants.FrontLeft.DriveMotorGearRatio,
+            TunerConstants.FrontLeft.SteerMotorGearRatio,
+            Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+            Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+            Inches.of(2),
+            KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
+            WHEEL_COF));
+  }
 
   @AutoLogOutput private boolean velocityMode = true;
   @AutoLogOutput private boolean brakeModeEnabled = true;
@@ -137,21 +142,25 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Debouncer gyroConnectedDebouncer =
-      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private final Alert gyroDisconnectedAlert =
-      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private final Debouncer gyroConnectedDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
+      AlertType.kError);
 
-  private static final LoggedTunableNumber coastWaitTime =
-      new LoggedTunableNumber("Drive/CoastWaitTimeSeconds", 0.5);
-  private static final LoggedTunableNumber coastMetersPerSecondThreshold =
-      new LoggedTunableNumber("Drive/CoastMetersPerSecThreshold", .05);
+  private static final LoggedTunableNumber coastWaitTime = new LoggedTunableNumber("Drive/CoastWaitTimeSeconds", 0.5);
+  private static final LoggedTunableNumber coastMetersPerSecondThreshold = new LoggedTunableNumber(
+      "Drive/CoastMetersPerSecThreshold", .05);
 
   private final Timer lastMovementTimer = new Timer();
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
   public static boolean joystickHasInput = true;
+
+  public boolean isDriving(){
+    if (joystickHasInput == true){
+      return true;
+    }
+  }
 
   public Drive(
       DriveIO driveIO,
@@ -203,15 +212,14 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         });
 
     // Configure SysId
-    sysId =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    sysId = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null,
+            null,
+            null,
+            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
   public enum CoastRequest {
@@ -220,10 +228,13 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     ALWAYS_COAST
   }
 
-  @Setter @AutoLogOutput private CoastRequest coastRequest = CoastRequest.ALWAYS_BRAKE;
+  @Setter
+  @AutoLogOutput
+  private CoastRequest coastRequest = CoastRequest.ALWAYS_BRAKE;
 
   @Override
   public void periodic() {
+    LedIOBlinkin.getInstance().driving = isDriving();
     driveIO.updateInputs(driveInputs);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -248,10 +259,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     }
 
     // Send odometry updates to robot state
-    double[] sampleTimestamps =
-        Constants.getMode() == Mode.SIM
-            ? new double[] {Timer.getTimestamp()}
-            : gyroInputs.odometryYawTimestamps; // All signals are sampled together
+    double[] sampleTimestamps = Constants.getMode() == Mode.SIM
+        ? new double[] { Timer.getTimestamp() }
+        : gyroInputs.odometryYawTimestamps; // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
       SwerveModulePosition[] wheelPositions = new SwerveModulePosition[4];
@@ -300,8 +310,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     // Reset movement timer if velocity above threshold
     if (Arrays.stream(modules)
         .anyMatch(
-            (module) ->
-                Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecondThreshold.get())) {
+            (module) -> Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecondThreshold.get())) {
       lastMovementTimer.reset();
     }
 
@@ -337,7 +346,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
             && !Robot.isJITing());
   }
 
-  /** Set brake mode to {@code enabled} doesn't change brake mode if already set. */
+  /**
+   * Set brake mode to {@code enabled} doesn't change brake mode if already set.
+   */
   private void setBrakeMode(boolean enabled) {
     if (brakeModeEnabled != enabled) {
       Arrays.stream(modules).forEach(module -> module.setBrakeMode(enabled));
@@ -358,7 +369,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /**
    * Runs the drive at the desired velocity with setpoint module forces.
    *
-   * @param speeds Speeds in meters/sec
+   * @param speeds       Speeds in meters/sec
    * @param moduleForces The forces applied to each module
    */
   public void runVelocity(ChassisSpeeds speeds, List<Vector<N2>> moduleForces) {
@@ -379,8 +390,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   }
 
   /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-   * return to their normal orientations the next time a nonzero velocity is requested.
+   * Stops the drive and turns the modules to an X arrangement to resist movement.
+   * The modules will
+   * return to their normal orientations the next time a nonzero velocity is
+   * requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -403,7 +416,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  /**
+   * Returns the module states (turn angles and drive velocities) for all of the
+   * modules.
+   */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -428,7 +444,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     return values;
   }
 
-  /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  /**
+   * Returns the average velocity of the modules in rotations/sec (Phoenix native
+   * units).
+   */
   public double getFFCharacterizationVelocity() {
     double output = 0.0;
     for (int i = 0; i < 4; i++) {
@@ -484,60 +503,59 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /** Returns an array of module translations. */
   public static Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
-      new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-      new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
-      new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-      new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+        new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+        new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
+        new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+        new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
 
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  // TODO: seems like there is a better way to do this
-                  CommandScheduler.getInstance().schedule(modules[0].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[1].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[2].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[3].getSystemCheckCommand());
-                },
-                this),
-            // Hack to run module system checks since modules[] does not exist when this method is
-            // called
-            Commands.waitUntil(
-                () ->
-                    modules[0].getCurrentCommand() == null
-                        && modules[1].getCurrentCommand() == null
-                        && modules[2].getCurrentCommand() == null
-                        && modules[3].getCurrentCommand() == null),
-            Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
-            Commands.waitSeconds(2.0),
-            Commands.runOnce(
-                () -> {
-                  runVelocity(new ChassisSpeeds());
-                  if (-gyroInputs.imuRate < Units.radiansToDegrees(0.3)) {
-                    addFault("[System Check] IMU rate too low", false, true);
-                  }
-                },
-                this),
-            Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, -0.5))),
-            Commands.waitSeconds(2.0),
-            Commands.runOnce(
-                () -> {
-                  runVelocity(new ChassisSpeeds());
-                  if (-gyroInputs.imuRate > Units.radiansToDegrees(-0.3)) {
-                    addFault("[System Check] IMU rate too low", false, true);
-                  }
-                },
-                this))
+        Commands.runOnce(
+            () -> {
+              // TODO: seems like there is a better way to do this
+              CommandScheduler.getInstance().schedule(modules[0].getSystemCheckCommand());
+              CommandScheduler.getInstance().schedule(modules[1].getSystemCheckCommand());
+              CommandScheduler.getInstance().schedule(modules[2].getSystemCheckCommand());
+              CommandScheduler.getInstance().schedule(modules[3].getSystemCheckCommand());
+            },
+            this),
+        // Hack to run module system checks since modules[] does not exist when this
+        // method is
+        // called
+        Commands.waitUntil(
+            () -> modules[0].getCurrentCommand() == null
+                && modules[1].getCurrentCommand() == null
+                && modules[2].getCurrentCommand() == null
+                && modules[3].getCurrentCommand() == null),
+        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
+        Commands.waitSeconds(2.0),
+        Commands.runOnce(
+            () -> {
+              runVelocity(new ChassisSpeeds());
+              if (-gyroInputs.imuRate < Units.radiansToDegrees(0.3)) {
+                addFault("[System Check] IMU rate too low", false, true);
+              }
+            },
+            this),
+        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, -0.5))),
+        Commands.waitSeconds(2.0),
+        Commands.runOnce(
+            () -> {
+              runVelocity(new ChassisSpeeds());
+              if (-gyroInputs.imuRate > Units.radiansToDegrees(-0.3)) {
+                addFault("[System Check] IMU rate too low", false, true);
+              }
+            },
+            this))
         .until(
-            () ->
-                getFaults().size() > 0
-                    || modules[0].getFaults().size() > 0
-                    || modules[1].getFaults().size() > 0
-                    || modules[2].getFaults().size() > 0
-                    || modules[3].getFaults().size() > 0)
+            () -> getFaults().size() > 0
+                || modules[0].getFaults().size() > 0
+                || modules[1].getFaults().size() > 0
+                || modules[2].getFaults().size() > 0
+                || modules[3].getFaults().size() > 0)
         .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
   }
 }

@@ -26,6 +26,7 @@ public class Hood extends SubsystemBase {
 
   public Hood(HoodIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   public void setAngle(Rotation2d angle) {

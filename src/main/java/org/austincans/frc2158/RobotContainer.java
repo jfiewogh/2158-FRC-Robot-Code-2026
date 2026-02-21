@@ -39,6 +39,7 @@ import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.LimelightHelpersCommands;
 import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.subsystems.Led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim3D;
@@ -120,7 +121,7 @@ public class RobotContainer {
           new Arena2026Rebuilt3D();
         }
 
-        driveSimulation = new SwerveDriveSimulation3D(Drive.mapleSimConfig, Pose2d.kZero);
+        driveSimulation = new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero);
         driveSimulation.registerWithArena(
             SimulatedArena3D.getInstance(), new Pose2d(14, 3, new Rotation2d()));
 

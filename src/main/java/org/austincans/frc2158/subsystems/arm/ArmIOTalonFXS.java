@@ -26,6 +26,8 @@ import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
@@ -109,5 +111,9 @@ public class ArmIOTalonFXS implements ArmIO {
     } else {
       return faults;
     }
+  }
+
+  public List<SelfChecking> getHardware(){
+    return List.of(motorSelfCheck);
   }
 }

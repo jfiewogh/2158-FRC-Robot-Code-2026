@@ -32,4 +32,5 @@ public class IntakeConstants {
   public static final double deployRotationalInertiaMetersSq = 0.01;
   public static final double intakeRotationalInertiaMetersSq = 0.01;
   public static final int maxIntakeAmount = ConfigUtil.getConfigInt("max_intake_Amount", 35);
+  public static final int maxDistFromIntake = ConfigUtil.getConfigInt("lasarCan_Distance", 20);
 }

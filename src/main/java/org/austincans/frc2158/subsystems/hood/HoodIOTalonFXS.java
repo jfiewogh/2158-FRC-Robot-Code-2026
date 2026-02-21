@@ -1,0 +1,106 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+//
+// Updated on Thursday February 05, 2026 at 19:51:21 CST
+
+package org.austincans.frc2158.subsystems.hood;
+
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFXS;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
+import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+
+public class HoodIOTalonFXS implements HoodIO {
+  private TalonFXS hoodMotor = new TalonFXS(HoodConstants.talonMotorID);
+  private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", hoodMotor);
+  private DutyCycleOut dc = new DutyCycleOut(0);
+  TalonFXSConfiguration configs = new TalonFXSConfiguration();
+
+  public HoodIOTalonFXS() {
+    configs.Slot0.kP = HoodConstants.kP;
+    configs.Slot0.kI = HoodConstants.kI;
+    configs.Slot0.kD = HoodConstants.kD;
+    configs.Slot0.kV = HoodConstants.kV;
+  }
+
+  public void runHoodMotor(double speed) {
+    hoodMotor.set(speed);
+  }
+
+  @Override
+  public Angle getAngle() {
+    return Angle.fromDegrees(hoodMotor.getPosition().getValue().in(null));
+  }
+
+  public void setAngle(Angle setPointDegrees) {
+    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(setPointDegrees.toDegrees())));
+  }
+
+  @Override
+  public void setAngleRotation2d(Rotation2d angle) {
+    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(angle.getDegrees())));
+  }
+
+  @Override
+  public Rotation2d getAngleRotation2d() {
+    return Rotation2d.fromRadians(
+        Units.rotationsToRadians(hoodMotor.getPosition().getValue().in(null)));
+  }
+
+  @Override
+  public boolean atAngle(Angle setPoint) {
+    if (getAngle() == setPoint) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public void updateInputs(HoodIOInputs inputs) {
+    inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
+    inputs.temperature = hoodMotor.getDeviceTemp().getValueAsDouble();
+    inputs.motorPosition = hoodMotor.getPosition().getValue().in(null);
+  }
+
+    @Override
+  public List<SelfChecking> getHardware(){
+    return List.of(hoodMotorCheck);
+  }
+
+  @Override
+  public List<SubsystemFault> checkForFaults(){
+    List<SubsystemFault> faults = new ArrayList<>();
+
+    List<SubsystemFault> deployFault = hoodMotorCheck.checkForFaults();
+    if (deployFault != null) {
+      faults.addAll(deployFault);
+    }
+
+    if (faults.isEmpty()) {
+      return null;
+    } else {
+      return faults;
+    }
+  }
+}

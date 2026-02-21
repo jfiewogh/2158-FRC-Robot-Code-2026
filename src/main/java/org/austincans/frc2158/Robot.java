@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import org.austincans.frc2158.subsystems.Led.LedIOBlinkin;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -39,6 +41,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  private final LedIOBlinkin ledController = LedIOBlinkin.getInstance();
 
   public Robot() {
     // Record metadata
@@ -105,6 +109,8 @@ public class Robot extends LoggedRobot {
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
+
+    ledController.periodic();
   }
 
   /** Returns whether we should wait to enable because JIT optimizations are in progress. */

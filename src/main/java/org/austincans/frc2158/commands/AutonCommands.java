@@ -137,6 +137,14 @@ public class AutonCommands {
                         > 0.05);
   }
 
+  public static Command goToHubAndShoot(Drive drive){
+    return Commands.parallel{
+        TurretCommands.shootToHub(flywheel,turret,hood,false,() -> intakeSimulation.getGamePiecesInIntake() > 0),
+        
+
+    }
+  }
+
   public static Command alignDriveIntakeCommand(
       ObjectDetection objectDetection, Drive drive, Intake intake, DoubleSupplier... suppliers) {
     return Commands.parallel(

@@ -27,6 +27,7 @@ import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
@@ -96,6 +97,11 @@ public class IntakeIOTalonFXS implements IntakeIO {
   @Override
   public void setDeployAngle(Angle angle) {
     deployMotor.setControl(positionRequest.withPosition(angle.toRotations()));
+  }
+
+  @Override
+  public List<SelfChecking> getHardware(){
+    return List.of(deployMotorSelfCheck, intakeMotorSelfCheck);
   }
 
   @Override

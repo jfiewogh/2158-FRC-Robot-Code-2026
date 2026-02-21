@@ -23,6 +23,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -65,5 +67,10 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public List<SelfChecking> getHardware(){
+    return List.of(selfCheckMotor);
   }
 }

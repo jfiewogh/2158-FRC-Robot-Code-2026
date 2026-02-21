@@ -86,7 +86,7 @@ public class AIRobotInSimulation extends SubsystemBase {
   private final int id;
 
   /* The drivetrain configuration for the opponent robots in the maple-sim simulation. */
-  private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG = Drive.mapleSimConfig;
+  private static final DriveTrainSimulationConfig DRIVETRAIN_CONFIG = Drive.getMapleSimConfig();
 
   // PathPlanner PID settings
   private final PPHolonomicDriveController driveController =
