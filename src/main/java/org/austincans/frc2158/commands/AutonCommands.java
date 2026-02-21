@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:10:33 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.commands;
 
@@ -52,14 +52,14 @@ public class AutonCommands {
   private static final double maxVelocityMetersPerSec = 5;
   private static final double maxAccelerationMetersPerSecSq = 10;
 
-  private static PIDController drivePIDX = new PIDController(1, 0.0, 0);
-  private static PIDController drivePIDY = new PIDController(1, 0.0, 0);
+  private static PIDController drivePIDX = new PIDController(2, 0.0, 0);
+  private static PIDController drivePIDY = new PIDController(2, 0.0, 0);
 
   private static final double maxVelocityRadPerSec = Math.PI * 2;
   private static final double maxAccelerationRadPerSecSq = Math.PI * 4;
   private static ProfiledPIDController rotationPID =
       new ProfiledPIDController(
-          8,
+          1,
           0,
           0,
           new TrapezoidProfile.Constraints(maxVelocityRadPerSec, maxAccelerationRadPerSecSq));
@@ -181,23 +181,27 @@ public class AutonCommands {
 
   private static double blueAllianceZoneX = Units.inchesToMeters(156.61 - 25);
   private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61 + 25);
-  private static double shootingLeftY = Units.inchesToMeters(50.59 + 12 + 73 * 0.5);
-  private static double shootingRightY = Units.inchesToMeters(317.688 - 50.35 - 12 - 73 * 0.5);
-
+  private static double shootingLeftY = Units.inchesToMeters(50.35 + 12 + 73 * 0.5);
+  private static double shootingRightY = Units.inchesToMeters(317.688 - (50.59 + 12 + 73 * 0.5));
   private static Rotation2d initialRobotRotation = Rotation2d.kZero;
+  private static ArrayList<Translation2d> blueHubShootingTranslations =
+      new ArrayList<>(
+          Arrays.asList(
+              new Translation2d(blueAllianceZoneX, shootingLeftY),
+              new Translation2d(blueAllianceZoneX, shootingRightY)));
+  private static ArrayList<Translation2d> redHubShootingTranslations =
+      new ArrayList<>(
+          Arrays.asList(
+              new Translation2d(redAllianceZoneX, shootingLeftY),
+              new Translation2d(redAllianceZoneX, shootingRightY)));
 
+  // TODO: fix
+  // if the robot goes over the hump, the robot continues with a constant velocity
   public static Command pathFindToNearestHubShootingPose(Drive drive, Alliance alliance) {
     Supplier<Translation2d> targetTranslationSupplier =
         () -> {
           ArrayList<Translation2d> hubShootingTranslations =
-              new ArrayList<>(
-                  alliance == Alliance.Blue
-                      ? Arrays.asList(
-                          new Translation2d(blueAllianceZoneX, shootingLeftY),
-                          new Translation2d(blueAllianceZoneX, shootingRightY))
-                      : Arrays.asList(
-                          new Translation2d(redAllianceZoneX, shootingLeftY),
-                          new Translation2d(redAllianceZoneX, shootingRightY)));
+              alliance == Alliance.Blue ? blueHubShootingTranslations : redHubShootingTranslations;
           return RobotState.getInstance()
               .getEstimatedPose()
               .getTranslation()
@@ -208,7 +212,9 @@ public class AutonCommands {
                 pathfindToPoseCommand(
                     new Pose2d(targetTranslationSupplier.get(), initialRobotRotation)),
             Set.of(drive))
-        .onlyIf(() -> !TurretCommands.isInAllianceZone(alliance));
+        .onlyIf(() -> !TurretCommands.isInAllianceZone(alliance, drive.getPose()))
+        .until(() -> TurretCommands.isInAllianceZone(alliance, drive.getPose()))
+        .handleInterrupt(() -> drive.runVelocity(new ChassisSpeeds()));
   }
 
   public static Command driveToHubAndShoot(
