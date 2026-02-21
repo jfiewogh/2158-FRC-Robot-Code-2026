@@ -51,6 +51,7 @@ public class Elevator extends AdvancedSubsystem {
   public Elevator(ElevatorIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
     elevatorPID.setTolerance(ElevatorConstants.pidTolerance);
   }
 
@@ -121,7 +122,7 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 1) {
-                    addFault(
+                    addFault("ELEV",
                         "[System Check] Rotation motor encoder velocity measured too slow",
                         false,
                         true);
@@ -137,7 +138,7 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.heightMeters < 0.95 || inputs.heightMeters > 1.05) {
-                    addFault(
+                    addFault("ELEV",
                         "[System Check] Rotation Motor did not reach target position", false, true);
                   }
                 },
@@ -151,7 +152,7 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 0.95) {
-                    addFault("[System Check] Drive motor encoder velocity too slow", false, true);
+                    addFault("ELEV","[System Check] Drive motor encoder velocity too slow", false, true);
                   }
                   moveAtVelocityCommand(0);
                 },

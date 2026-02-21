@@ -120,6 +120,7 @@ public class Module extends AdvancedSubsystem {
         new Alert(
             "Disconnected turn encoder on module " + Integer.toString(index) + ".",
             AlertType.kError);
+    io.getHardware().forEach(e -> registerHardware(e));
   }
 
   public void periodic() {
@@ -264,7 +265,7 @@ public class Module extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Units.radiansToDegrees(inputs.turnVelocityRadPerSec) < 20) {
-                    addFault(
+                    addFault("SWRV" + String.valueOf(index),
                         "[System Check] Rotation motor encoder velocity measured too slow",
                         false,
                         true);
@@ -281,7 +282,7 @@ public class Module extends AdvancedSubsystem {
                 () -> {
                   if (inputs.turnAbsolutePosition.getDegrees() < 70
                       || inputs.turnAbsolutePosition.getDegrees() > 110) {
-                    addFault(
+                    addFault("SWRV" + String.valueOf(index),
                         "[System Check] Rotation Motor did not reach target position", false, true);
                   }
                 },
@@ -295,7 +296,7 @@ public class Module extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Units.radiansToDegrees(inputs.driveVelocityRadPerSec) < 0.25) {
-                    addFault("[System Check] Drive motor encoder velocity too slow", false, true);
+                    addFault("SWRV" + String.valueOf(index),"[System Check] Drive motor encoder velocity too slow", false, true);
                   }
                   io.setDriveVelocity(0);
                 },

@@ -17,9 +17,16 @@
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.austincans.frc2158.subsystems.intake.Intake;
+import org.austincans.frc2158.subsystems.turret.Turret;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
@@ -27,8 +34,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {
@@ -37,8 +42,13 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     ERROR
   }
 
+  public enum FaultCodes {
+
+  }
+
   private final List<SubsystemFault> faults = new ArrayList<>();
   private final List<SelfChecking> hardware = new ArrayList<>();
+  private final List<Command> checkCommands = new ArrayList<>();
   private final String statusTable;
   private final boolean checkErrors;
 
@@ -115,16 +125,16 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     }
   }
 
-  protected void addFault(String description, boolean isWarning) {
-    this.addFault(new SubsystemFault(description, isWarning));
+  protected void addFault(String code, String description, boolean isWarning) {
+    this.addFault(new SubsystemFault(code, description, isWarning));
   }
 
-  protected void addFault(String description, boolean isWarning, boolean sticky) {
-    this.addFault(new SubsystemFault(description, isWarning, sticky));
+  protected void addFault(String code, String description, boolean isWarning, boolean sticky) {
+    this.addFault(new SubsystemFault(code, description, isWarning, sticky));
   }
 
-  protected void addFault(String description) {
-    this.addFault(description, false);
+  protected void addFault(String code, String description) {
+    this.addFault(code, description, false);
   }
 
   public List<SubsystemFault> getFaults() {
@@ -186,6 +196,14 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
 
   // Command to run a full systems check
   protected abstract Command systemCheckCommand();
+
+  public void registerCheckCommand(Command command){
+    checkCommands.add(command);
+  }
+
+  public Command sequentialCheck(){
+    return Commands.sequence(checkCommands.toArray(Command[]::new)).onlyWhile(() -> faults.size() == 0);
+  }
 
   // Method to check for faults while the robot is operating normally
   private void checkForFaults() {

@@ -32,6 +32,7 @@ public class Arm extends AdvancedSubsystem {
   public Arm(ArmIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   /**
@@ -105,7 +106,7 @@ public class Arm extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (getVelocity() < 0.1) {
-                    addFault("[System Check] Extension velocity measured too slow", false, true);
+                    addFault("ARM", "[System Check] Extension velocity measured too slow", false, true);
                   }
                   io.setVelocity(0);
                 },
@@ -116,7 +117,7 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < -15
                       || Units.rotationsToDegrees(getPosition()) > 15) {
-                    addFault("[System Check] Joint did not reach target position", false, true);
+                    addFault("ARM","[System Check] Joint did not reach target position", false, true);
                   }
                 },
                 this),
@@ -126,7 +127,7 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < 75
                       || Units.rotationsToDegrees(getPosition()) > 115) {
-                    addFault("[System Check] Joint did not reach target position", false, true);
+                    addFault("ARM", "[System Check] Joint did not reach target position", false, true);
                   }
                 },
                 this))

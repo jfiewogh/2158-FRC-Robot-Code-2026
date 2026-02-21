@@ -31,6 +31,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -146,5 +148,9 @@ public class TurretIOTalonFX implements TurretIO {
     } else {
       return faults;
     }
+  }
+
+  public List<SelfChecking> getHardware(){
+    return List.of(selfCheckingTalonFXS);
   }
 }

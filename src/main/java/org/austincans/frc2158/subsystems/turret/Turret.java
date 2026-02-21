@@ -32,6 +32,8 @@ public class Turret extends AdvancedSubsystem {
 
   public Turret(TurretIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   @Override
@@ -158,7 +160,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityDegPerSec < 5) {
-                    addFault(
+                    addFault("TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
                         false,
                         true);
@@ -171,7 +173,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (getTurretAngle() < -25 || getTurretAngle() > -15) {
-                    addFault("[System Check] Turret did not reach desired angle", false, true);
+                    addFault("TRRT","[System Check] Turret did not reach desired angle", false, true);
                   }
                 },
                 this),
@@ -180,7 +182,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Math.abs(getTurretAngle()) > 5) {
-                    addFault("[System Check] Turret did not reach desired angle", false, true);
+                    addFault("TRRT","[System Check] Turret did not reach desired angle", false, true);
                   }
                 },
                 this))

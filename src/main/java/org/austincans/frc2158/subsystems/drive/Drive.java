@@ -158,8 +158,8 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   public static boolean joystickHasInput = true;
 
-  public boolean isDriving(){
-    if (joystickHasInput == true){
+  public boolean isDriving() {
+    if (joystickHasInput == true) {
       return true;
     }
   }
@@ -181,6 +181,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
 
     driveIO.setModules(modules);
+    registerCheckCommand(systemCheckCommand());
 
     lastMovementTimer.start();
     setBrakeMode(true);
@@ -515,43 +516,17 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(
-            () -> {
-              // TODO: seems like there is a better way to do this
-              CommandScheduler.getInstance().schedule(modules[0].getSystemCheckCommand());
-              CommandScheduler.getInstance().schedule(modules[1].getSystemCheckCommand());
-              CommandScheduler.getInstance().schedule(modules[2].getSystemCheckCommand());
-              CommandScheduler.getInstance().schedule(modules[3].getSystemCheckCommand());
-            },
-            this),
-        // Hack to run module system checks since modules[] does not exist when this
-        // method is
-        // called
+        modules[0].getSystemCheckCommand(),
+        modules[1].getSystemCheckCommand(),
+        modules[2].getSystemCheckCommand(),
+        modules[3].getSystemCheckCommand(),
         Commands.waitUntil(
             () -> modules[0].getCurrentCommand() == null
                 && modules[1].getCurrentCommand() == null
                 && modules[2].getCurrentCommand() == null
                 && modules[3].getCurrentCommand() == null),
         Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
-        Commands.waitSeconds(2.0),
-        Commands.runOnce(
-            () -> {
-              runVelocity(new ChassisSpeeds());
-              if (-gyroInputs.imuRate < Units.radiansToDegrees(0.3)) {
-                addFault("[System Check] IMU rate too low", false, true);
-              }
-            },
-            this),
-        Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, -0.5))),
-        Commands.waitSeconds(2.0),
-        Commands.runOnce(
-            () -> {
-              runVelocity(new ChassisSpeeds());
-              if (-gyroInputs.imuRate > Units.radiansToDegrees(-0.3)) {
-                addFault("[System Check] IMU rate too low", false, true);
-              }
-            },
-            this))
+        Commands.waitSeconds(2.0)
         .until(
             () -> getFaults().size() > 0
                 || modules[0].getFaults().size() > 0

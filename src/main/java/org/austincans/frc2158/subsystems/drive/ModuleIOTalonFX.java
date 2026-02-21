@@ -47,6 +47,7 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
@@ -297,5 +298,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     // } else {
     return faults;
     // }
+  }
+
+  public List<SelfChecking> getHardware(){
+    return List.of(driveTalonSelfCheck, turnTalonSelfCheck);
   }
 }

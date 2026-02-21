@@ -25,6 +25,8 @@ import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SysIdSwerveRotation;
+
 public class Hood extends AdvancedSubsystem {
   private HoodIO io;
   private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
@@ -32,6 +34,7 @@ public class Hood extends AdvancedSubsystem {
   public Hood(HoodIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   Command runHoodMotorCommand(Angle angle) {
@@ -80,7 +83,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.hoodRadsPerSec < 1) {
-                    addFault("[System Check] Hood encoder velocity measured too slow", false, true);
+                    addFault("HOOD","[System Check] Hood encoder velocity measured too slow", false, true);
                   }
                 },
                 this),
@@ -93,7 +96,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
-                    addFault("[System Check] Hood did not reach target position", false, true);
+                    addFault("HOOD", "[System Check] Hood did not reach target position", false, true);
                   }
                 },
                 this),

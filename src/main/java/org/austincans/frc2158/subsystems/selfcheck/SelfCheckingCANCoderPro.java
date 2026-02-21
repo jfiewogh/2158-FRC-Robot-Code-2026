@@ -43,16 +43,16 @@ public class SelfCheckingCANCoderPro implements SelfChecking {
     List<SubsystemFault> faults = new ArrayList<>();
 
     if (hardwareFaultSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Hardware fault detected", label)));
+      faults.add(new SubsystemFault("CAN", String.format("[%s]: Hardware fault detected", label)));
     }
     if (bootEnabledSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Device booted while enabled", label)));
+      faults.add(new SubsystemFault("CAN", String.format("[%s]: Device booted while enabled", label)));
     }
     if (badMagnetSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Magnet too weak", label)));
+      faults.add(new SubsystemFault("CAN", String.format("[%s]: Magnet too weak", label)));
     }
     if (undervoltageSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Under voltage", label)));
+      faults.add(new SubsystemFault("CAN", String.format("[%s]: Under voltage", label)));
     }
 
     return faults;

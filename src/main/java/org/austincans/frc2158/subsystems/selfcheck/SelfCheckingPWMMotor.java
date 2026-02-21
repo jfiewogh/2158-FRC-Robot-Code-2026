@@ -35,7 +35,7 @@ public class SelfCheckingPWMMotor implements SelfChecking {
     List<SubsystemFault> faults = new ArrayList<>();
 
     if (!motor.isAlive()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Device timed out", label)));
+      faults.add(new SubsystemFault("PWM" + String.valueOf(motor.getPwmHandle()), String.format("[%s]: Device timed out", label)));
     }
 
     return faults;

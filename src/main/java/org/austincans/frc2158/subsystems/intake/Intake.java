@@ -36,6 +36,7 @@ public class Intake extends AdvancedSubsystem {
   public Intake(IntakeIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   public boolean ballIntaked(){
@@ -59,7 +60,6 @@ public class Intake extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addFault);
-    LedIOBlinkin.getInstance().intaked = ballIntaked();
   }
 
   public Command systemCheckCommand() {

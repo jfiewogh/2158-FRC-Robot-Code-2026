@@ -37,7 +37,7 @@ public class SelfCheckingSparkMax implements SelfChecking {
 
     REVLibError err = spark.getLastError();
     if (err != REVLibError.kOk) {
-      faults.add(new SubsystemFault(String.format("[%s]: Error: %s", label, err.name())));
+      faults.add(new SubsystemFault("SPRK" + String.valueOf(spark.getDeviceId()), String.format("[%s]: Error: %s", label, err.name())));
     }
 
     return faults;

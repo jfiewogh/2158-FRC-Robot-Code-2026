@@ -25,15 +25,15 @@ public class SubsystemFault {
   public final boolean isWarning;
   public final boolean sticky;
 
-  public SubsystemFault(String description, boolean isWarning) {
-    this(description, isWarning, false);
+  public SubsystemFault(String code, String description, boolean isWarning) {
+    this(code, description, isWarning, false);
   }
 
-  public SubsystemFault(String description) {
-    this(description, false);
+  public SubsystemFault(String code, String description) {
+    this(code, description, false);
   }
 
-  public SubsystemFault(String description, boolean isWarning, boolean sticky) {
+  public SubsystemFault(String code, String description, boolean isWarning, boolean sticky) {
     this.description = description;
     this.timestamp = Timer.getFPGATimestamp();
     this.isWarning = isWarning;

@@ -46,6 +46,7 @@ public class Flywheel extends AdvancedSubsystem {
   public Flywheel(FlywheelIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   public boolean readyToShoot(){
@@ -81,7 +82,7 @@ public class Flywheel extends AdvancedSubsystem {
         Commands.runOnce(
             () -> {
               if (getRPM() < 95 || getRPM() > 105) {
-                addFault("[System Check] Flywheel did not reach desired velocity RPM");
+                addFault("FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }));
   }
