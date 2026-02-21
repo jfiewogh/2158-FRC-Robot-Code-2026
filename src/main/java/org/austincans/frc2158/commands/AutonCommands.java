@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 12:49:35 CST
 
 package org.austincans.frc2158.commands;
 
@@ -24,18 +24,20 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.drive.Drive;
+import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.intake.Intake;
-import org.austincans.frc2158.subsystems.intake.IntakeConstants;
+import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
+import org.littletonrobotics.junction.Logger;
 
 public class AutonCommands {
   private static final double maxVelocityMetersPerSec = 5;
@@ -52,6 +54,18 @@ public class AutonCommands {
           0,
           0,
           new TrapezoidProfile.Constraints(maxVelocityRadPerSec, maxAccelerationRadPerSecSq));
+
+  private static final PathConstraints constraints =
+      new PathConstraints(
+          maxVelocityMetersPerSec, maxAccelerationMetersPerSecSq,
+          maxVelocityRadPerSec, maxAccelerationRadPerSecSq);
+
+  private static final double pathfindEndDistanceMeters = 0.5;
+  private static final double intakeDistanceMeters = 1;
+
+  private static final double intakeDurationSeconds = 3;
+  private static double intakeStartTime;
+  private static DoubleSupplier time = Timer::getFPGATimestamp;
 
   static {
     rotationPID.enableContinuousInput(-Math.PI, Math.PI);
@@ -70,18 +84,13 @@ public class AutonCommands {
     drive.runVelocity(speed);
   }
 
-  private static void intakeUntilFull(Intake intake) {
-    if (intake.getGamePieceAmount() < IntakeConstants.maxIntakeAmount) {
-      intake.setRelativeVelocity(0.5);
-    } else {
-      intake.setRelativeVelocity(0);
-    }
+  private static double getDistanceBetweenPoses(Pose2d pose1, Pose2d pose2) {
+    return pose1.getTranslation().getDistance(pose2.getTranslation());
   }
 
-  public static Command driveToPoseCommand(Drive drive, ObjectDetection objectDetection) {
-    Supplier<Pose2d> drivePose = drive::getPose;
+  private static Command driveToNearestGamePieceCommand(
+      Drive drive, ObjectDetection objectDetection, Intake intake) {
     Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
-
     return Commands.run(
             () -> {
               if (!Drive.joystickHasInput && nearestGamePiecePoseSupplier.get() != null) {
@@ -89,71 +98,74 @@ public class AutonCommands {
               }
             },
             drive)
-        .onlyWhile(
-            () ->
-                nearestGamePiecePoseSupplier.get() != null
-                    && nearestGamePiecePoseSupplier
-                            .get()
-                            .getTranslation()
-                            .getDistance(new Translation3d(drivePose.get().getTranslation()))
-                        > 0.05
-                    && !Drive.joystickHasInput);
+        .onlyWhile(() -> !Drive.joystickHasInput && nearestGamePiecePoseSupplier.get() != null)
+        .raceWith(Commands.waitSeconds(5));
   }
 
-  public static Command intakeUntilFullCommand(Intake intake) {
-    return Commands.runOnce(() -> intake.setRelativeVelocity(0.5));
+  public static Command runIntakeCommand(
+      Intake intake, ObjectDetection detection, Drive drive, double distance) {
+    Supplier<Pose3d> target = detection.getNearestGamePiecePoseSupplier();
+    Supplier<Pose2d> drivePose = drive.getPoseSupplier();
+    Command command =
+        Commands.run(
+                () -> {
+                  if (target.get() != null
+                      && getDistanceBetweenPoses(target.get().toPose2d(), drivePose.get())
+                          < distance) {
+                    intake.setRelativeVelocity(0.5);
+                  } else {
+                    intake.setRelativeVelocity(0);
+                  }
+                  Logger.recordOutput("intake duration", time.getAsDouble() - intakeStartTime);
+                })
+            .beforeStarting(() -> intakeStartTime = time.getAsDouble())
+            .onlyWhile(() -> target.get() != null);
+    command.addRequirements(intake);
+    return command;
   }
-
-  private static final PathConstraints constraints =
-      new PathConstraints(
-          maxVelocityMetersPerSec, maxAccelerationMetersPerSecSq,
-          maxVelocityRadPerSec, maxAccelerationRadPerSecSq);
 
   public static Command pathfindToPoseCommand(Drive drive, ObjectDetection objectDetection) {
-    Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
-    Supplier<Pose2d> drivePos = () -> drive.getPose();
-
+    Supplier<Pose3d> targetPoseSupplier = objectDetection.getNearestGamePiecePoseSupplier();
+    Supplier<Pose2d> currentPoseSupplier = drive.getPoseSupplier();
     return Commands.defer(
             () ->
                 AutoBuilder.pathfindToPose(
                     new Pose2d(
-                        nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d(),
+                        targetPoseSupplier.get().getTranslation().toTranslation2d(),
                         Rotation2d.fromRadians(
                             Math.atan2(
-                                nearestGamePiecePoseSupplier.get().getY() - drivePos.get().getY(),
-                                nearestGamePiecePoseSupplier.get().getX()
-                                    - drivePos.get().getX()))),
+                                targetPoseSupplier.get().getY() - currentPoseSupplier.get().getY(),
+                                targetPoseSupplier.get().getX()
+                                    - currentPoseSupplier.get().getX()))),
                     constraints),
             Set.of(drive))
-        .onlyIf(() -> nearestGamePiecePoseSupplier.get() != null)
+        .onlyIf(() -> targetPoseSupplier.get() != null)
         .onlyWhile(
             () ->
                 !Drive.joystickHasInput
-                    && nearestGamePiecePoseSupplier.get() != null
-                    && nearestGamePiecePoseSupplier
-                            .get()
-                            .getTranslation()
-                            .getDistance(new Translation3d(drivePos.get().getTranslation()))
-                        > 0.05);
+                    && targetPoseSupplier.get() != null
+                    && getDistanceBetweenPoses(
+                            targetPoseSupplier.get().toPose2d(), currentPoseSupplier.get())
+                        > pathfindEndDistanceMeters);
   }
 
-  public static Command goToHubAndShoot(Drive drive){
-    return Commands.parallel{
-        TurretCommands.shootToHub(flywheel,turret,hood,false,() -> intakeSimulation.getGamePiecesInIntake() > 0),
-        
-
-    }
+  public static Command driveToHubAndShoot(Drive drive, Turret turret, Flywheel flywheel){
+    return Commands.parallel()
   }
 
-  public static Command alignDriveIntakeCommand(
+  public static Command driveToAndIntakeGamePieces(
       ObjectDetection objectDetection, Drive drive, Intake intake, DoubleSupplier... suppliers) {
-    return Commands.parallel(
+    return Commands.deadline(
+            Commands.waitSeconds(intakeDurationSeconds),
             Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers)),
-            pathfindToPoseCommand(drive, objectDetection),
-            intakeUntilFullCommand(intake))
-        .onlyWhile(
-            () ->
-                intake.getGamePieceAmount() < IntakeConstants.maxIntakeAmount
-                    && !Drive.joystickHasInput);
+            runIntakeCommand(intake, objectDetection, drive, intakeDistanceMeters),
+            Commands.sequence(
+                pathfindToPoseCommand(drive, objectDetection),
+                driveToNearestGamePieceCommand(drive, objectDetection, intake)))
+        .handleInterrupt(
+            () -> {
+              intake.setRelativeVelocity(0);
+              drive.stop();
+            });
   }
 }
