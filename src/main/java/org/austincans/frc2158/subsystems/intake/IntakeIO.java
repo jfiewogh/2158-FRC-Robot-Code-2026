@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 12:49:35 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -66,7 +66,6 @@ public interface IntakeIO {
     public double intakeMotorVoltage = 0;
     public double intakeVelocityRadPerSec = 0;
     public double intakeTemperatureC = 0;
-    public int gamePiecesCount = 0;
   }
 
   public void updateInputs(IntakeIOInputs inputs);

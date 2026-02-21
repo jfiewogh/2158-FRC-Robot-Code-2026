@@ -13,13 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 12:49:35 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ObjectDetection extends SubsystemBase {
@@ -63,6 +64,10 @@ public class ObjectDetection extends SubsystemBase {
 
   public Pose3d getNearestGamePiecePose() {
     return inputs.nearestGamePiecePose;
+  }
+
+  public Supplier<Pose3d> getNearestGamePiecePoseSupplier() {
+    return this::getNearestGamePiecePose;
   }
 
   public Pose3d[] getGamePiecePoses() {

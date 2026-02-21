@@ -1,0 +1,25 @@
+diff a/src/main/java/org/austincans/frc2158/subsystems/intake/Intake.java b/src/main/java/org/austincans/frc2158/subsystems/intake/Intake.java	(rejected hunks)
+@@ -54,12 +54,20 @@ public class Intake extends AdvancedSubsystem {
+     io.checkForFaults().forEach(this::addFault);
+   }
+ 
++  public double getIntakeVelocityRadPerSec() {
++    return inputs.intakeVelocityRadPerSec;
++  }
++
+   public Command systemCheckCommand() {
+     return Commands.runOnce(() -> {});
+   }
+ 
+   // TODO: Change this because this only temporary
+-  public int getGamePieceAmount() {
+-    return inputs.gamePiecesCount;
+-  }
++  // public int getGamePieceAmount() {
++  //   return inputs.gamePiecesCount;
++  // }
++
++  // public IntSupplier getGamePieceAmountSupplier() {
++  //   return this::getGamePieceAmount;
++  // }
+ }

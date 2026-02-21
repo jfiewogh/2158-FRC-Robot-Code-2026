@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 12:49:35 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -61,6 +61,7 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.Setter;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Constants.Mode;
@@ -465,6 +466,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
     return driveInputs.pose.toPose2d();
+  }
+
+  public Supplier<Pose2d> getPoseSupplier() {
+    return this::getPose;
   }
 
   /** Returns the current odometry rotation. */
