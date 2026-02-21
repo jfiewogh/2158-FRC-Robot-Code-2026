@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -26,7 +26,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;

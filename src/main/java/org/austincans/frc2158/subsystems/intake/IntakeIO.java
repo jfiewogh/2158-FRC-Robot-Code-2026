@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -43,9 +43,10 @@ public interface IntakeIO {
   public double kD = ConfigUtil.getConfigDouble("intakekD", 0);
 
   public double maxVelocityRadPerSec = Math.PI;
-  public TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(
-      ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
-      ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
+  public TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(
+          ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
+          ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
 
   /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
   public double kS = ConfigUtil.getConfigDouble("intakekS", 0);
@@ -54,7 +55,8 @@ public interface IntakeIO {
   public double kV = ConfigUtil.getConfigDouble("intakekV", 0);
   public double kA = ConfigUtil.getConfigDouble("intakekA", 0);
   public final ArmFeedforward feedforward = new ArmFeedforward(kS, kG, kV, kA);
-  public ProfiledPIDController intakePIDController = new ProfiledPIDController(kP, kI, kD, constraints);
+  public ProfiledPIDController intakePIDController =
+      new ProfiledPIDController(kP, kI, kD, constraints);
 
   public boolean deployBreakEnabled = ConfigUtil.getConfigBoolean("intakeDeployBrakeEnabled", true);
 

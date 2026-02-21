@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.commands;
 
@@ -24,8 +24,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.RobotState;
@@ -35,9 +38,6 @@ import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.austincans.frc2158.util.ShooterMath;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import java.util.Optional;
 
 public class TurretCommands {
   public enum TrackingTargets {
@@ -84,17 +84,20 @@ public class TurretCommands {
 
     double targetHeight = target.getTranslation3d().getZ();
 
-    Translation2d futureRobotTranslation = robotPose
-        .getTranslation()
-        .plus(
-            new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
-                .times(latency));
-    Rotation2d futureRobotRotation = robotPose
-        .getRotation()
-        .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond))
-        .times(latency);
+    Translation2d futureRobotTranslation =
+        robotPose
+            .getTranslation()
+            .plus(
+                new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond)
+                    .times(latency));
+    Rotation2d futureRobotRotation =
+        robotPose
+            .getRotation()
+            .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond))
+            .times(latency);
 
-    Translation2d turretTranslation = futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
+    Translation2d turretTranslation =
+        futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
     double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
 
@@ -104,18 +107,21 @@ public class TurretCommands {
 
     double totalVelocity = getActualExitVelocityMetersPerSec(flywheelVelocityRPM);
 
-    double totalXYDistance = turretTranslation.getDistance(target.getTranslation3d().toTranslation2d());
+    double totalXYDistance =
+        turretTranslation.getDistance(target.getTranslation3d().toTranslation2d());
 
-    double totalPitchRad = ShooterMath.calculateProjectileAngle(
-        TURRET_HEIGHT, totalVelocity, totalXYDistance, targetHeight);
+    double totalPitchRad =
+        ShooterMath.calculateProjectileAngle(
+            TURRET_HEIGHT, totalVelocity, totalXYDistance, targetHeight);
 
     if (Double.isNaN(totalPitchRad)) {
       System.out.println("Cannot shoot into hub (1)");
     } else {
-      Rotation2d totalYaw = Rotation2d.fromRadians(
-          Math.atan2(
-              target.getTranslation3d().getY() - turretTranslation.getY(),
-              target.getTranslation3d().getX() - turretTranslation.getX()));
+      Rotation2d totalYaw =
+          Rotation2d.fromRadians(
+              Math.atan2(
+                  target.getTranslation3d().getY() - turretTranslation.getY(),
+                  target.getTranslation3d().getX() - turretTranslation.getX()));
 
       double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
       double totalXVelocity = totalXYVelocity * totalYaw.getCos();
@@ -132,8 +138,9 @@ public class TurretCommands {
 
       double totalTime = totalXYDistance / totalXYVelocity;
 
-      double hoodAngleRad = ShooterMath.calculateProjectileAngle(
-          TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, targetHeight);
+      double hoodAngleRad =
+          ShooterMath.calculateProjectileAngle(
+              TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, targetHeight);
 
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
@@ -168,9 +175,11 @@ public class TurretCommands {
     Pose3d robotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
-      possibleTargets = new TrackingTargets[] { TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight };
+      possibleTargets =
+          new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
     } else {
-      possibleTargets = new TrackingTargets[] { TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight };
+      possibleTargets =
+          new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
     }
     return getClosestTarget(robotPose, possibleTargets);
   }
@@ -179,10 +188,12 @@ public class TurretCommands {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
       return Commands.defer(
-          () -> Commands.run(() -> {
-            shootToTarget(flywheel, turret, hood, getShuttleTarget(alliance.get()));
-            isShuttling = true;
-          }),
+          () ->
+              Commands.run(
+                  () -> {
+                    shootToTarget(flywheel, turret, hood, getShuttleTarget(alliance.get()));
+                    isShuttling = true;
+                  }),
           Set.of());
     }
     return Commands.none();
@@ -191,25 +202,33 @@ public class TurretCommands {
   private static double blueAllianceZoneX = Units.inchesToMeters(156.61);
   private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61);
 
-  public static Command shootToHub(
-      Flywheel flywheel, Turret turret, Hood hood) {
+  public static boolean isInAllianceZone(Alliance alliance) {
+    return alliance == Alliance.Blue
+        ? RobotState.getInstance().getEstimatedPose().getX() < blueAllianceZoneX
+        : RobotState.getInstance().getEstimatedPose().getX() > redAllianceZoneX;
+  }
+
+  public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
 
     if (alliance.isPresent()) {
-      BooleanSupplier inAllianceZone = () -> alliance.get() == Alliance.Blue
-          ? RobotState.getInstance().getEstimatedPose().getX() < blueAllianceZoneX
-          : RobotState.getInstance().getEstimatedPose().getX() > redAllianceZoneX;
+      BooleanSupplier inAllianceZone = () -> isInAllianceZone(alliance.get());
 
       // TODO: determine using flywheel laser can
       BooleanSupplier noGamePiecesToShoot = () -> false;
 
       return Commands.run(
-          () -> {
-              if (inAllianceZone.getAsBoolean()) {
-                shootToTarget(flywheel, turret, hood,
-                  alliance.get() == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub);
-              }
-            })
+              () -> {
+                if (inAllianceZone.getAsBoolean()) {
+                  shootToTarget(
+                      flywheel,
+                      turret,
+                      hood,
+                      alliance.get() == Alliance.Blue
+                          ? TrackingTargets.blueHub
+                          : TrackingTargets.redHub);
+                }
+              })
           .until(noGamePiecesToShoot)
           .handleInterrupt(() -> flywheel.setVelocity(0));
     }

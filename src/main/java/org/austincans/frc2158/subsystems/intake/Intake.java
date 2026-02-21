@@ -13,16 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.math.Angle;
-import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.Logger;
@@ -38,7 +36,7 @@ public class Intake extends AdvancedSubsystem {
     io.getHardware().forEach(e -> registerHardware(e));
   }
 
-  public boolean distanceSensorActive(){
+  public boolean distanceSensorActive() {
     return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
   }
 

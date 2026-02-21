@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158;
 
@@ -195,11 +195,7 @@ public class RobotContainer {
           Command intakeCommand =
               Commands.runEnd(
                   () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-          Command shootCommand =
-              TurretCommands.shootToHub(
-                  flywheel,
-                  turret,
-                  hood);
+          Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood);
 
           keyboardInput.z().whileTrue(shootCommand);
           keyboardInput.v().whileTrue(intakeCommand);
@@ -213,6 +209,19 @@ public class RobotContainer {
               .onTrue(
                   AutonCommands.driveToAndIntakeGamePieces(
                       objectDetection, drive, intake, leftX, leftY, rightX, rightY));
+          keyboardInput
+              .comma()
+              .whileTrue(
+                  AutonCommands.driveToHubAndShoot(
+                      drive,
+                      turret,
+                      flywheel,
+                      hood,
+                      objectDetection,
+                      leftX,
+                      leftY,
+                      rightX,
+                      rightY));
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
@@ -225,8 +234,7 @@ public class RobotContainer {
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
-          NamedCommands.registerCommand(
-              "shuttle", TurretCommands.shuttle(flywheel, turret, hood));
+          NamedCommands.registerCommand("shuttle", TurretCommands.shuttle(flywheel, turret, hood));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());

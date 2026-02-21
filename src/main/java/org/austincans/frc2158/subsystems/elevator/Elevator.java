@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday December 24, 2025 at 21:41:23 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -96,8 +96,10 @@ public class Elevator extends AdvancedSubsystem {
   }
 
   public Command moveAtVelocityCommand(double velocity) {
-    return Commands.runOnce(() -> 
-      io.runVoltage(velocity / ElevatorConstants.maxVelocityMetersPerSec * Constants.maxVoltage));
+    return Commands.runOnce(
+        () ->
+            io.runVoltage(
+                velocity / ElevatorConstants.maxVelocityMetersPerSec * Constants.maxVoltage));
   }
 
   public Command stopCommand() {

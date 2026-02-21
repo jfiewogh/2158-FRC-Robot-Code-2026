@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -21,8 +21,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -59,13 +57,13 @@ public class Hood extends AdvancedSubsystem {
   }
 
   public Command stopCommand() {
-  return new InstantCommand(
-      () -> {
-        io.setAngle(Angle.fromDegrees(0));
-      });
-}
+    return new InstantCommand(
+        () -> {
+          io.setAngle(Angle.fromDegrees(0));
+        });
+  }
 
-   public Command systemCheckCommand() {
+  public Command systemCheckCommand() {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
@@ -76,7 +74,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.waitSeconds(0.1),
             Commands.runOnce(
                 () -> {
-                  if (inputs.hoodRadsPerSec < 1) {
+                  if (inputs.hoodVelocityRadPerSec < 1) {
                     addFault("[System Check] Hood encoder velocity measured too slow", false, true);
                   }
                 },

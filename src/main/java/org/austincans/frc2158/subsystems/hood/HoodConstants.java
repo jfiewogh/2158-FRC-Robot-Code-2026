@@ -13,12 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 19, 2026 at 20:08:44 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.hood;
-import java.util.TreeMap;
+
 import org.austincans.frc2158.util.ConfigUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public class HoodConstants {
   static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);

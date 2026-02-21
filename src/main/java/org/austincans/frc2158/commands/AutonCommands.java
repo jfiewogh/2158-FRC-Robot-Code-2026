@@ -13,38 +13,39 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 12:49:35 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.commands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.austincans.frc2158.commands.TurretCommands.TrackingTargets;
+import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.intake.Intake;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
-import org.ironmaple.simulation.IntakeSimulation;
 import org.littletonrobotics.junction.Logger;
 
 public class AutonCommands {
@@ -115,29 +116,30 @@ public class AutonCommands {
     Supplier<Pose3d> target = detection.getNearestGamePiecePoseSupplier();
     Supplier<Pose2d> drivePose = drive.getPoseSupplier();
     return Commands.run(
-                () -> {
-                  if (target.get() != null
-                      && getDistanceBetweenPoses(target.get().toPose2d(), drivePose.get())
-                          < distance) {
-                    intake.setRelativeVelocity(0.5);
-                  } else {
-                    intake.setRelativeVelocity(0);
-                  }
-                  Logger.recordOutput("intake duration", time.getAsDouble() - intakeStartTime);
-                }, intake)
-            .beforeStarting(() -> intakeStartTime = time.getAsDouble())
-            .onlyWhile(() -> target.get() != null);
+            () -> {
+              if (target.get() != null
+                  && getDistanceBetweenPoses(target.get().toPose2d(), drivePose.get()) < distance) {
+                intake.setRelativeVelocity(0.5);
+              } else {
+                intake.setRelativeVelocity(0);
+              }
+              Logger.recordOutput("intake duration", time.getAsDouble() - intakeStartTime);
+            },
+            intake)
+        .beforeStarting(() -> intakeStartTime = time.getAsDouble())
+        .onlyWhile(() -> target.get() != null);
   }
 
   public static Command pathfindToPoseCommand(Pose2d pose) {
-    return Commands.run(() -> AutoBuilder.pathfindToPose(pose, constraints));
+    return AutoBuilder.pathfindToPose(pose, constraints);
   }
 
-  public static Command pathfindToNearestGamePieceCommand(Drive drive, ObjectDetection objectDetection) {
+  public static Command pathfindToNearestGamePieceCommand(
+      Drive drive, ObjectDetection objectDetection) {
     Supplier<Pose3d> targetPoseSupplier = objectDetection.getNearestGamePiecePoseSupplier();
     Supplier<Pose2d> currentPoseSupplier = drive::getPose;
     return Commands.defer(
-            () -> 
+            () ->
                 pathfindToPoseCommand(
                     new Pose2d(
                         targetPoseSupplier.get().getTranslation().toTranslation2d(),
@@ -151,9 +153,9 @@ public class AutonCommands {
         .onlyWhile(
             () ->
                 targetPoseSupplier.get() != null
-                && getDistanceBetweenPoses(
-                        targetPoseSupplier.get().toPose2d(), currentPoseSupplier.get())
-                    > pathfindEndDistanceMeters);
+                    && getDistanceBetweenPoses(
+                            targetPoseSupplier.get().toPose2d(), currentPoseSupplier.get())
+                        > pathfindEndDistanceMeters);
   }
 
   /* Gal's Code
@@ -177,26 +179,53 @@ public class AutonCommands {
   }
   */
 
+  private static double blueAllianceZoneX = Units.inchesToMeters(156.61 - 25);
+  private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61 + 25);
+  private static double shootingLeftY = Units.inchesToMeters(50.59 + 12 + 73 * 0.5);
+  private static double shootingRightY = Units.inchesToMeters(317.688 - 50.35 - 12 - 73 * 0.5);
+
+  private static Rotation2d initialRobotRotation = Rotation2d.kZero;
+
   public static Command pathFindToNearestHubShootingPose(Drive drive, Alliance alliance) {
-    Supplier<Pose3d> targetPoseSupplier = () -> {
-      ArrayList<Pose3d> hubShootingPoses = alliance == Alliance.Blue 
-        ? List.of(new Pose3d(), new Pose3d())
-        : List.of(new Pose3d(), new Pose3d());
-      return RobotState.getInstance().getEstimatedPose().nearest(hubShootingPoses);
-    }
+    Supplier<Translation2d> targetTranslationSupplier =
+        () -> {
+          ArrayList<Translation2d> hubShootingTranslations =
+              new ArrayList<>(
+                  alliance == Alliance.Blue
+                      ? Arrays.asList(
+                          new Translation2d(blueAllianceZoneX, shootingLeftY),
+                          new Translation2d(blueAllianceZoneX, shootingRightY))
+                      : Arrays.asList(
+                          new Translation2d(redAllianceZoneX, shootingLeftY),
+                          new Translation2d(redAllianceZoneX, shootingRightY)));
+          return RobotState.getInstance()
+              .getEstimatedPose()
+              .getTranslation()
+              .nearest(hubShootingTranslations);
+        };
     return Commands.defer(
-      () -> pathfindToPoseCommand(targetPoseSupplier.get().toPose2d()),
-      drive
-    );
+            () ->
+                pathfindToPoseCommand(
+                    new Pose2d(targetTranslationSupplier.get(), initialRobotRotation)),
+            Set.of(drive))
+        .onlyIf(() -> !TurretCommands.isInAllianceZone(alliance));
   }
 
-  public static Command driveToHubAndShoot(Drive drive, Turret turret, Flywheel flywheel, Hood hood, ObjectDetection detection){
+  public static Command driveToHubAndShoot(
+      Drive drive,
+      Turret turret,
+      Flywheel flywheel,
+      Hood hood,
+      ObjectDetection detection,
+      DoubleSupplier... suppliers) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     if (alliance.isPresent()) {
       return Commands.parallel(
-        pathFindToNearestHubShootingPose(drive, alliance.get()),
-        TurretCommands.shootToHub(flywheel, turret, hood)
-      );
+              updateJoystickHasInputCommand(suppliers),
+              pathFindToNearestHubShootingPose(drive, alliance.get()),
+              TurretCommands.shootToHub(flywheel, turret, hood))
+          .beforeStarting(() -> initialRobotRotation = drive.getPose().getRotation())
+          .until(() -> Drive.joystickHasInput);
     }
     return Commands.none();
   }
@@ -205,7 +234,7 @@ public class AutonCommands {
       ObjectDetection objectDetection, Drive drive, Intake intake, DoubleSupplier... suppliers) {
     return Commands.deadline(
             Commands.waitSeconds(intakeDurationSeconds),
-            Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers)),
+            updateJoystickHasInputCommand(suppliers),
             runIntakeCommand(intake, objectDetection, drive, intakeDistanceMeters),
             Commands.sequence(
                 pathfindToNearestGamePieceCommand(drive, objectDetection),
@@ -216,5 +245,9 @@ public class AutonCommands {
               intake.setRelativeVelocity(0);
               drive.stop();
             });
+  }
+
+  private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {
+    return Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers));
   }
 }

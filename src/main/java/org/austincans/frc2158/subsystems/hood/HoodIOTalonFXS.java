@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Saturday February 21, 2026 at 16:10:33 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -22,10 +22,8 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
@@ -83,13 +81,13 @@ public class HoodIOTalonFXS implements HoodIO {
     inputs.motorPosition = hoodMotor.getPosition().getValue().in(null);
   }
 
-    @Override
-  public List<SelfChecking> getHardware(){
+  @Override
+  public List<SelfChecking> getHardware() {
     return List.of(hoodMotorCheck);
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults(){
+  public List<SubsystemFault> checkForFaults() {
     List<SubsystemFault> faults = new ArrayList<>();
 
     List<SubsystemFault> deployFault = hoodMotorCheck.checkForFaults();
