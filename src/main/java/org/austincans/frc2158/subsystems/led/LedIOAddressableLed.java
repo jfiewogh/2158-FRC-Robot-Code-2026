@@ -49,12 +49,12 @@ public class LedIOAddressableLed implements LedIO {
 
     @Override
     public void updateInputs(LedIOInputs inputs) {
-        setPattern(state);
-        inputs.state = state;
+        inputs.state = this.state;
     }
 
     @Override
     public void setPattern(LedState state) {
+        this.state = state;
         switch (state) {
             case READYTOSHOOT -> {
                 green.applyTo(m_ledBuffer);
