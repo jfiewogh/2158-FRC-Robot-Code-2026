@@ -38,15 +38,11 @@ import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 import org.littletonrobotics.junction.Logger;
 
 public class AutonCommands {
-  private static final double maxVelocityMetersPerSec = 5;
-  private static final double maxAccelerationMetersPerSecSq = 10;
+private static final double maxVelocityMetersPerSec = 5;
+private static final double maxAccelerationMetersPerSecSq = 10;
 
-  private static final HolonomicDriveController controller =
-      new HolonomicDriveController(
-          new PIDController(1, 0, 0),
-          new PIDController(1, 0, 0),
-          new ProfiledPIDController(
-              1, 0, 0, new TrapezoidProfile.Constraints(Math.PI * 2, Math.PI)));
+private static PIDController drivePIDX = new PIDController(1.5,0.0,0.0);
+private static PIDController drivePIDY = new PIDController(1.5,0.0,0.0);
 
   private static final double maxVelocityRadPerSec = Math.PI * 2;
   private static final double maxAccelerationRadPerSecSq = Math.PI * 4;
@@ -62,9 +58,14 @@ public class AutonCommands {
   }
 
   private static void driveToPose(Drive drive, Pose2d pose) {
-    ChassisSpeeds speeds = controller.calculate(pose, null, null);
-    drive.runVelocity(speeds);
-  }
+        ChassisSpeeds speed = ChassisSpeeds.fromFieldRelativeSpeeds(
+            drivePIDX.calculate(drive.getPose().getX(), pose.getX()),
+            drivePIDY.calculate(drive.getPose().getY(), pose.getY()),
+            rotationPID.calculate(drive.getPose().getRotation().getRadians(),
+            Math.atan2(pose.getY() - drive.getPose().getY(), pose.getX() - drive.getPose().getX())),
+            drive.getRotation());
+        drive.runVelocity(speed);
+    }
 
   private static void intakeUntilFull(Intake intake) {
     if (intake.getGamePieceAmount() < IntakeConstants.maxIntakeAmount) {
@@ -85,28 +86,29 @@ public class AutonCommands {
 
   public static Command driveToPoseCommand(Drive drive, ObjectDetection objectDetection) {
     Supplier<Pose3d> nearestGamePiecePoseSupplier = objectDetection::getNearestGamePiecePose;
-    Supplier<Pose2d> drivePos = () -> drive.getPose();
 
     // Logger.recordOutput("nearest pose", nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d());
-
-    return Commands.defer(
-        () -> AutoBuilder.pathfindToPose(
-            new Pose2d(
-                nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d(),
-                Rotation2d.fromRadians(
-                    Math.atan2(
-                        nearestGamePiecePoseSupplier.get().getY() - drivePos.get().getY(),
-                        nearestGamePiecePoseSupplier.get().getX() - drivePos.get().getX()))),
-            constraints)
-        .onlyWhile(
-            () ->
-                !Drive.joystickHasInput
-                    && nearestGamePiecePoseSupplier.get() != null
-                    && nearestGamePiecePoseSupplier.get().getTranslation()
-                            .getDistance(new Translation3d(drivePos.get().getTranslation()))
-                        > 0.05),
-        null
-     );
+    return Commands.run(
+        () -> driveToPose(drive, nearestGamePiecePoseSupplier.get().toPose2d())
+    );
+    // return Commands.defer(
+    //     () -> AutoBuilder.pathfindToPose(
+    //         new Pose2d(
+    //             nearestGamePiecePoseSupplier.get().getTranslation().toTranslation2d(),
+    //             Rotation2d.fromRadians(
+    //                 Math.atan2(
+    //                     nearestGamePiecePoseSupplier.get().getY() - drivePos.get().getY(),
+    //                     nearestGamePiecePoseSupplier.get().getX() - drivePos.get().getX()))),
+    //         constraints)
+    //     .onlyWhile(
+    //         () ->
+    //             !Drive.joystickHasInput
+    //                 && nearestGamePiecePoseSupplier.get() != null
+    //                 && nearestGamePiecePoseSupplier.get().getTranslation()
+    //                         .getDistance(new Translation3d(drivePos.get().getTranslation()))
+    //                     > 0.05),
+    //     null
+    //  );
 
      
   }
