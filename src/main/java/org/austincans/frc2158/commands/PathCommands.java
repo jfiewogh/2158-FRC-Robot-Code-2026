@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Saturday February 21, 2026 at 20:04:14 CST
 
 package org.austincans.frc2158.commands;
 
@@ -21,8 +21,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Set;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.drive.DriveConstants;
 
@@ -33,7 +31,8 @@ public class PathCommands {
           DriveConstants.maxLinearSpeed, DriveConstants.maxLinearAcceleration,
           DriveConstants.maxAngularSpeed, DriveConstants.maxAngularAcceleration);
 
-  public static Command followPathToPose(Drive drive, Pose2d pose) {
-    return Commands.defer(() -> AutoBuilder.pathfindToPose(pose, pathConstraints), Set.of(drive));
+  public static Command pathfindToPoseCommand(
+      Drive drive, Pose2d pose, double goalEndVelocityMetersPerSec) {
+    return AutoBuilder.pathfindToPose(pose, pathConstraints, goalEndVelocityMetersPerSec);
   }
 }

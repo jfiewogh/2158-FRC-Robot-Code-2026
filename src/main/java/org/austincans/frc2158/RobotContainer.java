@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Saturday February 21, 2026 at 20:04:14 CST
 
 package org.austincans.frc2158;
 
@@ -113,7 +113,6 @@ public class RobotContainer {
 
         // Initialize Rebuilt Arena
         boolean isThreaded = false;
-
         if (isThreaded) {
           new Arena2026Rebuilt3D(PhysicsThreadConfig.enabled(100));
         } else {
@@ -208,7 +207,7 @@ public class RobotContainer {
               .m()
               .onTrue(
                   AutonCommands.driveToAndIntakeGamePieces(
-                      objectDetection, drive, intake, leftX, leftY, rightX, rightY));
+                      drive, objectDetection, intake, leftX, leftY, rightX, rightY));
           keyboardInput
               .comma()
               .whileTrue(
