@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.commands;
 
@@ -36,7 +36,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.drive.DriveConstants;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -206,10 +205,7 @@ public class AutonCommands {
                 alliance == Alliance.Blue
                     ? blueHubShootingTranslations
                     : redHubShootingTranslations;
-            return RobotState.getInstance()
-                .getEstimatedPose()
-                .getTranslation()
-                .nearest(hubShootingTranslations);
+            return drive.getPose().getTranslation().nearest(hubShootingTranslations);
           };
       return Commands.defer(
               () -> {
@@ -227,7 +223,7 @@ public class AutonCommands {
                 return Commands.parallel(
                     pathfindCommand,
                     updateJoystickHasInputCommand(suppliers),
-                    TurretCommands.shootToHub(flywheel, turret, hood));
+                    TurretCommands.shootToHub(flywheel, turret, hood, drive));
               },
               Set.of(drive, turret, flywheel, hood, detection))
           .beforeStarting(() -> initialRobotRotation = drive.getPose().getRotation())

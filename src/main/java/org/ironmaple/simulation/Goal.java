@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation;
 
@@ -37,6 +37,7 @@ import org.ironmaple.simulation.gamepieces.GamePiece;
  * <h2>A abstract class to handle scoring elements in simulation.</h2>
  */
 public abstract class Goal implements SimulatedArena.Simulatable {
+  private static final boolean printScored = false;
 
   protected Rectangle xyBox;
   protected final Distance height;
@@ -163,7 +164,9 @@ public abstract class Goal implements SimulatedArena.Simulatable {
         .forEach(
             gamePiece -> {
               if (checkValidity(gamePiece)) {
-                System.out.println("Scored: " + gamePiece.getPose3d());
+                if (printScored) {
+                  System.out.println("Scored: " + gamePiece.getPose3d());
+                }
               }
             });
 
@@ -235,7 +238,7 @@ public abstract class Goal implements SimulatedArena.Simulatable {
    * the same implementation for children of the goal class.
    *
    * @param gamePiece The game piece to be checked.
-   * @return Wether or not the game piece is within this goal.
+   * @return Whether or not the game piece is within this goal.
    */
   protected boolean checkValidity(GamePiece gamePiece) {
     return checkRotation(gamePiece) & checkVel(gamePiece) & checkCollision(gamePiece);

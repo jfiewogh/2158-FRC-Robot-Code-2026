@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -60,7 +60,6 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import lombok.Setter;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.Constants.Mode;
@@ -197,7 +196,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         this::getChassisSpeeds,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(1, 0.0, 0.0), new PIDConstants(1, 0.0, 0.0)),
+            new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -452,14 +451,14 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     return gyroInputs.yawPosition;
   }
 
+  public Pose3d getPose3d() {
+    return driveInputs.pose;
+  }
+
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return driveInputs.pose.toPose2d();
-  }
-
-  public Supplier<Pose2d> getPoseSupplier() {
-    return this::getPose;
+    return getPose3d().toPose2d();
   }
 
   /** Returns the current odometry rotation. */

@@ -13,10 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -39,8 +40,8 @@ public class TurretIOSim implements TurretIO {
   @SuppressWarnings("unused")
   private double appliedVoltage = 0;
 
-  public TurretIOSim(Supplier<Rotation2d> hoodAngle) {
-    turretViz = new TurretViz("SimComponents", hoodAngle);
+  public TurretIOSim(Supplier<Pose3d> robotFieldRelPoseSupplier, Supplier<Rotation2d> hoodAngle) {
+    turretViz = new TurretViz("SimComponents", robotFieldRelPoseSupplier, hoodAngle);
   }
 
   @Override

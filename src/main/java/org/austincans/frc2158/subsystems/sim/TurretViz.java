@@ -13,21 +13,20 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.function.Supplier;
-import org.austincans.frc2158.RobotState;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
 
+// This is specifically for the 2026 robot
 public class TurretViz {
   private static final Rotation2d hoodDefaultAngle =
       Rotation2d.fromDegrees(90 - (30.719897 + 8.868396) * 0.5);
@@ -51,10 +50,13 @@ public class TurretViz {
 
   private final Pose3d[] models = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
 
+  private final Supplier<Pose3d> robotFieldRelPoseSupplier;
   private final Supplier<Rotation2d> hoodAngle;
 
-  public TurretViz(String key, Supplier<Rotation2d> hoodAngle) {
+  public TurretViz(
+      String key, Supplier<Pose3d> robotFieldRelPoseSupplier, Supplier<Rotation2d> hoodAngle) {
     this.key = key;
+    this.robotFieldRelPoseSupplier = robotFieldRelPoseSupplier;
     this.hoodAngle = hoodAngle;
 
     models[0] = new Pose3d(modelTranslations[0], Rotation3d.kZero);
@@ -71,9 +73,9 @@ public class TurretViz {
   }
 
   public void update(Rotation2d turretAngle) {
-    Pose2d drivePose = RobotState.getInstance().getEstimatedPose();
+    Pose3d robotPose = robotFieldRelPoseSupplier.get();
 
-    double yawRad = turretAngle.getRadians() - drivePose.getRotation().getRadians();
+    double yawRad = turretAngle.getRadians() - robotPose.getRotation().getZ();
 
     models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
 

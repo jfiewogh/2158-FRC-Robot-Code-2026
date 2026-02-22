@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -91,8 +91,6 @@ public class ShooterSim3D {
         Angle shooterAngle = Angle.ofBaseUnits(hoodAngleSupplier.get().getRadians(), Radians);
 
         shooterSim.shoot(launchingSpeed, shooterAngle);
-
-        // System.out.println("SHOT at " + exitVelocityMetersPerSec);
       }
     }
   }

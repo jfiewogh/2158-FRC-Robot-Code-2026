@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -69,10 +69,12 @@ public class RebuiltHub extends Goal {
 
   public static final Pose3d[] redShootPoses =
       Arrays.stream(blueShootPoses)
-          .map(FieldMirroringUtils::flip)
           .map(
-              (Pose3d toRotate) -> {
-                return toRotate.rotateBy(new Rotation3d(Rotation2d.fromDegrees(180)));
+              (Pose3d blueShootPose) -> {
+                Pose3d flipped = FieldMirroringUtils.flip(blueShootPose);
+                return new Pose3d(
+                    flipped.getTranslation(),
+                    flipped.getRotation().rotateBy(new Rotation3d(Rotation2d.fromDegrees(180))));
               })
           .toArray(Pose3d[]::new);
 
@@ -96,7 +98,10 @@ public class RebuiltHub extends Goal {
         "Fuel",
         isBlue ? BLUE_HUB_POS : RED_HUB_POS,
         isBlue,
-        true); // TODO: I don't know what this means
+        true);
+
+    // Logger.recordOutput("blue shoot poses", blueShootPoses);
+    // Logger.recordOutput("red shoot poses", redShootPoses);
 
     this.arena = arena;
     StructPublisher<Pose3d> HubPosePublisher =
@@ -130,6 +135,7 @@ public class RebuiltHub extends Goal {
     arena.addToScore(isBlue, arena.isActive(isBlue) ? 1 : 0);
 
     Pose3d shootPose = isBlue ? blueShootPoses[rng.nextInt(4)] : redShootPoses[rng.nextInt(4)];
+    // Logger.recordOutput("shoot pose", shootPose);
 
     arena.addPieceWithVariance(
         shootPose.getTranslation().toTranslation2d(),

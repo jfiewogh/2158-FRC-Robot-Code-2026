@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 23:31:39 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.sim;
 
@@ -23,8 +23,7 @@ import org.austincans.frc2158.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 // Visualizes the elevator stages based on the given position in meters
-// This is for a three-stage elevator
-
+// This is specifically for the 2025 robot's three-stage elevator
 public class ElevatorViz {
   private final String key;
 
