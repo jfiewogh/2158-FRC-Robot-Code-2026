@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 20:04:14 CST
+// Updated on Saturday February 21, 2026 at 23:31:39 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -197,7 +197,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         this::getChassisSpeeds,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
+            new PIDConstants(1, 0.0, 0.0), new PIDConstants(1, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);

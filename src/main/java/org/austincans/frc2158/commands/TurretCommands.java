@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 20:04:14 CST
+// Updated on Saturday February 21, 2026 at 23:31:39 CST
 
 package org.austincans.frc2158.commands;
 
@@ -199,21 +199,14 @@ public class TurretCommands {
     return Commands.none();
   }
 
-  private static double blueAllianceZoneX = Units.inchesToMeters(156.61);
-  private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61);
-
-  public static boolean isInAllianceZone(Alliance alliance, Pose2d robotPose) {
-    return alliance == Alliance.Blue
-        ? robotPose.getX() < blueAllianceZoneX
-        : robotPose.getX() > redAllianceZoneX;
-  }
-
   public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
 
     if (alliance.isPresent()) {
       BooleanSupplier inAllianceZone =
-          () -> isInAllianceZone(alliance.get(), RobotState.getInstance().getEstimatedPose());
+          () ->
+              RebuiltFieldCommands.isInAllianceZone(
+                  alliance.get(), RobotState.getInstance().getEstimatedPose());
 
       // TODO: determine using flywheel laser can
       BooleanSupplier noGamePiecesToShoot = () -> false;
@@ -229,7 +222,10 @@ public class TurretCommands {
                           ? TrackingTargets.blueHub
                           : TrackingTargets.redHub);
                 }
-              })
+              },
+              flywheel,
+              turret,
+              hood)
           .until(noGamePiecesToShoot)
           .handleInterrupt(() -> flywheel.setVelocity(0));
     }
