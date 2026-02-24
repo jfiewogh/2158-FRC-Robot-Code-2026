@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -26,10 +26,9 @@ import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import java.util.List;
-
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class ArmIOTalonFXS implements ArmIO {
   /* Motor */
@@ -103,8 +102,8 @@ public class ArmIOTalonFXS implements ArmIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = motorSelfCheck.checkForFaults();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = motorSelfCheck.checkForFaults();
     if (faults.isEmpty()) {
       return null;
     } else {
@@ -112,7 +111,7 @@ public class ArmIOTalonFXS implements ArmIO {
     }
   }
 
-  public List<SelfChecking> getHardware(){
+  public List<SelfChecking> getHardware() {
     return List.of(motorSelfCheck);
   }
 }

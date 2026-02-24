@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -27,9 +27,9 @@ import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 /** Add your docs here. */
 public class IntakeIOTalonFXS implements IntakeIO {
@@ -99,20 +99,20 @@ public class IntakeIOTalonFXS implements IntakeIO {
   }
 
   @Override
-  public List<SelfChecking> getHardware(){
+  public List<SelfChecking> getHardware() {
     return List.of(deployMotorSelfCheck, intakeMotorSelfCheck);
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> deployFault = deployMotorSelfCheck.checkForFaults();
+    List<HardwareFault> deployFault = deployMotorSelfCheck.checkForFaults();
     if (deployFault != null) {
       faults.addAll(deployFault);
     }
 
-    List<SubsystemFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
+    List<HardwareFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
     if (intakeFault != null) {
       faults.addAll(intakeFault);
     }

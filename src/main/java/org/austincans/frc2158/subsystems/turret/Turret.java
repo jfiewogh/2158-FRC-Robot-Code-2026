@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -160,10 +160,10 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityDegPerSec < 5) {
-                    addFault("TRRT",
+                    addSubsystemFault(
+                        "TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
-                        false,
-                        true);
+                        false);
                   }
                   io.setVelocity(0);
                 },
@@ -173,7 +173,8 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (getTurretAngle() < -25 || getTurretAngle() > -15) {
-                    addFault("TRRT","[System Check] Turret did not reach desired angle", false, true);
+                    addSubsystemFault(
+                        "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
                 this),
@@ -182,11 +183,11 @@ public class Turret extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Math.abs(getTurretAngle()) > 5) {
-                    addFault("TRRT","[System Check] Turret did not reach desired angle", false, true);
+                    addSubsystemFault(
+                        "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
                 this))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
   }
 }

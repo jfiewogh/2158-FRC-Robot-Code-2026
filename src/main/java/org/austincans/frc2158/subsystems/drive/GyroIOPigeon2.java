@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -31,8 +31,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2158.generated.TunerConstants;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingPigeon2;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
@@ -90,7 +90,7 @@ public class GyroIOPigeon2 implements GyroIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
+  public List<HardwareFault> checkForFaults() {
     return pigeonSelfChecker.checkForFaults();
   }
 }

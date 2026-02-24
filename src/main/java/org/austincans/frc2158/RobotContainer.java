@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158;
 
@@ -33,7 +33,6 @@ import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.DriveCommands;
 import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
-import org.austincans.frc2158.subsystems.Led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim;
@@ -103,7 +102,8 @@ public class RobotContainer {
         SimulatedArena.overrideInstance(new Arena2026Rebuilt());
 
         driveSimulation =
-            new SwerveDriveSimulation(Drive.getMapleSimConfig(), new Pose2d(14, 3, new Rotation2d()));
+            new SwerveDriveSimulation(
+                Drive.getMapleSimConfig(), new Pose2d(14, 3, new Rotation2d()));
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         drive =
             new Drive(

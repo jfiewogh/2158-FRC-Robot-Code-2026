@@ -13,11 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -26,14 +25,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class HoodIOSparkFlex implements HoodIO {
   private SparkFlex hoodMotor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);
@@ -87,15 +84,15 @@ public class HoodIOSparkFlex implements HoodIO {
   }
 
   @Override
-  public List<SelfChecking> getHardware(){
+  public List<SelfChecking> getHardware() {
     return List.of(hoodMotorCheck);
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults(){
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> deployFault = hoodMotorCheck.checkForFaults();
+    List<HardwareFault> deployFault = hoodMotorCheck.checkForFaults();
     if (deployFault != null) {
       faults.addAll(deployFault);
     }

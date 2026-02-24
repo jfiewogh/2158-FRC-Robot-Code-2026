@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -26,10 +26,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class ElevatorIOSpark implements ElevatorIO {
   // TODO: move constants to config
@@ -91,10 +90,10 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> motorFaults = motorSelfCheck.checkForFaults();
+    List<HardwareFault> motorFaults = motorSelfCheck.checkForFaults();
     if (motorFaults != null) {
       faults.addAll(motorFaults);
     }

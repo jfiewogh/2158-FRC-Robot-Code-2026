@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -30,10 +30,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
-
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class ArmIOSparkFlex implements ArmIO {
   /* Motor */
@@ -114,8 +113,8 @@ public class ArmIOSparkFlex implements ArmIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = selfCheckingMotor.checkForFaults();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = selfCheckingMotor.checkForFaults();
 
     if (faults.isEmpty()) {
       return null;
@@ -125,7 +124,7 @@ public class ArmIOSparkFlex implements ArmIO {
   }
 
   @Override
-  public List<SelfChecking> getHardware(){
+  public List<SelfChecking> getHardware() {
     return List.of(selfCheckingMotor);
   }
 }

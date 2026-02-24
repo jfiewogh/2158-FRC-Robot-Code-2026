@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -23,10 +23,9 @@ import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class FlywheelIOTalonFXS implements FlywheelIO {
   private final TalonFXS motor = new TalonFXS(FlywheelConstants.motorId, FlywheelConstants.canBus);
@@ -56,9 +55,9 @@ public class FlywheelIOTalonFXS implements FlywheelIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
-    List<SubsystemFault> motorFaults = selfCheckMotor.checkForFaults();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
+    List<HardwareFault> motorFaults = selfCheckMotor.checkForFaults();
     if (motorFaults != null) {
       faults.addAll(motorFaults);
     }
@@ -70,7 +69,7 @@ public class FlywheelIOTalonFXS implements FlywheelIO {
   }
 
   @Override
-  public List<SelfChecking> getHardware(){
+  public List<SelfChecking> getHardware() {
     return List.of(selfCheckMotor);
   }
 }

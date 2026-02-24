@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -95,7 +95,7 @@ public class Arm extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    io.checkForFaults().forEach(this::addFault);
+    io.checkForFaults().forEach(this::addHardwareFault);
   }
 
   @Override
@@ -106,7 +106,8 @@ public class Arm extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (getVelocity() < 0.1) {
-                    addFault("ARM", "[System Check] Extension velocity measured too slow", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Extension velocity measured too slow", false);
                   }
                   io.setVelocity(0);
                 },
@@ -117,7 +118,8 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < -15
                       || Units.rotationsToDegrees(getPosition()) > 15) {
-                    addFault("ARM","[System Check] Joint did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this),
@@ -127,11 +129,11 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < 75
                       || Units.rotationsToDegrees(getPosition()) > 115) {
-                    addFault("ARM", "[System Check] Joint did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this))
-        .until(() -> getFaults().size() > 0)
         .andThen(
             Commands.runOnce(
                 () -> {

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -125,7 +125,7 @@ public class Module extends AdvancedSubsystem {
 
   public void periodic() {
     io.updateInputs(inputs);
-    io.checkForFaults().forEach(this::addFault);
+    io.checkForFaults().forEach(this::addHardwareFault);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Update tunable numbers
@@ -265,10 +265,10 @@ public class Module extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Units.radiansToDegrees(inputs.turnVelocityRadPerSec) < 20) {
-                    addFault("SWRV" + String.valueOf(index),
+                    addSubsystemFault(
+                        "SWRV" + String.valueOf(index),
                         "[System Check] Rotation motor encoder velocity measured too slow",
-                        false,
-                        true);
+                        false);
                   }
                 },
                 this),
@@ -282,8 +282,10 @@ public class Module extends AdvancedSubsystem {
                 () -> {
                   if (inputs.turnAbsolutePosition.getDegrees() < 70
                       || inputs.turnAbsolutePosition.getDegrees() > 110) {
-                    addFault("SWRV" + String.valueOf(index),
-                        "[System Check] Rotation Motor did not reach target position", false, true);
+                    addSubsystemFault(
+                        "SWRV" + String.valueOf(index),
+                        "[System Check] Rotation Motor did not reach target position",
+                        false);
                   }
                 },
                 this),
@@ -296,13 +298,15 @@ public class Module extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (Units.radiansToDegrees(inputs.driveVelocityRadPerSec) < 0.25) {
-                    addFault("SWRV" + String.valueOf(index),"[System Check] Drive motor encoder velocity too slow", false, true);
+                    addSubsystemFault(
+                        "SWRV" + String.valueOf(index),
+                        "[System Check] Drive motor encoder velocity too slow",
+                        false);
                   }
                   io.setDriveVelocity(0);
                 },
                 this),
             Commands.waitSeconds(0.25))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stop, this));
   }
 }

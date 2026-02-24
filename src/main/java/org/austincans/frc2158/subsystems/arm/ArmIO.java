@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -21,9 +21,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.List;
-
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -49,21 +48,18 @@ public interface ArmIO {
 
   public void updateInputs(ArmIOInputs inputs);
 
-  public void setVoltage(double voltage)
-  ;
+  public void setVoltage(double voltage);
 
   // Encoder Values
-  public void setPosition(double position)
-  ;
+  public void setPosition(double position);
 
   // Meters per second
-  public void setVelocity(double velocity)
-  ;
+  public void setVelocity(double velocity);
 
   public default void stopMotor() {}
   ;
 
-  public default List<SubsystemFault> checkForFaults() {
+  public default List<HardwareFault> checkForFaults() {
     return List.of();
   }
 

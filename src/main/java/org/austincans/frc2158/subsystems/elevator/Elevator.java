@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -122,10 +122,10 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 1) {
-                    addFault("ELEV",
+                    addSubsystemFault(
+                        "ELEV",
                         "[System Check] Rotation motor encoder velocity measured too slow",
-                        false,
-                        true);
+                        false);
                   }
                 },
                 this),
@@ -138,8 +138,10 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.heightMeters < 0.95 || inputs.heightMeters > 1.05) {
-                    addFault("ELEV",
-                        "[System Check] Rotation Motor did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ELEV",
+                        "[System Check] Rotation Motor did not reach target position",
+                        false);
                   }
                 },
                 this),
@@ -152,13 +154,13 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 0.95) {
-                    addFault("ELEV","[System Check] Drive motor encoder velocity too slow", false, true);
+                    addSubsystemFault(
+                        "ELEV", "[System Check] Drive motor encoder velocity too slow", false);
                   }
                   moveAtVelocityCommand(0);
                 },
                 this),
             Commands.waitSeconds(0.25))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SysIdSwerveRotation;
 
 public class Hood extends AdvancedSubsystem {
   private HoodIO io;
@@ -83,7 +81,8 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.hoodRadsPerSec < 1) {
-                    addFault("HOOD","[System Check] Hood encoder velocity measured too slow", false, true);
+                    addSubsystemFault(
+                        "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
                   }
                 },
                 this),
@@ -96,12 +95,12 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
-                    addFault("HOOD", "[System Check] Hood did not reach target position", false, true);
+                    addSubsystemFault(
+                        "HOOD", "[System Check] Hood did not reach target position", false);
                   }
                 },
                 this),
             Commands.waitSeconds(0.25))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }

@@ -13,20 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.austincans.frc2158.subsystems.intake.Intake;
-import org.austincans.frc2158.subsystems.turret.Turret;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
@@ -34,6 +27,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
+import java.util.List;
+import org.austincans.frc2158.controllers.REVDigitController;
 
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {
@@ -42,11 +38,10 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     ERROR
   }
 
-  public enum FaultCodes {
+  public enum FaultCodes {}
 
-  }
-
-  private final List<SubsystemFault> faults = new ArrayList<>();
+  private final List<SubsystemFault> subsystemFaults = new ArrayList<>();
+  private final List<HardwareFault> hardwareFaults = new ArrayList<>();
   private final List<SelfChecking> hardware = new ArrayList<>();
   private final List<Command> checkCommands = new ArrayList<>();
   private final String statusTable;
@@ -101,9 +96,9 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     SmartDashboard.putString(statusTable + "/Status", status.name());
     SmartDashboard.putBoolean(statusTable + "/SystemOK", status == SystemStatus.OK);
 
-    String[] faultStrings = new String[this.faults.size()];
-    for (int i = 0; i < this.faults.size(); i++) {
-      SubsystemFault fault = this.faults.get(i);
+    String[] faultStrings = new String[this.hardwareFaults.size()];
+    for (int i = 0; i < this.hardwareFaults.size(); i++) {
+      HardwareFault fault = this.hardwareFaults.get(i);
       faultStrings[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
     }
     SmartDashboard.putStringArray(statusTable + "/Faults", faultStrings);
@@ -119,37 +114,65 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     //    BatteryUsage.reportUsage(this.getName(), device, amps, volts);
   }
 
-  protected void addFault(SubsystemFault fault) {
-    if (!this.faults.contains(fault)) {
-      this.faults.add(fault);
+  protected void addSubsystemFault(SubsystemFault fault) {
+    if (!this.subsystemFaults.contains(fault)) {
+      this.subsystemFaults.add(fault);
     }
   }
 
-  protected void addFault(String code, String description, boolean isWarning) {
-    this.addFault(new SubsystemFault(code, description, isWarning));
+  protected void addHardwareFault(HardwareFault fault) {
+    if (!this.hardwareFaults.contains(fault)) {
+      this.hardwareFaults.add(fault);
+    }
   }
 
-  protected void addFault(String code, String description, boolean isWarning, boolean sticky) {
-    this.addFault(new SubsystemFault(code, description, isWarning, sticky));
+  protected void addSubsystemFault(String code, String description, boolean isWarning) {
+    this.addSubsystemFault(new SubsystemFault(code, description, isWarning));
   }
 
-  protected void addFault(String code, String description) {
-    this.addFault(code, description, false);
+  protected void addSubsystemFault(String code, String description) {
+    this.addSubsystemFault(code, description, false);
   }
 
-  public List<SubsystemFault> getFaults() {
-    return this.faults;
+  protected void addHardwareFault(
+      String code, String description, boolean isWarning, boolean isSticky) {
+    this.addHardwareFault(new HardwareFault(code, description, isWarning, isSticky));
+  }
+
+  protected void addHardwareFault(String code, String description, boolean isWarning) {
+    this.addHardwareFault(new HardwareFault(code, description, isWarning, false));
+  }
+
+  protected void addHardwareFault(String code, String description) {
+    this.addHardwareFault(code, description, false);
+  }
+
+  public List<SubsystemFault> getSubsystemFaults() {
+    return this.subsystemFaults;
   }
 
   public void clearFaults() {
-    this.faults.clear();
+    this.subsystemFaults.clear();
+    this.hardwareFaults.clear();
   }
 
   public SystemStatus getSystemStatus() {
     SystemStatus worstStatus = SystemStatus.OK;
 
-    for (SubsystemFault f : this.faults) {
+    for (HardwareFault f : this.hardwareFaults) {
       if (f.sticky || f.timestamp > Timer.getFPGATimestamp() - 10) {
+        if (f.isWarning) {
+          if (worstStatus != SystemStatus.ERROR) {
+            worstStatus = SystemStatus.WARNING;
+          }
+        } else {
+          worstStatus = SystemStatus.ERROR;
+        }
+      }
+    }
+
+    for (SubsystemFault f : this.subsystemFaults) {
+      if (f.timestamp > Timer.getFPGATimestamp() - 10) {
         if (f.isWarning) {
           if (worstStatus != SystemStatus.ERROR) {
             worstStatus = SystemStatus.WARNING;
@@ -166,7 +189,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     hardware.add(new SelfCheckingTalonFXPro(label, talon));
   }
 
-  public void registerHardware(SelfChecking item){
+  public void registerHardware(SelfChecking item) {
     hardware.add(item);
   }
 
@@ -197,20 +220,25 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   // Command to run a full systems check
   protected abstract Command systemCheckCommand();
 
-  public void registerCheckCommand(Command command){
+  public void registerCheckCommand(Command command) {
     checkCommands.add(command);
   }
 
-  public Command sequentialCheck(){
-    return Commands.sequence(checkCommands.toArray(Command[]::new)).onlyWhile(() -> faults.size() == 0);
+  public Command sequentialCheck() {
+    return Commands.sequence(checkCommands.toArray(Command[]::new))
+        .onlyWhile(() -> subsystemFaults.size() == 0)
+        .handleInterrupt(
+            () ->
+                REVDigitController.getInstance()
+                    .writeDigits(subsystemFaults.get(0).description.toString()));
   }
 
   // Method to check for faults while the robot is operating normally
   private void checkForFaults() {
     if (checkErrors) {
       for (SelfChecking device : hardware) {
-        for (SubsystemFault fault : device.checkForFaults()) {
-          addFault(fault);
+        for (HardwareFault fault : device.checkForFaults()) {
+          addHardwareFault(fault);
         }
       }
     }

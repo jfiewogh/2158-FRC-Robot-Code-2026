@@ -13,15 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import org.austincans.frc2158.controllers.LaserCAN;
-import org.austincans.frc2158.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -49,11 +47,11 @@ public class Flywheel extends AdvancedSubsystem {
     registerCheckCommand(systemCheckCommand());
   }
 
-  public boolean readyToShoot(){
+  public boolean readyToShoot() {
     return lasarCan1.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan1;
   }
 
-  public boolean isShooting(){
+  public boolean isShooting() {
     return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
   }
 
@@ -61,9 +59,6 @@ public class Flywheel extends AdvancedSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
-
-    LedIOBlinkin.getInstance().readyToShoot = readyToShoot();  
-    LedIOBlinkin.getInstance().isShooting = isShooting();
   }
 
   public void setVelocity(double velocityRPM) {
@@ -82,7 +77,8 @@ public class Flywheel extends AdvancedSubsystem {
         Commands.runOnce(
             () -> {
               if (getRPM() < 95 || getRPM() > 105) {
-                addFault("FLY", "[System Check] Flywheel did not reach desired velocity RPM");
+                addSubsystemFault(
+                    "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }));
   }

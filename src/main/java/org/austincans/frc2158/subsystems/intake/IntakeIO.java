@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+// Updated on Tuesday February 24, 2026 at 10:51:13 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -22,8 +22,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -40,9 +40,10 @@ public interface IntakeIO {
   public double kD = ConfigUtil.getConfigDouble("intakekD", 0);
 
   public double maxVelocityRadPerSec = Math.PI;
-  public TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(
-      ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
-      ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
+  public TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(
+          ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
+          ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
 
   /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
   public double kS = ConfigUtil.getConfigDouble("intakekS", 0);
@@ -51,7 +52,8 @@ public interface IntakeIO {
   public double kV = ConfigUtil.getConfigDouble("intakekV", 0);
   public double kA = ConfigUtil.getConfigDouble("intakekA", 0);
   public final ArmFeedforward feedforward = new ArmFeedforward(kS, kG, kV, kA);
-  public ProfiledPIDController intakePIDController = new ProfiledPIDController(kP, kI, kD, constraints);
+  public ProfiledPIDController intakePIDController =
+      new ProfiledPIDController(kP, kI, kD, constraints);
 
   public boolean deployBreakEnabled = ConfigUtil.getConfigBoolean("intakeDeployBrakeEnabled", true);
 
@@ -75,7 +77,7 @@ public interface IntakeIO {
   // degrees
   public void setDeployAngle(Angle angle);
 
-  public default List<SubsystemFault> checkForFaults() {
+  public default List<HardwareFault> checkForFaults() {
     return List.of();
   }
 
