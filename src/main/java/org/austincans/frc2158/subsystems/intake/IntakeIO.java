@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -22,6 +22,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
@@ -67,7 +68,6 @@ public interface IntakeIO {
     public double intakeMotorVoltage = 0;
     public double intakeVelocityRadPerSec = 0;
     public double intakeTemperatureC = 0;
-    public int gamePiecesCount = 0;
   }
 
   public void updateInputs(IntakeIOInputs inputs);
@@ -81,6 +81,10 @@ public interface IntakeIO {
   public void setDeployAngle(Angle angle);
 
   public default List<SubsystemFault> checkForFaults() {
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware() {
     return List.of();
   }
 }

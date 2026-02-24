@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
@@ -60,7 +60,8 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
   protected RebuiltOutpost redOutpost;
 
   // Field Dimensions
-  private static final double FIELD_WIDTH = 17.548;
+  private static final double FIELD_WIDTH =
+      edu.wpi.first.math.util.Units.inchesToMeters(651.22); // 17.548;
   private static final double FIELD_HEIGHT = 8.052;
   private Translation2d fuelZoneCenter = new Translation2d(FIELD_WIDTH / 2, FIELD_HEIGHT / 2);
   private int neutralFuelCount = 408;

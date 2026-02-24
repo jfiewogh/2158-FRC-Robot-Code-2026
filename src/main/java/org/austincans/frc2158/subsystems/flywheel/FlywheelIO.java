@@ -13,11 +13,12 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -36,6 +37,10 @@ public interface FlywheelIO {
   public default void runVelocity(double velocityRPM) {}
 
   public default List<SubsystemFault> checkForFaults() {
-    return null;
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware() {
+    return List.of();
   }
 }

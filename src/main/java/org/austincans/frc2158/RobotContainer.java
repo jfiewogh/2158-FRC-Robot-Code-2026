@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158;
 
@@ -120,7 +120,7 @@ public class RobotContainer {
           new Arena2026Rebuilt3D();
         }
 
-        driveSimulation = new SwerveDriveSimulation3D(Drive.mapleSimConfig, Pose2d.kZero);
+        driveSimulation = new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero);
         driveSimulation.registerWithArena(
             SimulatedArena3D.getInstance(), new Pose2d(14, 3, new Rotation2d()));
 
@@ -158,7 +158,7 @@ public class RobotContainer {
                     0,
                     intakeHeight / 2,
                     Rotation3d.kZero),
-                35,
+                Integer.MAX_VALUE, // 35
                 SimulatedArena3D.getInstance());
 
         objectDetection =
@@ -195,13 +195,7 @@ public class RobotContainer {
           Command intakeCommand =
               Commands.runEnd(
                   () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-          Command shootCommand =
-              TurretCommands.shootToHub(
-                  flywheel,
-                  turret,
-                  hood,
-                  false,
-                  () -> intakeSimulation.getGamePiecesInIntake() > 0);
+          Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood);
 
           keyboardInput.z().whileTrue(shootCommand);
           keyboardInput.v().whileTrue(intakeCommand);
@@ -212,7 +206,22 @@ public class RobotContainer {
 
           keyboardInput
               .m()
-              .onTrue(AutonCommands.alignDriveIntakeCommand(objectDetection, drive, intake));
+              .onTrue(
+                  AutonCommands.driveToAndIntakeGamePieces(
+                      objectDetection, drive, intake, leftX, leftY, rightX, rightY));
+          keyboardInput
+              .comma()
+              .whileTrue(
+                  AutonCommands.driveToHubAndShoot(
+                      drive,
+                      turret,
+                      flywheel,
+                      hood,
+                      objectDetection,
+                      leftX,
+                      leftY,
+                      rightX,
+                      rightY));
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
@@ -225,8 +234,7 @@ public class RobotContainer {
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
-          NamedCommands.registerCommand(
-              "shuttle", TurretCommands.shuttle(flywheel, turret, hood, false));
+          NamedCommands.registerCommand("shuttle", TurretCommands.shuttle(flywheel, turret, hood));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());

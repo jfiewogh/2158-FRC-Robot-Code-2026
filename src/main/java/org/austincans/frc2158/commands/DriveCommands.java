@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.commands;
 
@@ -254,6 +254,25 @@ public class DriveCommands {
                   System.out.println("\tkS: " + formatter.format(kS));
                   System.out.println("\tkV: " + formatter.format(kV));
                 }));
+  }
+
+  public static Command robotPointToPose(Drive drive, Pose2d pose) {
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.run(
+        () -> {
+          double omega =
+              angleController.calculate(
+                  drive.getRotation().getRadians(), pose.getRotation().getDegrees());
+          ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
+          drive.runVelocity(speeds);
+        });
   }
 
   /** Measures the robot's wheel radius by spinning in a circle. */

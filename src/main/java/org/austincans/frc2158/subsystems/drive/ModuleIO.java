@@ -13,12 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -75,6 +76,10 @@ public interface ModuleIO {
   public default void setBrakeMode(boolean enabled) {}
 
   default List<SubsystemFault> checkForFaults() {
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware() {
     return List.of();
   }
 }

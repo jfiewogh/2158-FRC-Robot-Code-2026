@@ -13,12 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,9 +37,21 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
+  private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
+  private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
+
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
+  }
+
+  public boolean readyToShoot() {
+    return lasarCan1.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan1;
+  }
+
+  public boolean isShooting() {
+    return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
   }
 
   @Override

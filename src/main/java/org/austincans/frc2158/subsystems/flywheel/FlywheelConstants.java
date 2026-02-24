@@ -13,22 +13,26 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import com.ctre.phoenix6.CANBus;
+import org.austincans.frc2158.util.ConfigUtil;
 
 public class FlywheelConstants {
   // TODO: get from config
-  public static final double kS = 0;
-  public static final double kV = 0;
-  public static final double kA = 0;
+  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);
+  public static final double kV = ConfigUtil.getConfigDouble("FLYWHEEL_V", 0);
+  public static final double kA = ConfigUtil.getConfigDouble("FLYWHEEL_A", 0);
+  public static final int maxDistFromLasarCan1 = ConfigUtil.getConfigInt("lasarCan1_distance", 30);
+  public static final int maxDistFromLasarCan2 = ConfigUtil.getConfigInt("lasarCan2_distance", 30);
 
   /* REAL */
-  public static final int motorId = 0;
-  public static final int encoderId = 0;
-
+  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);
+  public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEEL_ENCODER_ID", 0);
+  public static final int lasarCan1Id = ConfigUtil.getConfigInt("LASARCAN1_ID", 0);
+  public static final int lasarCan2Id = ConfigUtil.getConfigInt("LASARCAN2_ID", 1);
   public static final CANBus canBus = new CANBus("*");
 
   public static final double radiusMeters = 0.0508;

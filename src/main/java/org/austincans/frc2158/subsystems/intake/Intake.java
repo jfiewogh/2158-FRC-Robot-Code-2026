@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Wednesday February 18, 2026 at 20:17:49 CST
+// Updated on Saturday February 21, 2026 at 16:51:46 CST
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -33,6 +33,11 @@ public class Intake extends AdvancedSubsystem {
 
   public Intake(IntakeIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
+  }
+
+  public boolean distanceSensorActive() {
+    return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
   }
 
   public void setRelativeVelocity(double velocity) {
@@ -56,10 +61,5 @@ public class Intake extends AdvancedSubsystem {
 
   public Command systemCheckCommand() {
     return Commands.runOnce(() -> {});
-  }
-
-  // TODO: Change this because this only temporary
-  public int getGamePieceAmount() {
-    return inputs.gamePiecesCount;
   }
 }
