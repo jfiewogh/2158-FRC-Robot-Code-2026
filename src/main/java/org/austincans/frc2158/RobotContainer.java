@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158;
 
@@ -113,7 +113,6 @@ public class RobotContainer {
 
         // Initialize Rebuilt Arena
         boolean isThreaded = false;
-
         if (isThreaded) {
           new Arena2026Rebuilt3D(PhysicsThreadConfig.enabled(100));
         } else {
@@ -163,6 +162,8 @@ public class RobotContainer {
 
         objectDetection =
             new ObjectDetection(
+                //     new ODIOSimAll(
+                //         "Fuel", driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
                 // new ObjectDetectionIOSimInRange(
                 // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
                 new ODIOSimInView(
@@ -181,7 +182,7 @@ public class RobotContainer {
 
         if (intakeSimulation != null) {
           Hood hood = new Hood(new HoodIOTest());
-          Turret turret = new Turret(new TurretIOSim(hood::getAngle));
+          Turret turret = new Turret(new TurretIOSim(drive::getPose3d, hood::getAngle));
           Intake intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 
           Flywheel flywheel =
@@ -195,7 +196,7 @@ public class RobotContainer {
           Command intakeCommand =
               Commands.runEnd(
                   () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-          Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood);
+          Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
 
           keyboardInput.z().whileTrue(shootCommand);
           keyboardInput.v().whileTrue(intakeCommand);
@@ -208,11 +209,11 @@ public class RobotContainer {
               .m()
               .onTrue(
                   AutonCommands.driveToAndIntakeGamePieces(
-                      objectDetection, drive, intake, leftX, leftY, rightX, rightY));
+                      drive, objectDetection, intake, leftX, leftY, rightX, rightY));
           keyboardInput
               .comma()
               .whileTrue(
-                  AutonCommands.driveToHubAndShoot(
+                  AutonCommands.driveToAndShootIntoHub(
                       drive,
                       turret,
                       flywheel,
@@ -234,7 +235,8 @@ public class RobotContainer {
 
           NamedCommands.registerCommand("runIntake", intakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
-          NamedCommands.registerCommand("shuttle", TurretCommands.shuttle(flywheel, turret, hood));
+          NamedCommands.registerCommand(
+              "shuttle", TurretCommands.shuttle(flywheel, turret, hood, drive));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());

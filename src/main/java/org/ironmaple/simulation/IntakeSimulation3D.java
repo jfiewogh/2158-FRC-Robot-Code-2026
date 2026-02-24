@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation;
 
@@ -38,6 +38,8 @@ import org.ironmaple.simulation.physics.PhysicsShape;
  * its volume and "collects" them if enabled.
  */
 public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
+  private final boolean consolePrintingEnabled = false;
+
   private final String targetedGamePieceType;
   private final AbstractDriveTrainSimulation3D drivetrain;
   private final PhysicsShape intakeShape;
@@ -150,9 +152,11 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
           if (!gamePiecesToRemove.contains(gp)) {
             gamePiecesToRemove.add(gp);
             gamePiecesInIntakeCount++;
-            System.out.printf(
-                "[IntakeSimulation3D] Collected game piece! Type=%s, Now have %d%n",
-                gp.getType(), gamePiecesInIntakeCount);
+            if (consolePrintingEnabled) {
+              System.out.printf(
+                  "[IntakeSimulation3D] Collected game piece! Type=%s, Now have %d%n",
+                  gp.getType(), gamePiecesInIntakeCount);
+            }
             if (gamePiecesInIntakeCount >= capacity) break;
           }
         }
@@ -160,9 +164,11 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
         // Log what types of bodies we're finding (to debug if game pieces aren't being
         // recognized)
         if (subTickNum == 0) {
-          // System.out.printf(
-          //     "[IntakeSimulation3D] Overlap detected but userData=%s (not a game piece)%n",
-          //     userData != null ? userData.getClass().getSimpleName() : "null");
+          if (consolePrintingEnabled) {
+            System.out.printf(
+                "[IntakeSimulation3D] Overlap detected but userData=%s (not a game piece)%n",
+                userData != null ? userData.getClass().getSimpleName() : "null");
+          }
         }
       }
     }
@@ -177,7 +183,10 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
       GamePieceOnFieldSimulation3D gp = gamePiecesToRemove.poll();
       // Use arena.removePiece to properly clean up both physics and display
       arena.removePiece(gp);
-      System.out.printf("[IntakeSimulation3D] Removed game piece from field (physics + display)%n");
+      if (consolePrintingEnabled) {
+        System.out.printf(
+            "[IntakeSimulation3D] Removed game piece from field (physics + display)%n");
+      }
     }
   }
 

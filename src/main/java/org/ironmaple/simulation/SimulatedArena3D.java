@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation;
 
@@ -61,6 +61,8 @@ import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
  * <p>This class provides a similar API to {@link SimulatedArena} but uses 3D physics internally.
  */
 public abstract class SimulatedArena3D implements Arena {
+  private static final boolean printGamePieceScored = false;
+
   /** Whether to allow the simulation to run a real robot. HIGHLY RECOMMENDED to be turned OFF */
   public static boolean ALLOW_CREATION_ON_REAL_ROBOT = false;
 
@@ -742,7 +744,9 @@ public abstract class SimulatedArena3D implements Arena {
   public void registerGamePieceScored(GamePiece piece, Object goal) {
     // For now, just remove the piece. Logic can be expanded.
     // We could also log it or create a visual effect.
-    System.out.println("Game Piece Scored in 3D: " + piece.getType());
+    if (printGamePieceScored) {
+      System.out.println("Game Piece Scored in 3D: " + piece.getType());
+    }
     // Do NOT remove here, the caller (Goal) should remove it or we let it be
     // handled there.
     // Goal calls removePiece().

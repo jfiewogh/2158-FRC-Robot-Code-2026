@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -23,6 +23,7 @@ import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+// NOTE: Sometimes flywheel run velocity does not work
 /*
  * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
  * is an algorithm that uses a series of measurements observed over time, including statistical

@@ -13,22 +13,28 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import java.util.function.Supplier;
+import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.sim.ShooterSim;
 import org.ironmaple.simulation.IntakeSimulation;
 
 public class FlywheelIOSim implements FlywheelIO {
+  private static final boolean isFeedbackControl = false;
+
   private final ShooterSim shooterSim;
 
   private final DCMotor plant = DCMotor.getNeoVortex(1);
@@ -44,27 +50,38 @@ public class FlywheelIOSim implements FlywheelIO {
 
   private double appliedVolts;
 
+  /** I am passing in the drive subsystem as a parameter but only using its getter methods */
   public FlywheelIOSim(
+      Drive drive,
       IntakeSimulation intakeSimulation,
+      Supplier<Pose3d> robotFieldRelPoseSupplier,
       Supplier<Rotation2d> hoodAngleSupplier,
       Supplier<Rotation2d> turretAngle) {
     shooterSim =
         new ShooterSim(
-            FlywheelConstants.radiusMeters, 0.1, intakeSimulation, hoodAngleSupplier, turretAngle);
+            drive,
+            FlywheelConstants.radiusMeters,
+            0.1,
+            intakeSimulation,
+            hoodAngleSupplier,
+            turretAngle);
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.velocityRPM = sim.getAngularVelocityRPM();
 
-    // double feedback =
-    //     controller.calculate(inputs.velocityRPM) / FlywheelConstants.maxRPM *
-    // Constants.maxVoltage;
-    // double feedforward = feedforwardController.calculate(inputs.velocityRPM);
-    // appliedVolts = MathUtil.clamp(feedback + feedforward, -12, 12);
+    if (isFeedbackControl) {
+      double feedback =
+          controller.calculate(inputs.velocityRPM)
+              / FlywheelConstants.maxRPM
+              * Constants.maxVoltage;
+      double feedforward = feedforwardController.calculate(inputs.velocityRPM);
+      appliedVolts = MathUtil.clamp(feedback + feedforward, -12, 12);
 
-    // sim.setInputVoltage(appliedVolts);
-    // sim.update(Constants.loopPeriodSecs);
+      sim.setInputVoltage(appliedVolts);
+      sim.update(Constants.loopPeriodSecs);
+    }
 
     inputs.appliedVolts = sim.getInputVoltage();
 

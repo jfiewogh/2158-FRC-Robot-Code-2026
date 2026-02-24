@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.commands;
 
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.hood.Hood;
@@ -77,10 +77,13 @@ public class TurretCommands {
     return Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
   }
 
+  /**
+   * Only setter methods used for flywheel, turret, and hood. Only getter methods used for drive.
+   */
   public static void shootToTarget(
-      Flywheel flywheel, Turret turret, Hood hood, TrackingTargets target) {
-    Pose2d robotPose = RobotState.getInstance().getEstimatedPose();
-    ChassisSpeeds robotSpeeds = RobotState.getInstance().getRobotVelocity();
+      Flywheel flywheel, Turret turret, Hood hood, Drive drive, TrackingTargets target) {
+    Pose2d robotPose = drive.getPose();
+    ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
 
     double targetHeight = target.getTranslation3d().getZ();
 
@@ -171,8 +174,8 @@ public class TurretCommands {
     return closestTarget;
   }
 
-  private static TrackingTargets getShuttleTarget(Alliance alliance) {
-    Pose3d robotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
+  private static TrackingTargets getShuttleTarget(Drive drive, Alliance alliance) {
+    Pose3d robotPose = new Pose3d(drive.getPose());
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
       possibleTargets =
@@ -184,14 +187,15 @@ public class TurretCommands {
     return getClosestTarget(robotPose, possibleTargets);
   }
 
-  public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood) {
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-    if (alliance.isPresent()) {
+  public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
+    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+    if (allianceOptional.isPresent()) {
+      Alliance alliance = allianceOptional.get();
       return Commands.defer(
           () ->
               Commands.run(
                   () -> {
-                    shootToTarget(flywheel, turret, hood, getShuttleTarget(alliance.get()));
+                    shootToTarget(flywheel, turret, hood, drive, getShuttleTarget(drive, alliance));
                     isShuttling = true;
                   }),
           Set.of());
@@ -199,37 +203,28 @@ public class TurretCommands {
     return Commands.none();
   }
 
-  private static double blueAllianceZoneX = Units.inchesToMeters(156.61);
-  private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61);
-
-  public static boolean isInAllianceZone(Alliance alliance, Pose2d robotPose) {
-    return alliance == Alliance.Blue
-        ? robotPose.getX() < blueAllianceZoneX
-        : robotPose.getX() > redAllianceZoneX;
-  }
-
-  public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood) {
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-
-    if (alliance.isPresent()) {
-      BooleanSupplier inAllianceZone =
-          () -> isInAllianceZone(alliance.get(), RobotState.getInstance().getEstimatedPose());
+  public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
+    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+    if (allianceOptional.isPresent()) {
+      Alliance alliance = allianceOptional.get();
 
       // TODO: determine using flywheel laser can
       BooleanSupplier noGamePiecesToShoot = () -> false;
 
       return Commands.run(
               () -> {
-                if (inAllianceZone.getAsBoolean()) {
+                if (RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose())) {
                   shootToTarget(
                       flywheel,
                       turret,
                       hood,
-                      alliance.get() == Alliance.Blue
-                          ? TrackingTargets.blueHub
-                          : TrackingTargets.redHub);
+                      drive,
+                      alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub);
                 }
-              })
+              },
+              flywheel,
+              turret,
+              hood)
           .until(noGamePiecesToShoot)
           .handleInterrupt(() -> flywheel.setVelocity(0));
     }

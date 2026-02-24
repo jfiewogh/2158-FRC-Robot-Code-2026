@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Saturday February 21, 2026 at 16:51:46 CST
+// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation;
 
@@ -54,6 +54,8 @@ import org.littletonrobotics.junction.Logger;
  * projectiles.
  */
 public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
+  private static final boolean printGamePiecesShot = false;
+
   private final GamePieceInfo3D gamePieceInfo;
   private final AbstractDriveTrainSimulation3D driveTrainSimulation;
   private final Supplier<Pose3d> shooterPoseSupplier;
@@ -307,14 +309,16 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
     // Set initial velocity for the projectile
     projectile.getPhysicsBody().setLinearVelocityMPS(initialVelocity);
 
-    System.out.printf(
-        "[ShooterSimulation3D] Shot game piece! Pos=(%.2f,%.2f,%.2f) Vel=(%.2f,%.2f,%.2f) m/s%n",
-        shooterPoseWorld.getX(),
-        shooterPoseWorld.getY(),
-        shooterPoseWorld.getZ(),
-        initialVelocity.getX(),
-        initialVelocity.getY(),
-        initialVelocity.getZ());
+    if (printGamePiecesShot) {
+      System.out.printf(
+          "[ShooterSimulation3D] Shot game piece! Pos=(%.2f,%.2f,%.2f) Vel=(%.2f,%.2f,%.2f) m/s%n",
+          shooterPoseWorld.getX(),
+          shooterPoseWorld.getY(),
+          shooterPoseWorld.getZ(),
+          initialVelocity.getX(),
+          initialVelocity.getY(),
+          initialVelocity.getZ());
+    }
   }
 
   /**
