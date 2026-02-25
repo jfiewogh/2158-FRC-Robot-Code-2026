@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.ironmaple.simulation.seasonspecific.crescendo2024;
 

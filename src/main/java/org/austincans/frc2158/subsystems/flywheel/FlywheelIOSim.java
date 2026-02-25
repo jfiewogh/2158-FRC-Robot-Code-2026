@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -36,6 +35,7 @@ public class FlywheelIOSim implements FlywheelIO {
   private static final boolean isFeedbackControl = false;
 
   private final ShooterSim shooterSim;
+  private final IntakeSimulation intakeSimulation;
 
   private final DCMotor plant = DCMotor.getNeoVortex(1);
   private final FlywheelSim sim =
@@ -48,6 +48,7 @@ public class FlywheelIOSim implements FlywheelIO {
   private final SimpleMotorFeedforward feedforwardController =
       new SimpleMotorFeedforward(FlywheelConstants.kS, FlywheelConstants.kV, FlywheelConstants.kA);
 
+  private double velocityRPM;
   private double appliedVolts;
 
   /** I am passing in the drive subsystem as a parameter but only using its getter methods */
@@ -65,11 +66,13 @@ public class FlywheelIOSim implements FlywheelIO {
             intakeSimulation,
             hoodAngleSupplier,
             turretAngle);
+    this.intakeSimulation = intakeSimulation;
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.velocityRPM = sim.getAngularVelocityRPM();
+    velocityRPM = inputs.velocityRPM;
 
     if (isFeedbackControl) {
       double feedback =
@@ -98,5 +101,20 @@ public class FlywheelIOSim implements FlywheelIO {
   @Override
   public void runVelocity(double velocityRPM) {
     sim.setAngularVelocity(Units.rotationsToRadians(velocityRPM) / 60);
+  }
+
+  @Override
+  public boolean readyToShoot() {
+    return intakeSimulation.getGamePiecesAmount() > 0;
+  }
+
+  @Override
+  public boolean isShooting() {
+    return velocityRPM > 100 && readyToShoot();
+  }
+
+  @Override
+  public boolean noGamePiecesToShoot() {
+    return intakeSimulation.getGamePiecesAmount() == 0;
   }
 }

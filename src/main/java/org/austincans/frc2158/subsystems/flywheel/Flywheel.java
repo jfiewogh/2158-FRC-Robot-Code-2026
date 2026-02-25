@@ -13,13 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,25 +32,15 @@ import org.littletonrobotics.junction.Logger;
  * the filter is also provided showing how the filter relates to maximum likelihood statistics.
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
  */
+
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
-
-  private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
-  private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
-  }
-
-  public boolean readyToShoot() {
-    return lasarCan1.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan1;
-  }
-
-  public boolean isShooting() {
-    return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
   }
 
   @Override
@@ -67,6 +55,18 @@ public class Flywheel extends AdvancedSubsystem {
 
   public double getRPM() {
     return inputs.velocityRPM;
+  }
+
+  public boolean readyToShoot() {
+    return io.readyToShoot();
+  }
+
+  public boolean isShooting() {
+    return io.isShooting();
+  }
+
+  public boolean noGamePiecesToShoot() {
+    return io.noGamePiecesToShoot();
   }
 
   @Override

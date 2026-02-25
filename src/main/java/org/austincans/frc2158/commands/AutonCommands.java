@@ -13,13 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.commands;
 
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -32,10 +34,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.drive.DriveConstants;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
@@ -45,8 +47,8 @@ import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.vision.ObjectDetection;
 
 public class AutonCommands {
-  private static PIDController drivePIDX = new PIDController(2, 0.0, 0);
-  private static PIDController drivePIDY = new PIDController(2, 0.0, 0);
+  private static PIDController drivePIDX = new PIDController(3, 0.0, 0);
+  private static PIDController drivePIDY = new PIDController(3, 0.0, 0);
   private static ProfiledPIDController rotationPID =
       new ProfiledPIDController(
           1,
@@ -87,6 +89,21 @@ public class AutonCommands {
   // pathfindToPoseCommand stops working
   // and the robot continues to drive with its last velocity
 
+  // TODO: put this in Constants file, different code should based on what field is chosen
+  private static final double fieldLength = Units.inchesToMeters(651.22);
+  private static final double fieldWidth = Units.inchesToMeters(317.69);
+
+  private static boolean poseInAllianceHalf(Pose3d pose) {
+    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+    return allianceOptional.isPresent() && allianceOptional.get() == Alliance.Blue
+        ? pose.getX() < fieldLength / 2 - DriveConstants.driveBaseRadius * 1.2
+        : pose.getX() > fieldLength / 2 + DriveConstants.driveBaseRadius * 1.2;
+  }
+
+  private static boolean robotInAllianceHalf(Drive drive) {
+    return poseInAllianceHalf(drive.getPose3d());
+  }
+
   public static Command driveToAndIntakeGamePieces(
       Drive drive, ObjectDetection detection, Intake intake, DoubleSupplier... suppliers) {
     return Commands.defer(
@@ -105,11 +122,21 @@ public class AutonCommands {
                         0)
                     // PID Control (used for aligning and driving to nearby game pieces)
                     .andThen(
+                        // TODO: this should run only if pathfind worked
                         Commands.run(
                             () -> {
-                              if (!Drive.joystickHasInput
-                                  && detection.getNearestGamePiecePose() != null) {
-                                driveToPose(drive, detection.getNearestGamePiecePose().toPose2d());
+                              Pose3d targetPose =
+                                  DriverStation.isAutonomous()
+                                      ? detection.getNearestGamePiecePoseSatisfyingCondition(
+                                          drive, pose -> poseInAllianceHalf(pose))
+                                      : detection.getNearestGamePiecePose();
+                              if (!Drive.joystickHasInput && targetPose != null) {
+                                if (!DriverStation.isAutonomous() || robotInAllianceHalf(drive)) {
+                                  driveToPose(
+                                      drive, detection.getNearestGamePiecePose().toPose2d());
+                                }
+                              } else {
+                                drive.stop();
                               }
                             }))
                     // Intake
@@ -129,6 +156,23 @@ public class AutonCommands {
                             }))
                     .alongWith(Commands.run(() -> updateJoystickHasInputCommand(suppliers))),
             Set.of(drive, detection, intake))
+        .beforeStarting(
+            () -> {
+              System.out.println("start drive intake command");
+              //   System.out.println(detection.getNearestGamePiecePose());
+              Pathfinding.setDynamicObstacles(
+                  List.of(
+                      DriverStation.getAlliance().get() == Alliance.Blue
+                          ? Pair.of(
+                              new Translation2d(
+                                  fieldLength / 2 - DriveConstants.driveBaseRadius, 0),
+                              new Translation2d(fieldLength, fieldWidth))
+                          : Pair.of(
+                              new Translation2d(0, 0),
+                              new Translation2d(
+                                  fieldLength / 2 + DriveConstants.driveBaseRadius, fieldWidth))),
+                  drive.getPose().getTranslation());
+            })
         .onlyIf(() -> detection.getNearestGamePiecePose() != null)
         .onlyWhile(() -> detection.getNearestGamePiecePose() != null)
         .until(
@@ -138,46 +182,24 @@ public class AutonCommands {
                     || Drive.joystickHasInput)
         .finallyDo(
             () -> {
-              System.out.println("STOP");
+              System.out.println("end drive intake command");
               drive.stop();
               intake.setRelativeVelocity(0);
+              Pathfinding.setDynamicObstacles(List.of(), drive.getPose().getTranslation());
             });
   }
 
-  /*
-   * Gal's Code
-   * public static Command driveToHubAndShoot(Drive drive, Turret turret, Flywheel
-   * flywheel, Hood hood, ObjectDetection detection, double allianceZone){
-   * Alliance alliance = DriverStation.getAlliance().get();
-   * BooleanSupplier inAllianceZone;
-   * if (alliance != null){
-   * if (alliance == Alliance.Blue){
-   * inAllianceZone = () -> drive.getPoseSupplier().get().getX() < allianceZone;
-   * }
-   * else {
-   * inAllianceZone = () -> drive.getPoseSupplier().get().getX() > allianceZone;
-   * }
-   * } else {
-   * return Commands.none();
-   * }
-   * return Commands.parallel(
-   * TurretCommands.shootToHub(flywheel, turret, hood).onlyIf(inAllianceZone),
-   * findPathToPose()
-   * );
-   * }
-   */
-
-  private static double blueShootingX = Units.inchesToMeters(156.61 - 25);
-  private static double redShootingX = Units.inchesToMeters(651.22 - 156.61 + 25);
-  private static double shootingLeftY = Units.inchesToMeters(50.35 + 12 + 73 * 0.5);
-  private static double shootingRightY = Units.inchesToMeters(317.688 - (50.59 + 12 + 73 * 0.5));
-  private static Rotation2d initialRobotRotation = Rotation2d.kZero;
-  private static ArrayList<Translation2d> blueHubShootingTranslations =
+  private static final double blueShootingX = Units.inchesToMeters(156.61 - 25);
+  private static final double redShootingX = Units.inchesToMeters(651.22 - 156.61 + 25);
+  private static final double shootingLeftY = Units.inchesToMeters(50.35 + 12 + 73 * 0.5);
+  private static final double shootingRightY =
+      Units.inchesToMeters(317.688 - (50.59 + 12 + 73 * 0.5));
+  private static final ArrayList<Translation2d> blueHubShootingTranslations =
       new ArrayList<>(
           Arrays.asList(
               new Translation2d(blueShootingX, shootingLeftY),
               new Translation2d(blueShootingX, shootingRightY)));
-  private static ArrayList<Translation2d> redHubShootingTranslations =
+  private static final ArrayList<Translation2d> redHubShootingTranslations =
       new ArrayList<>(
           Arrays.asList(
               new Translation2d(redShootingX, shootingLeftY),
@@ -189,6 +211,34 @@ public class AutonCommands {
         : robotPose.getX() > redShootingX;
   }
 
+  private static Translation2d getTargetHubShootingTranslation(Drive drive, Alliance alliance) {
+    return drive
+        .getPose()
+        .getTranslation()
+        .nearest(
+            alliance == Alliance.Blue ? blueHubShootingTranslations : redHubShootingTranslations);
+  }
+
+  private static Rotation2d targetRotation = Rotation2d.kZero;
+  private static Rotation2d[] possibleBumpRotations =
+      new Rotation2d[] {
+        Rotation2d.fromDegrees(45),
+        Rotation2d.fromDegrees(135),
+        Rotation2d.fromDegrees(225),
+        Rotation2d.fromDegrees(315)
+      };
+
+  private static double getDifferenceOfTwoRotations(Rotation2d first, Rotation2d second) {
+    double difference = (first.getRadians() - second.getRadians()) % (Math.PI * 2);
+    if (difference > Math.PI) {
+      difference -= Math.PI * 2;
+    }
+    if (difference < -Math.PI) {
+      difference += Math.PI * 2;
+    }
+    return Math.abs(difference);
+  }
+
   public static Command driveToAndShootIntoHub(
       Drive drive,
       Turret turret,
@@ -196,40 +246,50 @@ public class AutonCommands {
       Hood hood,
       ObjectDetection detection,
       DoubleSupplier... suppliers) {
-    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-    if (allianceOptional.isPresent()) {
-      Alliance alliance = allianceOptional.get();
-      Supplier<Translation2d> targetTranslationSupplier =
-          () -> {
-            ArrayList<Translation2d> hubShootingTranslations =
-                alliance == Alliance.Blue
-                    ? blueHubShootingTranslations
-                    : redHubShootingTranslations;
-            return drive.getPose().getTranslation().nearest(hubShootingTranslations);
-          };
-      return Commands.defer(
-              () -> {
-                Pose2d targetPose =
-                    new Pose2d(targetTranslationSupplier.get(), initialRobotRotation);
-                Command pathfindCommand =
-                    PathCommands.pathfindToPoseCommand(drive, targetPose, 0)
-                        .onlyIf(() -> !isFullyInAllianceZone(alliance, drive.getPose()))
-                        .until(
-                            () ->
-                                isFullyInAllianceZone(alliance, drive.getPose())
-                                    || getDistanceBetweenPoses(drive.getPose(), targetPose)
-                                        < pathfindEndDistance)
-                        .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
-                return Commands.parallel(
-                    pathfindCommand,
-                    updateJoystickHasInputCommand(suppliers),
-                    TurretCommands.shootToHub(flywheel, turret, hood, drive));
-              },
-              Set.of(drive, turret, flywheel, hood, detection))
-          .beforeStarting(() -> initialRobotRotation = drive.getPose().getRotation())
-          .until(() -> Drive.joystickHasInput);
-    }
-    return Commands.none();
+    return Commands.defer(
+            () -> {
+              Alliance alliance =
+                  DriverStation.getAlliance().get(); // NOTE: assuming it is not null
+              Pose2d targetPose =
+                  new Pose2d(getTargetHubShootingTranslation(drive, alliance), targetRotation);
+              Command pathfindCommand =
+                  PathCommands.pathfindToPoseCommand(drive, targetPose, 0)
+                      .onlyIf(
+                          () -> !RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose()))
+                      .until(
+                          () ->
+                              isFullyInAllianceZone(alliance, drive.getPose())
+                                  || getDistanceBetweenPoses(drive.getPose(), targetPose)
+                                      < pathfindEndDistance)
+                      .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
+              return Commands.deadline(
+                  TurretCommands.shootToHub(flywheel, turret, hood, drive),
+                  pathfindCommand,
+                  updateJoystickHasInputCommand(suppliers));
+            },
+            Set.of(drive, turret, flywheel, hood, detection))
+        .beforeStarting(
+            () -> {
+              Rotation2d robotRotation = drive.getPose().getRotation();
+              Rotation2d minRotation = possibleBumpRotations[0];
+              double minDifference = getDifferenceOfTwoRotations(robotRotation, minRotation);
+              for (int i = 1; i < possibleBumpRotations.length; i++) {
+                Rotation2d possibleRotation = possibleBumpRotations[i];
+                double difference = getDifferenceOfTwoRotations(robotRotation, possibleRotation);
+                if (difference < minDifference) {
+                  minDifference = difference;
+                  minRotation = possibleRotation;
+                }
+              }
+              targetRotation = minRotation;
+            })
+        .until(() -> Drive.joystickHasInput)
+        .finallyDo(
+            () -> {
+              drive.stop();
+              flywheel.setVelocity(0);
+              System.out.println("end drive score command");
+            });
   }
 
   private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {

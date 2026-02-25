@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -27,7 +26,7 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
-public class FlywheelIOTalonFX implements FlywheelIO {
+public class FlywheelIOTalonFX extends FlywheelIOReal {
   private final TalonFX motor = new TalonFX(FlywheelConstants.motorId, FlywheelConstants.canBus);
   private final SelfCheckingTalonFXPro selfCheckMotor =
       new SelfCheckingTalonFXPro("flywheel", motor);

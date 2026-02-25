@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -29,7 +28,7 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
-public class FlywheelIOSparkFlex implements FlywheelIO {
+public class FlywheelIOSparkFlex extends FlywheelIOReal {
   private final SparkFlex motor = new SparkFlex(FlywheelConstants.motorId, MotorType.kBrushless);
   private final SelfCheckingSparkFlex selfCheckMotor = new SelfCheckingSparkFlex("flywheel", motor);
 

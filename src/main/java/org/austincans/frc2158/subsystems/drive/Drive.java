@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -233,7 +232,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   public void periodic() {
+    Logger.processInputs("Drive/Inputs", driveInputs);
     driveIO.updateInputs(driveInputs);
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     gyroIO.checkForFaults().forEach(this::addFault);

@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158;
 
@@ -82,13 +81,14 @@ public class RobotContainer {
 
   private IntakeSimulation3D intakeSimulation;
 
+  private DoubleSupplier leftY, leftX, rightY, rightX;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-    DoubleSupplier leftY = () -> -controller.getLeftY();
-    DoubleSupplier leftX = () -> -controller.getLeftX();
-    DoubleSupplier rightY = () -> -controller.getRightX();
-    DoubleSupplier rightX = () -> -controller.getRightY();
+    leftY = () -> -controller.getLeftY();
+    leftX = () -> -controller.getLeftX();
+    rightY = () -> -controller.getRightX();
+    rightX = () -> -controller.getRightY();
 
     switch (Constants.currentMode) {
       case REAL -> {
@@ -160,19 +160,6 @@ public class RobotContainer {
                 Integer.MAX_VALUE, // 35
                 SimulatedArena3D.getInstance());
 
-        objectDetection =
-            new ObjectDetection(
-                //     new ODIOSimAll(
-                //         "Fuel", driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-                // new ObjectDetectionIOSimInRange(
-                // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-                new ODIOSimInView(
-                    "Fuel",
-                    LimelightConfig.LIMELIGHT_3G,
-                    4,
-                    driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                    () -> new Pose3d()));
-
         KeyboardInput keyboardInput = new KeyboardInput();
 
         leftX = keyboardInput::leftX;
@@ -182,7 +169,29 @@ public class RobotContainer {
 
         if (intakeSimulation != null) {
           Hood hood = new Hood(new HoodIOTest());
+
           Turret turret = new Turret(new TurretIOSim(drive::getPose3d, hood::getAngle));
+          turret.setDefaultCommand(
+              Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
+
+          objectDetection =
+              new ObjectDetection(
+                  //     new ODIOSimAll(
+                  //         "Fuel", driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
+                  // new ObjectDetectionIOSimInRange(
+                  // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
+                  new ODIOSimInView(
+                      "Fuel",
+                      LimelightConfig.LIMELIGHT_3G,
+                      4,
+                      driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
+                      () ->
+                          new Pose3d(
+                              Translation3d.kZero,
+                              new Rotation3d(
+                                  Rotation2d.fromDegrees(turret.getTurretAngle())
+                                      .minus(drive.getRotation())))));
+
           Intake intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 
           Flywheel flywheel =
@@ -193,36 +202,27 @@ public class RobotContainer {
                       hood::getAngle,
                       () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
 
-          Command intakeCommand =
+          Command runIntakeCommand =
               Commands.runEnd(
                   () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
           Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
 
           keyboardInput.z().whileTrue(shootCommand);
-          keyboardInput.v().whileTrue(intakeCommand);
+          keyboardInput.v().whileTrue(runIntakeCommand);
 
           keyboardInput
               .c()
               .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
 
-          keyboardInput
-              .m()
-              .onTrue(
-                  AutonCommands.driveToAndIntakeGamePieces(
-                      drive, objectDetection, intake, leftX, leftY, rightX, rightY));
-          keyboardInput
-              .comma()
-              .whileTrue(
-                  AutonCommands.driveToAndShootIntoHub(
-                      drive,
-                      turret,
-                      flywheel,
-                      hood,
-                      objectDetection,
-                      leftX,
-                      leftY,
-                      rightX,
-                      rightY));
+          Command driveAndIntakeCommand =
+              AutonCommands.driveToAndIntakeGamePieces(
+                  drive, objectDetection, intake, leftX, leftY, rightX, rightY);
+          keyboardInput.m().onTrue(driveAndIntakeCommand);
+
+          Command driveAndScoreCommand =
+              AutonCommands.driveToAndShootIntoHub(
+                  drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
+          keyboardInput.comma().whileTrue(driveAndScoreCommand);
           // // keyboardInput
           // // .x()
           // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
@@ -233,13 +233,17 @@ public class RobotContainer {
           // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
           // Rotation2d.kZero)));
 
-          NamedCommands.registerCommand("runIntake", intakeCommand);
+          NamedCommands.registerCommand("runIntake", runIntakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
+          NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
+          NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
           NamedCommands.registerCommand(
               "shuttle", TurretCommands.shuttle(flywheel, turret, hood, drive));
         } else {
           NamedCommands.registerCommand("runIntake", Commands.none());
           NamedCommands.registerCommand("shoot", Commands.none());
+          NamedCommands.registerCommand("driveAndIntake", Commands.none());
+          NamedCommands.registerCommand("driveAndScore", Commands.none());
           NamedCommands.registerCommand("shuttle", Commands.none());
         }
       }
@@ -280,6 +284,7 @@ public class RobotContainer {
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
     autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
+    autoChooser.addOption("New Auto", AutoBuilder.buildAuto("New Auto"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
@@ -340,7 +345,7 @@ public class RobotContainer {
 
   public void preloadSimulation() {
     if (intakeSimulation != null) {
-      intakeSimulation.addGamePiecesToIntake(20);
+      intakeSimulation.addGamePiecesToIntake(8);
     }
   }
 

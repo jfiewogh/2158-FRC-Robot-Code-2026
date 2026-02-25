@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.commands;
 
@@ -45,8 +44,8 @@ public class PathCommands {
 
   /* Trajectory (currently unused) */
 
-  private static PIDController xController = new PIDController(1, 0.0, 0);
-  private static PIDController yController = new PIDController(1, 0.0, 0);
+  private static PIDController xController = new PIDController(3, 0.0, 0);
+  private static PIDController yController = new PIDController(3, 0.0, 0);
   private static ProfiledPIDController omegaController =
       new ProfiledPIDController(
           2,

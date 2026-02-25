@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "S1"
+            "pathName": "Shuttling Auto 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "S2"
+            "pathName": "Shuttling Auto 2"
           }
         }
       ]

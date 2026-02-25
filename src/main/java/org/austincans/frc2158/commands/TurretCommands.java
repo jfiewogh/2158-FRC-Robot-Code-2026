@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.commands;
 
@@ -30,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
@@ -154,7 +152,7 @@ public class TurretCommands {
 
         // Should run only if angle is possible
         flywheel.setVelocity(flywheelVelocityRPM);
-        turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
+        turret.setDesiredAngleFieldRelative(turretAngle);
         hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
       }
     }
@@ -207,10 +205,6 @@ public class TurretCommands {
     Optional<Alliance> allianceOptional = DriverStation.getAlliance();
     if (allianceOptional.isPresent()) {
       Alliance alliance = allianceOptional.get();
-
-      // TODO: determine using flywheel laser can
-      BooleanSupplier noGamePiecesToShoot = () -> false;
-
       return Commands.run(
               () -> {
                 if (RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose())) {
@@ -225,8 +219,16 @@ public class TurretCommands {
               flywheel,
               turret,
               hood)
-          .until(noGamePiecesToShoot)
-          .handleInterrupt(() -> flywheel.setVelocity(0));
+          .until(
+              () -> {
+                System.out.println(flywheel.noGamePiecesToShoot());
+                return flywheel.noGamePiecesToShoot();
+              })
+          .handleInterrupt(
+              () -> {
+                System.out.println("no game pieces to shoot");
+                flywheel.setVelocity(0);
+              });
     }
     return Commands.none();
   }

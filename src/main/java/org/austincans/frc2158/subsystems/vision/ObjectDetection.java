@@ -13,14 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.austincans.frc2158.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
 public class ObjectDetection extends SubsystemBase {
@@ -64,6 +66,20 @@ public class ObjectDetection extends SubsystemBase {
 
   public Pose3d getNearestGamePiecePose() {
     return inputs.nearestGamePiecePose;
+  }
+
+  public Pose3d getNearestGamePiecePoseSatisfyingCondition(
+      Drive drive, Predicate<Pose3d> condition) {
+    ArrayList<Pose3d> eligibleGamePiecePoses = new ArrayList<Pose3d>();
+    for (Pose3d gamePiecePose : getGamePiecePoses()) {
+      if (condition.test(gamePiecePose)) {
+        eligibleGamePiecePoses.add(gamePiecePose);
+      }
+    }
+    if (eligibleGamePiecePoses.size() == 0) {
+      return null;
+    }
+    return drive.getPose3d().nearest(eligibleGamePiecePoses);
   }
 
   public Supplier<Pose3d> getNearestGamePiecePoseSupplier() {

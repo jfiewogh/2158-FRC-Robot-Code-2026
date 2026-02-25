@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -32,8 +31,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface DriveIO {
   @AutoLog
   public class DriveIOInputs {
-    Pose3d pose = Pose3d.kZero;
-    ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+    public Pose3d pose = Pose3d.kZero;
+    public ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
   }
 
   public static final SwerveDriveKinematics kinematics =

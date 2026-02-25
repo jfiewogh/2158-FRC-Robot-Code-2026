@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -25,6 +24,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 
 public class FlywheelIOSim3D implements FlywheelIO {
   private final ShooterSim3D shooterSim;
+  private final IntakeSimulation3D intakeSimulation;
 
   private double velocityRPM;
 
@@ -41,6 +41,7 @@ public class FlywheelIOSim3D implements FlywheelIO {
             intakeSimulation,
             hoodAngleSupplier,
             turretAngle);
+    this.intakeSimulation = intakeSimulation;
   }
 
   @Override
@@ -52,5 +53,21 @@ public class FlywheelIOSim3D implements FlywheelIO {
   @Override
   public void runVelocity(double velocityRPM) {
     this.velocityRPM = velocityRPM;
+  }
+
+  @Override
+  public boolean readyToShoot() {
+    return intakeSimulation.getGamePiecesInIntake() > 0;
+  }
+
+  @Override
+  public boolean isShooting() {
+    return velocityRPM > 100 && readyToShoot();
+  }
+
+  @Override
+  public boolean noGamePiecesToShoot() {
+    System.out.println(intakeSimulation.getGamePiecesInIntake());
+    return intakeSimulation.getGamePiecesInIntake() == 0;
   }
 }

@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -83,7 +82,7 @@ public class Turret extends AdvancedSubsystem {
     double angleOffset = Math.copySign(Math.acos(cosC), aimPointLeft);
 
     setDesiredAngleFieldRelative(
-        jointToTargetAngle.minus(new Rotation2d(angleOffset)), robotPose.getRotation());
+        jointToTargetAngle.minus(new Rotation2d(angleOffset))); // , robotPose.getRotation());
   }
 
   public double getTurretVelocity() {
@@ -109,9 +108,8 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(
-      Rotation2d fieldRelativeAngle, Rotation2d currentRotation) {
-    Rotation2d desiredAngle = fieldRelativeAngle.minus(currentRotation);
+  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle) {
+    // Rotation2d desiredAngle = fieldRelativeAngle.minus(currentRotation);
 
     // if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
     //     && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
@@ -131,8 +129,8 @@ public class Turret extends AdvancedSubsystem {
     return Commands.run(
         () ->
             setDesiredAngleFieldRelative(
-                Rotation2d.fromDegrees(fieldRelativeAngle),
-                new Rotation2d() // TODO: insert Swerve Pose
+                Rotation2d.fromDegrees(fieldRelativeAngle)
+                // new Rotation2d() // TODO: insert Swerve Pose
                 ),
         this);
   }

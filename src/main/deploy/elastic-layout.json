@@ -50,6 +50,48 @@
               "topic": "/SmartDashboard/Alerts",
               "period": 0.06
             }
+          },
+          {
+            "title": "MatchNumber",
+            "x": 256.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchNumber",
+              "period": 0.06,
+              "data_type": "int"
+            }
+          },
+          {
+            "title": "MatchTime",
+            "x": 384.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchTime",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "MatchType",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/DriverStation/MatchType",
+              "period": 0.06,
+              "data_type": "int"
+            }
           }
         ]
       }
@@ -63,7 +105,7 @@
             "title": "Auto Choices",
             "x": 0.0,
             "y": 0.0,
-            "width": 512.0,
+            "width": 416.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {

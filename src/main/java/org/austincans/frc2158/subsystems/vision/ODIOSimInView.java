@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.vision;
 
@@ -52,6 +51,8 @@ public class ODIOSimInView implements ODIO {
     return SimulatedArena3D.getInstance().getGamePiecePosesArrayByType(gamePieceType);
   }
 
+  // TODO: fix this
+  // camera not in correct direction
   private boolean checkPoseInView(Pose3d fieldRelGamePiecePose) {
     Pose3d robotRelCameraPose = robotRelCameraPoseSupplier.get();
     Pose3d fieldRelCameraPose =

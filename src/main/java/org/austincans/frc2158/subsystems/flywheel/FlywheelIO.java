@@ -13,7 +13,6 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Sunday February 22, 2026 at 14:08:53 CST
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -42,5 +41,17 @@ public interface FlywheelIO {
 
   public default List<SelfChecking> getHardware() {
     return List.of();
+  }
+
+  public default boolean readyToShoot() {
+    return false;
+  }
+
+  public default boolean isShooting() {
+    return false;
+  }
+
+  public default boolean noGamePiecesToShoot() {
+    return false;
   }
 }
