@@ -4,17 +4,18 @@ ints:
     # 10s Camera
     # 20s Subsystems
     # 30s Swerve
-    FL_DRIVE_ID: 0
-    FL_TURN_ID: 0
-    FL_ENCODER_ID: 0
-    FR_DRIVE_ID: 0
-    FR_TURN_ID: 0
-    FR_ENCODER_ID: 0
-    BL_DRIVE_ID: 0
-    BL_TURN_ID: 0
-    BL_ENCODER_ID: 0
-    BR_DRIVE_ID: 0
-    BR_TURN_ID: 0
+    # 40s Encoders 
+    FL_DRIVE_ID: 31
+    FL_TURN_ID: 32
+    FL_ENCODER_ID: 41
+    FR_DRIVE_ID: 33
+    FR_TURN_ID: 34
+    FR_ENCODER_ID: 42
+    BL_DRIVE_ID: 35
+    BL_TURN_ID: 36
+    BL_ENCODER_ID: 43
+    BR_DRIVE_ID: 37
+    BR_TURN_ID: 38
     BR_ENCODER_ID: 0
     PWM_LED_PORT: 0
     NUM_OF_LEDS: 60
@@ -149,7 +150,7 @@ booleans:
     BR_TURN_INVERTED: true
 strings:
   values:
-    CARNIVORE_CAN_NAME: CANivore2158
+    CARNIVORE_CAN_NAME: 2158_CAN
 enums:
   values:
     ok: test_1
