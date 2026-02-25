@@ -505,6 +505,19 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   protected Command systemCheckCommand() {
-    return Commands.none();
+    return Commands.sequence(
+            modules[0].getSystemCheckCommand(),
+            modules[1].getSystemCheckCommand(),
+            modules[2].getSystemCheckCommand(),
+            modules[3].getSystemCheckCommand(),
+            Commands.waitUntil(
+                () ->
+                    modules[0].getCurrentCommand() == null
+                        && modules[1].getCurrentCommand() == null
+                        && modules[2].getCurrentCommand() == null
+                        && modules[3].getCurrentCommand() == null),
+            Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
+            Commands.waitSeconds(2.0))
+        .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
   }
 }
