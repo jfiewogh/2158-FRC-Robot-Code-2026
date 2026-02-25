@@ -26,18 +26,18 @@ import org.littletonrobotics.junction.AutoLog;
 public interface TurretIO {
   @AutoLog
   class TurretIOInputs {
-    public double positionDeg = 0.0;
-    public double velocityDegPerSec = 0.0;
+    public double positionRad = 0.0; // robot relative
+    public double velocityRadPerSec = 0.0; // robot relative
     public double voltage = 0.0;
     public double currentAmps = 0.0;
-    public double temperatureC = 0.0;
+    public double temperatureCelsius = 0.0;
   }
 
   public void setVoltage(double voltage);
 
   public void setDesiredAngle(Rotation2d angle);
 
-  public void setVelocity(double degPerSec);
+  public void setVelocity(double velocityRadPerSec);
 
   public void updateInputs(TurretIOInputs inputs);
 

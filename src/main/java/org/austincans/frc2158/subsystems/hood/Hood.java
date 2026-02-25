@@ -80,7 +80,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.waitSeconds(0.1),
             Commands.runOnce(
                 () -> {
-                  if (inputs.hoodRadsPerSec < 1) {
+                  if (inputs.velocityRotationsPerSec < 1) {
                     addSubsystemFault(
                         "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
                   }

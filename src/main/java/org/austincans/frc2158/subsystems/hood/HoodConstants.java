@@ -17,8 +17,6 @@
 
 package org.austincans.frc2158.subsystems.hood;
 
-import java.util.TreeMap;
-
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class HoodConstants {

@@ -20,6 +20,7 @@ package org.austincans.frc2158.subsystems.turret;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
@@ -49,23 +50,23 @@ public class Turret extends AdvancedSubsystem {
     io.setVoltage(voltage);
   }
 
-  public void setTurretVelocity(double degPerSec) {
-    io.setVelocity(degPerSec);
+  public void setTurretVelocity(double velocityRadPerSec) {
+    io.setVelocity(velocityRadPerSec);
   }
 
   /**
    * Get the value of the absolute encoder
    *
-   * @return Absolute turret angle in degrees
+   * @return Absolute turret angle in radians
    */
   public double getTurretAngle() {
-    return inputs.positionDeg;
+    return inputs.positionRad;
   }
 
   /**
    * Create a command to set the turret angle
    *
-   * @param turretAngle Desired turret angle in degrees
+   * @param turretAngle Desired turret angle
    * @return Command to rotate turret to given angle
    */
   public Command setTurretAngleCommand(Rotation2d turretAngle) {
@@ -89,7 +90,7 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public double getTurretVelocity() {
-    return inputs.velocityDegPerSec;
+    return inputs.velocityRadPerSec;
   }
 
   public Command pointTurretToPositionCommand(Translation3d fieldPos, double aimPointLeft) {
@@ -111,16 +112,8 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(
-      Rotation2d fieldRelativeAngle, Rotation2d currentRotation) {
-    Rotation2d desiredAngle = fieldRelativeAngle.minus(currentRotation);
-
-    // if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
-    //     && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
-    io.setDesiredAngle(fieldRelativeAngle);
-    // } else {
-    //   io.setDesiredAngle(Rotation2d.fromDegrees(0));
-    // }
+  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
+    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation));
   }
 
   /**
@@ -129,13 +122,9 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to hold, in degrees
    * @return Command to hold turret at field relative angle
    */
-  public Command fieldRelativeAngleCommand(double fieldRelativeAngle) {
+  public Command fieldRelativeAngleCommand(Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
     return Commands.run(
-        () ->
-            setDesiredAngleFieldRelative(
-                Rotation2d.fromDegrees(fieldRelativeAngle),
-                new Rotation2d() // TODO: insert Swerve Pose
-                ),
+        () -> setDesiredAngleFieldRelative(fieldRelativeAngle, robotRotation),
         this);
   }
 
@@ -149,7 +138,7 @@ public class Turret extends AdvancedSubsystem {
     return Commands.run(
         () ->
             io.setDesiredAngle(
-                Rotation2d.fromDegrees(getTurretAngle() + angleControl.getAsDouble() * 1)),
+                Rotation2d.fromRadians(getTurretAngle() + angleControl.getAsDouble() * 1)),
         this);
   }
 
@@ -159,7 +148,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.velocityDegPerSec < 5) {
+                  if (inputs.velocityRadPerSec < Units.degreesToRadians(5)) {
                     addSubsystemFault(
                         "TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
@@ -172,7 +161,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (getTurretAngle() < -25 || getTurretAngle() > -15) {
+                  if (getTurretAngle() < Units.degreesToRadians(-25) || getTurretAngle() > Units.degreesToRadians(-15)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
@@ -182,7 +171,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Math.abs(getTurretAngle()) > 5) {
+                  if (Math.abs(getTurretAngle()) > Units.degreesToRadians(5)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }

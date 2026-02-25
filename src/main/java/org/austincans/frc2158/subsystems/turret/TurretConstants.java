@@ -21,6 +21,7 @@ import com.ctre.phoenix6.CANBus;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class TurretConstants {
+  // values used by SparkFlex and TalonFX
   public static final double kP = ConfigUtil.getConfigDouble("TURRET_P", 0);
   public static final double kI = ConfigUtil.getConfigDouble("TURRET_I", 0);
   public static final double kD = ConfigUtil.getConfigDouble("TURRET_D", 0);
@@ -31,21 +32,25 @@ public class TurretConstants {
   public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
-  // TODO: is CANBus name supposed to be intakeCanbus?
-  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158"));
-
   public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 0);
-
   public static final double turretHeight = ConfigUtil.getConfigDouble("TURRET_HEIGHT", 0);
 
-  public static final boolean forwardLimit = true;
-  public static final boolean reverseLimit = true;
-  public static final double turretForwardSoftLimit =
-      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
-  public static final double turretReverseSoftLimit =
-      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final boolean forwardSoftLimitEnabled = ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED",
+      true);
+  public static final boolean reverseSoftLimitEnabled = ConfigUtil.getConfigBoolean("TURRET_REVERSE_SOFT_LIMIT_ENABLED",
+      true);
+  public static final double forwardSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final double reverseSoftLimit = ConfigUtil.getConfigDouble("TURRET_REVERSE_SOFT_LIMIT", 0);
+  public static final boolean isBrakeMode = ConfigUtil.getConfigBoolean("TURRET_IS_BRAKE_MODE", false);
 
-  // Turret Sim
-  public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
+  // values only used by TalonFX
+  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158"));
+
+  // values only used by SparkFlex
+  public static final boolean isBrushlessMotor = ConfigUtil.getConfigBoolean("TURRET_IS_BRUSHLESS_MOTOR", true);
+  public static final int smartCurrentLimit = ConfigUtil.getConfigInt("TURRET_SMART_CURRENT_LIMIT", 80);
+
+  // values (possibly only) used in sim
+  public static final double rotationalInertiaMetersSq = ConfigUtil
+      .getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
 }

@@ -28,9 +28,9 @@ public interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
     public double hoodAngleDeg;
-    public double temperature;
-    public double motorPosition;
-    public double hoodRadsPerSec;
+    public double temperatureCelsius;
+    public double motorPositionRotations;
+    public double velocityRotationsPerSec;
   }
 
   public default void updateInputs(HoodIOInputs inputs) {}

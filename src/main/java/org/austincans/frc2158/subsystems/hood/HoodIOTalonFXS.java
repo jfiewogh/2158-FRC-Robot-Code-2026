@@ -77,8 +77,9 @@ public class HoodIOTalonFXS implements HoodIO {
 
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
-    inputs.temperature = hoodMotor.getDeviceTemp().getValueAsDouble();
-    inputs.motorPosition = hoodMotor.getPosition().getValue().in(null);
+    inputs.temperatureCelsius = hoodMotor.getDeviceTemp().getValueAsDouble();
+    inputs.motorPositionRotations = hoodMotor.getPosition().getValueAsDouble();
+    inputs.velocityRotationsPerSec = hoodMotor.getVelocity().getValueAsDouble();
   }
 
   @Override
