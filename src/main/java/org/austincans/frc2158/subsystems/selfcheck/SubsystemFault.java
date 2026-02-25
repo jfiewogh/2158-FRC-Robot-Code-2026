@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,8 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
@@ -23,21 +21,15 @@ public class SubsystemFault {
   public final String description;
   public final double timestamp;
   public final boolean isWarning;
-  public final boolean sticky;
 
-  public SubsystemFault(String description, boolean isWarning) {
-    this(description, isWarning, false);
+  public SubsystemFault(String code, String description) {
+    this(code, description, false);
   }
 
-  public SubsystemFault(String description) {
-    this(description, false);
-  }
-
-  public SubsystemFault(String description, boolean isWarning, boolean sticky) {
+  public SubsystemFault(String code, String description, boolean isWarning) {
     this.description = description;
     this.timestamp = Timer.getFPGATimestamp();
     this.isWarning = isWarning;
-    this.sticky = sticky;
   }
 
   @Override

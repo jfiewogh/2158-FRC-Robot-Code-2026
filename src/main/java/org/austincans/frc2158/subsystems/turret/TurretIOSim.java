@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.turret;
 
@@ -20,7 +19,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import java.util.function.Supplier;
 import org.austincans.frc2158.Constants;
@@ -28,6 +26,7 @@ import org.austincans.frc2158.subsystems.sim.TurretViz;
 
 public class TurretIOSim implements TurretIO {
   private final TurretViz turretViz;
+  private static final boolean inputVoltage = false;
 
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);
   private final DCMotorSim sim =
@@ -45,12 +44,17 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-    // sim.setInputVoltage(appliedVoltage);
+    if (inputVoltage) {
+      sim.setInputVoltage(appliedVoltage);
+    }
     sim.update(Constants.loopPeriodSecs);
 
-    inputs.positionDeg = Units.radiansToDegrees(sim.getAngularPositionRad());
+    inputs.positionRad = sim.getAngularPositionRad();
+    inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.voltage = appliedVoltage;
+    inputs.currentAmps = sim.getCurrentDrawAmps();
 
-    turretViz.update(Rotation2d.fromDegrees(inputs.positionDeg));
+    turretViz.update(Rotation2d.fromRadians(inputs.positionRad));
   }
 
   @Override

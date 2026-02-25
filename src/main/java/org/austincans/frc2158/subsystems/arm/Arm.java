@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.arm;
 
@@ -36,6 +35,7 @@ public class Arm extends AdvancedSubsystem {
   public Arm(ArmIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   /**
@@ -98,7 +98,7 @@ public class Arm extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    io.checkForFaults().forEach(this::addFault);
+    io.checkForFaults().forEach(this::addHardwareFault);
   }
 
   @Override
@@ -109,7 +109,8 @@ public class Arm extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (getVelocity() < 0.1) {
-                    addFault("[System Check] Extension velocity measured too slow", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Extension velocity measured too slow", false);
                   }
                   io.setVelocity(0);
                 },
@@ -120,7 +121,8 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < -15
                       || Units.rotationsToDegrees(getPosition()) > 15) {
-                    addFault("[System Check] Joint did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this),
@@ -130,11 +132,11 @@ public class Arm extends AdvancedSubsystem {
                 () -> {
                   if (Units.rotationsToDegrees(getPosition()) < 75
                       || Units.rotationsToDegrees(getPosition()) > 115) {
-                    addFault("[System Check] Joint did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ARM", "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this))
-        .until(() -> getFaults().size() > 0)
         .andThen(
             Commands.runOnce(
                 () -> {

@@ -12,24 +12,24 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
   @AutoLog
   class TurretIOInputs {
-    public double positionDeg = 0.0;
-    public double velocityDegPerSec = 0.0;
+    public double positionRad = 0.0; // robot relative
+    public double velocityRadPerSec = 0.0; // robot relative
     public double voltage = 0.0;
     public double currentAmps = 0.0;
-    public double temperatureC = 0.0;
+    public double temperatureCelsius = 0.0;
   }
 
   /*
@@ -49,11 +49,15 @@ public interface TurretIO {
 
   public void setDesiredAngle(Rotation2d angle);
 
-  public void setVelocity(double degPerSec);
+  public void setVelocity(double velocityRadPerSec);
 
   public void updateInputs(TurretIOInputs inputs);
 
-  public default List<SubsystemFault> checkForFaults() {
-    return null;
+  public default List<HardwareFault> checkForFaults() {
+    return List.of();
+  }
+
+  public default List<SelfChecking> getHardware() {
+    return List.of();
   }
 }

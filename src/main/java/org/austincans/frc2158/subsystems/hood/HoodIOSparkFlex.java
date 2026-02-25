@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -27,9 +26,9 @@ import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class HoodIOSparkFlex implements HoodIO {
   private SparkFlex hoodMotor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);
@@ -64,10 +63,9 @@ public class HoodIOSparkFlex implements HoodIO {
 
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
-    // TODO: add hood velocity
-    // inputs.hoodVelocityRadPerSec
-    inputs.temperature = hoodMotor.getMotorTemperature();
-    inputs.motorPosition = motorEncoder.getPosition();
+    inputs.temperatureCelsius = hoodMotor.getMotorTemperature();
+    inputs.motorPositionRotations = motorEncoder.getPosition();
+    inputs.velocityRotationsPerSec = motorEncoder.getVelocity();
   }
 
   public void setAngleRotation2d(Rotation2d angle) {
@@ -89,10 +87,10 @@ public class HoodIOSparkFlex implements HoodIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> deployFault = hoodMotorCheck.checkForFaults();
+    List<HardwareFault> deployFault = hoodMotorCheck.checkForFaults();
     if (deployFault != null) {
       faults.addAll(deployFault);
     }

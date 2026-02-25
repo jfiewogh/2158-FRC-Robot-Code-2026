@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.hood;
 
@@ -31,6 +30,7 @@ public class Hood extends AdvancedSubsystem {
   public Hood(HoodIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   Command runHoodMotorCommand(Angle angle) {
@@ -73,8 +73,9 @@ public class Hood extends AdvancedSubsystem {
             Commands.waitSeconds(0.1),
             Commands.runOnce(
                 () -> {
-                  if (inputs.hoodVelocityRadPerSec < 1) {
-                    addFault("[System Check] Hood encoder velocity measured too slow", false, true);
+                  if (inputs.velocityRotationsPerSec < 1) {
+                    addSubsystemFault(
+                        "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
                   }
                 },
                 this),
@@ -87,12 +88,12 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
-                    addFault("[System Check] Hood did not reach target position", false, true);
+                    addSubsystemFault(
+                        "HOOD", "[System Check] Hood did not reach target position", false);
                   }
                 },
                 this),
             Commands.waitSeconds(0.25))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }

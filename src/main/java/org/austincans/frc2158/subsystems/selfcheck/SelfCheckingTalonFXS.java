@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,8 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
-// Updated on Thursday November 20, 2025 at 12:24:24 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
@@ -25,6 +23,7 @@ import java.util.List;
 
 public class SelfCheckingTalonFXS implements SelfChecking {
   private final String label;
+  private final int ID;
   private final StatusSignal<Integer> firmwareVersionSignal;
   private final StatusSignal<Boolean> hardwareFaultSignal;
   private final StatusSignal<Boolean> bootEnabledSignal;
@@ -33,6 +32,7 @@ public class SelfCheckingTalonFXS implements SelfChecking {
 
   public SelfCheckingTalonFXS(String label, TalonFXS talon) {
     this.label = label;
+    this.ID = talon.getDeviceID();
 
     firmwareVersionSignal = talon.getVersion();
     hardwareFaultSignal = talon.getFault_Hardware();
@@ -42,25 +42,39 @@ public class SelfCheckingTalonFXS implements SelfChecking {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
     if (firmwareVersionSignal.refresh().getStatus() != StatusCode.OK) {
-      faults.add(new SubsystemFault(String.format("[%s]: No communication with device", label)));
+      faults.add(
+          new HardwareFault(
+              "TAL" + String.valueOf(ID),
+              String.format("[%s]: No communication with device", label)));
     }
     if (hardwareFaultSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Hardware fault detected", label)));
+      faults.add(
+          new HardwareFault(
+              "TAL" + String.valueOf(ID), String.format("[%s]: Hardware fault detected", label)));
     }
     if (bootEnabledSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Device booted while enabled", label)));
+      faults.add(
+          new HardwareFault(
+              "TAL" + String.valueOf(ID),
+              String.format("[%s]: Device booted while enabled", label)));
     }
     if (deviceTempSignal.refresh().getValue()) {
       faults.add(
-          new SubsystemFault(String.format("[%s]: Device temperature too high", label), true));
+          new HardwareFault(
+              "TAL" + String.valueOf(ID),
+              String.format("[%s]: Device temperature too high", label),
+              true));
     }
     if (procTempSignal.refresh().getValue()) {
       faults.add(
-          new SubsystemFault(String.format("[%s]: Processor temperature too high", label), true));
+          new HardwareFault(
+              "TAL" + String.valueOf(ID),
+              String.format("[%s]: Processor temperature too high", label),
+              true));
     }
 
     return faults;

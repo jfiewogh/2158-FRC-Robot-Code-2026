@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -24,9 +23,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public class FlywheelIOSparkFlex extends FlywheelIOReal {
   private final SparkFlex motor = new SparkFlex(FlywheelConstants.motorId, MotorType.kBrushless);
@@ -56,9 +55,9 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
-    List<SubsystemFault> motorFaults = selfCheckMotor.checkForFaults();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
+    List<HardwareFault> motorFaults = selfCheckMotor.checkForFaults();
     if (motorFaults != null) {
       faults.addAll(motorFaults);
     }

@@ -12,13 +12,12 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
@@ -40,7 +39,7 @@ public interface GyroIO {
 
   public default void updateInputs(GyroIOInputs inputs) {}
 
-  public default List<SubsystemFault> checkForFaults() {
+  public default List<HardwareFault> checkForFaults() {
     return List.of();
   }
 }

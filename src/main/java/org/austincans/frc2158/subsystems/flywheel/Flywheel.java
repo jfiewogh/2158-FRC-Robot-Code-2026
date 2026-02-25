@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -41,6 +40,7 @@ public class Flywheel extends AdvancedSubsystem {
   public Flywheel(FlywheelIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   @Override
@@ -77,7 +77,8 @@ public class Flywheel extends AdvancedSubsystem {
         Commands.runOnce(
             () -> {
               if (getRPM() < 95 || getRPM() > 105) {
-                addFault("[System Check] Flywheel did not reach desired velocity RPM");
+                addSubsystemFault(
+                    "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }));
   }

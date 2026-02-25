@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -26,9 +25,9 @@ import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.austincans.frc2158.util.ConfigUtil;
 
 /** Add your docs here. */
@@ -104,15 +103,15 @@ public class IntakeIOTalonFXS implements IntakeIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> deployFault = deployMotorSelfCheck.checkForFaults();
+    List<HardwareFault> deployFault = deployMotorSelfCheck.checkForFaults();
     if (deployFault != null) {
       faults.addAll(deployFault);
     }
 
-    List<SubsystemFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
+    List<HardwareFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
     if (intakeFault != null) {
       faults.addAll(intakeFault);
     }

@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.controllers;
 
@@ -22,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // @author Austin Cans Robotics Team 2158
 public class LinearActuatorController extends SubsystemBase {
   private static Servo linearActuator;
-  private REVDigitController controller = new REVDigitController();
   private double speed = 0; // PWM in ms
 
   // L16-100-35-6-R
@@ -42,7 +40,7 @@ public class LinearActuatorController extends SubsystemBase {
   @Override
   public void periodic() {
     if (speed == 0) {
-      setSpeed(controller.getInstance().getPotentiometer() + 1);
+      setSpeed(REVDigitController.getInstance().getPotentiometer() + 1);
     } else {
       setSpeed(speed);
     }

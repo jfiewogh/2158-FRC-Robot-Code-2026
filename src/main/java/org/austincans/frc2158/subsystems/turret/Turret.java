@@ -12,13 +12,13 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
@@ -31,6 +31,8 @@ public class Turret extends AdvancedSubsystem {
 
   public Turret(TurretIO io) {
     this.io = io;
+    io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   @Override
@@ -46,23 +48,23 @@ public class Turret extends AdvancedSubsystem {
     io.setVoltage(voltage);
   }
 
-  public void setTurretVelocity(double degPerSec) {
-    io.setVelocity(degPerSec);
+  public void setTurretVelocity(double velocityRadPerSec) {
+    io.setVelocity(velocityRadPerSec);
   }
 
   /**
    * Get the value of the absolute encoder
    *
-   * @return Absolute turret angle in degrees
+   * @return Absolute turret angle in radians
    */
   public double getTurretAngle() {
-    return inputs.positionDeg;
+    return inputs.positionRad;
   }
 
   /**
    * Create a command to set the turret angle
    *
-   * @param turretAngle Desired turret angle in degrees
+   * @param turretAngle Desired turret angle
    * @return Command to rotate turret to given angle
    */
   public Command setTurretAngleCommand(Rotation2d turretAngle) {
@@ -82,11 +84,11 @@ public class Turret extends AdvancedSubsystem {
     double angleOffset = Math.copySign(Math.acos(cosC), aimPointLeft);
 
     setDesiredAngleFieldRelative(
-        jointToTargetAngle.minus(new Rotation2d(angleOffset))); // , robotPose.getRotation());
+        jointToTargetAngle.minus(new Rotation2d(angleOffset)), robotPose.getRotation());
   }
 
   public double getTurretVelocity() {
-    return inputs.velocityDegPerSec * 360.0;
+    return inputs.velocityRadPerSec;
   }
 
   public Command pointTurretToPositionCommand(Translation3d fieldPos, double aimPointLeft) {
@@ -108,15 +110,9 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle) {
-    // Rotation2d desiredAngle = fieldRelativeAngle.minus(currentRotation);
-
-    // if (desiredAngle.getDegrees() < ConfigUtil.getConfigDouble("turretForwardLimit", 360)
-    //     && desiredAngle.getDegrees() > ConfigUtil.getConfigDouble("turretReverseLimit", 0)) {
-    io.setDesiredAngle(fieldRelativeAngle);
-    // } else {
-    //   io.setDesiredAngle(Rotation2d.fromDegrees(0));
-    // }
+  public void setDesiredAngleFieldRelative(
+      Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
+    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation));
   }
 
   /**
@@ -125,14 +121,10 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to hold, in degrees
    * @return Command to hold turret at field relative angle
    */
-  public Command fieldRelativeAngleCommand(double fieldRelativeAngle) {
+  public Command fieldRelativeAngleCommand(
+      Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
     return Commands.run(
-        () ->
-            setDesiredAngleFieldRelative(
-                Rotation2d.fromDegrees(fieldRelativeAngle)
-                // new Rotation2d() // TODO: insert Swerve Pose
-                ),
-        this);
+        () -> setDesiredAngleFieldRelative(fieldRelativeAngle, robotRotation), this);
   }
 
   /**
@@ -145,7 +137,7 @@ public class Turret extends AdvancedSubsystem {
     return Commands.run(
         () ->
             io.setDesiredAngle(
-                Rotation2d.fromDegrees(getTurretAngle() + angleControl.getAsDouble() * 1)),
+                Rotation2d.fromRadians(getTurretAngle() + angleControl.getAsDouble() * 1)),
         this);
   }
 
@@ -155,11 +147,11 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.velocityDegPerSec * 360.0 < 5) {
-                    addFault(
+                  if (inputs.velocityRadPerSec < Units.degreesToRadians(5)) {
+                    addSubsystemFault(
+                        "TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
-                        false,
-                        true);
+                        false);
                   }
                   io.setVelocity(0);
                 },
@@ -168,8 +160,10 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (getTurretAngle() < -25 || getTurretAngle() > -15) {
-                    addFault("[System Check] Turret did not reach desired angle", false, true);
+                  if (getTurretAngle() < Units.degreesToRadians(-25)
+                      || getTurretAngle() > Units.degreesToRadians(-15)) {
+                    addSubsystemFault(
+                        "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
                 this),
@@ -177,12 +171,12 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Math.abs(getTurretAngle()) > 5) {
-                    addFault("[System Check] Turret did not reach desired angle", false, true);
+                  if (Math.abs(getTurretAngle()) > Units.degreesToRadians(5)) {
+                    addSubsystemFault(
+                        "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
                 this))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
   }
 }

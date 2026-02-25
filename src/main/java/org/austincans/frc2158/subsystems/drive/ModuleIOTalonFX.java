@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -46,8 +45,9 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2158.Constants;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
+import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXPro;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
   protected final SwerveModuleConstants<
@@ -278,15 +278,15 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
-    List<SubsystemFault> driveFaults = driveTalonSelfCheck.checkForFaults();
+    List<HardwareFault> driveFaults = driveTalonSelfCheck.checkForFaults();
     if (driveFaults != null) {
       faults.addAll(driveFaults);
     }
 
-    List<SubsystemFault> turnFaults = turnTalonSelfCheck.checkForFaults();
+    List<HardwareFault> turnFaults = turnTalonSelfCheck.checkForFaults();
     if (turnFaults != null) {
       faults.addAll(turnFaults);
     }
@@ -296,5 +296,9 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     // } else {
     return faults;
     // }
+  }
+
+  public List<SelfChecking> getHardware() {
+    return List.of(driveTalonSelfCheck, turnTalonSelfCheck);
   }
 }

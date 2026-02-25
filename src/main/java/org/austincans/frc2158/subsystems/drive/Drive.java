@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -50,7 +49,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Arrays;
@@ -131,7 +129,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                     WHEEL_COF));
   }
 
-  @AutoLogOutput private boolean velocityMode = true;
+  @AutoLogOutput private boolean velocityMode = false;
   @AutoLogOutput private boolean brakeModeEnabled = true;
 
   private final DriveIO driveIO;
@@ -178,6 +176,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
 
     driveIO.setModules(modules);
+    registerCheckCommand(systemCheckCommand());
 
     lastMovementTimer.start();
     setBrakeMode(true);
@@ -232,12 +231,11 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   public void periodic() {
-    Logger.processInputs("Drive/Inputs", driveInputs);
     driveIO.updateInputs(driveInputs);
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
-    gyroIO.checkForFaults().forEach(this::addFault);
+    gyroIO.checkForFaults().forEach(this::addHardwareFault);
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();
@@ -507,33 +505,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   protected Command systemCheckCommand() {
-    return Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  // TODO: seems like there is a better way to do this
-                  CommandScheduler.getInstance().schedule(modules[0].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[1].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[2].getSystemCheckCommand());
-                  CommandScheduler.getInstance().schedule(modules[3].getSystemCheckCommand());
-                },
-                this),
-            // Hack to run module system checks since modules[] does not exist when this
-            // method is
-            // called
-            Commands.waitUntil(
-                () ->
-                    modules[0].getCurrentCommand() == null
-                        && modules[1].getCurrentCommand() == null
-                        && modules[2].getCurrentCommand() == null
-                        && modules[3].getCurrentCommand() == null),
-            Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))))
-        .until(
-            () ->
-                getFaults().size() > 0
-                    || modules[0].getFaults().size() > 0
-                    || modules[1].getFaults().size() > 0
-                    || modules[2].getFaults().size() > 0
-                    || modules[3].getFaults().size() > 0)
-        .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
+    return Commands.none();
   }
 }

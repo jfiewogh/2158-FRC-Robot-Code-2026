@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.intake;
 
@@ -33,6 +32,7 @@ public class Intake extends AdvancedSubsystem {
   public Intake(IntakeIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
   }
 
   public boolean distanceSensorActive() {
@@ -59,7 +59,7 @@ public class Intake extends AdvancedSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
-    io.checkForFaults().forEach(this::addFault);
+    io.checkForFaults().forEach(this::addHardwareFault);
   }
 
   public Command systemCheckCommand() {

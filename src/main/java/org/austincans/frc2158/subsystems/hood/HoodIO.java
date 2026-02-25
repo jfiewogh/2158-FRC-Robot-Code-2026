@@ -12,24 +12,23 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 import org.austincans.frc2158.math.Angle;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
     public double hoodAngleDeg;
-    public double hoodVelocityRadPerSec;
-    public double temperature;
-    public double motorPosition;
+    public double temperatureCelsius;
+    public double motorPositionRotations;
+    public double velocityRotationsPerSec;
   }
 
   public void updateInputs(HoodIOInputs inputs);
@@ -44,7 +43,7 @@ public interface HoodIO {
 
   public boolean atAngle(Angle setpoint);
 
-  public default List<SubsystemFault> checkForFaults() {
+  public default List<HardwareFault> checkForFaults() {
     return List.of();
   }
 

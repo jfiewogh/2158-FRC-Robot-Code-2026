@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
@@ -28,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
+import org.austincans.frc2158.controllers.REVDigitController;
 
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {
@@ -36,8 +36,12 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     ERROR
   }
 
-  private final List<SubsystemFault> faults = new ArrayList<>();
+  public enum FaultCodes {}
+
+  private final List<SubsystemFault> subsystemFaults = new ArrayList<>();
+  private final List<HardwareFault> hardwareFaults = new ArrayList<>();
   private final List<SelfChecking> hardware = new ArrayList<>();
+  private final List<Command> checkCommands = new ArrayList<>();
   private final String statusTable;
   private final boolean checkErrors;
 
@@ -90,9 +94,9 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     SmartDashboard.putString(statusTable + "/Status", status.name());
     SmartDashboard.putBoolean(statusTable + "/SystemOK", status == SystemStatus.OK);
 
-    String[] faultStrings = new String[this.faults.size()];
-    for (int i = 0; i < this.faults.size(); i++) {
-      SubsystemFault fault = this.faults.get(i);
+    String[] faultStrings = new String[this.hardwareFaults.size()];
+    for (int i = 0; i < this.hardwareFaults.size(); i++) {
+      HardwareFault fault = this.hardwareFaults.get(i);
       faultStrings[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
     }
     SmartDashboard.putStringArray(statusTable + "/Faults", faultStrings);
@@ -108,37 +112,65 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     //    BatteryUsage.reportUsage(this.getName(), device, amps, volts);
   }
 
-  protected void addFault(SubsystemFault fault) {
-    if (!this.faults.contains(fault)) {
-      this.faults.add(fault);
+  protected void addSubsystemFault(SubsystemFault fault) {
+    if (!this.subsystemFaults.contains(fault)) {
+      this.subsystemFaults.add(fault);
     }
   }
 
-  protected void addFault(String description, boolean isWarning) {
-    this.addFault(new SubsystemFault(description, isWarning));
+  protected void addHardwareFault(HardwareFault fault) {
+    if (!this.hardwareFaults.contains(fault)) {
+      this.hardwareFaults.add(fault);
+    }
   }
 
-  protected void addFault(String description, boolean isWarning, boolean sticky) {
-    this.addFault(new SubsystemFault(description, isWarning, sticky));
+  protected void addSubsystemFault(String code, String description, boolean isWarning) {
+    this.addSubsystemFault(new SubsystemFault(code, description, isWarning));
   }
 
-  protected void addFault(String description) {
-    this.addFault(description, false);
+  protected void addSubsystemFault(String code, String description) {
+    this.addSubsystemFault(code, description, false);
   }
 
-  public List<SubsystemFault> getFaults() {
-    return this.faults;
+  protected void addHardwareFault(
+      String code, String description, boolean isWarning, boolean isSticky) {
+    this.addHardwareFault(new HardwareFault(code, description, isWarning, isSticky));
+  }
+
+  protected void addHardwareFault(String code, String description, boolean isWarning) {
+    this.addHardwareFault(new HardwareFault(code, description, isWarning, false));
+  }
+
+  protected void addHardwareFault(String code, String description) {
+    this.addHardwareFault(code, description, false);
+  }
+
+  public List<SubsystemFault> getSubsystemFaults() {
+    return this.subsystemFaults;
   }
 
   public void clearFaults() {
-    this.faults.clear();
+    this.subsystemFaults.clear();
+    this.hardwareFaults.clear();
   }
 
   public SystemStatus getSystemStatus() {
     SystemStatus worstStatus = SystemStatus.OK;
 
-    for (SubsystemFault f : this.faults) {
+    for (HardwareFault f : this.hardwareFaults) {
       if (f.sticky || f.timestamp > Timer.getFPGATimestamp() - 10) {
+        if (f.isWarning) {
+          if (worstStatus != SystemStatus.ERROR) {
+            worstStatus = SystemStatus.WARNING;
+          }
+        } else {
+          worstStatus = SystemStatus.ERROR;
+        }
+      }
+    }
+
+    for (SubsystemFault f : this.subsystemFaults) {
+      if (f.timestamp > Timer.getFPGATimestamp() - 10) {
         if (f.isWarning) {
           if (worstStatus != SystemStatus.ERROR) {
             worstStatus = SystemStatus.WARNING;
@@ -186,12 +218,25 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   // Command to run a full systems check
   protected abstract Command systemCheckCommand();
 
+  public void registerCheckCommand(Command command) {
+    checkCommands.add(command);
+  }
+
+  public Command sequentialCheck() {
+    return Commands.sequence(checkCommands.toArray(Command[]::new))
+        .onlyWhile(() -> subsystemFaults.size() == 0)
+        .handleInterrupt(
+            () ->
+                REVDigitController.getInstance()
+                    .writeDigits(subsystemFaults.get(0).description.toString()));
+  }
+
   // Method to check for faults while the robot is operating normally
   private void checkForFaults() {
     if (checkErrors) {
       for (SelfChecking device : hardware) {
-        for (SubsystemFault fault : device.checkForFaults()) {
-          addFault(fault);
+        for (HardwareFault fault : device.checkForFaults()) {
+          addHardwareFault(fault);
         }
       }
     }

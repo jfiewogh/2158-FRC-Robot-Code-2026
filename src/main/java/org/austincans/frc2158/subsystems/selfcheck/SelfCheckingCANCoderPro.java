@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,8 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
@@ -39,20 +37,21 @@ public class SelfCheckingCANCoderPro implements SelfChecking {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    List<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    List<HardwareFault> faults = new ArrayList<>();
 
     if (hardwareFaultSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Hardware fault detected", label)));
+      faults.add(new HardwareFault("CAN", String.format("[%s]: Hardware fault detected", label)));
     }
     if (bootEnabledSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Device booted while enabled", label)));
+      faults.add(
+          new HardwareFault("CAN", String.format("[%s]: Device booted while enabled", label)));
     }
     if (badMagnetSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Magnet too weak", label)));
+      faults.add(new HardwareFault("CAN", String.format("[%s]: Magnet too weak", label)));
     }
     if (undervoltageSignal.refresh().getValue()) {
-      faults.add(new SubsystemFault(String.format("[%s]: Under voltage", label)));
+      faults.add(new HardwareFault("CAN", String.format("[%s]: Under voltage", label)));
     }
 
     return faults;

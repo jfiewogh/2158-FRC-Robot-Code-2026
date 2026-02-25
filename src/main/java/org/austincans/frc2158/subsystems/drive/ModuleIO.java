@@ -12,14 +12,13 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
@@ -74,7 +73,7 @@ public interface ModuleIO {
   /** Set brake mode on drive motor */
   public default void setBrakeMode(boolean enabled) {}
 
-  default List<SubsystemFault> checkForFaults() {
+  default List<HardwareFault> checkForFaults() {
     return List.of();
   }
 

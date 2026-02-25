@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -23,7 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 import java.util.Queue;
-import org.austincans.frc2158.subsystems.selfcheck.SubsystemFault;
+import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {
@@ -65,7 +64,7 @@ public class GyroIONavX implements GyroIO {
 
   // TODO: add check for faults
   @Override
-  public List<SubsystemFault> checkForFaults() {
+  public List<HardwareFault> checkForFaults() {
     return List.of();
   }
 }

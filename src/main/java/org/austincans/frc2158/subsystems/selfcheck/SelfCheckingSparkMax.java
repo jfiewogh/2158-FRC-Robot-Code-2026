@@ -1,4 +1,4 @@
-// Copyright (c) 2025 the ausTIN CANs
+// Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,8 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
-// Updated on Thursday November 13, 2025 at 17:43:29 CST
 
 package org.austincans.frc2158.subsystems.selfcheck;
 
@@ -32,12 +30,15 @@ public class SelfCheckingSparkMax implements SelfChecking {
   }
 
   @Override
-  public List<SubsystemFault> checkForFaults() {
-    ArrayList<SubsystemFault> faults = new ArrayList<>();
+  public List<HardwareFault> checkForFaults() {
+    ArrayList<HardwareFault> faults = new ArrayList<>();
 
     REVLibError err = spark.getLastError();
     if (err != REVLibError.kOk) {
-      faults.add(new SubsystemFault(String.format("[%s]: Error: %s", label, err.name())));
+      faults.add(
+          new HardwareFault(
+              "SPRK" + String.valueOf(spark.getDeviceId()),
+              String.format("[%s]: Error: %s", label, err.name())));
     }
 
     return faults;

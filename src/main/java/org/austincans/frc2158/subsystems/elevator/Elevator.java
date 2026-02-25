@@ -12,7 +12,6 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
-//
 
 package org.austincans.frc2158.subsystems.elevator;
 
@@ -50,6 +49,7 @@ public class Elevator extends AdvancedSubsystem {
   public Elevator(ElevatorIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
+    registerCheckCommand(systemCheckCommand());
     elevatorPID.setTolerance(ElevatorConstants.pidTolerance);
   }
 
@@ -120,10 +120,10 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 1) {
-                    addFault(
+                    addSubsystemFault(
+                        "ELEV",
                         "[System Check] Rotation motor encoder velocity measured too slow",
-                        false,
-                        true);
+                        false);
                   }
                 },
                 this),
@@ -136,8 +136,10 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.heightMeters < 0.95 || inputs.heightMeters > 1.05) {
-                    addFault(
-                        "[System Check] Rotation Motor did not reach target position", false, true);
+                    addSubsystemFault(
+                        "ELEV",
+                        "[System Check] Rotation Motor did not reach target position",
+                        false);
                   }
                 },
                 this),
@@ -150,13 +152,13 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   if (inputs.velocityMetersPerSec < 0.95) {
-                    addFault("[System Check] Drive motor encoder velocity too slow", false, true);
+                    addSubsystemFault(
+                        "ELEV", "[System Check] Drive motor encoder velocity too slow", false);
                   }
                   moveAtVelocityCommand(0);
                 },
                 this),
             Commands.waitSeconds(0.25))
-        .until(() -> getFaults().size() > 0)
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }
