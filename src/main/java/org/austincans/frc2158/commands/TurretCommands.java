@@ -94,8 +94,7 @@ public class TurretCommands {
     Rotation2d futureRobotRotation =
         robotPose
             .getRotation()
-            .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond))
-            .times(latency);
+            .plus(new Rotation2d(robotSpeeds.omegaRadiansPerSecond).times(latency));
 
     Translation2d turretTranslation =
         futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
@@ -192,11 +191,11 @@ public class TurretCommands {
   }
 
   public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
-    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-    if (allianceOptional.isPresent()) {
-      Alliance alliance = allianceOptional.get();
-      return Commands.run(
-              () -> {
+    return Commands.run(
+            () -> {
+              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+              if (allianceOptional.isPresent()) {
+                Alliance alliance = allianceOptional.get();
                 if (RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose())) {
                   shootToTarget(
                       flywheel,
@@ -205,21 +204,20 @@ public class TurretCommands {
                       drive,
                       alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub);
                 }
-              },
-              flywheel,
-              turret,
-              hood)
-          .until(
-              () -> {
-                System.out.println(flywheel.noGamePiecesToShoot());
-                return flywheel.noGamePiecesToShoot();
-              })
-          .handleInterrupt(
-              () -> {
-                System.out.println("no game pieces to shoot");
-                flywheel.setVelocity(0);
-              });
-    }
-    return Commands.none();
+              }
+            },
+            flywheel,
+            turret,
+            hood)
+        .until(
+            () -> {
+              System.out.println(flywheel.noGamePiecesToShoot());
+              return flywheel.noGamePiecesToShoot();
+            })
+        .finallyDo(
+            () -> {
+              System.out.println("no game pieces to shoot");
+              flywheel.setVelocity(0);
+            });
   }
 }

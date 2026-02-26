@@ -48,13 +48,10 @@ public class TurretViz {
 
   private final Pose3d[] models = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
 
-  private final Supplier<Pose3d> robotFieldRelPoseSupplier;
   private final Supplier<Rotation2d> hoodAngle;
 
-  public TurretViz(
-      String key, Supplier<Pose3d> robotFieldRelPoseSupplier, Supplier<Rotation2d> hoodAngle) {
+  public TurretViz(String key, Supplier<Rotation2d> hoodAngle) {
     this.key = key;
-    this.robotFieldRelPoseSupplier = robotFieldRelPoseSupplier;
     this.hoodAngle = hoodAngle;
 
     models[0] = new Pose3d(modelTranslations[0], Rotation3d.kZero);
@@ -71,9 +68,7 @@ public class TurretViz {
   }
 
   public void update(Rotation2d turretAngle) {
-    Pose3d robotPose = robotFieldRelPoseSupplier.get();
-
-    double yawRad = turretAngle.getRadians() + robotPose.getRotation().getZ();
+    double yawRad = turretAngle.getRadians();
 
     models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
 
