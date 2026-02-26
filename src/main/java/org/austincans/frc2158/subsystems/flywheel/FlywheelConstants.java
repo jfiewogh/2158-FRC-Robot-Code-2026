@@ -23,8 +23,10 @@ public class FlywheelConstants {
   public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);
   public static final double kV = ConfigUtil.getConfigDouble("FLYWHEEL_V", 0);
   public static final double kA = ConfigUtil.getConfigDouble("FLYWHEEL_A", 0);
-  public static final int maxDistFromLasarCan1 = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_1", 30);
-  public static final int maxDistFromLasarCan2 = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_2", 30);
+  public static final int maxDistFromLasarCan1 =
+      ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_1", 30);
+  public static final int maxDistFromLasarCan2 =
+      ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_2", 30);
 
   /* REAL */
   public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);

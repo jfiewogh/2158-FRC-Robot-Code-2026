@@ -27,7 +27,6 @@ import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOTalonFXS implements ArmIO {
   /* Motor */
@@ -46,7 +45,8 @@ public class ArmIOTalonFXS implements ArmIO {
     motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
 
     config = new TalonFXSConfiguration();
-    config.MotorOutput.NeutralMode = ArmConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    config.MotorOutput.NeutralMode =
+        ArmConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     config.CurrentLimits.StatorCurrentLimit = ArmConstants.statorCurrentLimit;
     config.Slot0.kP = ArmConstants.kP;
     config.Slot0.kI = ArmConstants.kI;

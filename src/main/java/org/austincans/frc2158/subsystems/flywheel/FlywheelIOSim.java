@@ -87,8 +87,6 @@ public class FlywheelIOSim implements FlywheelIO {
 
     inputs.appliedVolts = sim.getInputVoltage();
 
-    // TODO: whether it can shoot should be based on whether it has passed through indexer
-    // (create Indexer subsystem and IndexerViz)
     shooterSim.update(inputs.velocityRPM, inputs.velocityRPM > 100);
   }
 

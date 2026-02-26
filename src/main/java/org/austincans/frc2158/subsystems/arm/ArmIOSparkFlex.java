@@ -26,12 +26,10 @@ import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOSparkFlex implements ArmIO {
   /* Motor */
@@ -49,7 +47,8 @@ public class ArmIOSparkFlex implements ArmIO {
     config = new SparkFlexConfig();
     config.idleMode(ArmConstants.brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
+    ClosedLoopConfig closedLoop =
+        new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     config.apply(closedLoop);
 
     SoftLimitConfig softLimit =

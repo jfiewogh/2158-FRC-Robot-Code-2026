@@ -19,7 +19,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.frc2158.Constants;
-import org.austincans.frc2158.util.ConfigUtil;
 
 public class ArmIOSim implements ArmIO {
   private final DCMotor neoVortex = DCMotor.getNeoVortex(1);

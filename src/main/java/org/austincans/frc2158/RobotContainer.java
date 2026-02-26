@@ -39,6 +39,7 @@ import org.austincans.frc2158.commands.TurretCommands;
 import org.austincans.frc2158.generated.TunerConstants;
 import org.austincans.frc2158.subsystems.drive.*;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
+import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelIOSim3D;
 import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.hood.HoodIOTest;
@@ -175,19 +176,12 @@ public class RobotContainer {
 
           objectDetection =
               new ObjectDetection(
-                  //     new ODIOSimAll(
-                  //         "Fuel", driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
-                  // new ObjectDetectionIOSimInRange(
-                  // "Fuel", 1, driveSimulation::getSimulatedDriveTrainPose3dGroundRelative));
                   new ODIOSimInView(
                       "Fuel",
                       LimelightConfig.LIMELIGHT_3G,
                       4,
                       driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                      () ->
-                          new Pose3d(
-                              Translation3d.kZero,
-                              new Rotation3d(Rotation2d.fromDegrees(turret.getTurretAngle())))));
+                      () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
 
           Intake intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 
@@ -205,6 +199,12 @@ public class RobotContainer {
           Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
 
           keyboardInput.z().whileTrue(shootCommand);
+          keyboardInput
+              .x()
+              .whileTrue(
+                  Commands.runEnd(
+                      () -> flywheel.setVelocity(FlywheelConstants.maxRPM * 0.75),
+                      () -> flywheel.setVelocity(0)));
           keyboardInput.v().whileTrue(runIntakeCommand);
 
           keyboardInput
@@ -220,15 +220,6 @@ public class RobotContainer {
               AutonCommands.driveToAndShootIntoHub(
                   drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
           keyboardInput.comma().whileTrue(driveAndScoreCommand);
-          // // keyboardInput
-          // // .x()
-          // // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(8, 4,
-          //
-          // Rotation2d.kZero)));
-          // keyboardInput
-          // .c()
-          // .whileTrue(PathCommands.followPathToPose(drive, new Pose2d(14, 3,
-          // Rotation2d.kZero)));
 
           NamedCommands.registerCommand("runIntake", runIntakeCommand);
           NamedCommands.registerCommand("shoot", shootCommand);
