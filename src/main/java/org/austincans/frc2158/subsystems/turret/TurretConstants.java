@@ -16,6 +16,7 @@
 package org.austincans.frc2158.subsystems.turret;
 
 import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.math.util.Units;
 import org.austincans.frc2158.util.ConfigUtil;
 
 public class TurretConstants {
@@ -30,8 +31,9 @@ public class TurretConstants {
   public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
-  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 0);
-  public static final double turretHeight = ConfigUtil.getConfigDouble("TURRET_HEIGHT", 0);
+  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
+  public static final double turretHeightMeters =
+      ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(25));
 
   public static final boolean forwardSoftLimitEnabled =
       ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED", true);
@@ -53,7 +55,7 @@ public class TurretConstants {
   public static final int smartCurrentLimit =
       ConfigUtil.getConfigInt("TURRET_SMART_CURRENT_LIMIT", 80);
 
-  // values (possibly only) used in sim
+  // values used in sim
   public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
+      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.001);
 }

@@ -104,6 +104,10 @@ public class Turret extends AdvancedSubsystem {
     return Commands.run(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0)), this);
   }
 
+  public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
+    io.setDesiredAngle(robotRelativeAngle);
+  }
+
   /**
    * Set the desired angle of the turret to a field relative angle
    *

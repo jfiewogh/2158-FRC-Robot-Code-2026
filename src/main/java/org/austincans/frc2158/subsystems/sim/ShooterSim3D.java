@@ -59,13 +59,8 @@ public class ShooterSim3D {
     Supplier<Pose3d> shooterPose =
         () ->
             new Pose3d(
-                new Translation3d(0, 0, TurretConstants.turretHeight),
-                new Rotation3d(
-                    0,
-                    0,
-                    turretAngleSupplier.get().getRadians()
-                        - driveSimulation.getGyroSimulation().getGyroReading().getRadians()));
-
+                new Translation3d(0, 0, TurretConstants.turretHeightMeters),
+                new Rotation3d(turretAngleSupplier.get()));
     shooterSim =
         ShooterSimulation3D.create(FuelBall.createInfo(SimulatedArena3D.getInstance()))
             .onRobot(driveSimulation, shooterPose)

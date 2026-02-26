@@ -40,10 +40,10 @@ public class TurretIOTalonFX extends TurretIOReal {
   // Feedforward
   private final ArmFeedforward feedforward =
       new ArmFeedforward(
-          kS, // kS
+          TurretConstants.kS, // kS
           0, // kG - Pivot doesn't need gravity compensation
-          kV, // kV
-          kA // kA
+          TurretConstants.kV, // kV
+          TurretConstants.kA // kA
           );
 
   private final PositionVoltage positionRequest;

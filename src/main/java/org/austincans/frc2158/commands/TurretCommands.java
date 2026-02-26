@@ -35,6 +35,7 @@ import org.austincans.frc2158.subsystems.hood.Hood;
 import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.austincans.frc2158.util.ShooterMath;
+import org.littletonrobotics.junction.Logger;
 
 public class TurretCommands {
   public enum TrackingTargets {
@@ -66,7 +67,7 @@ public class TurretCommands {
   private static final double FLYWHEEL_RADIUS = FlywheelConstants.radiusMeters; // meters
   private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
 
-  private static final double TURRET_HEIGHT = TurretConstants.turretHeight; // meters
+  private static final double TURRET_HEIGHT = TurretConstants.turretHeightMeters; // meters
   public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
@@ -100,16 +101,12 @@ public class TurretCommands {
         futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
     double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
-
     flywheel.setVelocity(0);
 
     // TOTAL VALUES
-
     double totalVelocity = getActualExitVelocityMetersPerSec(flywheelVelocityRPM);
-
     double totalXYDistance =
         turretTranslation.getDistance(target.getTranslation3d().toTranslation2d());
-
     double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
             TURRET_HEIGHT, totalVelocity, totalXYDistance, targetHeight);
@@ -122,20 +119,17 @@ public class TurretCommands {
               Math.atan2(
                   target.getTranslation3d().getY() - turretTranslation.getY(),
                   target.getTranslation3d().getX() - turretTranslation.getX()));
-
       double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
       double totalXVelocity = totalXYVelocity * totalYaw.getCos();
       double totalYVelocity = totalXYVelocity * totalYaw.getSin();
 
       // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
-
       double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
       double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
       double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
       Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
 
       // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
-
       double totalTime = totalXYDistance / totalXYVelocity;
 
       double hoodAngleRad =
@@ -145,13 +139,10 @@ public class TurretCommands {
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
       } else {
-        // if (target.getTranslation3d().getY() != 4.034536) {
-        // hoodAngleRad = Math.PI / 2;
-        // }
-
         // Should run only if angle is possible
         flywheel.setVelocity(flywheelVelocityRPM);
         turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
+        Logger.recordOutput("turret field rel angle", turretAngle);
         hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
       }
     }

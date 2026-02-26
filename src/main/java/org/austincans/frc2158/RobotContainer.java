@@ -187,9 +187,7 @@ public class RobotContainer {
                       () ->
                           new Pose3d(
                               Translation3d.kZero,
-                              new Rotation3d(
-                                  Rotation2d.fromDegrees(turret.getTurretAngle())
-                                      .minus(drive.getRotation())))));
+                              new Rotation3d(Rotation2d.fromDegrees(turret.getTurretAngle())))));
 
           Intake intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 

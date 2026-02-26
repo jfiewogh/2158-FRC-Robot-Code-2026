@@ -68,7 +68,7 @@ public class ShooterSim {
 
       double exitVelocityMetersPerSec = Units.rotationsToRadians(velocityRPM) / 60 * radius;
 
-      Distance initialHeight = Distance.ofBaseUnits(TurretConstants.turretHeight, Meters);
+      Distance initialHeight = Distance.ofBaseUnits(TurretConstants.turretHeightMeters, Meters);
       LinearVelocity launchingSpeed =
           LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
       Angle shooterAngle = Angle.ofBaseUnits(hoodAngle.get().getRadians(), Radians);

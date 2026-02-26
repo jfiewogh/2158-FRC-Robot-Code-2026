@@ -15,7 +15,11 @@
 
 package org.austincans.frc2158.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -54,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -232,6 +237,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @Override
   public void periodic() {
     driveIO.updateInputs(driveInputs);
+    Logger.processInputs("Drive/Inputs", driveInputs);
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -506,10 +512,14 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            modules[0].getSystemCheckCommand(),
-            modules[1].getSystemCheckCommand(),
-            modules[2].getSystemCheckCommand(),
-            modules[3].getSystemCheckCommand(),
+            Commands.defer(
+                () ->
+                    Commands.sequence(
+                        modules[0].getSystemCheckCommand(),
+                        modules[1].getSystemCheckCommand(),
+                        modules[2].getSystemCheckCommand(),
+                        modules[3].getSystemCheckCommand()),
+                Set.of(this)),
             Commands.waitUntil(
                 () ->
                     modules[0].getCurrentCommand() == null

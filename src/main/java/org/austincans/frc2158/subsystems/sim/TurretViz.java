@@ -41,9 +41,9 @@ public class TurretViz {
   // TODO: move to constants
   private final Translation3d[] modelTranslations =
       new Translation3d[] {
-        new Translation3d(0, 0, TurretConstants.turretHeight),
-        new Translation3d(0, 0, TurretConstants.turretHeight),
-        new Translation3d(0.127981, 0, 0.106538 + TurretConstants.turretHeight)
+        new Translation3d(0, 0, TurretConstants.turretHeightMeters),
+        new Translation3d(0, 0, TurretConstants.turretHeightMeters),
+        new Translation3d(0.127981, 0, 0.106538 + TurretConstants.turretHeightMeters)
       };
 
   private final Pose3d[] models = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
@@ -73,7 +73,7 @@ public class TurretViz {
   public void update(Rotation2d turretAngle) {
     Pose3d robotPose = robotFieldRelPoseSupplier.get();
 
-    double yawRad = turretAngle.getRadians() - robotPose.getRotation().getZ();
+    double yawRad = turretAngle.getRadians() + robotPose.getRotation().getZ();
 
     models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
 

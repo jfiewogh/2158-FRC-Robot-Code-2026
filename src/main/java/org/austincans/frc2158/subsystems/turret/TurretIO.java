@@ -19,7 +19,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
@@ -31,19 +30,6 @@ public interface TurretIO {
     public double currentAmps = 0.0;
     public double temperatureCelsius = 0.0;
   }
-
-  /*
-   * PID
-   * kP: Proportional
-   * kI: Integral
-   * kD: Derivative
-   */
-  public double kP = ConfigUtil.getConfigDouble("turretkP", 0);
-  public double kI = ConfigUtil.getConfigDouble("turretkI", 0);
-  public double kD = ConfigUtil.getConfigDouble("turretkD", 0);
-  public double kV = ConfigUtil.getConfigDouble("turretkV", 0);
-  public double kS = ConfigUtil.getConfigDouble("turretkS", 0);
-  public double kA = ConfigUtil.getConfigDouble("turretkA", 0);
 
   public void setVoltage(double voltage);
 
