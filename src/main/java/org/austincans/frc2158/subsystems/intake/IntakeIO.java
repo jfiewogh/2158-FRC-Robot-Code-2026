@@ -27,37 +27,6 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface IntakeIO {
-  public final int deployCanID = ConfigUtil.getConfigInt("deployCanID", 0);
-  public final int intakeCanID = ConfigUtil.getConfigInt("intakeCanID", 0);
-
-  /*
-   * PID
-   * kP: Proportional
-   * kI: Integral
-   * kD: Derivative
-   */
-  public double kP = ConfigUtil.getConfigDouble("intakekP", 0.001);
-  public double kI = ConfigUtil.getConfigDouble("intakekI", 0);
-  public double kD = ConfigUtil.getConfigDouble("intakekD", 0);
-
-  public double maxVelocityRadPerSec = Math.PI;
-  public TrapezoidProfile.Constraints constraints =
-      new TrapezoidProfile.Constraints(
-          ConfigUtil.getConfigDouble("intakeMaxVelocityRadPerSec", maxVelocityRadPerSec),
-          ConfigUtil.getConfigDouble("intakeMaxAccelerationRadPerSecSq", Math.PI));
-
-  /** Feedforward kS: Static kG: Gravity kV: Velocity kA: Acceleration */
-  public double kS = ConfigUtil.getConfigDouble("intakekS", 0);
-
-  public double kG = ConfigUtil.getConfigDouble("intakekG", 0);
-  public double kV = ConfigUtil.getConfigDouble("intakekV", 0);
-  public double kA = ConfigUtil.getConfigDouble("intakekA", 0);
-  public final ArmFeedforward feedforward = new ArmFeedforward(kS, kG, kV, kA);
-  public ProfiledPIDController intakePIDController =
-      new ProfiledPIDController(kP, kI, kD, constraints);
-
-  public boolean deployBreakEnabled = ConfigUtil.getConfigBoolean("intakeDeployBrakeEnabled", true);
-
   @AutoLog
   public class IntakeIOInputs {
     public double deployMotorVoltage = 0;

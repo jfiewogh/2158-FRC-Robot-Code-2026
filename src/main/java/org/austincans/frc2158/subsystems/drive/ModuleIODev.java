@@ -96,9 +96,9 @@ public class ModuleIODev implements ModuleIO {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Slot0 =
         new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("drivekP", 0.0))
+            .withKP(ConfigUtil.getConfigDouble("DRIVE_P", 0.0))
             .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("drivekD", 0.0));
+            .withKD(ConfigUtil.getConfigDouble("DRIVE_D", 0.0));
     driveConfig.Feedback.SensorToMechanismRatio = driveReduction;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps;
     driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps;
@@ -112,9 +112,9 @@ public class ModuleIODev implements ModuleIO {
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.Slot0 =
         new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("turnkP", 0.0))
+            .withKP(ConfigUtil.getConfigDouble("TURN_P", 0.0))
             .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("turnkD", 0.0));
+            .withKD(ConfigUtil.getConfigDouble("TURN_D", 0.0));
     turnConfig.Feedback.SensorToMechanismRatio = turnReduction;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps;

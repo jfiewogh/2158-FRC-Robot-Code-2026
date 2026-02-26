@@ -36,32 +36,28 @@ public class ArmIOTalonFXS implements ArmIO {
   private final TalonFXSConfiguration config;
   private final CANcoder encoder;
 
-  private int canID = ConfigUtil.getConfigInt("armID", 0);
-  private int statorCurrentLimit = ConfigUtil.getConfigInt("armCurrentLimit", 0);
-  private boolean brakeMode = ConfigUtil.getConfigBoolean("armIsBrakeMode", false);
-
   private final VoltageOut voltageRequest = new VoltageOut(0);
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
   public ArmIOTalonFXS() {
     // Initialize motor controller
-    motor = new TalonFXS(canID, ArmConstants.armCANBus);
+    motor = new TalonFXS(ArmConstants.canID, ArmConstants.armCANBus);
     motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
 
     config = new TalonFXSConfiguration();
-    config.MotorOutput.NeutralMode = brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    config.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
-    config.Slot0.kP = kP;
-    config.Slot0.kI = kI;
-    config.Slot0.kD = kD;
-    config.Slot0.kS = kS;
-    config.Slot0.kG = kG;
-    config.Slot0.kV = kV;
-    config.Slot0.kA = kA;
+    config.MotorOutput.NeutralMode = ArmConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    config.CurrentLimits.StatorCurrentLimit = ArmConstants.statorCurrentLimit;
+    config.Slot0.kP = ArmConstants.kP;
+    config.Slot0.kI = ArmConstants.kI;
+    config.Slot0.kD = ArmConstants.kD;
+    config.Slot0.kS = ArmConstants.kS;
+    config.Slot0.kG = ArmConstants.kG;
+    config.Slot0.kV = ArmConstants.kV;
+    config.Slot0.kA = ArmConstants.kA;
 
     // Configure encoder
-    encoder = new CANcoder(ConfigUtil.getConfigInt("armEncoderID", 0));
+    encoder = new CANcoder(ArmConstants.armEncoder);
 
     config.ExternalFeedback.FeedbackRemoteSensorID = encoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =

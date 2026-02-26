@@ -48,15 +48,15 @@ public class IntakeIOSparkFlex implements IntakeIO {
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
     deployMotor =
-        new SparkFlex(ConfigUtil.getConfigInt("intakeDeployMotorID1", 0), MotorType.kBrushless);
-    intakeMotor = new SparkFlex(ConfigUtil.getConfigInt("intakeMotorID1", 0), MotorType.kBrushless);
+        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0), MotorType.kBrushless);
+    intakeMotor = new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0), MotorType.kBrushless);
 
     deployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
 
     config = new SparkFlexConfig();
-    config.idleMode(deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD);
+    config.idleMode(IntakeConstants.deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
     config.apply(closedLoop);
 
     // Configure deployEncoder

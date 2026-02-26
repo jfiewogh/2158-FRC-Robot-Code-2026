@@ -20,14 +20,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2158.controllers.LaserCAN;
 import org.austincans.frc2158.math.Angle;
 import org.austincans.frc2158.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2158.util.ConfigUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  private final LaserCAN laserCAN = new LaserCAN(ConfigUtil.getConfigInt("intakeLaserCANID", 0));
+  private final LaserCAN laserCAN = new LaserCAN(IntakeConstants.laserCANID);
 
   public Intake(IntakeIO io) {
     this.io = io;

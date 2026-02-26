@@ -44,25 +44,25 @@ public class IntakeIOTalonFXS implements IntakeIO {
 
   public IntakeIOTalonFXS() {
     // Initialize motor controller
-    deployMotor = new TalonFXS(deployCanID, IntakeConstants.intakeCANBus);
-    intakeMotor = new TalonFXS(intakeCanID, IntakeConstants.intakeCANBus);
+    deployMotor = new TalonFXS(IntakeConstants.deployCanID, IntakeConstants.intakeCANBus);
+    intakeMotor = new TalonFXS(IntakeConstants.intakeCanID, IntakeConstants.intakeCANBus);
 
     deployMotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);
 
     config = new TalonFXSConfiguration();
     config.MotorOutput.NeutralMode =
-        deployBreakEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    config.Slot0.kP = kP;
-    config.Slot0.kI = kI;
-    config.Slot0.kD = kD;
-    config.Slot0.kS = kS;
-    config.Slot0.kG = kG;
-    config.Slot0.kV = kV;
-    config.Slot0.kA = kA;
+        IntakeConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    config.Slot0.kP = IntakeConstants.kP;
+    config.Slot0.kI = IntakeConstants.kI;
+    config.Slot0.kD = IntakeConstants.kD;
+    config.Slot0.kS = IntakeConstants.kS;
+    config.Slot0.kG = IntakeConstants.kG;
+    config.Slot0.kV = IntakeConstants.kV;
+    config.Slot0.kA = IntakeConstants.kA;
 
     // Configure encoder
-    deployEncoder = new CANcoder(ConfigUtil.getConfigInt("armEncoderID", 0));
+    deployEncoder = new CANcoder(ConfigUtil.getConfigInt("ARM_ENCODER_ID", 0));
 
     config.ExternalFeedback.FeedbackRemoteSensorID = deployEncoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =

@@ -58,10 +58,10 @@ public class Module extends AdvancedSubsystem {
         drivekV.initDefault(0);
         // Multiplied by desired wheelTorqueNm
         drivekT.initDefault(DriveConstants.driveReduction / DCMotor.getKrakenX60Foc(1).KtNMPerAmp);
-        drivekP.initDefault(ConfigUtil.getConfigDouble("drivekP", 0.0));
-        drivekD.initDefault(ConfigUtil.getConfigDouble("drivekD", 0.0));
-        turnkP.initDefault(ConfigUtil.getConfigDouble("turnkP", 0.0));
-        turnkD.initDefault(ConfigUtil.getConfigDouble("turnkD", 0.0));
+        drivekP.initDefault(ConfigUtil.getConfigDouble("DRIVE_P", 0.0));
+        drivekD.initDefault(ConfigUtil.getConfigDouble("DRIVE_D", 0.0));
+        turnkP.initDefault(ConfigUtil.getConfigDouble("TURN_P", 0.0));
+        turnkD.initDefault(ConfigUtil.getConfigDouble("TURN_D", 0.0));
       }
       default -> {
         drivekS.initDefault(0.014);

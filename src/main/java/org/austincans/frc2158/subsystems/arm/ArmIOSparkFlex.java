@@ -41,28 +41,23 @@ public class ArmIOSparkFlex implements ArmIO {
   private SparkFlexConfig config;
   private final SparkClosedLoopController controller;
 
-  private int canID = ConfigUtil.getConfigInt("armID", 0);
-  private int statorCurrentLimit = ConfigUtil.getConfigInt("armCurrentLimit", 0);
-  private boolean brakeMode = ConfigUtil.getConfigBoolean("armIsBrakeMode", false);
-
   public ArmIOSparkFlex() {
     // Initialize motor controller
-    motor = new SparkFlex(canID, MotorType.kBrushless);
+    motor = new SparkFlex(ArmConstants.canID, MotorType.kBrushless);
     selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motor);
 
     config = new SparkFlexConfig();
-    config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+    config.idleMode(ArmConstants.brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(kP, kI, kD);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
     config.apply(closedLoop);
 
     SoftLimitConfig softLimit =
         new SoftLimitConfig()
-            .forwardSoftLimit(ConfigUtil.getConfigDouble("armForwardSoftLimit", 0))
-            .forwardSoftLimitEnabled(ConfigUtil.getConfigBoolean("armSoftLimitEnabled", true))
-            .reverseSoftLimit(ConfigUtil.getConfigDouble("armReverseSoftLimit", 0))
-            .reverseSoftLimitEnabled(
-                ConfigUtil.getConfigBoolean("armReverseSoftLimitEnabled", false));
+            .forwardSoftLimit(ArmConstants.armForwardSoftLimit)
+            .forwardSoftLimitEnabled(ArmConstants.armForwardSoftLimitEnabled)
+            .reverseSoftLimit(ArmConstants.armReversedSoftLimit)
+            .reverseSoftLimitEnabled(ArmConstants.armReversedSoftLimitEnabled);
     config.apply(softLimit);
 
     // Configure encoder
@@ -70,7 +65,7 @@ public class ArmIOSparkFlex implements ArmIO {
     encoder.setPosition(0);
 
     // Set current limits
-    config.smartCurrentLimit(statorCurrentLimit);
+    config.smartCurrentLimit(ArmConstants.statorCurrentLimit);
 
     // Closed Loop Controller
     controller = motor.getClosedLoopController();
@@ -84,14 +79,7 @@ public class ArmIOSparkFlex implements ArmIO {
     controller.setSetpoint(voltage, ControlType.kVoltage);
   }
 
-  // Encoder Values
-  @Override
   public void setPosition(double position) {
-    setPosition(position, ConfigUtil.getConfigDouble("defaultArmVel", 5));
-  }
-
-  public void setPosition(double position, double VelocityRadPerSec) {
-    feedforward.calculate(Units.degreesToRadians(position), VelocityRadPerSec);
     controller.setSetpoint(position, ControlType.kPosition);
   }
 

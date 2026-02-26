@@ -27,13 +27,13 @@ public class ArmIOSim implements ArmIO {
   private final SingleJointedArmSim armSim =
       new SingleJointedArmSim(
           neoVortex,
-          ConfigUtil.getConfigDouble("armGearing", 0),
+          ArmConstants.gearRatio,
           0.001,
-          ConfigUtil.getConfigDouble("armLength", 0),
+          ArmConstants.armLength,
           0,
-          ConfigUtil.getConfigDouble("armMaxRad", 0),
+          ArmConstants.maxRad,
           true,
-          ConfigUtil.getConfigDouble("armStartingPosition", 0));
+          ArmConstants.startingPosition);
 
   private double armAppliedVolts;
 
