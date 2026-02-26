@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Thursday February 05, 2026 at 19:51:21 CST
+//
 
 package org.austincans.frc2158.subsystems.flywheel;
 
@@ -38,10 +38,10 @@ public class FlywheelConstants {
   public static final double radiusMeters =
       ConfigUtil.getConfigDouble("FLYWHEEL_RADIUS", encoderId);
 
-  public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 0);
+  public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 1);
 
   /* SIM */
-  public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 0);
+  public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 1);
 
   public static final double maxRPM = ConfigUtil.getConfigDouble("FLYWHEEL_MAX_RPM", JKgMetersSq);
 }

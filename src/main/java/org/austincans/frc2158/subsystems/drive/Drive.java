@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 //
-// Updated on Tuesday February 24, 2026 at 10:51:13 CST
+//
 
 package org.austincans.frc2158.subsystems.drive;
 
@@ -56,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -506,10 +507,14 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            modules[0].getSystemCheckCommand(),
-            modules[1].getSystemCheckCommand(),
-            modules[2].getSystemCheckCommand(),
-            modules[3].getSystemCheckCommand(),
+            Commands.defer(
+                () ->
+                    Commands.sequence(
+                        modules[0].getSystemCheckCommand(),
+                        modules[1].getSystemCheckCommand(),
+                        modules[2].getSystemCheckCommand(),
+                        modules[3].getSystemCheckCommand()),
+                Set.of(this)),
             Commands.waitUntil(
                 () ->
                     modules[0].getCurrentCommand() == null
