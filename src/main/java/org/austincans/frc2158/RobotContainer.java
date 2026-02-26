@@ -169,7 +169,7 @@ public class RobotContainer {
         if (intakeSimulation != null) {
           Hood hood = new Hood(new HoodIOTest());
 
-          Turret turret = new Turret(new TurretIOSim(drive::getPose3d, hood::getAngle));
+          Turret turret = new Turret(new TurretIOSim(hood::getAngle));
           turret.setDefaultCommand(
               Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
 
@@ -197,7 +197,7 @@ public class RobotContainer {
                       driveSimulation,
                       intakeSimulation,
                       hood::getAngle,
-                      () -> Rotation2d.fromDegrees(turret.getTurretAngle())));
+                      () -> Rotation2d.fromRadians(turret.getTurretAngle())));
 
           Command runIntakeCommand =
               Commands.runEnd(

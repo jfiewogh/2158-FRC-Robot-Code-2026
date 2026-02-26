@@ -15,7 +15,6 @@
 
 package org.austincans.frc2158.subsystems.turret;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -35,11 +34,10 @@ public class TurretIOSim implements TurretIO {
               motorBase, TurretConstants.rotationalInertiaMetersSq, TurretConstants.gearing),
           motorBase);
 
-  @SuppressWarnings("unused")
   private double appliedVoltage = 0;
 
-  public TurretIOSim(Supplier<Pose3d> robotFieldRelPoseSupplier, Supplier<Rotation2d> hoodAngle) {
-    turretViz = new TurretViz("SimComponents", robotFieldRelPoseSupplier, hoodAngle);
+  public TurretIOSim(Supplier<Rotation2d> hoodAngle) {
+    turretViz = new TurretViz("SimComponents", hoodAngle);
   }
 
   @Override
