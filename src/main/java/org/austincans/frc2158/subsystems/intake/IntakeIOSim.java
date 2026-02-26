@@ -57,7 +57,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.deployPositionRad = deploySim.getAngularPositionRad();
 
     double deployAppliedVolts =
-        intakePIDController.calculate(inputs.deployPositionRad)
+        IntakeConstants.intakePIDController.calculate(inputs.deployPositionRad)
             / (Math.PI * 2)
             * Constants.maxVoltage;
 
@@ -90,6 +90,6 @@ public class IntakeIOSim implements IntakeIO {
   @Override
   public void setDeployAngle(Angle angle) {
     System.out.println(angle.toRadians());
-    intakePIDController.setGoal(angle.toRadians());
+    IntakeConstants.intakePIDController.setGoal(angle.toRadians());
   }
 }
