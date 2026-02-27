@@ -17,8 +17,13 @@
 
 package org.austincans.frc2158.util;
 
+import java.util.Set;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 public class KalmanFilter1D {
-  private double estimatedPoses; // Estimated pose
+  private double estimatedPoses;
   private double covariance;
 
   private double processNoiseCovariance; // Process noise covariance
@@ -29,7 +34,20 @@ public class KalmanFilter1D {
    * 1. Collect static noise of sensor
    * 2. Calculate standard deviation of sensor
    * 3. Covariance = (Std. Deviation) ^2
+   * 
+   * Measurement Noise is == RMS ^ 2
    */
+
+  /*
+   * Tune process noise with hopes and dreams
+   * or trial and error
+   * https://www.mathworks.com/help/fusion/ug/tuning-kalman-filter-to-improve-
+   * state-estimation.html
+   * 
+   * Just assume 0
+   */
+
+  RootMeanSquare rms = new RootMeanSquare();
 
   public KalmanFilter1D(
       double initialPose, double initialP, double processNoise, double measurementNoise) {
@@ -56,6 +74,12 @@ public class KalmanFilter1D {
 
     this.estimatedPoses = this.estimatedPoses + K * (measurement - this.estimatedPoses);
     this.covariance = (1 - K) * this.covariance;
+    if (rms.values.size() < 200){
+      rms.storeValue(measurement);
+    } else {
+      rms.values.remove(rms.values.size() - 1); // Pop
+      rms.values.add(0, measurement);
+    }
   }
 
   public double getState() {

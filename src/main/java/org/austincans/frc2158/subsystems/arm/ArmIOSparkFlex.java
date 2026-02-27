@@ -33,12 +33,14 @@ import java.util.List;
 import org.austincans.frc2158.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2158.util.KalmanFilter1D;
 
 public class ArmIOSparkFlex implements ArmIO {
   /* Motor */
   private final SparkFlex motor;
   private SelfCheckingSparkFlex selfCheckingMotor;
   private final RelativeEncoder encoder;
+  private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
   private SparkFlexConfig config;
   private final SparkClosedLoopController controller;
 
