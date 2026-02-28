@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.function.Supplier;
+import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,11 +31,6 @@ public class TurretViz {
       Rotation2d.fromDegrees(90 - (30.719897 + 8.868396) * 0.5);
 
   double radius = Units.inchesToMeters(9.747475);
-
-  public final String robotPath = "assets/Robot_2026Robot";
-  public final String model0Path = robotPath + "/model_0.glb";
-  public final String model1Path = robotPath + "/model_1.glb";
-  public final String model2Path = robotPath + "/model_2.glb";
 
   private final String key;
 
@@ -50,21 +46,11 @@ public class TurretViz {
 
   private final Supplier<Rotation2d> hoodAngle;
 
-  public TurretViz(String key, Supplier<Rotation2d> hoodAngle) {
+  public TurretViz(String key, Supplier<Rotation2d> hoodAngle, Drive drive) {
     this.key = key;
     this.hoodAngle = hoodAngle;
 
     models[0] = new Pose3d(modelTranslations[0], Rotation3d.kZero);
-
-    // PhysicsShape shape0 =
-    //
-    // SimulatedArena3D.getInstance().getPhysicsEngine().createCompoundShapeFromMesh(model0Path);
-    // PhysicsShape shape1 =
-    //
-    // SimulatedArena3D.getInstance().getPhysicsEngine().createCompoundShapeFromMesh(model1Path);
-    // PhysicsShape shape2 =
-    //
-    // SimulatedArena3D.getInstance().getPhysicsEngine().createCompoundShapeFromMesh(model2Path);
   }
 
   public void update(Rotation2d turretAngle) {

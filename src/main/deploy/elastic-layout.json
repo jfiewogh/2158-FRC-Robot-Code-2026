@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 32,
+  "grid_size": 128,
   "tabs": [
     {
       "name": "Teleoperated",
@@ -24,7 +24,8 @@
               "show_trajectories": true,
               "field_rotation": 0.0,
               "robot_color": 4294198070,
-              "trajectory_color": 4294967295
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": true
             }
           },
           {
@@ -50,48 +51,6 @@
               "topic": "/SmartDashboard/Alerts",
               "period": 0.06
             }
-          },
-          {
-            "title": "MatchNumber",
-            "x": 256.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchNumber",
-              "period": 0.06,
-              "data_type": "int"
-            }
-          },
-          {
-            "title": "MatchTime",
-            "x": 384.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchTime",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 15,
-              "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "MatchType",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Large Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchType",
-              "period": 0.06,
-              "data_type": "int"
-            }
           }
         ]
       }
@@ -100,21 +59,7 @@
       "name": "Autonomous",
       "grid_layout": {
         "layouts": [],
-        "containers": [
-          {
-            "title": "Auto Choices",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 416.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Auto Choices",
-              "period": 0.06,
-              "sort_options": false
-            }
-          }
-        ]
+        "containers": []
       }
     },
     {
@@ -432,6 +377,133 @@
       }
     },
     {
+      "name": "Camera",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Front Left",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/frontleft",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Front Right",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/frontright",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AI",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/llvision",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AprilTag",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/pvvision",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Rear Left",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/rearleft",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Rear Right",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/rearright",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Server",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/camera/server",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "Controller",
       "grid_layout": {
         "layouts": [],
@@ -541,6 +613,124 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Radio",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Server",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/fanctrl/server",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Fan 1 RPM",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/frc2158/fanctrl/fan1rpm",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Fan 2 RPM",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/frc2158/fanctrl/fan2rpm",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "PWM",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/frc2158/fanctrl/fanspeed",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Fan Status",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/frc2158/fanctrl/fanstatus",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Temperature (C)",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Number Slider",
+            "properties": {
+              "topic": "/frc2158/fanctrl/radiotempc",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 24.0,
+              "max_value": 72.0,
+              "divisions": 5,
+              "update_continuously": false
+            }
+          },
+          {
+            "title": "Temperature (F)",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Number Slider",
+            "properties": {
+              "topic": "/frc2158/fanctrl/radiotempf",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 75.0,
+              "max_value": 160.0,
+              "divisions": 5,
+              "update_continuously": false
             }
           }
         ]
@@ -693,7 +883,7 @@
           },
           {
             "title": "Temperature (C)",
-            "x": 896.0,
+            "x": 640.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -723,217 +913,14 @@
       }
     },
     {
-      "name": "SelfCheck",
-      "grid_layout": {
-        "layouts": [],
-        "containers": []
-      }
-    },
-    {
-      "name": "Camera",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
-          {
-            "title": "Front Left",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/frontleft",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Front Right",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/frontright",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "AI",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/llvision",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "AprilTag",
-            "x": 896.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/pvvision",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Rear Left",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/rearleft",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Rear Right",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/rearright",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Server",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/camera/server",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Operator",
+      "name": "Subsystem Status",
       "grid_layout": {
         "layouts": [
           {
-            "title": "Score",
+            "title": "Drive",
             "x": 0.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 448.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "L1",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/L1",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              },
-              {
-                "title": "L2",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/L2",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              },
-              {
-                "title": "L3",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/L3",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              },
-              {
-                "title": "L4",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/L4",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              }
-            ]
-          },
-          {
-            "title": "D",
-            "x": 128.0,
-            "y": 256.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -941,81 +928,43 @@
             },
             "children": [
               {
-                "title": "L",
+                "title": "SystemCheck",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 256.0,
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/D/L",
+                  "topic": "/SmartDashboard/SystemStatus/Drive/SystemCheck",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "show_type": true,
+                  "maximize_button_space": false
                 }
               },
               {
-                "title": "R",
+                "title": "CheckRan",
                 "x": 0.0,
                 "y": 0.0,
-                "width": 256.0,
+                "width": 128.0,
                 "height": 128.0,
-                "type": "Command",
+                "type": "Boolean Box",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/D/R",
+                  "topic": "/SmartDashboard/SystemStatus/Drive/CheckRan",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
           },
           {
-            "title": "A",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "L",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/A/L",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              },
-              {
-                "title": "R",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/A/R",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              }
-            ]
-          },
-          {
-            "title": "B",
+            "title": "Flywheel",
             "x": 256.0,
             "y": 0.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -1023,40 +972,43 @@
             },
             "children": [
               {
-                "title": "L",
+                "title": "SystemCheck",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 256.0,
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/B/L",
+                  "topic": "/SmartDashboard/SystemStatus/Flywheel/SystemCheck",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "show_type": true,
+                  "maximize_button_space": false
                 }
               },
               {
-                "title": "R",
+                "title": "CheckRan",
                 "x": 0.0,
                 "y": 0.0,
-                "width": 256.0,
+                "width": 128.0,
                 "height": 128.0,
-                "type": "Command",
+                "type": "Boolean Box",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/B/R",
+                  "topic": "/SmartDashboard/SystemStatus/Flywheel/CheckRan",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
           },
           {
-            "title": "C",
-            "x": 384.0,
+            "title": "Hood",
+            "x": 512.0,
             "y": 0.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -1064,40 +1016,87 @@
             },
             "children": [
               {
-                "title": "L",
-                "x": 416.0,
-                "y": 128.0,
-                "width": 256.0,
-                "height": 128.0,
-                "type": "Command",
-                "properties": {
-                  "topic": "/SmartDashboard/Operator/C/L",
-                  "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
-                }
-              },
-              {
-                "title": "R",
+                "title": "SystemCheck",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 256.0,
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/C/R",
+                  "topic": "/SmartDashboard/SystemStatus/Hood/SystemCheck",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "show_type": true,
+                  "maximize_button_space": false
+                }
+              },
+              {
+                "title": "CheckRan",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/SystemStatus/Hood/CheckRan",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
           },
           {
-            "title": "E",
+            "title": "Intake",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "SystemCheck",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/SystemStatus/Intake/SystemCheck",
+                  "period": 0.06,
+                  "show_type": true,
+                  "maximize_button_space": false
+                }
+              },
+              {
+                "title": "CheckRan",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/SystemStatus/Intake/CheckRan",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Module",
             "x": 256.0,
             "y": 256.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -1105,40 +1104,43 @@
             },
             "children": [
               {
-                "title": "L",
+                "title": "SystemCheck",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 256.0,
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/E/L",
+                  "topic": "/SmartDashboard/SystemStatus/Module/SystemCheck",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "show_type": true,
+                  "maximize_button_space": false
                 }
               },
               {
-                "title": "R",
+                "title": "CheckRan",
                 "x": 0.0,
                 "y": 0.0,
-                "width": 256.0,
+                "width": 128.0,
                 "height": 128.0,
-                "type": "Command",
+                "type": "Boolean Box",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/E/R",
+                  "topic": "/SmartDashboard/SystemStatus/Module/CheckRan",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
           },
           {
-            "title": "F",
-            "x": 384.0,
+            "title": "Turret",
+            "x": 512.0,
             "y": 256.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -1146,170 +1148,40 @@
             },
             "children": [
               {
-                "title": "L",
+                "title": "SystemCheck",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 256.0,
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/F/L",
+                  "topic": "/SmartDashboard/SystemStatus/Turret/SystemCheck",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "show_type": true,
+                  "maximize_button_space": false
                 }
               },
               {
-                "title": "R",
+                "title": "CheckRan",
                 "x": 0.0,
                 "y": 0.0,
-                "width": 256.0,
+                "width": 128.0,
                 "height": 128.0,
-                "type": "Command",
+                "type": "Boolean Box",
                 "properties": {
-                  "topic": "/SmartDashboard/Operator/F/R",
+                  "topic": "/SmartDashboard/SystemStatus/Turret/CheckRan",
                   "period": 0.06,
-                  "show_type": false,
-                  "maximize_button_space": true
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
           }
         ],
-        "containers": [
-          {
-            "title": "GetTheCoral",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Operator/GetTheCoral",
-              "period": 0.06,
-              "show_type": false,
-              "maximize_button_space": true
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Radio",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
-          {
-            "title": "Server",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/fanctrl/server",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Fan 1 RPM",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/frc2158/fanctrl/fan1rpm",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Fan 2 RPM",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/frc2158/fanctrl/fan2rpm",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "PWM",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/frc2158/fanctrl/fanspeed",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Fan Status",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/frc2158/fanctrl/fanstatus",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Temperature (C)",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/frc2158/fanctrl/radiotempc",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 24.0,
-              "max_value": 72.0,
-              "divisions": 5,
-              "update_continuously": false
-            }
-          },
-          {
-            "title": "Temperature (F)",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 128.0,
-            "type": "Number Slider",
-            "properties": {
-              "topic": "/frc2158/fanctrl/radiotempf",
-              "period": 0.06,
-              "data_type": "double",
-              "min_value": 75.0,
-              "max_value": 160.0,
-              "divisions": 5,
-              "update_continuously": false
-            }
-          }
-        ]
+        "containers": []
       }
     }
   ]

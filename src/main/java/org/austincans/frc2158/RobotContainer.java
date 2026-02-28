@@ -49,6 +49,7 @@ import org.austincans.frc2158.subsystems.turret.Turret;
 import org.austincans.frc2158.subsystems.turret.TurretIOSim;
 import org.austincans.frc2158.subsystems.vision.*;
 import org.ironmaple.simulation.IntakeSimulation3D;
+import org.ironmaple.simulation.RobotSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
@@ -123,6 +124,8 @@ public class RobotContainer {
         driveSimulation.registerWithArena(
             SimulatedArena3D.getInstance(), new Pose2d(14, 3, new Rotation2d()));
 
+        RobotSimulation3D robotSimulation = new RobotSimulation3D(driveSimulation);
+
         drive =
             new Drive(
                 new DriveIOSim3D(driveSimulation),
@@ -159,6 +162,7 @@ public class RobotContainer {
                     Rotation3d.kZero),
                 Integer.MAX_VALUE, // 35
                 SimulatedArena3D.getInstance());
+        // robotSimulation.addIntakeSimulation(intakeSimulation);
 
         KeyboardInput keyboardInput = new KeyboardInput();
 
@@ -170,7 +174,7 @@ public class RobotContainer {
         if (intakeSimulation != null) {
           Hood hood = new Hood(new HoodIOTest());
 
-          Turret turret = new Turret(new TurretIOSim(hood::getAngle));
+          Turret turret = new Turret(new TurretIOSim(hood::getAngle, drive, robotSimulation));
           turret.setDefaultCommand(
               Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
 
