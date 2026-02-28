@@ -18,7 +18,7 @@ package org.austincans.frc2158.subsystems.flywheel;
 import org.austincans.frc2158.controllers.LaserCAN;
 
 // Includes the sensors used in a real flywheel
-public class FlywheelIOReal implements FlywheelIO {
+public abstract class FlywheelIOReal implements FlywheelIO {
   private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
   private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
 
