@@ -31,10 +31,10 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class HoodIOSparkFlex implements HoodIO {
-  private SparkFlex hoodMotor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);
-  private SelfCheckingSparkFlex hoodMotorCheck = new SelfCheckingSparkFlex("Hood Motor", hoodMotor);
-  private RelativeEncoder motorEncoder = hoodMotor.getEncoder();
-  SparkClosedLoopController controller = hoodMotor.getClosedLoopController();
+  private SparkFlex motor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);
+  private SelfCheckingSparkFlex hoodMotorCheck = new SelfCheckingSparkFlex("Hood Motor", motor);
+  private RelativeEncoder motorEncoder = motor.getEncoder();
+  SparkClosedLoopController controller = motor.getClosedLoopController();
 
   SparkFlexConfig config = new SparkFlexConfig();
 
@@ -53,17 +53,13 @@ public class HoodIOSparkFlex implements HoodIO {
     return Rotation2d.fromRadians(Units.rotationsToRadians(motorEncoder.getPosition()));
   }
 
-  public void runHoodMotor(double speed) {
-    hoodMotor.set(speed);
-  }
-
   public void setAngle(Angle setpoint) {
-    controller.setSetpoint(Units.degreesToRotations(setpoint.toDegrees()), ControlType.kPosition);
+    controller.setSetpoint(setpoint.toRotations(), ControlType.kPosition);
   }
 
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
-    inputs.temperatureCelsius = hoodMotor.getMotorTemperature();
+    inputs.temperatureCelsius = motor.getMotorTemperature();
     inputs.motorPositionRotations = motorEncoder.getPosition();
     inputs.velocityRotationsPerSec = motorEncoder.getVelocity();
   }
@@ -73,12 +69,8 @@ public class HoodIOSparkFlex implements HoodIO {
   }
 
   @Override
-  public boolean atAngle(Angle setPoint) {
-    if (getAngle() == setPoint) {
-      return true;
-    } else {
-      return false;
-    }
+  public boolean atAngle(Angle setpoint) {
+    return getAngle() == setpoint;
   }
 
   @Override
@@ -100,5 +92,10 @@ public class HoodIOSparkFlex implements HoodIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    motor.setVoltage(voltage);
   }
 }

@@ -49,4 +49,8 @@ public class HoodIOTest implements HoodIO {
   public boolean atAngle(Angle setpoint) {
     return currentAngle == setpoint.getRotation2d();
   }
+
+  @Override
+  public void setVoltage(double voltage) {}
+
 }

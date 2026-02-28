@@ -25,4 +25,6 @@ public class HoodConstants {
   static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
   static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
   static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
+  public static final double rotationalInertiaMetersSq =  ConfigUtil.getConfigDouble("HOOD_ROTATIONAL_INERTIAL_METERS_SQ", 5);
+  public static final double gearing = ConfigUtil.getConfigDouble("HOOD_GEARING", 5);
 }

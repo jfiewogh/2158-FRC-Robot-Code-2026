@@ -28,8 +28,8 @@ import org.austincans.frc2158.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2158.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 public class HoodIOTalonFXS implements HoodIO {
-  private TalonFXS hoodMotor = new TalonFXS(HoodConstants.talonMotorID);
-  private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", hoodMotor);
+  private TalonFXS motor = new TalonFXS(HoodConstants.talonMotorID);
+  private SelfCheckingTalonFXS hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", motor);
   private DutyCycleOut dc = new DutyCycleOut(0);
   TalonFXSConfiguration configs = new TalonFXSConfiguration();
 
@@ -40,28 +40,24 @@ public class HoodIOTalonFXS implements HoodIO {
     configs.Slot0.kV = HoodConstants.kV;
   }
 
-  public void runHoodMotor(double speed) {
-    hoodMotor.set(speed);
-  }
-
   @Override
   public Angle getAngle() {
-    return Angle.fromDegrees(hoodMotor.getPosition().getValue().in(null));
+    return Angle.fromDegrees(motor.getPosition().getValue().in(null));
   }
 
-  public void setAngle(Angle setPointDegrees) {
-    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(setPointDegrees.toDegrees())));
+  public void setAngle(Angle setpoint) {
+    motor.setControl(dc.withOutput(setpoint.toRotations()));
   }
 
   @Override
   public void setAngleRotation2d(Rotation2d angle) {
-    hoodMotor.setControl(dc.withOutput(Units.degreesToRotations(angle.getDegrees())));
+    motor.setControl(dc.withOutput(Units.degreesToRotations(angle.getDegrees())));
   }
 
   @Override
   public Rotation2d getAngleRotation2d() {
     return Rotation2d.fromRadians(
-        Units.rotationsToRadians(hoodMotor.getPosition().getValue().in(null)));
+        Units.rotationsToRadians(motor.getPosition().getValue().in(null)));
   }
 
   @Override
@@ -75,9 +71,9 @@ public class HoodIOTalonFXS implements HoodIO {
 
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
-    inputs.temperatureCelsius = hoodMotor.getDeviceTemp().getValueAsDouble();
-    inputs.motorPositionRotations = hoodMotor.getPosition().getValueAsDouble();
-    inputs.velocityRotationsPerSec = hoodMotor.getVelocity().getValueAsDouble();
+    inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+    inputs.motorPositionRotations = motor.getPosition().getValueAsDouble();
+    inputs.velocityRotationsPerSec = motor.getVelocity().getValueAsDouble();
   }
 
   @Override
@@ -99,5 +95,10 @@ public class HoodIOTalonFXS implements HoodIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    motor.setVoltage(voltage);
   }
 }

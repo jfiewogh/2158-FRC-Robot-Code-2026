@@ -43,6 +43,8 @@ public interface HoodIO {
 
   public boolean atAngle(Angle setpoint);
 
+  public void setVoltage(double voltage);
+
   public default List<HardwareFault> checkForFaults() {
     return List.of();
   }

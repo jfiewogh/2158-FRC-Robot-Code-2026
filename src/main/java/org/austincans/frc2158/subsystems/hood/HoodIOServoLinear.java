@@ -43,9 +43,9 @@ public class HoodIOServoLinear implements HoodIO {
   }
 
   @Override
-  public void setAngle(Angle setPointDegrees) {
-    linearActuator.setSpeed(angles.get(setPointDegrees.toDegrees()));
-    currentAngle = Angle.fromDegrees(setPointDegrees.toDegrees());
+  public void setAngle(Angle setPoint) {
+    linearActuator.setSpeed(angles.get(setPoint.toDegrees()));
+    currentAngle = Angle.fromDegrees(setPoint.toDegrees());
   }
 
   @Override
@@ -63,4 +63,7 @@ public class HoodIOServoLinear implements HoodIO {
   public boolean atAngle(Angle setpoint) {
     return currentAngle.toDegrees() == setpoint.toDegrees();
   }
+
+  @Override
+  public void setVoltage(double voltage) {}
 }
