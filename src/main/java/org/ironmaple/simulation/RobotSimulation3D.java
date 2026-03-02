@@ -16,7 +16,7 @@
 package org.ironmaple.simulation;
 
 import com.jme3.bullet.collision.PhysicsCollisionObject;
-import com.jme3.bullet.joints.HingeJoint;
+import com.jme3.bullet.joints.SixDofJoint;
 import com.jme3.math.Vector3f;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -89,34 +89,45 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
         driveSimulation
             .getSimulatedDriveTrainPose3dGroundRelative()
             .plus(new Transform3d(0, 0, TurretConstants.turretHeightMeters, Rotation3d.kZero)));
-    HingeJoint joint =
-        new HingeJoint(
-            ((BulletBody) driveSimulation.getPhysicsBody()).getRigidBody(),
-            ((BulletBody) shooterBase.getBody()).getRigidBody(),
+
+    BulletBody driveSimulationBody = (BulletBody) driveSimulation.getPhysicsBody();
+    BulletBody shooterBaseBody = (BulletBody) shooterBase.getBody();
+
+    SixDofJoint sixDofJoint =
+        new SixDofJoint(
+            driveSimulationBody.getRigidBody(),
+            shooterBaseBody.getRigidBody(),
             new Vector3f(0, 0, (float) TurretConstants.turretHeightMeters),
-            new Vector3f(0, 0, 0),
-            Vector3f.UNIT_Z,
-            Vector3f.UNIT_Z);
-    joint.setCollisionBetweenLinkedBodies(false);
-    joint.setAngularOnly(false);
-    joint.setLimit(0, 0);
-    physicsEngine.getPhysicsSpace().addJoint(joint);
+            Vector3f.ZERO,
+            true);
+    sixDofJoint.setAngularUpperLimit(Vector3f.ZERO);
+    sixDofJoint.setAngularLowerLimit(Vector3f.ZERO);
+    sixDofJoint.setLinearLowerLimit(Vector3f.ZERO);
+    sixDofJoint.setLinearUpperLimit(Vector3f.ZERO);
+    sixDofJoint.setCollisionBetweenLinkedBodies(false);
+    physicsEngine.getPhysicsSpace().addJoint(sixDofJoint);
   }
 
   public void addTurret(MeshSimulation3D turret) {
     this.turret = turret;
     turret.setPose3d(shooterBase.getPose3d());
-    HingeJoint joint =
-        new HingeJoint(
-            ((BulletBody) shooterBase.getBody()).getRigidBody(),
-            ((BulletBody) turret.getBody()).getRigidBody(),
-            new Vector3f(0, 0, 0),
-            new Vector3f(0, 0, 0),
-            Vector3f.UNIT_Z,
-            Vector3f.UNIT_Z);
-    joint.setCollisionBetweenLinkedBodies(false);
-    joint.setAngularOnly(false);
-    physicsEngine.getPhysicsSpace().addJoint(joint);
+
+    BulletBody shooterBaseBody = (BulletBody) shooterBase.getBody();
+    BulletBody turretBody = (BulletBody) turret.getBody();
+
+    SixDofJoint sixDofJoint =
+        new SixDofJoint(
+            shooterBaseBody.getRigidBody(),
+            turretBody.getRigidBody(),
+            Vector3f.ZERO,
+            Vector3f.ZERO,
+            true);
+    sixDofJoint.setAngularUpperLimit(new Vector3f(0, 0, -1));
+    sixDofJoint.setAngularLowerLimit(new Vector3f(0, 0, 1));
+    sixDofJoint.setLinearLowerLimit(Vector3f.ZERO);
+    sixDofJoint.setLinearUpperLimit(Vector3f.ZERO);
+    sixDofJoint.setCollisionBetweenLinkedBodies(false);
+    physicsEngine.getPhysicsSpace().addJoint(sixDofJoint);
   }
 
   // TODO: Fix hood mesh simulation. Pitch does not change
@@ -126,27 +137,34 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
         shooterBase
             .getPose3d()
             .plus(new Transform3d(RebuiltShooterViz.modelTranslations[2], Rotation3d.kZero)));
-    BulletBody shooterBody = (BulletBody) shooterBase.getBody();
+
+    BulletBody shooterBaseBody = (BulletBody) shooterBase.getBody();
     BulletBody turretBody = (BulletBody) turret.getBody();
     BulletBody hoodBody = (BulletBody) hood.getBody();
     hoodBody
         .getRigidBody()
         .setIgnoreList(
-            new PhysicsCollisionObject[] {shooterBody.getRigidBody(), turretBody.getRigidBody()});
-    HingeJoint pitchJoint =
-        new HingeJoint(
+            new PhysicsCollisionObject[] {
+              shooterBaseBody.getRigidBody(), turretBody.getRigidBody()
+            });
+
+    SixDofJoint sixDofJoint =
+        new SixDofJoint(
             turretBody.getRigidBody(),
             hoodBody.getRigidBody(),
-            new Vector3f(0, 0, 0),
-            // (int) RebuiltShooterViz.modelTranslations[2].getX(),
-            // (int) RebuiltShooterViz.modelTranslations[2].getY(),
-            // (int) RebuiltShooterViz.modelTranslations[2].getZ()),
-            new Vector3f(0, 0, 0),
-            Vector3f.UNIT_X,
-            Vector3f.UNIT_X);
-    pitchJoint.setCollisionBetweenLinkedBodies(false);
-    pitchJoint.setAngularOnly(false);
-    physicsEngine.getPhysicsSpace().addJoint(pitchJoint);
+            Vector3f.ZERO,
+            // new Vector3f(
+            //     (float) RebuiltShooterViz.modelTranslations[2].getX(),
+            //     (float) RebuiltShooterViz.modelTranslations[2].getY(),
+            //     (float) RebuiltShooterViz.modelTranslations[2].getZ()),
+            Vector3f.ZERO,
+            true);
+    sixDofJoint.setAngularUpperLimit(new Vector3f(0, (float) -Math.PI / 2, (float) Math.PI / 4));
+    sixDofJoint.setAngularLowerLimit(new Vector3f(0, 0, 0));
+    sixDofJoint.setLinearLowerLimit(Vector3f.ZERO);
+    sixDofJoint.setLinearUpperLimit(Vector3f.ZERO);
+    sixDofJoint.setCollisionBetweenLinkedBodies(false);
+    physicsEngine.getPhysicsSpace().addJoint(sixDofJoint);
   }
 
   @Override

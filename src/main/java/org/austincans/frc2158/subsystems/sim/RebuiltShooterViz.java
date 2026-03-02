@@ -58,18 +58,19 @@ public class RebuiltShooterViz {
 
     models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
 
-    double pitchRad =
-        Math.PI / 2 - hoodAngle.get().getRadians() - (Math.PI / 2 - hoodDefaultAngle.getRadians());
-
     models[2] =
         new Pose3d(
             new Translation3d(modelTranslations[2].getX(), modelTranslations[2].getY(), 0)
                 .rotateBy(new Rotation3d(0, 0, yawRad))
                 .plus(new Translation3d(0, 0, modelTranslations[2].getZ())),
-            new Rotation3d(0, pitchRad, yawRad));
+            new Rotation3d(0, getPitchRad(hoodAngle.get().getRadians()), yawRad));
 
     for (int i = 0; i < models.length; i++) {
       Logger.recordOutput(key + "/Turret" + i, models[i]);
     }
+  }
+
+  public static double getPitchRad(double hoodAngleRad) {
+    return Math.PI / 2 - hoodAngleRad - (Math.PI / 2 - hoodDefaultAngle.getRadians());
   }
 }

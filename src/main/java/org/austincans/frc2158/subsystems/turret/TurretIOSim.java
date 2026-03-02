@@ -63,16 +63,20 @@ public class TurretIOSim implements TurretIO {
     inputs.currentAmps = sim.getCurrentDrawAmps();
 
     double driveTrainYaw = robotSimulation.getDriveTrainPose().getRotation().getZ();
-    robotSimulation.getShooterBase().setAngularPositionRad(new Translation3d(0, 0, driveTrainYaw));
+    // robotSimulation.getShooterBase().setAngularPositionRad(new Translation3d(0, 0,
+    // // driveTrainYaw));
     robotSimulation
         .getTurret()
         .setAngularPositionRad(new Translation3d(0, 0, driveTrainYaw + inputs.positionRad));
-    robotSimulation.getTurret().setAngularVelocityRadPerSec(new Translation3d());
+    // robotSimulation.getTurret().setAngularVelocityRadPerSec(new Translation3d());
     robotSimulation
         .getHood()
         .setAngularPositionRad(
-            new Translation3d(0, hoodAngle.get().getRadians(), driveTrainYaw + inputs.positionRad));
-    robotSimulation.getHood().setAngularVelocityRadPerSec(new Translation3d());
+            new Translation3d(
+                0,
+                RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
+                driveTrainYaw + inputs.positionRad));
+    // robotSimulation.getHood().setAngularVelocityRadPerSec(new Translation3d(0, 0.5, 0));
 
     rebuiltShooterViz.update(Rotation2d.fromRadians(inputs.positionRad));
   }
