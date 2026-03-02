@@ -20,17 +20,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2158.Constants;
 import org.austincans.frc2158.util.swerve.SwerveSetpoint;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation3D;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveIOSim3D implements DriveIO {
-  private final SwerveDriveSimulation3D simulation;
+  private final AbstractDriveTrainSimulation3D simulation;
 
   private Module[] modules;
 
   private SwerveSetpoint currentSetpoint;
 
-  public DriveIOSim3D(SwerveDriveSimulation3D simulation) {
+  public DriveIOSim3D(AbstractDriveTrainSimulation3D simulation) {
     this.simulation = simulation;
   }
 

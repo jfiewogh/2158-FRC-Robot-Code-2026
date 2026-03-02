@@ -33,7 +33,7 @@ public class TurretConstants {
 
   public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
   public static final double turretHeightMeters =
-      ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(25));
+      ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(15));
 
   public static final boolean forwardSoftLimitEnabled =
       ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED", true);

@@ -68,8 +68,7 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
       AbstractDriveTrainSimulation3D drivetrain,
       PhysicsShape intakeShape,
       Transform3d intakeOffset,
-      int capacity,
-      SimulatedArena3D arena) {
+      int capacity) {
     this.targetedGamePieceType = targetedGamePieceType;
     this.drivetrain = drivetrain;
     this.intakeShape = intakeShape;
@@ -77,9 +76,9 @@ public class IntakeSimulation3D implements SimulatedArena3D.Simulatable {
     this.capacity = capacity;
     this.gamePiecesInIntakeCount = 0;
     this.gamePiecesToRemove = new ArrayDeque<>();
-    this.physicsEngine = arena.getPhysicsEngine();
-    this.arena = arena;
 
+    arena = SimulatedArena3D.getInstance();
+    physicsEngine = arena.getPhysicsEngine();
     arena.addCustomSimulation(this);
   }
 

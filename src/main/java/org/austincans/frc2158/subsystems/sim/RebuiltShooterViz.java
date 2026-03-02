@@ -26,7 +26,7 @@ import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
 
 // This is specifically for the 2026 robot
-public class TurretViz {
+public class RebuiltShooterViz {
   private static final Rotation2d hoodDefaultAngle =
       Rotation2d.fromDegrees(90 - (30.719897 + 8.868396) * 0.5);
 
@@ -35,7 +35,7 @@ public class TurretViz {
   private final String key;
 
   // TODO: move to constants
-  private final Translation3d[] modelTranslations =
+  public static final Translation3d[] modelTranslations =
       new Translation3d[] {
         new Translation3d(0, 0, TurretConstants.turretHeightMeters),
         new Translation3d(0, 0, TurretConstants.turretHeightMeters),
@@ -46,7 +46,7 @@ public class TurretViz {
 
   private final Supplier<Rotation2d> hoodAngle;
 
-  public TurretViz(String key, Supplier<Rotation2d> hoodAngle, Drive drive) {
+  public RebuiltShooterViz(String key, Supplier<Rotation2d> hoodAngle, Drive drive) {
     this.key = key;
     this.hoodAngle = hoodAngle;
 

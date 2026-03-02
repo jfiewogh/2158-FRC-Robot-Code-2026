@@ -52,5 +52,4 @@ public class HoodIOTest implements HoodIO {
 
   @Override
   public void setVoltage(double voltage) {}
-
 }

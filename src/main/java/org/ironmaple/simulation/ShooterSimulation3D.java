@@ -20,6 +20,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.jme3.bullet.objects.PhysicsRigidBody;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -41,6 +42,7 @@ import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D.GamePieceInfo3D;
 import org.ironmaple.simulation.motorsims.MapleMotorSim;
 import org.ironmaple.simulation.motorsims.SimMotorConfigs;
+import org.ironmaple.simulation.physics.bullet.BulletBody;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -247,7 +249,7 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
    * @param velocity the muzzle velocity of the game piece
    * @param pitch the launch angle (up/down) relative to the shooter's horizontal
    */
-  public void shoot(LinearVelocity velocity, Angle pitch) {
+  public void shoot(LinearVelocity velocity, Angle pitch, BulletBody... ignoredBodies) {
     if (gamePiecesLoaded <= 0) return;
 
     gamePiecesLoaded--;
@@ -306,6 +308,13 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
 
     // Set initial velocity for the projectile
     projectile.getPhysicsBody().setLinearVelocityMPS(initialVelocity);
+
+    // Used to ignore specific bodies (ex. turret mesh)
+    PhysicsRigidBody[] ignored = new PhysicsRigidBody[ignoredBodies.length];
+    for (int i = 0; i < ignoredBodies.length; i++) {
+      ignored[i] = ignoredBodies[i].getRigidBody();
+    }
+    ((BulletBody) projectile.getPhysicsBody()).getRigidBody().setIgnoreList(ignored);
 
     if (printGamePiecesShot) {
       System.out.printf(

@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.sim.ShooterSim3D;
 import org.ironmaple.simulation.IntakeSimulation3D;
+import org.ironmaple.simulation.RobotSimulation3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 
 public class FlywheelIOSim3D implements FlywheelIO {
@@ -31,7 +32,8 @@ public class FlywheelIOSim3D implements FlywheelIO {
       SwerveDriveSimulation3D driveSimulation,
       IntakeSimulation3D intakeSimulation,
       Supplier<Rotation2d> hoodAngleSupplier,
-      Supplier<Rotation2d> turretAngle) {
+      Supplier<Rotation2d> turretAngle,
+      RobotSimulation3D robotSimulation) {
     shooterSim =
         new ShooterSim3D(
             FlywheelConstants.radiusMeters,
@@ -39,7 +41,8 @@ public class FlywheelIOSim3D implements FlywheelIO {
             driveSimulation,
             intakeSimulation,
             hoodAngleSupplier,
-            turretAngle);
+            turretAngle,
+            robotSimulation);
     this.intakeSimulation = intakeSimulation;
   }
 

@@ -110,8 +110,8 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
    * @param arena the 3D simulation arena
    * @param initialPose the initial 2D pose (converted to 3D with ground height)
    */
-  public void registerWithArena(SimulatedArena3D arena, Pose2d initialPose) {
-    this.arena = arena;
+  public void registerWithArena(Pose2d initialPose) {
+    this.arena = SimulatedArena3D.getInstance();
     this.physicsEngine = arena.getPhysicsEngine();
 
     // Create collision shape (box)

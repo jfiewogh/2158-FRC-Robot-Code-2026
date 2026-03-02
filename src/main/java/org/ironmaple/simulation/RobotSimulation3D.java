@@ -15,66 +15,170 @@
 
 package org.ironmaple.simulation;
 
+import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.math.Vector3f;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import java.util.ArrayList;
+import edu.wpi.first.math.geometry.Translation3d;
+import org.austincans.frc2158.subsystems.drive.DriveConstants;
+import org.austincans.frc2158.subsystems.sim.RebuiltShooterViz;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation3D;
+import org.ironmaple.simulation.physics.PhysicsShape;
 import org.ironmaple.simulation.physics.bullet.BulletBody;
 import org.ironmaple.simulation.physics.bullet.BulletPhysicsEngine;
+import org.littletonrobotics.junction.Logger;
 
 // Works only for Bullet, not Jolt
 public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
+  private final String robotName;
+
   private final SimulatedArena3D arena;
   private final BulletPhysicsEngine physicsEngine;
-  private final AbstractDriveTrainSimulation3D driveTrainSimulation;
-  private ArrayList<MeshSimulation3D> meshSimulations;
+  private final AbstractDriveTrainSimulation3D driveSimulation;
+
   private IntakeSimulation3D intakeSimulation;
+  // shooter
   private ShooterSimulation3D shooterSimulation;
-  private MeshSimulation3D turretSimulation;
+  private MeshSimulation3D shooterBase;
+  private MeshSimulation3D turret;
+  private MeshSimulation3D hood;
 
-  // TODO: maybe put all simulatables in one ArrayList, including
-  // driveTrainSimulation because it is
-  // also a simulatable
-  // This can help with simplification but be a challenge if we want to access
-  // and/or modify a
-  // specific simulatable
+  public RobotSimulation3D(
+      String robotName, AbstractDriveTrainSimulation3D driveSimulation, Pose2d initialPose) {
+    this.robotName = robotName;
+    this.driveSimulation = driveSimulation;
+    driveSimulation.registerWithArena(initialPose);
 
-  public RobotSimulation3D(AbstractDriveTrainSimulation3D driveTrainSimulation) {
-    this.driveTrainSimulation = driveTrainSimulation;
     arena = SimulatedArena3D.getInstance();
     physicsEngine = (BulletPhysicsEngine) arena.getPhysicsEngine();
+    arena.addCustomSimulation(this);
   }
 
-  public void addMeshSimulation(MeshSimulation3D meshSimulation) {
-    meshSimulations.add(meshSimulation);
+  // TODO: IntakeSimulation3D has no collision, add it
+  // GamePiece and type should come from an enum (ex. from ObjectDetection)
+  // If number of game pieces in intake is greater than max (ex. 35), it should
+  // exit out the robot
+  public void addIntakeSimulation(
+      String targetedGamePieceType,
+      double intakeDepth,
+      double intakeWidth,
+      double intakeHeight,
+      int capacity) {
+    PhysicsShape intakeShape =
+        physicsEngine.createBoxShape(
+            new Translation3d(intakeDepth * 0.5, intakeWidth * 0.5, intakeHeight * 0.5));
+    Transform3d intakeOffset =
+        new Transform3d(
+            DriveConstants.trackWidthX / 2 + intakeDepth / 2,
+            0,
+            intakeHeight / 2,
+            Rotation3d.kZero);
+    intakeSimulation =
+        new IntakeSimulation3D("Fuel", driveSimulation, intakeShape, intakeOffset, capacity);
   }
 
-  public void addTurretSimulation(MeshSimulation3D turretSimulation) {
-    this.turretSimulation = turretSimulation;
-    turretSimulation.setPose3d(
-        driveTrainSimulation
-            .getSimulatedDriveTrainPose3d()
+  public void addShooterSimulation(ShooterSimulation3D shooterSimulation) {}
+
+  public void addShooterBase(MeshSimulation3D shooterBase) {
+    this.shooterBase = shooterBase;
+    shooterBase.setPose3d(
+        driveSimulation
+            .getSimulatedDriveTrainPose3dGroundRelative()
             .plus(new Transform3d(0, 0, TurretConstants.turretHeightMeters, Rotation3d.kZero)));
     HingeJoint joint =
         new HingeJoint(
-            ((BulletBody) driveTrainSimulation.getPhysicsBody()).getRigidBody(),
-            ((BulletBody) turretSimulation.getBody()).getRigidBody(),
+            ((BulletBody) driveSimulation.getPhysicsBody()).getRigidBody(),
+            ((BulletBody) shooterBase.getBody()).getRigidBody(),
             new Vector3f(0, 0, (float) TurretConstants.turretHeightMeters),
             new Vector3f(0, 0, 0),
             Vector3f.UNIT_Z,
             Vector3f.UNIT_Z);
     joint.setCollisionBetweenLinkedBodies(false);
+    joint.setAngularOnly(false);
+    joint.setLimit(0, 0);
     physicsEngine.getPhysicsSpace().addJoint(joint);
   }
 
+  public void addTurret(MeshSimulation3D turret) {
+    this.turret = turret;
+    turret.setPose3d(shooterBase.getPose3d());
+    HingeJoint joint =
+        new HingeJoint(
+            ((BulletBody) shooterBase.getBody()).getRigidBody(),
+            ((BulletBody) turret.getBody()).getRigidBody(),
+            new Vector3f(0, 0, 0),
+            new Vector3f(0, 0, 0),
+            Vector3f.UNIT_Z,
+            Vector3f.UNIT_Z);
+    joint.setCollisionBetweenLinkedBodies(false);
+    joint.setAngularOnly(false);
+    physicsEngine.getPhysicsSpace().addJoint(joint);
+  }
+
+  // TODO: Fix hood mesh simulation. Pitch does not change
+  public void addHood(MeshSimulation3D hood) {
+    this.hood = hood;
+    hood.setPose3d(
+        shooterBase
+            .getPose3d()
+            .plus(new Transform3d(RebuiltShooterViz.modelTranslations[2], Rotation3d.kZero)));
+    BulletBody shooterBody = (BulletBody) shooterBase.getBody();
+    BulletBody turretBody = (BulletBody) turret.getBody();
+    BulletBody hoodBody = (BulletBody) hood.getBody();
+    hoodBody
+        .getRigidBody()
+        .setIgnoreList(
+            new PhysicsCollisionObject[] {shooterBody.getRigidBody(), turretBody.getRigidBody()});
+    HingeJoint pitchJoint =
+        new HingeJoint(
+            turretBody.getRigidBody(),
+            hoodBody.getRigidBody(),
+            new Vector3f(0, 0, 0),
+            // (int) RebuiltShooterViz.modelTranslations[2].getX(),
+            // (int) RebuiltShooterViz.modelTranslations[2].getY(),
+            // (int) RebuiltShooterViz.modelTranslations[2].getZ()),
+            new Vector3f(0, 0, 0),
+            Vector3f.UNIT_X,
+            Vector3f.UNIT_X);
+    pitchJoint.setCollisionBetweenLinkedBodies(false);
+    pitchJoint.setAngularOnly(false);
+    physicsEngine.getPhysicsSpace().addJoint(pitchJoint);
+  }
+
   @Override
-  public void simulationSubTick(int subTickNum) {}
+  public void simulationSubTick(int subTickNum) {
+    Logger.recordOutput("RobotSimulation/ShooterBasePose", shooterBase.getPose3d());
+    Logger.recordOutput("RobotSimulation/TurretPose", turret.getPose3d());
+    Logger.recordOutput("RobotSimulation/HoodPose", hood.getPose3d());
+  }
+
+  // Getters
+
+  public AbstractDriveTrainSimulation3D getDriveSimulation() {
+    return driveSimulation;
+  }
+
+  public IntakeSimulation3D getIntakeSimulation() {
+    return intakeSimulation;
+  }
+
+  public MeshSimulation3D getShooterBase() {
+    return shooterBase;
+  }
+
+  public MeshSimulation3D getTurret() {
+    return turret;
+  }
+
+  public MeshSimulation3D getHood() {
+    return hood;
+  }
 
   public Pose3d getDriveTrainPose() {
-    return driveTrainSimulation.getSimulatedDriveTrainPose3dGroundRelative();
+    return driveSimulation.getSimulatedDriveTrainPose3dGroundRelative();
   }
 }

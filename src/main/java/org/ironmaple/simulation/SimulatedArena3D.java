@@ -41,6 +41,7 @@ import org.ironmaple.simulation.physics.PhysicsBody;
 import org.ironmaple.simulation.physics.PhysicsEngine;
 import org.ironmaple.simulation.physics.PhysicsShape;
 import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -302,6 +303,8 @@ public abstract class SimulatedArena3D implements Arena {
 
     // Add field obstacles
     for (FieldMap3D.Obstacle obstacle : fieldMap.getObstacles()) {
+      Logger.recordOutput(obstacle.meshResourcePath(), obstacle.pose());
+
       PhysicsShape shape = obstacle.shape();
       // If shape is null, check for mesh resource or halfExtents
       if (shape == null && obstacle.meshResourcePath() != null) {

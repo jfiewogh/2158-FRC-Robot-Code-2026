@@ -29,10 +29,12 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import org.austincans.frc2158.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation3D;
+import org.ironmaple.simulation.RobotSimulation3D;
 import org.ironmaple.simulation.ShooterSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.ironmaple.simulation.gamepieces.FuelBall;
+import org.ironmaple.simulation.physics.bullet.BulletBody;
 
 public class ShooterSim3D {
   private final double radius;
@@ -44,6 +46,7 @@ public class ShooterSim3D {
   private double lastShootingTime = 0;
 
   private final ShooterSimulation3D shooterSim;
+  private final RobotSimulation3D robotSimulation;
 
   public ShooterSim3D(
       double radius,
@@ -51,10 +54,12 @@ public class ShooterSim3D {
       SwerveDriveSimulation3D driveSimulation,
       IntakeSimulation3D intakeSimulation,
       Supplier<Rotation2d> hoodAngleSupplier,
-      Supplier<Rotation2d> turretAngleSupplier) {
+      Supplier<Rotation2d> turretAngleSupplier,
+      RobotSimulation3D robotSimulation) {
     this.radius = radius;
     this.shootingDelay = shootingDelay;
     this.hoodAngleSupplier = hoodAngleSupplier;
+    this.robotSimulation = robotSimulation;
 
     Supplier<Pose3d> shooterPose =
         () ->
@@ -83,7 +88,12 @@ public class ShooterSim3D {
             LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
         Angle shooterAngle = Angle.ofBaseUnits(hoodAngleSupplier.get().getRadians(), Radians);
 
-        shooterSim.shoot(launchingSpeed, shooterAngle);
+        shooterSim.shoot(
+            launchingSpeed,
+            shooterAngle,
+            (BulletBody) robotSimulation.getShooterBase().getBody(),
+            (BulletBody) robotSimulation.getTurret().getBody(),
+            (BulletBody) robotSimulation.getHood().getBody());
       }
     }
   }

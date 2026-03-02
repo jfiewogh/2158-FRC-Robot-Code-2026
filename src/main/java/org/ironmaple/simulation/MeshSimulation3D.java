@@ -18,10 +18,11 @@ package org.ironmaple.simulation;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import java.util.function.Supplier;
+import java.util.List;
 import org.ironmaple.simulation.physics.PhysicsBody;
 import org.ironmaple.simulation.physics.PhysicsEngine;
 import org.ironmaple.simulation.physics.PhysicsShape;
+import org.littletonrobotics.junction.Logger;
 
 /** This should be robot relative. This is attached to the drive simulation. */
 public class MeshSimulation3D implements SimulatedArena3D.Simulatable {
@@ -29,32 +30,24 @@ public class MeshSimulation3D implements SimulatedArena3D.Simulatable {
   private final PhysicsEngine physicsEngine;
   private final PhysicsShape shape;
   private final PhysicsBody body;
-  private final Supplier<Pose3d> originPoseSupplier;
-  private final Supplier<Translation3d> speedsSupplier;
 
   /**
    * SimulatedArena3D must be initialized before this can be created. Origin pose represents another
    * object it is attached to. Currently has same functions has registerWithArena
    */
-  public MeshSimulation3D(
-      String meshName,
-      double massKg,
-      Pose3d initialPose,
-      Supplier<Pose3d> originPoseSupplier,
-      Supplier<Translation3d> speedsSupplier) {
+  public MeshSimulation3D(String meshName, double massKg) {
     arena = SimulatedArena3D.getInstance();
     physicsEngine = arena.getPhysicsEngine();
     shape = physicsEngine.createCompoundShapeFromMesh("meshes/" + meshName);
-    // TODO: add option to make btCompoundShape that moves together with another mesh or shape (ex.
-    // drive)
-    body = physicsEngine.createDynamicBody(shape, massKg, initialPose);
-    this.originPoseSupplier = originPoseSupplier;
+    body = physicsEngine.createDynamicBody(shape, massKg, Pose3d.kZero);
     arena.addCustomSimulation(this);
-    this.speedsSupplier = speedsSupplier;
   }
 
   @Override
-  public void simulationSubTick(int subTickNum) {}
+  public void simulationSubTick(int subTickNum) {
+    List<PhysicsBody> overlaps = physicsEngine.getOverlappingBodies(shape, getPose3d());
+    Logger.recordOutput("mesh overlaps", overlaps.size());
+  }
 
   public void setPose3d(Pose3d pose) {
     body.setPose3d(pose);

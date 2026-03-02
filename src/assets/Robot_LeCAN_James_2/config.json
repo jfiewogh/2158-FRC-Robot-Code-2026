@@ -1,0 +1,18 @@
+{
+  "name": "LeCAN James 2",
+  "isFTC": false,
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 0
+    },
+    {
+      "axis": "y",
+      "degrees": 0
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ]
+}
