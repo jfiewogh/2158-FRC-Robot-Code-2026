@@ -97,13 +97,15 @@ public class RobotContainer {
 
   private DoubleSupplier leftY, leftX, rightY, rightX;
 
+  // Commands
+  private Command runIntakeCommand;
+  private Command shootToHubCommand;
+  private Command driveAndIntakeCommand;
+  private Command driveAndScoreCommand;
+  private Command shuttleCommand;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    leftY = () -> -driverController.getLeftY();
-    leftX = () -> -driverController.getLeftX();
-    rightY = () -> -driverController.getRightX();
-    rightX = () -> -driverController.getRightY();
-
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
@@ -116,63 +118,23 @@ public class RobotContainer {
                 new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                 new ModuleIOTalonFXReal(TunerConstants.BackRight),
                 (pose) -> {});
-        this.vision =
+        vision =
             new Vision(
                 drive,
                 new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                 new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-
         turret = new Turret(new TurretIOSparkFlex());
-
+        hood = new Hood(new HoodIOSparkFlex());
+        intake = new Intake(new IntakeIOSparkFlex());
+        flywheel = new Flywheel(new FlywheelIOSparkFlex());
+        // TODO: add limelight name
         objectDetection =
             new ObjectDetection(
                 new ODIOReal(
-                    "limeLight", ObjectDetection.GamePieceType.FUEL, LimelightConfig.LIMELIGHT_3G));
-
-        hood = new Hood(new HoodIOSparkFlex());
-
-        intake = new Intake(new IntakeIOSparkFlex());
-
-        flywheel = new Flywheel(new FlywheelIOSparkFlex());
-
-        Command runIntakeCommand =
-            Commands.runEnd(
-                () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-        Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
-
-        operatorController.a().whileTrue(shootCommand);
-        operatorController
-            .x()
-            .whileTrue(
-                Commands.runEnd(
-                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM * 0.75),
-                    () -> flywheel.setVelocity(0)));
-        driverController.b().whileTrue(runIntakeCommand);
-
-        driverController
-            .y()
-            .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
-
-        Command driveAndIntakeCommand =
-            AutonCommands.driveToAndIntakeGamePieces(
-                drive, objectDetection, intake, leftX, leftY, rightX, rightY);
-        driverController.rightBumper().onTrue(driveAndIntakeCommand);
-
-        Command driveAndScoreCommand =
-            AutonCommands.driveToAndShootIntoHub(
-                drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
-        operatorController.leftBumper().whileTrue(driveAndScoreCommand);
-
-        NamedCommands.registerCommand("runIntake", runIntakeCommand);
-        NamedCommands.registerCommand("shoot", shootCommand);
-        NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
-        NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
-        NamedCommands.registerCommand(
-            "shuttle", TurretCommands.shuttle(flywheel, turret, hood, drive));
+                    "limelight", ObjectDetection.GamePieceType.FUEL, LimelightConfig.LIMELIGHT_3G));
       }
-
-        // TODO: Add option to choose between 2d and 3d sim
       case SIM -> {
+        // TODO: Add option to choose between 2d and 3d sim
         // Sim robot, instantiate physics sim IO implementations
 
         // Initialize Rebuilt arena
@@ -182,6 +144,7 @@ public class RobotContainer {
         } else {
           new Arena2026Rebuilt3D();
         }
+
         // Initialize robot simulation
         RobotSimulation3D robotSimulation =
             new RobotSimulation3D(
@@ -191,6 +154,13 @@ public class RobotContainer {
         robotSimulation.addIntakeSimulation(
             "Fuel", 0.1, Constants.RobotConstants.kBumperWidthMeters, 0.1, Integer.MAX_VALUE);
         intakeSimulation = robotSimulation.getIntakeSimulation();
+
+        MeshSimulation3D model0 = new MeshSimulation3D("model_0.obj", 3);
+        robotSimulation.addShooterBase(model0);
+        MeshSimulation3D model1 = new MeshSimulation3D("model_1.obj", 1);
+        robotSimulation.addTurret(model1);
+        MeshSimulation3D model2 = new MeshSimulation3D("model_2.obj", 1);
+        robotSimulation.addHood(model2);
 
         drive =
             new Drive(
@@ -210,26 +180,9 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(
                     camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
-        KeyboardInput keyboardInput = new KeyboardInput();
-
-        leftX = keyboardInput::leftX;
-        leftY = keyboardInput::leftY;
-        rightX = keyboardInput::rightX;
-        rightY = keyboardInput::rightY;
-
         hood = new Hood(new HoodIOTest(robotSimulation));
 
-        MeshSimulation3D model0 = new MeshSimulation3D("model_0.obj", 3);
-        robotSimulation.addShooterBase(model0);
-        MeshSimulation3D model1 = new MeshSimulation3D("model_1.obj", 1);
-        robotSimulation.addTurret(model1);
-        MeshSimulation3D model2 = new MeshSimulation3D("model_2.obj", 1);
-        robotSimulation.addHood(model2);
-
         turret = new Turret(new TurretIOSim(hood::getAngle, drive, robotSimulation));
-        turret.setDefaultCommand(
-            Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
-        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardInput.middleY()), hood));
 
         objectDetection =
             new ObjectDetection(
@@ -250,56 +203,6 @@ public class RobotContainer {
                     hood::getAngle,
                     () -> Rotation2d.fromRadians(turret.getTurretAngle()),
                     robotSimulation));
-
-        Command runIntakeCommand =
-            Commands.runEnd(
-                () -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-        Command shootCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
-
-        keyboardInput.z().whileTrue(shootCommand);
-        keyboardInput
-            .x()
-            .whileTrue(
-                Commands.runEnd(
-                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM * 0.75),
-                    () -> flywheel.setVelocity(0)));
-        keyboardInput.v().whileTrue(runIntakeCommand);
-
-        keyboardInput
-            .c()
-            .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
-
-        Command driveAndIntakeCommand =
-            AutonCommands.driveToAndIntakeGamePieces(
-                drive, objectDetection, intake, leftX, leftY, rightX, rightY);
-        keyboardInput.m().onTrue(driveAndIntakeCommand);
-
-        Command driveAndScoreCommand =
-            AutonCommands.driveToAndShootIntoHub(
-                drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
-        keyboardInput.comma().whileTrue(driveAndScoreCommand);
-
-        keyboardInput.period().whileTrue(TurretCommands.shuttle(flywheel, turret, hood, drive));
-
-        keyboardInput
-            .slash()
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Arena2026Rebuilt3D rebuiltArena =
-                          (Arena2026Rebuilt3D) SimulatedArena3D.getInstance();
-                      Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-                      if (allianceOptional.isPresent()) {
-                        rebuiltArena.outpostDump(allianceOptional.get() == Alliance.Blue);
-                      }
-                    }));
-
-        NamedCommands.registerCommand("runIntake", runIntakeCommand);
-        NamedCommands.registerCommand("shoot", shootCommand);
-        NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
-        NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
-        NamedCommands.registerCommand(
-            "shuttle", TurretCommands.shuttle(flywheel, turret, hood, drive));
       }
       default -> {
         // Replayed robot, disable IO implementations
@@ -315,6 +218,29 @@ public class RobotContainer {
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
       }
     }
+
+    // Initialize commands
+    // TODO: runIntakeCommand should deploy intake before it can run it
+    runIntakeCommand =
+        Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+
+    shootToHubCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
+    
+    driveAndIntakeCommand =
+        AutonCommands.driveToAndIntakeGamePieces(
+            drive, objectDetection, intake, leftX, leftY, rightX, rightY);
+    
+    driveAndScoreCommand =
+        AutonCommands.driveToAndShootIntoHub(
+            drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
+    shuttleCommand = TurretCommands.shuttle(flywheel, turret, hood, drive);
+
+    // Register auton commands
+    NamedCommands.registerCommand("runIntake", runIntakeCommand);
+    NamedCommands.registerCommand("shoot", shootToHubCommand);
+    NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
+    NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
+    NamedCommands.registerCommand("shuttle", shuttleCommand);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -369,6 +295,67 @@ public class RobotContainer {
     // () -> -controller.getLeftY(),
     // () -> -controller.getLeftX(),
     // () -> new Rotation2d()));
+
+    switch (Constants.currentMode) {
+      case REAL -> {
+        operatorController.a().whileTrue(shootToHubCommand);
+        driverController.x().whileTrue(runIntakeCommand);
+
+        leftY = () -> -driverController.getLeftY();
+        leftX = () -> -driverController.getLeftX();
+        rightY = () -> -driverController.getRightX();
+        rightX = () -> -driverController.getRightY();
+      }
+      case SIM -> {
+        KeyboardInput keyboardInput = new KeyboardInput();
+
+        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardInput.middleY()), hood));
+
+        turret.setDefaultCommand(
+            Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
+
+        keyboardInput
+            .z()
+            .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+
+        keyboardInput
+            .x()
+            .whileTrue(
+                Commands.runEnd(
+                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM * 0.75),
+                    () -> flywheel.setVelocity(0)));
+
+        keyboardInput.c().whileTrue(shootToHubCommand);
+
+        keyboardInput.v().whileTrue(runIntakeCommand);
+
+        keyboardInput.m().onTrue(driveAndIntakeCommand);
+
+        keyboardInput.comma().whileTrue(driveAndScoreCommand);
+
+        keyboardInput.period().whileTrue(shuttleCommand);
+
+        // Outpost dump
+        keyboardInput
+            .slash()
+            .onTrue(
+                Commands.runOnce(
+                    () -> {
+                      Arena2026Rebuilt3D rebuiltArena =
+                          (Arena2026Rebuilt3D) SimulatedArena3D.getInstance();
+                      Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+                      if (allianceOptional.isPresent()) {
+                        rebuiltArena.outpostDump(allianceOptional.get() == Alliance.Blue);
+                      }
+                    }));
+
+        leftX = keyboardInput::leftX;
+        leftY = keyboardInput::leftY;
+        rightX = keyboardInput::rightX;
+        rightY = keyboardInput::rightY;
+      }
+      default -> {}
+    }
 
     // Switch to X pattern when X button is pressed
     driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
