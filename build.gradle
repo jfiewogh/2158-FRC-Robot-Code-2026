@@ -13,7 +13,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-def ROBOT_MAIN_CLASS = "org.austincans.frc2158.Main"
+def ROBOT_MAIN_CLASS = "org.austincans.frc2026.Main"
 def grpcVersion = '1.61.0' // Update this to the latest gRPC version as needed
 def protobufVersion = '3.25.1'
 def getYear() {
@@ -44,6 +44,9 @@ sourceSets {
         java {
             srcDirs 'build/generated/source/proto/main/grpc'
             srcDirs 'build/generated/source/proto/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
         }
         proto {
             srcDirs "trajectory_native/proto"
@@ -119,6 +122,10 @@ task(replayWatch, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
@@ -173,6 +180,20 @@ dependencies {
     implementation "com.google.guava:guava:31.1-jre"
     implementation 'org.jgrapht:jgrapht-core:1.5.1'
     //implementation 'com.github.frc5431:TitanUtil:2025.5.0'
+
+    // MapleSim libraries
+    implementation 'org.dyn4j:dyn4j:5.0.2'
+    // 3D Physics Engine
+
+
+    implementation "com.github.stephengold:Libbulletjme-Windows64:22.0.3"
+    runtimeOnly "com.github.stephengold:Libbulletjme-Windows64:22.0.3:SpDebug"
+    implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
+    runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
+
+
+
+    implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
 }
 
 test {
@@ -231,7 +252,7 @@ tasks.withType(JavaCompile) {
 project.compileJava.dependsOn(createVersionFile)
 gversion {
     srcDir       = "src/main/java/"
-    classPackage = "org.austincans.frc2158"
+    classPackage = "org.austincans.frc2026"
     className    = "BuildConstants"
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
     timeZone     = "America/Chicago"
@@ -240,7 +261,7 @@ gversion {
 
 // Generate drive trajectories when building
 task(generateDriveTrajectories, dependsOn: "classes", type: JavaExec) {
-    mainClass = "org.austincans.frc2158.subsystems.drive.trajectory.GenerateTrajectories"
+    mainClass = "org.austincans.frc2026.subsystems.drive.trajectory.GenerateTrajectories"
     classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -284,7 +305,7 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude "**/build/**", "**/build-*/**", "src/main/java/org/austincans/frc2158/BuildConstants.java"
+            exclude "**/build/**", "**/build-*/**", "src/main/java/org/austincans/frc2026/BuildConstants.java"
         }
         importOrder('java', 'javax', 'org', 'com', 'edu', '') // or importOrderFile
         toggleOffOn()
@@ -294,7 +315,7 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
         // licenseHeader("// Copyright (c) ${getYear()} the ausTIN CANs\n// https://github.com/AusTINCANsProgrammingTeam\n//\n// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   \n// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           \"888                   .o8   \n//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo \n//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   \n//  888    \"     888`88b.    888                888`88b.    888   888  888   888 888   888   888   \n//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . \n// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   \"888\" \n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n//\n// Updated on ${getCurrentDate()}\n\n")
-        licenseHeader("// Copyright (c) ${getYear()} the ausTIN CANs\n// https://github.com/AusTINCANsProgrammingTeam\n//\n// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   \n// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           \"888                   .o8   \n//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo \n//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   \n//  888    \"     888`88b.    888                888`88b.    888   888  888   888 888   888   888   \n//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . \n// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   \"888\" \n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n//\n//\n\n")
+        licenseHeader("// Copyright (c) ${getYear()} the ausTIN CANs\n// https://github.com/AusTINCANsProgrammingTeam\n//\n// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   \n// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           \"888                   .o8   \n//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo \n//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   \n//  888    \"     888`88b.    888                888`88b.    888   888  888   888 888   888   888   \n//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . \n// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   \"888\" \n//\n// Use of this source code is governed by a BSD\n// license that can be found in the LICENSE file\n// at the root directory of this project.\n\n")
     }
     groovyGradle {
         target fileTree(".") {
