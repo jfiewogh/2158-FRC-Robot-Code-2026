@@ -73,16 +73,25 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+  private Drive drive;
 
   @SuppressWarnings("unused")
-  private final Vision vision;
+  private Vision vision;
 
   private ObjectDetection objectDetection;
   private Turret turret;
   private Hood hood;
   private Intake intake;
   private Flywheel flywheel;
+
+  // Subsystem Enabled // only applies to real robot
+  public static final boolean driveEnabled = true;
+  public static final boolean visionEnabled = false;
+  public static final boolean objectDetectionEnabled = false;
+  public static final boolean turretEnabled = false;
+  public static final boolean hoodEnabled = false;
+  public static final boolean intakeEnabled = false;
+  public static final boolean flywheelEnabled = false;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -109,33 +118,50 @@ public class RobotContainer {
   private Command shootToHubCommand;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new DriveIOReal(),
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-        turret = new Turret(new TurretIOSparkFlex());
-        hood = new Hood(new HoodIOSparkFlex());
-        intake = new Intake(new IntakeIOSparkFlex());
-        flywheel = new Flywheel(new FlywheelIOSparkFlex());
-        // TODO: add limelight name
-        objectDetection =
-            new ObjectDetection(
-                new ODIOReal(
-                    "limelight", ObjectDetection.GamePieceType.FUEL, LimelightConfig.LIMELIGHT_3G));
+        if (driveEnabled) {
+          drive =
+              new Drive(
+                  new DriveIOReal(),
+                  new GyroIOPigeon2(),
+                  new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                  new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                  new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                  new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                  (pose) -> {});
+        }
+        if (visionEnabled) {
+          vision =
+              new Vision(
+                  drive,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        }
+        if (turretEnabled) {
+          turret = new Turret(new TurretIOSparkFlex());
+        }
+        if (hoodEnabled) {
+          hood = new Hood(new HoodIOSparkFlex());
+        }
+        if (intakeEnabled) {
+          intake = new Intake(new IntakeIOSparkFlex());
+        }
+        if (flywheelEnabled) {
+          flywheel = new Flywheel(new FlywheelIOSparkFlex());
+        }
+        if (objectDetectionEnabled) {
+          // TODO: add actual limelight name
+          objectDetection =
+              new ObjectDetection(
+                  new ODIOReal(
+                      "limelight",
+                      ObjectDetection.GamePieceType.FUEL,
+                      LimelightConfig.LIMELIGHT_3G));
+        }
       }
       case SIM -> {
         // TODO: Add option to choose between 2d and 3d sim
@@ -241,27 +267,39 @@ public class RobotContainer {
 
     // Initialize commands
     // TODO: runIntakeCommand should deploy intake before it can run it
-    runIntakeCommand =
-        Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
-
-    shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
-    shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
-    shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
-
-    driveAndIntakeCommand =
-        AutonCommands.driveToAndIntakeGamePieces(
-            drive, objectDetection, intake, leftX, leftY, rightX, rightY);
-
-    driveAndScoreCommand =
-        AutonCommands.driveToAndShootIntoHub(
-            drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
-
-    // Register auton commands
-    NamedCommands.registerCommand("runIntake", runIntakeCommand);
-    NamedCommands.registerCommand("shoot", shootToHubCommand);
-    NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
-    NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
-    NamedCommands.registerCommand("shuttle", shuttleCommand);
+    if (intakeEnabled) {
+      runIntakeCommand =
+          Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+      NamedCommands.registerCommand("runIntake", runIntakeCommand);
+    } else {
+      NamedCommands.registerCommand("runIntake", Commands.none());
+    }
+    if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
+      shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
+      shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
+      shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
+      NamedCommands.registerCommand("shoot", shootToHubCommand);
+      NamedCommands.registerCommand("shuttle", shuttleCommand);
+    } else {
+      NamedCommands.registerCommand("shoot", Commands.none());
+      NamedCommands.registerCommand("shuttle", Commands.none());
+    }
+    if (driveEnabled && objectDetectionEnabled && intakeEnabled) {
+      driveAndIntakeCommand =
+          AutonCommands.driveToAndIntakeGamePieces(
+              drive, objectDetection, intake, leftX, leftY, rightX, rightY);
+      NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
+    } else {
+      NamedCommands.registerCommand("driveAndIntake", Commands.none());
+    }
+    if (driveEnabled && objectDetectionEnabled && turretEnabled && flywheelEnabled && hoodEnabled) {
+      driveAndScoreCommand =
+          AutonCommands.driveToAndShootIntoHub(
+              drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
+      NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
+    } else {
+      NamedCommands.registerCommand("driveAndScore", Commands.none());
+    }
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -294,7 +332,9 @@ public class RobotContainer {
     autoChooser.addOption("New Auto", AutoBuilder.buildAuto("New Auto"));
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
+    if (driveEnabled) {
+      drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
+    }
 
     // Configure the button bindings
     configureButtonBindings();
@@ -319,12 +359,20 @@ public class RobotContainer {
 
     switch (Constants.controlMode) {
       case JOYSTICK -> {
-        driverController.leftTrigger().whileTrue(runIntakeCommand);
-        driverController.rightTrigger().whileTrue(shootCommand);
+        if (runIntakeCommand != null) {
+          driverController.leftTrigger().whileTrue(runIntakeCommand);
+        }
+        if (shootCommand != null) {
+          driverController.rightTrigger().whileTrue(shootCommand);
+        }
 
         // Testing
-        operatorController.a().onTrue(driveAndIntakeCommand);
-        operatorController.b().onTrue(driveAndScoreCommand);
+        if (driveAndIntakeCommand != null) {
+          operatorController.a().onTrue(driveAndIntakeCommand);
+        }
+        if (driveAndScoreCommand != null) {
+          operatorController.b().onTrue(driveAndScoreCommand);
+        }
       }
       case KEYBOARD -> {
         hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardInput.middleY()), hood));
@@ -370,21 +418,24 @@ public class RobotContainer {
       default -> {}
     }
 
-    // Switch to X pattern when X button is pressed
-    driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    if (driveEnabled) {
+      // Switch to X pattern when X button is pressed
+      driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro / odometry
-    final Runnable resetGyro =
-        Constants.currentMode == Constants.Mode.SIM
-            ? () ->
-                drive.setPose(
-                    driveSimulation
-                        .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
-            // simulation
-            : () ->
-                drive.setPose(
-                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+      // Reset gyro / odometry
+      final Runnable resetGyro =
+          Constants.currentMode == Constants.Mode.SIM
+              ? () ->
+                  drive.setPose(
+                      driveSimulation
+                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+              // during
+              // simulation
+              : () ->
+                  drive.setPose(
+                      new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+      driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    }
   }
 
   /**
