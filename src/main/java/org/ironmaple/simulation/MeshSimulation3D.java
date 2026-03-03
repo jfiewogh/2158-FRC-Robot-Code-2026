@@ -54,8 +54,8 @@ public class MeshSimulation3D implements SimulatedArena3D.Simulatable {
     body.setPose3d(pose);
   }
 
-  public void setAngularVelocityRadPerSec(Translation3d angularVelocityRadPerSec) {
-    body.setAngularVelocityRadPerSec(angularVelocityRadPerSec);
+  public void setAngularVelocityRadPerSec(double x, double y, double z) {
+    body.setAngularVelocityRadPerSec(new Translation3d(x, y, z));
   }
 
   public void setRoll(Rotation2d roll) {
@@ -85,13 +85,9 @@ public class MeshSimulation3D implements SimulatedArena3D.Simulatable {
             new Rotation3d(currentRotation.getX(), currentRotation.getY(), yaw.getRadians())));
   }
 
-  public void setAngularPositionRad(Translation3d angularPositionRad) {
+  public void setAngularPositionRad(double roll, double pitch, double yaw) {
     Pose3d currentPose = getPose3d();
-    body.setPose3d(
-        new Pose3d(
-            currentPose.getTranslation(),
-            new Rotation3d(
-                angularPositionRad.getX(), angularPositionRad.getY(), angularPositionRad.getZ())));
+    body.setPose3d(new Pose3d(currentPose.getTranslation(), new Rotation3d(roll, pitch, yaw)));
   }
 
   public Pose3d getPose3d() {

@@ -16,7 +16,6 @@
 package org.austincans.frc2158.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -64,16 +63,14 @@ public class TurretIOSim implements TurretIO {
     inputs.currentAmps = sim.getCurrentDrawAmps();
 
     double driveTrainYaw = robotSimulation.getDriveTrainPose().getRotation().getZ();
-    // robotSimulation.getShooterBase().setAngularPositionRad(new Translation3d(0, 0,
-    // // driveTrainYaw));
     robotSimulation.getTurret().setYaw(Rotation2d.fromRadians(driveTrainYaw + inputs.positionRad));
-    robotSimulation
-        .getTurret()
-        .setAngularVelocityRadPerSec(new Translation3d(0, 0, inputs.velocityRadPerSec));
+    robotSimulation.getTurret().setAngularVelocityRadPerSec(0, 0, inputs.velocityRadPerSec);
     robotSimulation
         .getHood()
-        .setPitch(
-            Rotation2d.fromRadians(RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians())));
+        .setAngularPositionRad(
+            0,
+            RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
+            driveTrainYaw + inputs.positionRad);
     System.out.println(
         Units.radiansToDegrees(RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians())));
 
