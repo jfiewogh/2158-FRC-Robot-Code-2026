@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "driveAndScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Dynamic Auto 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "driveAndIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "driveAndScore"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "driveAndIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "driveAndScore"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
