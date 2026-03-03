@@ -34,8 +34,8 @@ public class HoodIOSim implements HoodIO {
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().toDegrees(0);
     inputs.temperatureCelsius = 0;
-    inputs.motorPositionRotations = getAngle().toRotations();
-    inputs.velocityRotationsPerSec = motor.getAngularVelocityRadPerSec();
+    inputs.motorPositionRad = getAngle().toRadians();
+    inputs.velocityRadPerSec = motor.getAngularVelocityRadPerSec();
   }
 
   @Override

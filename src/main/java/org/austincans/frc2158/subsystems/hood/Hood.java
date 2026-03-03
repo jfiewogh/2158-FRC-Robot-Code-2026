@@ -37,6 +37,11 @@ public class Hood extends AdvancedSubsystem {
     return Commands.run((() -> io.setAngle(angle)));
   }
 
+  // TODO: Only IO with setVelocity implementation is HoodIOTest
+  public void setVelocity(double velocityRadPerSec) {
+    io.setVelocity(velocityRadPerSec);
+  }
+
   public void setAngle(Rotation2d angle) {
     io.setAngleRotation2d(angle);
   }
@@ -73,7 +78,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.waitSeconds(0.1),
             Commands.runOnce(
                 () -> {
-                  if (inputs.velocityRotationsPerSec < 1) {
+                  if (inputs.velocityRadPerSec < Math.PI * 2) {
                     addSubsystemFault(
                         "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
                   }

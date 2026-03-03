@@ -175,19 +175,18 @@ public class TurretCommands {
   }
 
   public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
-    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-    if (allianceOptional.isPresent()) {
-      Alliance alliance = allianceOptional.get();
-      return Commands.defer(
-          () ->
-              Commands.run(
-                  () -> {
+    return Commands.defer(
+        () ->
+            Commands.run(
+                () -> {
+                  Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+                  if (allianceOptional.isPresent()) {
+                    Alliance alliance = allianceOptional.get();
                     shootToTarget(flywheel, turret, hood, drive, getShuttleTarget(drive, alliance));
                     isShuttling = true;
-                  }),
-          Set.of());
-    }
-    return Commands.none();
+                  }
+                }),
+        Set.of());
   }
 
   public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {

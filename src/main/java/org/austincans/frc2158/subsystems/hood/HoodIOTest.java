@@ -16,14 +16,27 @@
 package org.austincans.frc2158.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import org.austincans.frc2158.math.Angle;
+import org.ironmaple.simulation.RobotSimulation3D;
 
 public class HoodIOTest implements HoodIO {
+  private final RobotSimulation3D robotSimulation;
+
   private Rotation2d currentAngle = Rotation2d.kZero;
+  private double velocityRadPerSec = 0;
+
+  public HoodIOTest(RobotSimulation3D robotSimulation) {
+    this.robotSimulation = robotSimulation;
+  }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = currentAngle.getDegrees();
+    inputs.velocityRadPerSec = velocityRadPerSec;
+    robotSimulation
+        .getHood()
+        .setAngularVelocityRadPerSec(new Translation3d(0, inputs.velocityRadPerSec, 0));
   }
 
   @Override
@@ -52,4 +65,9 @@ public class HoodIOTest implements HoodIO {
 
   @Override
   public void setVoltage(double voltage) {}
+
+  @Override
+  public void setVelocity(double velocityRadPerSec) {
+    this.velocityRadPerSec = velocityRadPerSec;
+  }
 }

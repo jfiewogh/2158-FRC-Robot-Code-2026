@@ -60,8 +60,8 @@ public class HoodIOSparkFlex implements HoodIO {
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
     inputs.temperatureCelsius = motor.getMotorTemperature();
-    inputs.motorPositionRotations = motorEncoder.getPosition();
-    inputs.velocityRotationsPerSec = motorEncoder.getVelocity();
+    inputs.motorPositionRad = Units.rotationsToRadians(motorEncoder.getPosition());
+    inputs.velocityRadPerSec = Units.rotationsToRadians(motorEncoder.getVelocity()) / 60;
   }
 
   public void setAngleRotation2d(Rotation2d angle) {

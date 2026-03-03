@@ -34,8 +34,10 @@ public class RebuiltShooterViz {
 
   private final String key;
 
+  public static final Translation3d hoodOffset = new Translation3d(0.127981, 0, 0.106538);
+
   // TODO: move to constants
-  public static final Translation3d[] modelTranslations =
+  private final Translation3d[] modelTranslations =
       new Translation3d[] {
         new Translation3d(0, 0, TurretConstants.turretHeightMeters),
         new Translation3d(0, 0, TurretConstants.turretHeightMeters),

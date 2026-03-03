@@ -104,7 +104,7 @@ public class BulletBody implements PhysicsBody {
   @Override
   public Translation3d getAngularVelocityRadPerSec() {
     Vector3f angVel = rigidBody.getAngularVelocity(null);
-    return BulletPhysicsEngine.toTranslation3d(angVel).times(-1);
+    return BulletPhysicsEngine.toTranslation3d(angVel).unaryMinus();
   }
 
   /**
@@ -120,7 +120,7 @@ public class BulletBody implements PhysicsBody {
   @Override
   public void setAngularVelocityRadPerSec(Translation3d angularVelocityRadPerSec) {
     // Extract angular velocity components from Translation3d
-    Vector3f angVel = BulletPhysicsEngine.toVector3f(angularVelocityRadPerSec.times(-1));
+    Vector3f angVel = BulletPhysicsEngine.toVector3f(angularVelocityRadPerSec);
     rigidBody.setAngularVelocity(angVel);
   }
 

@@ -15,6 +15,9 @@
 
 package org.austincans.frc2158.subsystems.hood;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
@@ -72,8 +75,8 @@ public class HoodIOTalonFXS implements HoodIO {
   public void updateInputs(HoodIOInputs inputs) {
     inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
     inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
-    inputs.motorPositionRotations = motor.getPosition().getValueAsDouble();
-    inputs.velocityRotationsPerSec = motor.getVelocity().getValueAsDouble();
+    inputs.motorPositionRad = motor.getPosition().getValue().in(Radians);
+    inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
   }
 
   @Override

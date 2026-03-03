@@ -16,6 +16,7 @@
 package org.ironmaple.simulation;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import java.util.List;
@@ -57,14 +58,40 @@ public class MeshSimulation3D implements SimulatedArena3D.Simulatable {
     body.setAngularVelocityRadPerSec(angularVelocityRadPerSec);
   }
 
-  public void setAngularPositionRad(Translation3d angularPositionRad) {
+  public void setRoll(Rotation2d roll) {
     Pose3d currentPose = getPose3d();
     Rotation3d currentRotation = currentPose.getRotation();
     body.setPose3d(
         new Pose3d(
             currentPose.getTranslation(),
+            new Rotation3d(roll.getRadians(), currentRotation.getY(), currentRotation.getZ())));
+  }
+
+  public void setPitch(Rotation2d pitch) {
+    Pose3d currentPose = getPose3d();
+    Rotation3d currentRotation = currentPose.getRotation();
+    body.setPose3d(
+        new Pose3d(
+            currentPose.getTranslation(),
+            new Rotation3d(currentRotation.getX(), pitch.getRadians(), currentRotation.getZ())));
+  }
+
+  public void setYaw(Rotation2d yaw) {
+    Pose3d currentPose = getPose3d();
+    Rotation3d currentRotation = currentPose.getRotation();
+    body.setPose3d(
+        new Pose3d(
+            currentPose.getTranslation(),
+            new Rotation3d(currentRotation.getX(), currentRotation.getY(), yaw.getRadians())));
+  }
+
+  public void setAngularPositionRad(Translation3d angularPositionRad) {
+    Pose3d currentPose = getPose3d();
+    body.setPose3d(
+        new Pose3d(
+            currentPose.getTranslation(),
             new Rotation3d(
-                currentRotation.getX(), currentRotation.getY(), angularPositionRad.getZ())));
+                angularPositionRad.getX(), angularPositionRad.getY(), angularPositionRad.getZ())));
   }
 
   public Pose3d getPose3d() {

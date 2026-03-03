@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import java.util.function.Supplier;
 import org.austincans.frc2158.Constants;
@@ -65,18 +66,16 @@ public class TurretIOSim implements TurretIO {
     double driveTrainYaw = robotSimulation.getDriveTrainPose().getRotation().getZ();
     // robotSimulation.getShooterBase().setAngularPositionRad(new Translation3d(0, 0,
     // // driveTrainYaw));
+    robotSimulation.getTurret().setYaw(Rotation2d.fromRadians(driveTrainYaw + inputs.positionRad));
     robotSimulation
         .getTurret()
-        .setAngularPositionRad(new Translation3d(0, 0, driveTrainYaw + inputs.positionRad));
-    // robotSimulation.getTurret().setAngularVelocityRadPerSec(new Translation3d());
+        .setAngularVelocityRadPerSec(new Translation3d(0, 0, inputs.velocityRadPerSec));
     robotSimulation
         .getHood()
-        .setAngularPositionRad(
-            new Translation3d(
-                0,
-                RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
-                driveTrainYaw + inputs.positionRad));
-    // robotSimulation.getHood().setAngularVelocityRadPerSec(new Translation3d(0, 0.5, 0));
+        .setPitch(
+            Rotation2d.fromRadians(RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians())));
+    System.out.println(
+        Units.radiansToDegrees(RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians())));
 
     rebuiltShooterViz.update(Rotation2d.fromRadians(inputs.positionRad));
   }

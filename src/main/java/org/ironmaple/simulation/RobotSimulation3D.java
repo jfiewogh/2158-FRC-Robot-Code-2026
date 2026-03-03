@@ -136,7 +136,7 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
     hood.setPose3d(
         shooterBase
             .getPose3d()
-            .plus(new Transform3d(RebuiltShooterViz.modelTranslations[2], Rotation3d.kZero)));
+            .plus(new Transform3d(RebuiltShooterViz.hoodOffset, Rotation3d.kZero)));
 
     BulletBody shooterBaseBody = (BulletBody) shooterBase.getBody();
     BulletBody turretBody = (BulletBody) turret.getBody();
@@ -152,15 +152,17 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
         new SixDofJoint(
             turretBody.getRigidBody(),
             hoodBody.getRigidBody(),
-            Vector3f.ZERO,
-            // new Vector3f(
-            //     (float) RebuiltShooterViz.modelTranslations[2].getX(),
-            //     (float) RebuiltShooterViz.modelTranslations[2].getY(),
-            //     (float) RebuiltShooterViz.modelTranslations[2].getZ()),
-            Vector3f.ZERO,
+            new Vector3f(
+                (float) RebuiltShooterViz.hoodOffset.getX(),
+                (float) RebuiltShooterViz.hoodOffset.getY(),
+                (float) RebuiltShooterViz.hoodOffset.getZ()),
+            new Vector3f(
+                (float) RebuiltShooterViz.hoodOffset.getX(),
+                (float) RebuiltShooterViz.hoodOffset.getY(),
+                (float) RebuiltShooterViz.hoodOffset.getZ()),
             true);
-    sixDofJoint.setAngularUpperLimit(new Vector3f(0, (float) -Math.PI / 2, (float) Math.PI / 4));
-    sixDofJoint.setAngularLowerLimit(new Vector3f(0, 0, 0));
+    sixDofJoint.setAngularUpperLimit(new Vector3f(0, (float) -Math.PI / 2, 0));
+    sixDofJoint.setAngularLowerLimit(new Vector3f(0, (float) Math.PI / 4, 0));
     sixDofJoint.setLinearLowerLimit(Vector3f.ZERO);
     sixDofJoint.setLinearUpperLimit(Vector3f.ZERO);
     sixDofJoint.setCollisionBetweenLinkedBodies(false);

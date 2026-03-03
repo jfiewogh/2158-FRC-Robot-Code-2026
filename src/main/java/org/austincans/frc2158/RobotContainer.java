@@ -215,7 +215,7 @@ public class RobotContainer {
         rightX = keyboardInput::rightX;
         rightY = keyboardInput::rightY;
 
-        hood = new Hood(new HoodIOTest());
+        hood = new Hood(new HoodIOTest(robotSimulation));
 
         MeshSimulation3D model0 = new MeshSimulation3D("model_0.obj", 3);
         robotSimulation.addShooterBase(model0);
@@ -227,6 +227,7 @@ public class RobotContainer {
         turret = new Turret(new TurretIOSim(hood::getAngle, drive, robotSimulation));
         turret.setDefaultCommand(
             Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
+        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardInput.middleY()), hood));
 
         objectDetection =
             new ObjectDetection(
@@ -275,6 +276,8 @@ public class RobotContainer {
             AutonCommands.driveToAndShootIntoHub(
                 drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
         keyboardInput.comma().whileTrue(driveAndScoreCommand);
+
+        keyboardInput.period().whileTrue(TurretCommands.shuttle(flywheel, turret, hood, drive));
 
         NamedCommands.registerCommand("runIntake", runIntakeCommand);
         NamedCommands.registerCommand("shoot", shootCommand);

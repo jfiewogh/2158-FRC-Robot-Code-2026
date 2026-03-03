@@ -27,11 +27,13 @@ public interface HoodIO {
   public class HoodIOInputs {
     public double hoodAngleDeg;
     public double temperatureCelsius;
-    public double motorPositionRotations;
-    public double velocityRotationsPerSec;
+    public double motorPositionRad;
+    public double velocityRadPerSec;
   }
 
   public void updateInputs(HoodIOInputs inputs);
+
+  public default void setVelocity(double velocityRadPerSec) {}
 
   public void setAngle(Angle angle);
 
