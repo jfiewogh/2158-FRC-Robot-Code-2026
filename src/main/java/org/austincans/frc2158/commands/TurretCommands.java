@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.austincans.frc2158.RobotState;
+import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2158.subsystems.hood.Hood;
@@ -78,6 +79,8 @@ public class TurretCommands {
       Flywheel flywheel, Turret turret, Hood hood, TrackingTargets target) {
     Pose2d robotPose = RobotState.getInstance().getEstimatedPose();
     ChassisSpeeds robotSpeeds = RobotState.getInstance().getRobotVelocity();
+    
+    Drive.driveSpeedMultiplier = 0.5;
 
     double targetHeight = target.getTranslation3d().getZ();
 
@@ -187,7 +190,7 @@ public class TurretCommands {
         () -> Commands.run(() -> {
           shootToTarget(flywheel, turret, hood, getShuttleTarget(isBlue));
           isShuttling = true;
-        }),
+        }).finallyDo(() -> Drive.driveSpeedMultiplier = 1),
         Set.of());
   }
 
@@ -201,14 +204,14 @@ public class TurretCommands {
             if (containsFuel.getAsBoolean()) {
               shootToTarget(flywheel, turret, hood, TrackingTargets.blueHub);
             }
-          });
+          }).finallyDo(() -> Drive.driveSpeedMultiplier = 1);
     } else {
       return Commands.run(
           () -> {
             if (containsFuel.getAsBoolean()) {
               shootToTarget(flywheel, turret, hood, TrackingTargets.redHub);
             }
-          });
+          }).finallyDo(() -> Drive.driveSpeedMultiplier = 1);
     }
   }
 }
