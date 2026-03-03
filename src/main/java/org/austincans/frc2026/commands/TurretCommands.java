@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
+import java.util.Set;
+
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -61,6 +63,13 @@ public class TurretCommands {
       return this.targetTranslation3d;
     }
   }
+
+  public static enum shootingMode{
+    SHUTTLE,
+    HUB
+  }
+
+  public static shootingMode mode = shootingMode.HUB;
 
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
   private static final double FLYWHEEL_RADIUS = FlywheelConstants.radiusMeters; // meters
@@ -224,5 +233,24 @@ public class TurretCommands {
               flywheel.setVelocity(0);
               Drive.driveSpeedMultiplier = 1;
             });
+  }
+
+  public static Command shoot(Flywheel flywheel, Turret turret, Hood hood, Drive drive){
+    return Commands.defer(() -> {
+      switch (mode) {
+        case SHUTTLE:
+          return shuttle(flywheel, turret, hood, drive);
+        case HUB:
+          return shootToHub(flywheel, turret, hood, drive);
+        default:
+          return shootToHub(flywheel, turret, hood, drive);
+      }
+    }, Set.of(flywheel, hood, turret, drive));
+  }
+
+  public static Command setShootingMode(shootingMode newMode){
+    return Commands.runOnce(
+      () -> mode = newMode
+    );
   }
 }

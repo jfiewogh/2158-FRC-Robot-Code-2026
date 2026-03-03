@@ -38,6 +38,7 @@ import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
+import org.austincans.frc2026.commands.TurretCommands.shootingMode;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.frc2026.subsystems.drive.*;
@@ -66,9 +67,12 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -99,39 +103,42 @@ public class RobotContainer {
 
   // Commands
   private Command runIntakeCommand;
-  private Command shootToHubCommand;
   private Command driveAndIntakeCommand;
   private Command driveAndScoreCommand;
+  private Command shootCommand;
+  private Command modeHub;
+  private Command modeShuttle;
   private Command shuttleCommand;
+  private Command shootToHubCommand;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new DriveIOReal(),
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                (pose) -> {});
-        vision =
-            new Vision(
-                drive,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        drive = new Drive(
+            new DriveIOReal(),
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+            new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+            new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+            new ModuleIOTalonFXReal(TunerConstants.BackRight),
+            (pose) -> {
+            });
+        vision = new Vision(
+            drive,
+            new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+            new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
         turret = new Turret(new TurretIOSparkFlex());
         hood = new Hood(new HoodIOSparkFlex());
         intake = new Intake(new IntakeIOSparkFlex());
         flywheel = new Flywheel(new FlywheelIOSparkFlex());
         // TODO: add limelight name
-        objectDetection =
-            new ObjectDetection(
-                new ODIOReal(
-                    "limelight", ObjectDetection.GamePieceType.FUEL, LimelightConfig.LIMELIGHT_3G));
+        objectDetection = new ObjectDetection(
+            new ODIOReal(
+                "limelight", ObjectDetection.GamePieceType.FUEL, LimelightConfig.LIMELIGHT_3G));
       }
       case SIM -> {
         // TODO: Add option to choose between 2d and 3d sim
@@ -146,10 +153,9 @@ public class RobotContainer {
         }
 
         // Initialize robot simulation
-        RobotSimulation3D robotSimulation =
-            new RobotSimulation3D(
-                new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero),
-                new Pose2d(14, 3, Rotation2d.kZero));
+        RobotSimulation3D robotSimulation = new RobotSimulation3D(
+            new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero),
+            new Pose2d(14, 3, Rotation2d.kZero));
         driveSimulation = (SwerveDriveSimulation3D) robotSimulation.getDriveSimulation();
         robotSimulation.addIntakeSimulation(
             "Fuel", 0.1, Constants.RobotConstants.kBumperWidthMeters, 0.1, Integer.MAX_VALUE);
@@ -162,78 +168,83 @@ public class RobotContainer {
         MeshSimulation3D model2 = new MeshSimulation3D("model_2.obj", 1);
         robotSimulation.addHood(model2);
 
-        drive =
-            new Drive(
-                new DriveIOSim3D(driveSimulation),
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+        drive = new Drive(
+            new DriveIOSim3D(driveSimulation),
+            new GyroIOSim(driveSimulation.getGyroSimulation()),
+            new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
+            new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
+            new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
+            new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
+            driveSimulation::setSimulationWorldPose);
 
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                new VisionIOPhotonVisionSim(
-                    camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+        vision = new Vision(
+            drive,
+            new VisionIOPhotonVisionSim(
+                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+            new VisionIOPhotonVisionSim(
+                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
         hood = new Hood(new HoodIOTest(robotSimulation));
 
         turret = new Turret(new TurretIOSim(hood::getAngle, drive, robotSimulation));
 
-        objectDetection =
-            new ObjectDetection(
-                new ODIOSimInView(
-                    "Fuel",
-                    LimelightConfig.LIMELIGHT_3G,
-                    4,
-                    driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                    () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
+        objectDetection = new ObjectDetection(
+            new ODIOSimInView(
+                "Fuel",
+                LimelightConfig.LIMELIGHT_3G,
+                4,
+                driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
+                () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
 
         intake = new Intake(new IntakeIOSim3D(intakeSimulation));
 
-        flywheel =
-            new Flywheel(
-                new FlywheelIOSim3D(
-                    driveSimulation,
-                    intakeSimulation,
-                    hood::getAngle,
-                    () -> Rotation2d.fromRadians(turret.getTurretAngle()),
-                    robotSimulation));
+        flywheel = new Flywheel(
+            new FlywheelIOSim3D(
+                driveSimulation,
+                intakeSimulation,
+                hood::getAngle,
+                () -> Rotation2d.fromRadians(turret.getTurretAngle()),
+                robotSimulation));
       }
       default -> {
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new DriveIO() {},
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-        vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+        drive = new Drive(
+            new DriveIO() {
+            },
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            (pose) -> {
+            });
+        vision = new Vision(drive, new VisionIO() {
+        }, new VisionIO() {
+        });
       }
     }
 
     // Initialize commands
     // TODO: runIntakeCommand should deploy intake before it can run it
-    runIntakeCommand =
-        Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+    runIntakeCommand = Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+
+    shootCommand = TurretCommands.shoot(flywheel, turret, hood, drive);
+    modeHub = TurretCommands.setShootingMode(shootingMode.HUB);
+    modeShuttle = TurretCommands.setShootingMode(shootingMode.SHUTTLE);
 
     shootToHubCommand = TurretCommands.shootToHub(flywheel, turret, hood, drive);
-    
-    driveAndIntakeCommand =
-        AutonCommands.driveToAndIntakeGamePieces(
-            drive, objectDetection, intake, leftX, leftY, rightX, rightY);
-    
-    driveAndScoreCommand =
-        AutonCommands.driveToAndShootIntoHub(
-            drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
     shuttleCommand = TurretCommands.shuttle(flywheel, turret, hood, drive);
+
+    driveAndIntakeCommand = AutonCommands.driveToAndIntakeGamePieces(
+        drive, objectDetection, intake, leftX, leftY, rightX, rightY);
+
+    driveAndScoreCommand = AutonCommands.driveToAndShootIntoHub(
+        drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
 
     // Register auton commands
     NamedCommands.registerCommand("runIntake", runIntakeCommand);
@@ -298,8 +309,12 @@ public class RobotContainer {
 
     switch (Constants.currentMode) {
       case REAL -> {
-        operatorController.a().whileTrue(shootToHubCommand);
-        driverController.x().whileTrue(runIntakeCommand);
+        operatorController.a().onTrue(driveAndIntakeCommand);
+        operatorController.rightBumper().onTrue(modeHub);
+        operatorController.leftBumper().onTrue(modeShuttle);
+        
+        driverController.leftTrigger().whileTrue(runIntakeCommand);
+        driverController.rightTrigger().whileTrue(shootCommand);
 
         leftY = () -> -driverController.getLeftY();
         leftX = () -> -driverController.getLeftX();
@@ -384,7 +399,8 @@ public class RobotContainer {
   }
 
   public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+    if (Constants.currentMode != Constants.Mode.SIM)
+      return;
 
     driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
     SimulatedArena3D.getInstance().resetFieldForAuto();
@@ -397,7 +413,8 @@ public class RobotContainer {
   }
 
   public void updateSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+    if (Constants.currentMode != Constants.Mode.SIM)
+      return;
 
     SimulatedArena3D.getInstance().simulationPeriodic();
     Logger.recordOutput(
