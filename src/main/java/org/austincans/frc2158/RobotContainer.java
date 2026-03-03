@@ -24,12 +24,15 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2158.commands.AutonCommands;
 import org.austincans.frc2158.commands.DriveCommands;
@@ -278,6 +281,19 @@ public class RobotContainer {
         keyboardInput.comma().whileTrue(driveAndScoreCommand);
 
         keyboardInput.period().whileTrue(TurretCommands.shuttle(flywheel, turret, hood, drive));
+
+        keyboardInput
+            .slash()
+            .onTrue(
+                Commands.runOnce(
+                    () -> {
+                      Arena2026Rebuilt3D rebuiltArena =
+                          (Arena2026Rebuilt3D) SimulatedArena3D.getInstance();
+                      Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+                      if (allianceOptional.isPresent()) {
+                        rebuiltArena.outpostDump(allianceOptional.get() == Alliance.Blue);
+                      }
+                    }));
 
         NamedCommands.registerCommand("runIntake", runIntakeCommand);
         NamedCommands.registerCommand("shoot", shootCommand);

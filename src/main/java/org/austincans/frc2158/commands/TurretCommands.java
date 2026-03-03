@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
-import java.util.Set;
 import org.austincans.frc2158.subsystems.drive.Drive;
 import org.austincans.frc2158.subsystems.flywheel.Flywheel;
 import org.austincans.frc2158.subsystems.flywheel.FlywheelConstants;
@@ -174,19 +173,23 @@ public class TurretCommands {
     return getClosestTarget(robotPose, possibleTargets);
   }
 
+  // TODO: Maybe make it so that robot does not shoot over hub
   public static Command shuttle(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
-    return Commands.defer(
-        () ->
-            Commands.run(
-                () -> {
-                  Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-                  if (allianceOptional.isPresent()) {
-                    Alliance alliance = allianceOptional.get();
-                    shootToTarget(flywheel, turret, hood, drive, getShuttleTarget(drive, alliance));
-                    isShuttling = true;
-                  }
-                }),
-        Set.of());
+    return Commands.run(
+            () -> {
+              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+              if (allianceOptional.isPresent()) {
+                Alliance alliance = allianceOptional.get();
+                shootToTarget(flywheel, turret, hood, drive, getShuttleTarget(drive, alliance));
+                isShuttling = true;
+              }
+            })
+        .until(flywheel::noGamePiecesToShoot)
+        .finallyDo(
+            () -> {
+              flywheel.setVelocity(0);
+              isShuttling = false;
+            });
   }
 
   public static Command shootToHub(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {

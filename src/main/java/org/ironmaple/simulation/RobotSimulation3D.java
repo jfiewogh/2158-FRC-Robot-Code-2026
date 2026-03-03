@@ -130,7 +130,6 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
     physicsEngine.getPhysicsSpace().addJoint(sixDofJoint);
   }
 
-  // TODO: Fix hood mesh simulation. Pitch does not change
   public void addHood(MeshSimulation3D hood) {
     this.hood = hood;
     hood.setPose3d(

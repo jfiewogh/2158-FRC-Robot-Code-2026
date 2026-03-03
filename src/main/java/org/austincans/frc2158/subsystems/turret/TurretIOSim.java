@@ -18,7 +18,6 @@ package org.austincans.frc2158.subsystems.turret;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import java.util.function.Supplier;
 import org.austincans.frc2158.Constants;
@@ -71,8 +70,6 @@ public class TurretIOSim implements TurretIO {
             0,
             RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
             driveTrainYaw + inputs.positionRad);
-    System.out.println(
-        Units.radiansToDegrees(RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians())));
 
     rebuiltShooterViz.update(Rotation2d.fromRadians(inputs.positionRad));
   }
