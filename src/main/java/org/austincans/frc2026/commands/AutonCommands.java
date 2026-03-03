@@ -262,7 +262,7 @@ public class AutonCommands {
                                       < pathfindEndDistance)
                       .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
               return Commands.deadline(
-                  TurretCommands.shootToHub(flywheel, turret, hood, drive),
+                  TurretCommands.shootToHubCommand(flywheel, turret, hood, drive),
                   pathfindCommand,
                   updateJoystickHasInputCommand(suppliers));
             },

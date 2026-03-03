@@ -30,7 +30,7 @@ public class TurretConstants {
   public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
-  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 0);
+  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
   public static final double turretHeightMeters = ConfigUtil.getConfigDouble("TURRET_HEIGHT", 0);
 
   public static final boolean forwardSoftLimitEnabled =
@@ -55,5 +55,5 @@ public class TurretConstants {
 
   // values (possibly only) used in sim
   public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0);
+      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
 }

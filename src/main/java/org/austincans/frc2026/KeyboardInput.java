@@ -31,10 +31,12 @@ public class KeyboardInput {
 
   /* Joystick 0 */
 
+  // left is positive
   public double leftX() {
     return -joystick0.getRawAxis(0);
   }
 
+  // up is positive
   public double leftY() {
     return -joystick0.getRawAxis(1);
   }
@@ -87,10 +89,12 @@ public class KeyboardInput {
 
   /* Joystick 2 */
 
+  // left is positive
   public double rightX() {
     return -joystick2.getRawAxis(0);
   }
 
+  // right is positive
   public double rightY() {
     return -joystick2.getRawAxis(1);
   }
