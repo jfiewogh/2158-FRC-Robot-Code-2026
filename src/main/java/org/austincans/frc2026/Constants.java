@@ -59,6 +59,12 @@ public final class Constants {
     REPLAY
   }
 
+  public static enum ControlMode {
+    JOYSTICK,
+    KEYBOARD
+  }
+  public static final ControlMode controlMode = ControlMode.JOYSTICK;
+
   public static final double loopPeriodSecs = 0.02;
   private static RobotType robotType = RobotBase.isReal() ? RobotType.COMPBOT : RobotType.SIMBOT;
   public static final boolean tuningMode = true;
