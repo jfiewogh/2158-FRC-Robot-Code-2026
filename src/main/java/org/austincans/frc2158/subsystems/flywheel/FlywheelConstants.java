@@ -37,10 +37,10 @@ public class FlywheelConstants {
 
   public static final double radiusMeters = 0.0508;
 
-  public static final double gearing = 1.0;
+  public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 0);
 
   /* SIM */
-  public static final double JKgMetersSq = 0.001;
+  public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 0);
 
   public static final double maxRPM = 2000;
 }

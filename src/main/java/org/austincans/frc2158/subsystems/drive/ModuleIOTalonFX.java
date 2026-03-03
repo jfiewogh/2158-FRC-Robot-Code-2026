@@ -21,6 +21,8 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -62,13 +64,13 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   private final SelfCheckingTalonFXPro turnTalonSelfCheck;
 
   protected final VoltageOut voltageRequest = new VoltageOut(0);
-  protected final PositionVoltage positionVoltageRequest = new PositionVoltage(0.0);
+  protected final MotionMagicVoltage positionVoltageRequest = new MotionMagicVoltage(0.0);
   protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
 
   // Torque-current control requests
   protected final TorqueCurrentFOC torqueCurrentRequest = new TorqueCurrentFOC(0);
-  protected final PositionTorqueCurrentFOC positionTorqueCurrentRequest =
-      new PositionTorqueCurrentFOC(0.0);
+  protected final MotionMagicTorqueCurrentFOC  positionTorqueCurrentRequest =
+      new MotionMagicTorqueCurrentFOC(0.0);
   protected final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
       new VelocityTorqueCurrentFOC(0.0);
 

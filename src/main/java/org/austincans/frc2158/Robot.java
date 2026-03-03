@@ -28,6 +28,10 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -37,6 +41,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private TalonFX minion;
+  private TalonFX minion2;
+  private Orchestra lebron;
 
   public Robot() {
     // Record metadata
@@ -86,6 +93,12 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    lebron = new Orchestra();
+    minion = new TalonFX(26);
+    minion2 = new TalonFX(27);
+    lebron.addInstrument(minion);
+    lebron.addInstrument(minion2);
+    lebron.loadMusic("LeBlondJames.chrp");
   }
 
   /** This function is called periodically during all modes. */
@@ -113,6 +126,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    lebron.play();
     // robotContainer.resetSimulationField();
   }
 
