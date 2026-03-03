@@ -45,8 +45,6 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
   private final AbstractDriveTrainSimulation3D driveSimulation;
 
   private IntakeSimulation3D intakeSimulation;
-  // shooter
-  private ShooterSimulation3D shooterSimulation;
   private MeshSimulation3D shooterBase;
   private MeshSimulation3D turret;
   private MeshSimulation3D hood;
