@@ -64,4 +64,16 @@ public class Intake extends AdvancedSubsystem {
   public Command systemCheckCommand() {
     return Commands.runOnce(() -> {});
   }
+
+  public Command deployCommand() {
+    return Commands.runOnce(() -> {
+      io.deploy();
+    },this);
+  }
+
+  public Command retractCommand() {
+    return Commands.runOnce(() -> {
+      io.retract();
+    },this);
+  }
 }

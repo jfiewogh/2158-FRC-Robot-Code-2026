@@ -92,6 +92,7 @@ public class RobotContainer {
   public static final boolean hoodEnabled = false;
   public static final boolean intakeEnabled = false;
   public static final boolean flywheelEnabled = false;
+  public static final boolean ledEnabled = true;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -163,6 +164,7 @@ public class RobotContainer {
                       ObjectDetection.GamePieceType.FUEL,
                       LimelightConfig.LIMELIGHT_3G));
         }
+        if (true){}
       }
       case TEST -> {
         // Real robot, instantiate hardware IO implementations

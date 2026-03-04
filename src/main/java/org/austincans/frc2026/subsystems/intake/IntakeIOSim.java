@@ -92,4 +92,14 @@ public class IntakeIOSim implements IntakeIO {
     System.out.println(angle.toRadians());
     IntakeConstants.intakePIDController.setGoal(angle.toRadians());
   }
+
+
+  @Override
+  public void deploy() {
+    // System.out.println(angle.toRadians());
+    // IntakeConstants.intakePIDController.setGoal(angle.toRadians());
+  }
+
+  @Override
+  public void retract(){}
 }

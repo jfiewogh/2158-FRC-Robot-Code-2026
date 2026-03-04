@@ -19,13 +19,16 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
+import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.util.ConfigUtil;
 
 public class IntakeConstants {
   public static final CANBus intakeCANBus =
       new CANBus(ConfigUtil.getConfigString("INTAKE_CANBUS", "2158"));
 
-  public static final int deployCanID = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0);
+  public static final int deployCanID1 = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID_1", 0);
+  public static final int deployCanID2 = ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID_2", 0);
   public static final int intakeCanID = ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 0);
 
   /*
@@ -69,4 +72,7 @@ public class IntakeConstants {
       ConfigUtil.getConfigInt("INTAKE_LASER_CAN_DISTANCE", 20);
 
   public static int laserCANID = ConfigUtil.getConfigInt("INTAKE_LASER_CAN_ID", 0);
+
+    public static Angle deployAngle = Angle.fromRotations(ConfigUtil.getConfigDouble("INTAKE_DEPLOY_ANGLE", 0));
+    public static Angle retractAngle = Angle.fromRotations(ConfigUtil.getConfigDouble("INTAKE_RETRACT_ANGLE", 0));
 }

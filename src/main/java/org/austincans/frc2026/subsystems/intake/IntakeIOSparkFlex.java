@@ -81,7 +81,6 @@ public class IntakeIOSparkFlex implements IntakeIO {
     inputs.intakeTemperatureC = intakeMotor.getMotorTemperature();
   }
 
-  @Override
   public void setDeployAngle(Angle angle) {
     deployController.setSetpoint(angle.toRotations(), ControlType.kPosition);
   }
@@ -120,5 +119,15 @@ public class IntakeIOSparkFlex implements IntakeIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public void deploy() {
+    setDeployAngle(IntakeConstants.deployAngle);
+  }
+
+  @Override
+  public void retract() {
+    setDeployAngle(IntakeConstants.retractAngle);
   }
 }
