@@ -165,7 +165,7 @@ public class RobotContainer {
                       ObjectDetection.GamePieceType.FUEL,
                       LimelightConfig.LIMELIGHT_3G));
         }
-        if (true){}
+        if (true) {}
       }
       case TEST -> {
         // Real robot, instantiate hardware IO implementations
@@ -243,10 +243,17 @@ public class RobotContainer {
             new Drive(
                 new DriveIOSim3D(driveSimulation),
                 new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
+                new ModuleIOTalonFXSim(TunerConstants.FrontLeft,
+                driveSimulation.getModules()[0]),
+                new ModuleIOTalonFXSim(TunerConstants.FrontRight,
+                driveSimulation.getModules()[1]),
                 new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
+                new ModuleIOTalonFXSim(TunerConstants.BackRight,
+                driveSimulation.getModules()[3]),
+                // new ModuleIOSim(driveSimulation.getModules()[0]),
+                // new ModuleIOSim(driveSimulation.getModules()[1]),
+                // new ModuleIOSim(driveSimulation.getModules()[2]),
+                // new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
 
         vision =

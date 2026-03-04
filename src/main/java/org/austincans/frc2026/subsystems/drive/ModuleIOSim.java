@@ -46,14 +46,10 @@ public class ModuleIOSim implements ModuleIO {
     this.moduleSimulation = moduleSimulation;
 
     // configures a generic motor controller for drive motor
-    this.driveMotor =
-        moduleSimulation
-            .useGenericMotorControllerForDrive()
-            .withCurrentLimit(Units.Amps.of(DriveConstants.driveCurrentLimitAmps));
-    this.turnMotor =
-        moduleSimulation
-            .useGenericControllerForSteer()
-            .withCurrentLimit(Units.Amps.of(DriveConstants.turnCurrentLimitAmps));
+    this.driveMotor = moduleSimulation.useGenericMotorControllerForDrive();
+    // .withCurrentLimit(Units.Amps.of(DriveConstants.driveCurrentLimitAmps));
+    this.turnMotor = moduleSimulation.useGenericControllerForSteer();
+    // .withCurrentLimit(Units.Amps.of(DriveConstants.turnCurrentLimitAmps));
 
     // Enable wrapping for turn PID
     turnController.enableContinuousInput(-Math.PI, Math.PI);

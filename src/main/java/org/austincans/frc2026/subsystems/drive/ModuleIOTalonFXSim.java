@@ -28,15 +28,12 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
  * constants from Phoenix. Simulation is always based on voltage control.
  */
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
-  private final SwerveModuleSimulation simulation;
-
   public ModuleIOTalonFXSim(
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants,
       SwerveModuleSimulation simulation) {
     super(PhoenixUtil.regulateModuleConstantForSimulation(constants));
 
-    this.simulation = simulation;
     simulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveTalon));
 
     simulation.useSteerMotorController(
