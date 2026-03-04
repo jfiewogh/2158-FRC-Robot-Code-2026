@@ -164,6 +164,49 @@ public class RobotContainer {
                       LimelightConfig.LIMELIGHT_3G));
         }
       }
+      case TEST -> {
+        // Real robot, instantiate hardware IO implementations
+        Drive.driveTestMultiplier = 0.2;
+        if (driveEnabled) {
+          drive =
+              new Drive(
+                  new DriveIOReal(),
+                  new GyroIOPigeon2(),
+                  new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                  new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                  new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                  new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                  (pose) -> {});
+        }
+        if (visionEnabled) {
+          vision =
+              new Vision(
+                  drive,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        }
+        if (turretEnabled) {
+          turret = new Turret(new TurretIOSparkFlex());
+        }
+        if (hoodEnabled) {
+          hood = new Hood(new HoodIOSparkFlex());
+        }
+        if (intakeEnabled) {
+          intake = new Intake(new IntakeIOSparkFlex());
+        }
+        if (flywheelEnabled) {
+          flywheel = new Flywheel(new FlywheelIOSparkFlex());
+        }
+        if (objectDetectionEnabled) {
+          // TODO: add actual limelight name
+          objectDetection =
+              new ObjectDetection(
+                  new ODIOReal(
+                      "limelight",
+                      ObjectDetection.GamePieceType.FUEL,
+                      LimelightConfig.LIMELIGHT_3G));
+        }
+      }
       case SIM -> {
         // TODO: Add option to choose between 2d and 3d sim
         // Sim robot, instantiate physics sim IO implementations
@@ -235,6 +278,7 @@ public class RobotContainer {
                     () -> Rotation2d.fromRadians(turret.getTurretAngle()),
                     robotSimulation));
       }
+
       default -> {
         // Replayed robot, disable IO implementations
         drive =

@@ -15,6 +15,7 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -86,6 +87,8 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void setDesiredAngle(Rotation2d angle) {
+    double radians = MathUtil.inputModulus(angle.getRadians(), -3, 3);
+    radians = MathUtil.clamp(radians, -2.325, 2.325);
     sim.setAngle(angle.getRadians());
   }
 }

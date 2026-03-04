@@ -27,6 +27,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
+
+import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -137,7 +140,13 @@ public class TurretCommands {
 
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
-      } else {
+      } else if (Constants.isSim && 
+      (turretAngle.minus(futureRobotRotation).getRotations() > 2.75 
+      || turretAngle.minus(futureRobotRotation).getRotations() < -2.75)
+      ){
+        System.out.println("Cannot Rotate Turret to Position");
+      }
+      else {
         // Should run only if angle is possible
         flywheel.setVelocity(flywheelVelocityRPM);
         turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);

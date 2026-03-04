@@ -45,6 +45,7 @@ import org.austincans.frc2026.util.ConfigUtil;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+  public static final boolean isSim = currentMode == Mode.SIM;
 
   public static final double maxVoltage = 12;
 
@@ -56,7 +57,10 @@ public final class Constants {
     SIM,
 
     /** Replaying from a log file. */
-    REPLAY
+    REPLAY,
+
+    /** Running a real robot with testing configurations */
+    TEST
   }
 
   public static enum ControlMode {

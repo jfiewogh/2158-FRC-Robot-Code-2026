@@ -83,6 +83,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
+  public static double driveTestMultiplier = 1; // For when in testing mode
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -512,7 +513,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * driveSpeedMultiplier;
+    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * driveSpeedMultiplier * driveTestMultiplier;
   }
 
   /** Returns the maximum angular speed in radians per sec. */
