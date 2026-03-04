@@ -86,12 +86,13 @@ public class RobotContainer {
 
   // Subsystem Enabled // only important for real robot
   public static final boolean driveEnabled = true;
-  public static final boolean visionEnabled = true;
-  public static final boolean objectDetectionEnabled = true;
-  public static final boolean turretEnabled = true;
-  public static final boolean hoodEnabled = true;
-  public static final boolean intakeEnabled = true;
-  public static final boolean flywheelEnabled = true;
+  public static final boolean visionEnabled = false;
+  public static final boolean objectDetectionEnabled = false;
+  public static final boolean turretEnabled = false;
+  public static final boolean hoodEnabled = false;
+  public static final boolean intakeEnabled = false;
+  public static final boolean flywheelEnabled = false;
+  public static final boolean ledEnabled = true;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -164,6 +165,7 @@ public class RobotContainer {
                       ObjectDetection.GamePieceType.FUEL,
                       LimelightConfig.LIMELIGHT_3G));
         }
+        if (true){}
       }
       case TEST -> {
         // Real robot, instantiate hardware IO implementations

@@ -25,6 +25,8 @@ import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.sim.IntakeSim3D;
 import org.ironmaple.simulation.IntakeSimulation3D;
 
+import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
+
 public class IntakeIOSim3D implements IntakeIO {
   private final IntakeSim3D intakeSim;
 
@@ -81,10 +83,21 @@ public class IntakeIOSim3D implements IntakeIO {
     rollerVelocityRadPerSec = velocity;
   }
 
+  // @Override
+  // public void setDeployAngle(Angle angle) {
+  //   IntakeConstants.intakePIDController.setGoal(angle.toRadians());
+  // }
+
+  @Override
+  public void deploy(){}
+
   @Override
   public void setDeployAngle(Angle angle) {
     IntakeConstants.intakePIDController.setGoal(angle.toRadians());
   }
+
+  @Override
+  public void retract(){}
 
   @Override
   public void setVoltage(double volts) {}

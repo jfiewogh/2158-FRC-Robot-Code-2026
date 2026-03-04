@@ -16,10 +16,13 @@
 package org.austincans.frc2026.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
@@ -32,10 +35,12 @@ import org.austincans.frc2026.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOTalonFXS implements IntakeIO {
-  private final TalonFXS deployMotor;
+  private final TalonFXS deployMotor1;
+  private final TalonFXS deployMotor2;
   private final TalonFXS intakeMotor;
 
-  private final SelfCheckingTalonFXS deployMotorSelfCheck;
+  private final SelfCheckingTalonFXS deploy1MotorSelfCheck;
+  private final SelfCheckingTalonFXS deploy2MotorSelfCheck;
   private final SelfCheckingTalonFXS intakeMotorSelfCheck;
 
   private final TalonFXSConfiguration config;
@@ -44,10 +49,12 @@ public class IntakeIOTalonFXS implements IntakeIO {
 
   public IntakeIOTalonFXS() {
     // Initialize motor controller
-    deployMotor = new TalonFXS(IntakeConstants.deployCanID, IntakeConstants.intakeCANBus);
+    deployMotor1 = new TalonFXS(IntakeConstants.deployCanID1, IntakeConstants.intakeCANBus);
+    deployMotor2 = new TalonFXS(IntakeConstants.deployCanID2, IntakeConstants.intakeCANBus);
     intakeMotor = new TalonFXS(IntakeConstants.intakeCanID, IntakeConstants.intakeCANBus);
 
-    deployMotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor", deployMotor);
+    deploy1MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 1", deployMotor1);
+    deploy2MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 2", deployMotor2);
     intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);
 
     config = new TalonFXSConfiguration();
@@ -67,17 +74,19 @@ public class IntakeIOTalonFXS implements IntakeIO {
     config.ExternalFeedback.FeedbackRemoteSensorID = deployEncoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =
         ExternalFeedbackSensorSourceValue.FusedCANcoder;
-
-    deployMotor.getConfigurator().apply(config);
-
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    deployMotor1.getConfigurator().apply(config);
+      config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    deployMotor2.getConfigurator().apply(config);
+    deployMotor2.setControl(new Follower(IntakeConstants.deployCanID1, MotorAlignmentValue.Aligned));
     deployEncoder.setPosition(0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.deployMotorVoltage = deployMotor.getMotorVoltage().getValueAsDouble();
-    inputs.deployPositionRad = deployMotor.getPosition().getValue().in(Units.Radians);
-    inputs.deployTemperatureC = deployMotor.getDeviceTemp().getValueAsDouble();
+    inputs.deployMotorVoltage = deployMotor1.getMotorVoltage().getValueAsDouble();
+    inputs.deployPositionRad = deployMotor1.getPosition().getValue().in(Units.Radians);
+    inputs.deployTemperatureC = deployMotor1.getDeviceTemp().getValueAsDouble();
     inputs.intakeMotorVoltage = intakeMotor.getMotorVoltage().getValueAsDouble();
     inputs.intakeTemperatureC = intakeMotor.getDeviceTemp().getValueAsDouble();
   }
@@ -92,21 +101,21 @@ public class IntakeIOTalonFXS implements IntakeIO {
     intakeMotor.setVoltage(voltage);
   }
 
-  @Override
   public void setDeployAngle(Angle angle) {
-    deployMotor.setControl(positionRequest.withPosition(angle.toRotations()));
+    deployMotor1.setControl(positionRequest.withPosition(angle.toRotations()));
   }
 
   @Override
   public List<SelfChecking> getHardware() {
-    return List.of(deployMotorSelfCheck, intakeMotorSelfCheck);
+    return List.of(deploy1MotorSelfCheck, deploy2MotorSelfCheck, intakeMotorSelfCheck);
   }
 
   @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = new ArrayList<>();
 
-    List<HardwareFault> deployFault = deployMotorSelfCheck.checkForFaults();
+    List<HardwareFault> deployFault = deploy2MotorSelfCheck.checkForFaults();
+    deployFault.addAll(deploy1MotorSelfCheck.checkForFaults());
     if (deployFault != null) {
       faults.addAll(deployFault);
     }
@@ -121,5 +130,15 @@ public class IntakeIOTalonFXS implements IntakeIO {
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public void deploy() {
+    deployMotor1.setVoltage(5); // TODO: CHANGE ME
+  }
+
+  @Override
+  public void retract() {
+    deployMotor2.setVoltage(-5);
   }
 }

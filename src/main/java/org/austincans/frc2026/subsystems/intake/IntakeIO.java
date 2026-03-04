@@ -40,8 +40,11 @@ public interface IntakeIO {
 
   public void setVoltage(double voltage);
 
-  // degrees
   public void setDeployAngle(Angle angle);
+
+  // degrees
+  public void deploy();
+  public void retract();
 
   public default List<HardwareFault> checkForFaults() {
     return List.of();
