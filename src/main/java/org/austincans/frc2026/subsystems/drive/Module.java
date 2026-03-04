@@ -69,7 +69,7 @@ public class Module extends AdvancedSubsystem {
         drivekT.initDefault(0);
         drivekP.initDefault(1);
         drivekD.initDefault(0);
-        turnkP.initDefault(10.0);
+        turnkP.initDefault(20);
         turnkD.initDefault(0);
       }
     }

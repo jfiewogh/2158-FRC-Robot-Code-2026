@@ -84,14 +84,14 @@ public class RobotContainer {
   private Intake intake;
   private Flywheel flywheel;
 
-  // Subsystem Enabled // only applies to real robot
+  // Subsystem Enabled // only important for real robot
   public static final boolean driveEnabled = true;
-  public static final boolean visionEnabled = false;
-  public static final boolean objectDetectionEnabled = false;
-  public static final boolean turretEnabled = false;
-  public static final boolean hoodEnabled = false;
-  public static final boolean intakeEnabled = false;
-  public static final boolean flywheelEnabled = false;
+  public static final boolean visionEnabled = true;
+  public static final boolean objectDetectionEnabled = true;
+  public static final boolean turretEnabled = true;
+  public static final boolean hoodEnabled = true;
+  public static final boolean intakeEnabled = true;
+  public static final boolean flywheelEnabled = true;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -113,6 +113,7 @@ public class RobotContainer {
   private Command driveAndIntakeCommand;
   private Command driveAndScoreCommand;
   private Command shootCommand;
+  private Command setTurnMode;
   // auton only
   private Command shuttleCommand;
   private Command shootToHubCommand;
@@ -121,7 +122,7 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
-      // TODO: MAKE TEST MODE
+        // TODO: MAKE TEST MODE
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
         if (driveEnabled) {
@@ -345,6 +346,9 @@ public class RobotContainer {
     } else {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
+    if (driveEnabled) {
+      setTurnMode = DriveCommands.setTurnMode(drive);
+    }
 
     // Set up auto routines
     autoChooser =
@@ -378,7 +382,7 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     if (driveEnabled) {
-      drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightX, rightY));
+      drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightX, rightY));
     }
 
     // Configure the button bindings
@@ -405,10 +409,14 @@ public class RobotContainer {
     switch (Constants.controlMode) {
       case JOYSTICK -> {
         if (runIntakeCommand != null) {
-          driverController.leftTrigger().whileTrue(runIntakeCommand);
+          driverController.leftBumper().whileTrue(runIntakeCommand);
         }
         if (shootCommand != null) {
-          driverController.rightTrigger().whileTrue(shootCommand);
+          driverController.rightBumper().whileTrue(shootCommand);
+        }
+
+        if (setTurnMode != null) {
+          driverController.b().onTrue(setTurnMode);
         }
 
         // Testing

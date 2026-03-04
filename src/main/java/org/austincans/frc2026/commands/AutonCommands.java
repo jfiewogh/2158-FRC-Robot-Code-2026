@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
@@ -88,21 +87,6 @@ public class AutonCommands {
   // pathfindToPoseCommand stops working
   // and the robot continues to drive with its last velocity
 
-  // TODO: put this in Constants file, different code should based on what field is chosen
-  private static final double fieldLength = Units.inchesToMeters(651.22);
-  private static final double fieldWidth = Units.inchesToMeters(317.69);
-
-  private static boolean poseInAllianceHalf(Pose3d pose) {
-    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-    return allianceOptional.isPresent() && allianceOptional.get() == Alliance.Blue
-        ? pose.getX() < fieldLength / 2 - DriveConstants.driveBaseRadius * 1.2
-        : pose.getX() > fieldLength / 2 + DriveConstants.driveBaseRadius * 1.2;
-  }
-
-  private static boolean robotInAllianceHalf(Drive drive) {
-    return poseInAllianceHalf(drive.getPose3d());
-  }
-
   public static Command driveToAndIntakeGamePieces(
       Drive drive, ObjectDetection detection, Intake intake, DoubleSupplier... suppliers) {
     return Commands.defer(
@@ -127,10 +111,11 @@ public class AutonCommands {
                               Pose3d targetPose =
                                   DriverStation.isAutonomous()
                                       ? detection.getNearestGamePiecePoseSatisfyingCondition(
-                                          drive, pose -> poseInAllianceHalf(pose))
+                                          drive, pose -> RebuiltFieldUtils.poseInAllianceHalf(pose))
                                       : detection.getNearestGamePiecePose();
                               if (!Drive.joystickHasInput && targetPose != null) {
-                                if (!DriverStation.isAutonomous() || robotInAllianceHalf(drive)) {
+                                if (!DriverStation.isAutonomous()
+                                    || RebuiltFieldUtils.robotInAllianceHalf(drive)) {
                                   driveToPose(
                                       drive, detection.getNearestGamePiecePose().toPose2d());
                                 }
@@ -164,12 +149,17 @@ public class AutonCommands {
                       DriverStation.getAlliance().get() == Alliance.Blue
                           ? Pair.of(
                               new Translation2d(
-                                  fieldLength / 2 - DriveConstants.driveBaseRadius, 0),
-                              new Translation2d(fieldLength, fieldWidth))
+                                  RebuiltFieldUtils.fieldLength / 2
+                                      - DriveConstants.driveBaseRadius,
+                                  0),
+                              new Translation2d(
+                                  RebuiltFieldUtils.fieldLength, RebuiltFieldUtils.fieldWidth))
                           : Pair.of(
                               new Translation2d(0, 0),
                               new Translation2d(
-                                  fieldLength / 2 + DriveConstants.driveBaseRadius, fieldWidth))),
+                                  RebuiltFieldUtils.fieldLength / 2
+                                      + DriveConstants.driveBaseRadius,
+                                  RebuiltFieldUtils.fieldWidth))),
                   drive.getPose().getTranslation());
             })
         .onlyIf(() -> detection.getNearestGamePiecePose() != null)
@@ -253,8 +243,7 @@ public class AutonCommands {
                   new Pose2d(getTargetHubShootingTranslation(drive, alliance), targetRotation);
               Command pathfindCommand =
                   PathCommands.pathfindToPoseCommand(drive, targetPose, 0)
-                      .onlyIf(
-                          () -> !RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose()))
+                      .onlyIf(() -> !RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose()))
                       .until(
                           () ->
                               isFullyInAllianceZone(alliance, drive.getPose())

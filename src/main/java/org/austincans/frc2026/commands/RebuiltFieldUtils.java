@@ -16,10 +16,20 @@
 package org.austincans.frc2026.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import java.util.Optional;
+import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.subsystems.drive.DriveConstants;
 
-public class RebuiltFieldCommands {
+public class RebuiltFieldUtils {
+  // TODO: Maybe move this to Constants file, different values should be based on what field is
+  // chosen
+  public static final double fieldLength = Units.inchesToMeters(651.22);
+  public static final double fieldWidth = Units.inchesToMeters(317.69);
+
   private static double blueAllianceZoneX = Units.inchesToMeters(156.61);
   private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61);
 
@@ -27,5 +37,16 @@ public class RebuiltFieldCommands {
     return alliance == Alliance.Blue
         ? robotPose.getX() < blueAllianceZoneX
         : robotPose.getX() > redAllianceZoneX;
+  }
+
+  public static boolean poseInAllianceHalf(Pose3d pose) {
+    Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+    return allianceOptional.isPresent() && allianceOptional.get() == Alliance.Blue
+        ? pose.getX() < fieldLength / 2 - DriveConstants.driveBaseRadius * 1.2
+        : pose.getX() > fieldLength / 2 + DriveConstants.driveBaseRadius * 1.2;
+  }
+
+  public static boolean robotInAllianceHalf(Drive drive) {
+    return poseInAllianceHalf(drive.getPose3d());
   }
 }

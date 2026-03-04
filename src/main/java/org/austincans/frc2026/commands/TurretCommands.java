@@ -27,9 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
-
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -48,10 +46,11 @@ public class TurretCommands {
     redDepotTrench(new Translation3d(11.915394, 0.632968, 0)),
     redLeftTrench(new Translation3d(11.915394, 7.436358, 0)),
 
-    redShuttleLeft(new Translation3d(14, 3, 0)),
-    redShuttleRight(new Translation3d(14, 6, 0)),
-    blueShuttleRight(new Translation3d(2, 3, 0)),
-    blueShuttleLeft(new Translation3d(2, 6, 0));
+    redShuttleLeft(new Translation3d(RebuiltFieldUtils.fieldLength - 1, 3, 0)),
+    redShuttleRight(
+        new Translation3d(RebuiltFieldUtils.fieldLength - 1, RebuiltFieldUtils.fieldWidth - 3, 0)),
+    blueShuttleRight(new Translation3d(1, 3, 0)),
+    blueShuttleLeft(new Translation3d(1, RebuiltFieldUtils.fieldWidth - 3, 0));
 
     private final Translation3d targetTranslation3d;
 
@@ -140,13 +139,11 @@ public class TurretCommands {
 
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
-      } else if (Constants.isSim && 
-      (turretAngle.minus(futureRobotRotation).getRotations() > 2.75 
-      || turretAngle.minus(futureRobotRotation).getRotations() < -2.75)
-      ){
+      } else if (Constants.isSim
+          && (turretAngle.minus(futureRobotRotation).getRotations() > 2.75
+              || turretAngle.minus(futureRobotRotation).getRotations() < -2.75)) {
         System.out.println("Cannot Rotate Turret to Position");
-      }
-      else {
+      } else {
         // Should run only if angle is possible
         flywheel.setVelocity(flywheelVelocityRPM);
         turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
@@ -226,7 +223,7 @@ public class TurretCommands {
               Optional<Alliance> allianceOptional = DriverStation.getAlliance();
               if (allianceOptional.isPresent()) {
                 Alliance alliance = allianceOptional.get();
-                if (RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose())) {
+                if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
                   shootToHub(flywheel, turret, hood, drive, alliance);
                 }
               }
@@ -252,7 +249,7 @@ public class TurretCommands {
               Optional<Alliance> allianceOptional = DriverStation.getAlliance();
               if (allianceOptional.isPresent()) {
                 Alliance alliance = allianceOptional.get();
-                if (RebuiltFieldCommands.isInAllianceZone(alliance, drive.getPose())) {
+                if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
                   shootToHub(flywheel, turret, hood, drive, alliance);
                 } else {
                   shuttle(flywheel, turret, hood, drive, alliance);

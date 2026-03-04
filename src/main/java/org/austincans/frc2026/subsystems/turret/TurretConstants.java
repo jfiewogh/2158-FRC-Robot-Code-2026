@@ -16,6 +16,7 @@
 package org.austincans.frc2026.subsystems.turret;
 
 import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.math.util.Units;
 import org.austincans.frc2026.util.ConfigUtil;
 
 public class TurretConstants {
@@ -31,27 +32,34 @@ public class TurretConstants {
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
   public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
-  public static final double turretHeightMeters = ConfigUtil.getConfigDouble("TURRET_HEIGHT", 0);
+  public static final double turretHeightMeters =
+      ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(20));
 
-  public static final boolean forwardSoftLimitEnabled = ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED",
-      true);
-  public static final boolean reverseSoftLimitEnabled = ConfigUtil.getConfigBoolean("TURRET_REVERSE_SOFT_LIMIT_ENABLED",
-      true);
-  public static final double forwardSoftLimit = ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
-  public static final double reverseSoftLimit = ConfigUtil.getConfigDouble("TURRET_REVERSE_SOFT_LIMIT", 0);
-  public static final boolean isBrakeMode = ConfigUtil.getConfigBoolean("TURRET_IS_BRAKE_MODE", false);
+  public static final boolean forwardSoftLimitEnabled =
+      ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED", true);
+  public static final boolean reverseSoftLimitEnabled =
+      ConfigUtil.getConfigBoolean("TURRET_REVERSE_SOFT_LIMIT_ENABLED", true);
+  public static final double forwardSoftLimit =
+      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
+  public static final double reverseSoftLimit =
+      ConfigUtil.getConfigDouble("TURRET_REVERSE_SOFT_LIMIT", 0);
+  public static final boolean isBrakeMode =
+      ConfigUtil.getConfigBoolean("TURRET_IS_BRAKE_MODE", false);
 
   // values only used by TalonFX
   public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158"));
 
   // values only used by SparkFlex
-  public static final boolean isBrushlessMotor = ConfigUtil.getConfigBoolean("TURRET_IS_BRUSHLESS_MOTOR", true);
-  public static final int smartCurrentLimit = ConfigUtil.getConfigInt("TURRET_SMART_CURRENT_LIMIT", 80);
+  public static final boolean isBrushlessMotor =
+      ConfigUtil.getConfigBoolean("TURRET_IS_BRUSHLESS_MOTOR", true);
+  public static final int smartCurrentLimit =
+      ConfigUtil.getConfigInt("TURRET_SMART_CURRENT_LIMIT", 80);
 
   // values (possibly only) used in sim
-  public static final double rotationalInertiaMetersSq = ConfigUtil
-      .getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
+  public static final double rotationalInertiaMetersSq =
+      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
 
-  public static final double turretMinimumRotation = ConfigUtil.getConfigDouble("TURRET_MIN_ROT", 0);
+  public static final double turretMinimumRotation =
+      ConfigUtil.getConfigDouble("TURRET_MIN_ROT", 0);
   public static final double turretMaxRotation = ConfigUtil.getConfigDouble("TURRET_MAX_ROT", 0);
 }

@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
@@ -160,14 +161,25 @@ public class DriveCommands {
                   () -> rotationSupplier.get().getCos(),
                   () -> rotationSupplier.get().getSin());
 
+              if (!Drive.joystickHasInput) {
+                return;
+              }
+
               // Get linear velocity
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+
               // Calculate angular speed
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                      drive.getRotation().getRadians(),
+                      isFlipped
+                          ? rotationSupplier.get().plus(Rotation2d.k180deg).getRadians()
+                          : rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -175,20 +187,58 @@ public class DriveCommands {
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                       omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
                       isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          ? drive.getRotation().plus(Rotation2d.k180deg)
                           : drive.getRotation()));
             },
             drive)
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  public static enum TurnMode {
+    TWO_AXIS,
+    ONE_AXIS
+  }
+
+  public static TurnMode turnMode = TurnMode.ONE_AXIS;
+
+  public static Command driveCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaXSupplier,
+      DoubleSupplier omegaYSupplier) {
+    return Commands.defer(
+        () -> {
+          if (turnMode == TurnMode.TWO_AXIS) {
+            return joystickDriveAtAngle(
+                drive,
+                xSupplier,
+                ySupplier,
+                () ->
+                    Rotation2d.fromRadians(
+                        Math.atan2(omegaXSupplier.getAsDouble(), omegaYSupplier.getAsDouble())));
+          }
+          return joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+        },
+        Set.of(drive));
+  }
+
+  public static Command setTurnMode(Drive drive) {
+    return Commands.runOnce(
+        () -> {
+          if (turnMode == TurnMode.ONE_AXIS) {
+            turnMode = TurnMode.TWO_AXIS;
+          } else {
+            turnMode = TurnMode.ONE_AXIS;
+          }
+        },
+        drive);
   }
 
   /**
