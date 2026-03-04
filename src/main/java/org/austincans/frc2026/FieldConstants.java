@@ -227,7 +227,7 @@ public class FieldConstants {
     NONE("2025-none");
 
     AprilTagLayoutType(String name) {
-      Constants.disableHAL();
+      // Constants.disableHAL();
       System.out.println("Processing AprilTag Layout for type: " + fieldType.getJsonFolder());
       if (Constants.disableHAL) {
         try {
@@ -248,7 +248,7 @@ public class FieldConstants {
           layout =
               new AprilTagFieldLayout(
                   Path.of(
-                      Filesystem.getDeployDirectory().getPath(),
+                      Filesystem.getDeployDirectory().getAbsolutePath(),
                       "apriltags",
                       fieldType.getJsonFolder(),
                       name + ".json"));

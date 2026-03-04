@@ -96,7 +96,6 @@ public class Module extends AdvancedSubsystem {
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
   private final Alert turnEncoderDisconnectedAlert;
-  private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
   public Module(
       ModuleIO io,
@@ -139,15 +138,6 @@ public class Module extends AdvancedSubsystem {
     }
     if (turnkP.hasChanged(hashCode()) || turnkD.hasChanged(hashCode())) {
       io.setTurnPID(turnkP.get(), 0, turnkD.get());
-    }
-
-    // Calculate positions for odometry
-    int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
-    odometryPositions = new SwerveModulePosition[sampleCount];
-    for (int i = 0; i < sampleCount; i++) {
-      double positionMeters = inputs.odometryDrivePositionsRad[i] * constants.WheelRadius;
-      Rotation2d angle = inputs.odometryTurnPositions[i];
-      odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
     }
 
     // Update alerts
@@ -233,16 +223,6 @@ public class Module extends AdvancedSubsystem {
   /** Returns the module state (turn angle and drive velocity). */
   public SwerveModuleState getState() {
     return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
-  }
-
-  /** Returns the module positions received this cycle. */
-  public SwerveModulePosition[] getOdometryPositions() {
-    return odometryPositions;
-  }
-
-  /** Returns the timestamps of the samples received this cycle. */
-  public double[] getOdometryTimestamps() {
-    return inputs.odometryTimestamps;
   }
 
   /** Returns the module position in radians. */

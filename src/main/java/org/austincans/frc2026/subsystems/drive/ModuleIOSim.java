@@ -97,10 +97,6 @@ public class ModuleIOSim implements ModuleIO {
     inputs.turnSupplyCurrentAmps = moduleSimulation.getSteerMotorSupplyCurrent().in(Units.Amps);
     inputs.turnStatorCurrentAmps = moduleSimulation.getSteerMotorSupplyCurrent().in(Units.Amps);
     inputs.turnTorqueCurrentAmps = 0.0;
-
-    // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
-    inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
-    inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
   }
 
   @Override

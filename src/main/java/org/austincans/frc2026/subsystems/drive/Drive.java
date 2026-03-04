@@ -67,6 +67,7 @@ import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Constants.Mode;
 import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.RobotState;
+import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -233,6 +234,14 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     ALWAYS_COAST
   }
 
+  private SwerveModulePosition[] getModulePositions() {
+    SwerveModulePosition[] states = new SwerveModulePosition[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getPosition();
+    }
+    return states;
+  }
+
   @Setter @AutoLogOutput private CoastRequest coastRequest = CoastRequest.ALWAYS_BRAKE;
 
   @Override
@@ -263,54 +272,40 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     }
 
     // Send odometry updates to robot state
-    double[] sampleTimestamps =
-        Constants.getMode() == Mode.SIM
-            ? new double[] {Timer.getTimestamp()}
-            : gyroInputs.odometryYawTimestamps; // All signals are sampled together
-    int sampleCount = sampleTimestamps.length;
-    for (int i = 0; i < sampleCount; i++) {
-      SwerveModulePosition[] wheelPositions = new SwerveModulePosition[4];
-      for (int j = 0; j < 4; j++) {
-        wheelPositions[j] = modules[j].getOdometryPositions()[i];
-      }
-      RobotState.getInstance()
-          .addOdometryObservation(
-              new RobotState.OdometryObservation(
-                  wheelPositions,
-                  Optional.ofNullable(
-                      gyroInputs.connected ? gyroInputs.odometryYawPositions[i] : null),
-                  sampleTimestamps[i]));
+    RobotState.getInstance()
+        .addOdometryObservation(
+            new OdometryObservation(
+                Timer.getTimestamp(),
+                getModulePositions(),
+                Optional.ofNullable(gyroInputs.connected ? gyroInputs.rollPosition : null),
+                Optional.ofNullable(gyroInputs.connected ? gyroInputs.pitchPosition : null),
+                Optional.ofNullable(gyroInputs.connected ? gyroInputs.yawPosition : null)));
 
-      // Log 3D robot pose
-      Logger.recordOutput(
-          "RobotState/EstimatedPose3d",
-          new Pose3d(RobotState.getInstance().getEstimatedPose())
-              .exp(
-                  new Twist3d(
-                      0.0,
-                      0.0,
-                      Math.abs(gyroInputs.pitchPosition.getRadians())
-                          * DriveConstants.trackWidthX
-                          / 2.0,
-                      0.0,
-                      gyroInputs.pitchPosition.getRadians(),
-                      0.0))
-              .exp(
-                  new Twist3d(
-                      0.0,
-                      0.0,
-                      Math.abs(gyroInputs.rollPosition.getRadians())
-                          * DriveConstants.trackWidthY
-                          / 2.0,
-                      gyroInputs.rollPosition.getRadians(),
-                      0.0,
-                      0.0)));
-    }
-
-    RobotState.getInstance().addDriveSpeeds(getChassisSpeeds());
-    RobotState.getInstance().setPitch(gyroInputs.pitchPosition);
-    RobotState.getInstance().setRoll(gyroInputs.rollPosition);
-
+    // Log 3D robot pose
+    Logger.recordOutput(
+        "RobotState/EstimatedPose3d",
+        new Pose3d(RobotState.getInstance().getEstimatedPose())
+            .exp(
+                new Twist3d(
+                    0.0,
+                    0.0,
+                    Math.abs(gyroInputs.pitchPosition.getRadians())
+                        * DriveConstants.trackWidthX
+                        / 2.0,
+                    0.0,
+                    gyroInputs.pitchPosition.getRadians(),
+                    0.0))
+            .exp(
+                new Twist3d(
+                    0.0,
+                    0.0,
+                    Math.abs(gyroInputs.rollPosition.getRadians())
+                        * DriveConstants.trackWidthY
+                        / 2.0,
+                    gyroInputs.rollPosition.getRadians(),
+                    0.0,
+                    0.0)));
+    RobotState.getInstance().setRobotVelocity(getChassisSpeeds());
     // Update brake mode
     // Reset movement timer if velocity above threshold
     if (Arrays.stream(modules)
@@ -506,13 +501,13 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /** Adds a new timestamped vision measurement. */
   @Override
   public void accept(
-      Pose2d visionRobotPoseMeters,
+      Pose3d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     RobotState.getInstance()
         .addVisionObservation(
             new VisionObservation(
-                visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs));
+                timestampSeconds, visionRobotPoseMeters, visionMeasurementStdDevs));
   }
 
   /** Returns the maximum linear speed in meters per sec. */

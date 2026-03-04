@@ -219,11 +219,6 @@ public class ModuleIOComp implements ModuleIO {
     inputs.turnStatorCurrentAmps = turnSupplyCurrentAmps.getValueAsDouble();
     inputs.turnTorqueCurrentAmps = turnTorqueCurrentAmps.getValueAsDouble();
 
-    // Update odometry inputs
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream().mapToDouble(Units::rotationsToRadians).toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
     drivePositionQueue.clear();
     turnPositionQueue.clear();
   }

@@ -19,7 +19,6 @@ import static org.austincans.frc2026.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -144,7 +143,7 @@ public class Vision extends SubsystemBase {
 
         // Send vision observation
         consumer.accept(
-            observation.pose().toPose2d(),
+            observation.pose(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
@@ -184,7 +183,7 @@ public class Vision extends SubsystemBase {
   @FunctionalInterface
   public interface VisionConsumer {
     void accept(
-        Pose2d visionRobotPoseMeters,
+        Pose3d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
   }

@@ -20,7 +20,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import java.util.Arrays;
 import org.austincans.frc2026.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
@@ -47,15 +46,5 @@ public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     super.updateInputs(inputs);
-
-    // Update odometry inputs
-    inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
-
-    inputs.odometryDrivePositionsRad =
-        Arrays.stream(simulation.getCachedDriveWheelFinalPositions())
-            .mapToDouble(angle -> angle.in(Radians))
-            .toArray();
-
-    inputs.odometryTurnPositions = simulation.getCachedSteerAbsolutePositions();
   }
 }

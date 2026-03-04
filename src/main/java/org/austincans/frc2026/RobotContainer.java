@@ -121,6 +121,7 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
+      // TODO: MAKE TEST MODE
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
         if (driveEnabled) {
@@ -302,7 +303,8 @@ public class RobotContainer {
     }
 
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser =
+        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("Top Auto"));
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -329,7 +331,6 @@ public class RobotContainer {
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
     autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
-    autoChooser.addOption("New Auto", AutoBuilder.buildAuto("New Auto"));
 
     // Default command, normal field-relative drive
     if (driveEnabled) {

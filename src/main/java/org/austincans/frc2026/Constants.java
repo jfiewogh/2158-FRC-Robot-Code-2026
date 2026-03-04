@@ -63,6 +63,7 @@ public final class Constants {
     JOYSTICK,
     KEYBOARD
   }
+
   public static final ControlMode controlMode = ControlMode.JOYSTICK;
 
   public static final double loopPeriodSecs = 0.02;

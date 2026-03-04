@@ -41,10 +41,6 @@ public interface ModuleIO {
     public double turnSupplyCurrentAmps = 0.0;
     public double turnStatorCurrentAmps = 0.0;
     public double turnTorqueCurrentAmps = 0.0;
-
-    public double[] odometryTimestamps = new double[] {};
-    public double[] odometryDrivePositionsRad = new double[] {};
-    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
 
   /** Updates the set of loggable inputs. */
