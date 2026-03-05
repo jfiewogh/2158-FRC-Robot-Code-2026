@@ -13,17 +13,18 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026;
+package org.austincans.lib.util;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-public class KeyboardInput {
+/** Keyboard Human Interface Device */
+public class KeyboardHID {
   private final Joystick joystick0;
   private final Joystick joystick1;
   private final Joystick joystick2;
 
-  public KeyboardInput() {
+  public KeyboardHID() {
     joystick0 = new Joystick(0);
     joystick1 = new Joystick(1);
     joystick2 = new Joystick(2);
@@ -31,12 +32,12 @@ public class KeyboardInput {
 
   /* Joystick 0 */
 
-  // left is positive
+  /** Axis from A and D keys. A is positive. D is negative. */
   public double leftX() {
     return -joystick0.getRawAxis(0);
   }
 
-  // up is positive
+  /** Axis from W and S keys. W is positive. S is negative. */
   public double leftY() {
     return -joystick0.getRawAxis(1);
   }
@@ -63,10 +64,12 @@ public class KeyboardInput {
 
   /* Joystick 1 */
 
+  /** Axis from J and L keys. J is positive. L is negative. */
   public double middleX() {
     return -joystick1.getRawAxis(0);
   }
 
+  /** Axis from I and K keys. I is positive. K is negative. */
   public double middleY() {
     return -joystick1.getRawAxis(1);
   }
@@ -89,12 +92,12 @@ public class KeyboardInput {
 
   /* Joystick 2 */
 
-  // left is positive
+  /** Axis from left and right arrows. Left is positive. Right is negative. */
   public double rightX() {
     return -joystick2.getRawAxis(0);
   }
 
-  // right is positive
+  /** Axis from up and down arrows. Up is positive. Down is negative. */
   public double rightY() {
     return -joystick2.getRawAxis(1);
   }

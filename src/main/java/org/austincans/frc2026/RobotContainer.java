@@ -61,6 +61,7 @@ import org.austincans.frc2026.subsystems.turret.TurretIOSim;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
+import org.austincans.lib.util.KeyboardHID;
 import org.ironmaple.simulation.IntakeSimulation3D;
 import org.ironmaple.simulation.MeshSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
@@ -113,7 +114,7 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
-  private final KeyboardInput keyboardInput = new KeyboardInput();
+  private final KeyboardHID keyboardHID = new KeyboardHID();
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -331,10 +332,10 @@ public class RobotContainer {
         rightY = () -> -driverController.getRightY();
       }
       case KEYBOARD -> {
-        leftX = keyboardInput::leftX;
-        leftY = keyboardInput::leftY;
-        rightX = keyboardInput::rightX;
-        rightY = keyboardInput::rightY;
+        leftX = keyboardHID::leftX;
+        leftY = keyboardHID::leftY;
+        rightX = keyboardHID::rightX;
+        rightY = keyboardHID::rightY;
       }
     }
 
@@ -455,34 +456,34 @@ public class RobotContainer {
         }
       }
       case KEYBOARD -> {
-        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardInput.middleY()), hood));
+        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()), hood));
 
         turret.setDefaultCommand(
-            Commands.run(() -> turret.setTurretVelocity(keyboardInput.middleX()), turret));
+            Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
 
-        keyboardInput
+        keyboardHID
             .z()
             .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
 
-        keyboardInput
+        keyboardHID
             .x()
             .whileTrue(
                 Commands.runEnd(
                     () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
                     () -> flywheel.setVelocity(0)));
 
-        keyboardInput.c().whileTrue(shootToHubCommand);
+        keyboardHID.c().whileTrue(shootToHubCommand);
 
-        keyboardInput.v().whileTrue(runIntakeCommand);
+        keyboardHID.v().whileTrue(runIntakeCommand);
 
-        keyboardInput.m().onTrue(driveAndIntakeCommand);
+        keyboardHID.m().onTrue(driveAndIntakeCommand);
 
-        keyboardInput.comma().whileTrue(driveAndScoreCommand);
+        keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
-        keyboardInput.period().whileTrue(shuttleCommand);
+        keyboardHID.period().whileTrue(shuttleCommand);
 
         // Outpost dump
-        keyboardInput
+        keyboardHID
             .slash()
             .onTrue(
                 Commands.runOnce(
@@ -508,9 +509,7 @@ public class RobotContainer {
               ? () ->
                   drive.setPose(
                       driveSimulation
-                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
-              // during
-              // simulation
+                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
               : () ->
                   drive.setPose(
                       new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
