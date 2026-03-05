@@ -155,7 +155,7 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
 
     // Apply light damping to prevent drift (0.1 is standard value)
     // Bullet damping range is [0, 1] where 1 stops object immediately.
-    physicsBody.setDamping(0.1, 0.1);
+    physicsBody.setDamping(0.5, 0.5);
 
     // Register as a custom simulation for sub-tick updates
     arena.addCustomSimulation(this);

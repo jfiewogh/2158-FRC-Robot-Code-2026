@@ -65,15 +65,14 @@ public class TurretCommands {
   }
 
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
-  private static final double FLYWHEEL_RADIUS = FlywheelConstants.radiusMeters; // meters
-  private static final double FLYWHEEL_MAXRPM = FlywheelConstants.maxRPM;
+  private static final double FLYWHEEL_SHOOT_SPEED = FlywheelConstants.maxRPM;
 
   private static final double TURRET_HEIGHT = TurretConstants.turretHeightMeters; // meters
   public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
   private static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
-    return Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FLYWHEEL_RADIUS;
+    return Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FlywheelConstants.radiusMeters;
   }
 
   /**
@@ -101,16 +100,15 @@ public class TurretCommands {
     Translation2d turretTranslation =
         futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
-    double flywheelVelocityRPM = FLYWHEEL_MAXRPM * 0.75;
     flywheel.setVelocity(0);
 
     // TOTAL VALUES
-    double totalVelocity = getActualExitVelocityMetersPerSec(flywheelVelocityRPM);
-    double totalXYDistance =
+    double totalVelocityMetersPerSec = getActualExitVelocityMetersPerSec(FLYWHEEL_SHOOT_SPEED);
+    double totalXYDistanceMeters =
         turretTranslation.getDistance(target.getTranslation3d().toTranslation2d());
     double totalPitchRad =
         ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT, totalVelocity, totalXYDistance, targetHeight);
+            TURRET_HEIGHT, totalVelocityMetersPerSec, totalXYDistanceMeters, targetHeight);
 
     if (Double.isNaN(totalPitchRad)) {
       System.out.println("Cannot shoot into hub (1)");
@@ -120,7 +118,7 @@ public class TurretCommands {
               Math.atan2(
                   target.getTranslation3d().getY() - turretTranslation.getY(),
                   target.getTranslation3d().getX() - turretTranslation.getX()));
-      double totalXYVelocity = totalVelocity * Math.cos(totalPitchRad);
+      double totalXYVelocity = totalVelocityMetersPerSec * Math.cos(totalPitchRad);
       double totalXVelocity = totalXYVelocity * totalYaw.getCos();
       double totalYVelocity = totalXYVelocity * totalYaw.getSin();
 
@@ -131,11 +129,11 @@ public class TurretCommands {
       Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
 
       // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
-      double totalTime = totalXYDistance / totalXYVelocity;
+      double totalTime = totalXYDistanceMeters / totalXYVelocity;
 
       double hoodAngleRad =
           ShooterMath.calculateProjectileAngle(
-              TURRET_HEIGHT, totalVelocity, effectiveSpeed * totalTime, targetHeight);
+              TURRET_HEIGHT, totalVelocityMetersPerSec, effectiveSpeed * totalTime, targetHeight);
 
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
@@ -145,7 +143,7 @@ public class TurretCommands {
         System.out.println("Cannot Rotate Turret to Position");
       } else {
         // Should run only if angle is possible
-        flywheel.setVelocity(flywheelVelocityRPM);
+        flywheel.setVelocity(FLYWHEEL_SHOOT_SPEED);
         turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
         Logger.recordOutput("turret field rel angle", turretAngle);
         hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));

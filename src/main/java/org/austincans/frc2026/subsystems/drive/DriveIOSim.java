@@ -24,6 +24,9 @@ import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+// TODO: Drive simulation is affected by other simulation components attached to it, which decrease
+// its speed
+// Maybe update the PID and feedback controllers to take this into account
 public class DriveIOSim implements DriveIO {
   private final SwerveDriveSimulation simulation;
 

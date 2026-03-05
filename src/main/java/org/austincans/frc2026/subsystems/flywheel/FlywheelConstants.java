@@ -42,5 +42,5 @@ public class FlywheelConstants {
   /* SIM */
   public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 0);
 
-  public static final double maxRPM = 2000;
+  public static final double maxRPM = 2100;
 }

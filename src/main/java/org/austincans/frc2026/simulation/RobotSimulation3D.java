@@ -170,9 +170,15 @@ public class RobotSimulation3D implements SimulatedArena3D.Simulatable {
 
   @Override
   public void simulationSubTick(int subTickNum) {
-    Logger.recordOutput("RobotSimulation/ShooterBasePose", shooterBase.getPose3d());
-    Logger.recordOutput("RobotSimulation/TurretPose", turret.getPose3d());
-    Logger.recordOutput("RobotSimulation/HoodPose", hood.getPose3d());
+    if (shooterBase != null) {
+      Logger.recordOutput("RobotSimulation/ShooterBasePose", shooterBase.getPose3d());
+      if (turret != null) {
+        Logger.recordOutput("RobotSimulation/TurretPose", turret.getPose3d());
+        if (hood != null) {
+          Logger.recordOutput("RobotSimulation/HoodPose", hood.getPose3d());
+        }
+      }
+    }
   }
 
   // Getters

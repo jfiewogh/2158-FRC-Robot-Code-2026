@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -53,6 +54,7 @@ import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretIOSim;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
@@ -87,15 +89,22 @@ public class RobotContainer {
   private Flywheel flywheel;
   private Led led;
 
-  // Subsystem Enabled // only important for real robot
-  public static final boolean driveEnabled = true;
-  public static final boolean visionEnabled = false;
-  public static final boolean objectDetectionEnabled = false;
-  public static final boolean turretEnabled = false;
-  public static final boolean hoodEnabled = false;
-  public static final boolean intakeEnabled = false;
-  public static final boolean flywheelEnabled = false;
-  public static final boolean ledEnabled = true;
+  // Subsystem Enabled // only matters for real robot
+  private static final boolean driveEnabled = true;
+  private static final boolean visionEnabled = true;
+  private static final boolean objectDetectionEnabled = true;
+  private static final boolean turretEnabled = true;
+  private static final boolean hoodEnabled = true;
+  private static final boolean intakeEnabled = true;
+  private static final boolean flywheelEnabled = true;
+  private static final boolean ledEnabled = true;
+
+  /* Sim Booleans */
+  private static final boolean isThreaded = false;
+  // Set whether models should exist in physics engine
+  private static final boolean simulateShooterBase = true;
+  private static final boolean simulateTurret = true;
+  private static final boolean simulateHood = true;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -126,7 +135,6 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
-        // TODO: MAKE TEST MODE
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
         if (driveEnabled) {
@@ -223,7 +231,6 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
 
         // Initialize Rebuilt arena
-        boolean isThreaded = false;
         if (isThreaded) {
           new Arena2026Rebuilt3D(PhysicsThreadConfig.enabled(100));
         } else {
@@ -240,31 +247,25 @@ public class RobotContainer {
             "Fuel", 0.1, Constants.RobotConstants.kBumperWidthMeters, 0.1, 35);
         intakeSimulation = robotSimulation.getIntakeSimulation();
 
-        // Set whether models should exist in physics engine
-        boolean simulateShooterBase = false;
-        boolean simulateTurret = false;
-        boolean simulateHood = false;
         if (simulateShooterBase) {
-          robotSimulation.addShooterBase(new MeshSimulation3D("model_0.obj", 3));
-        }
-        if (simulateTurret) {
-          robotSimulation.addTurret(new MeshSimulation3D("model_1.obj", 1));
-        }
-        if (simulateHood) {
-          robotSimulation.addHood(new MeshSimulation3D("model_2.obj", 1));
+          robotSimulation.addShooterBase(new MeshSimulation3D("model_0.obj", 0.1));
+          if (simulateTurret) {
+            robotSimulation.addTurret(new MeshSimulation3D("model_1.obj", 0.1));
+            if (simulateHood) {
+              robotSimulation.addHood(new MeshSimulation3D("model_2.obj", 0.1));
+            }
+          }
         }
 
         drive =
             new Drive(
                 new DriveIOSim3D(driveSimulation),
                 new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft,
-                driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight,
-                driveSimulation.getModules()[1]),
+                new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
+                new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
                 new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight,
-                driveSimulation.getModules()[3]),
+                new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
+                // TODO: ModuleIOSim does not work
                 // new ModuleIOSim(driveSimulation.getModules()[0]),
                 // new ModuleIOSim(driveSimulation.getModules()[1]),
                 // new ModuleIOSim(driveSimulation.getModules()[2]),
@@ -465,7 +466,7 @@ public class RobotContainer {
             .x()
             .whileTrue(
                 Commands.runEnd(
-                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM * 0.75),
+                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
                     () -> flywheel.setVelocity(0)));
 
         keyboardInput.c().whileTrue(shootToHubCommand);
@@ -513,6 +514,7 @@ public class RobotContainer {
                       new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
       driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     }
+    SmartDashboard.putData("SeqSystemCheck", AdvancedSubsystem.sequentialCheck());
   }
 
   /**
