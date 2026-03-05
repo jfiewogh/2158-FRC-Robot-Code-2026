@@ -58,6 +58,7 @@ public class KeyboardHID {
     return new JoystickButton(joystick0, 4);
   }
 
+  /** Axis from R and E keys. R is positive. E is negative. */
   public double getLeftAxis2() {
     return joystick0.getRawAxis(2);
   }
