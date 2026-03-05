@@ -24,12 +24,16 @@ import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2026.util.ConfigUtil;
 
@@ -37,25 +41,26 @@ import org.austincans.frc2026.util.ConfigUtil;
 public class IntakeIOTalonFXS implements IntakeIO {
   private final TalonFXS deployMotor1;
   private final TalonFXS deployMotor2;
-  private final TalonFXS intakeMotor;
+  private final SparkFlex intakeMotor;
 
   private final SelfCheckingTalonFXS deploy1MotorSelfCheck;
   private final SelfCheckingTalonFXS deploy2MotorSelfCheck;
-  private final SelfCheckingTalonFXS intakeMotorSelfCheck;
+  private final SelfCheckingSparkFlex intakeMotorSelfCheck;
 
   private final TalonFXSConfiguration config;
   private final CANcoder deployEncoder;
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
-
+// TODO: SEPERATE DEPLOY MOTORS AND ROLLER MOTORS
   public IntakeIOTalonFXS() {
     // Initialize motor controller
     deployMotor1 = new TalonFXS(IntakeConstants.deployCanID1, IntakeConstants.intakeCANBus);
     deployMotor2 = new TalonFXS(IntakeConstants.deployCanID2, IntakeConstants.intakeCANBus);
-    intakeMotor = new TalonFXS(IntakeConstants.intakeCanID, IntakeConstants.intakeCANBus);
+    intakeMotor =
+        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0), MotorType.kBrushless);
 
     deploy1MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 1", deployMotor1);
     deploy2MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 2", deployMotor2);
-    intakeMotorSelfCheck = new SelfCheckingTalonFXS("Intake Motor", intakeMotor);
+    intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
 
     config = new TalonFXSConfiguration();
     config.MotorOutput.NeutralMode =
@@ -87,8 +92,8 @@ public class IntakeIOTalonFXS implements IntakeIO {
     inputs.deployMotorVoltage = deployMotor1.getMotorVoltage().getValueAsDouble();
     inputs.deployPositionRad = deployMotor1.getPosition().getValue().in(Units.Radians);
     inputs.deployTemperatureC = deployMotor1.getDeviceTemp().getValueAsDouble();
-    inputs.intakeMotorVoltage = intakeMotor.getMotorVoltage().getValueAsDouble();
-    inputs.intakeTemperatureC = intakeMotor.getDeviceTemp().getValueAsDouble();
+    inputs.intakeMotorVoltage = intakeMotor.getBusVoltage();
+    inputs.intakeTemperatureC = intakeMotor.getMotorTemperature();
   }
 
   @Override

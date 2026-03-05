@@ -15,8 +15,13 @@
 
 package org.austincans.frc2026.subsystems.intake;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.util.Set;
+
 import org.austincans.frc2026.controllers.LaserCAN;
 import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -27,6 +32,7 @@ public class Intake extends AdvancedSubsystem {
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private final LaserCAN laserCAN = new LaserCAN(IntakeConstants.laserCANID);
+  private final DigitalInput magLimitSwitch = new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
   public static boolean deployed = false;
 
@@ -38,8 +44,10 @@ public class Intake extends AdvancedSubsystem {
 
   public boolean intakeDeployed() {
     // TODO: GET LIMIT SWTICH
-    // return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
-    return false;
+    // return laserCAN.getMeasurement().distance_mm <
+    // IntakeConstants.maxDistFromIntake;
+    return magLimitSwitch.get();
+    // return false;
   }
 
   public void setRelativeVelocity(double velocity) {
@@ -67,22 +75,26 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public Command systemCheckCommand() {
-    return Commands.runOnce(() -> {});
+    return Commands.runOnce(() -> {
+    });
   }
 
   public Command deployCommand() {
-    return Commands.runOnce(
-        () -> {
-          io.deploy();
-        },
-        this);
+    return Commands.defer(
+        () -> Commands.runEnd(
+            () -> {
+              io.deploy();
+            },
+            () -> {
+              intakeDeployed();
+            },
+            this),
+        Set.of(this));
   }
 
   public Command retractCommand() {
-    return Commands.runOnce(
-        () -> {
-          io.retract();
-        },
-        this);
+    return Commands.runOnce(() -> {
+      io.retract();
+    }, this);
   }
 }

@@ -52,6 +52,7 @@ import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
+import org.austincans.frc2026.subsystems.intake.IntakeIOTalonFXS;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -162,7 +163,7 @@ public class RobotContainer {
           hood = new Hood(new HoodIOSparkFlex());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex());
+          intake = new Intake(new IntakeIOTalonFXS());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());
