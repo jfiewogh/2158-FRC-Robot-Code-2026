@@ -1,0 +1,3 @@
+TODO: Move all reusable subsystems into this directory
+It should include classes like ArmBase, DriveBase, and ElevatorBase.
+These classes can be inherited from and modified in the frc2026/subsystems directory.
