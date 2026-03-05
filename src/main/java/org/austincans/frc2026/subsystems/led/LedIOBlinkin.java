@@ -158,7 +158,7 @@ public class LedIOBlinkin implements LedIO {
   private Optional<Alliance> alliance;
   private Object disabledColor;
 
-  private LedIOBlinkin() {
+  public LedIOBlinkin() {
     m_blinkin = new Spark(LedConstants.blinkinID);
   }
 

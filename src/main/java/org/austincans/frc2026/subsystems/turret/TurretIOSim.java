@@ -25,6 +25,7 @@ import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.sim.RebuiltShooterViz;
+import org.ironmaple.simulation.MeshSimulation3D;
 
 public class TurretIOSim implements TurretIO {
   private final RebuiltShooterViz rebuiltShooterViz;
@@ -63,14 +64,18 @@ public class TurretIOSim implements TurretIO {
     inputs.currentAmps = sim.getCurrentDrawAmps();
 
     double driveTrainYaw = robotSimulation.getDriveTrainPose().getRotation().getZ();
-    robotSimulation.getTurret().setYaw(Rotation2d.fromRadians(driveTrainYaw + inputs.positionRad));
-    robotSimulation.getTurret().setAngularVelocityRadPerSec(0, 0, inputs.velocityRadPerSec);
-    robotSimulation
-        .getHood()
-        .setAngularPositionRad(
-            0,
-            RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
-            driveTrainYaw + inputs.positionRad);
+    MeshSimulation3D turret = robotSimulation.getTurret();
+    if (turret != null) {
+      turret.setYaw(Rotation2d.fromRadians(driveTrainYaw + inputs.positionRad));
+      turret.setAngularVelocityRadPerSec(0, 0, inputs.velocityRadPerSec);
+    }
+    MeshSimulation3D hood = robotSimulation.getHood();
+    if (hood != null) {
+      hood.setAngularPositionRad(
+          0,
+          RebuiltShooterViz.getPitchRad(hoodAngle.get().getRadians()),
+          driveTrainYaw + inputs.positionRad);
+    }
 
     rebuiltShooterViz.update(Rotation2d.fromRadians(inputs.positionRad));
   }

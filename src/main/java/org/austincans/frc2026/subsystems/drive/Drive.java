@@ -163,6 +163,8 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   public static boolean joystickHasInput = true;
 
+  public static boolean isDriving = false;
+
   public boolean isDriving() {
     return joystickHasInput;
   }
@@ -346,6 +348,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         !gyroConnectedDebouncer.calculate(gyroInputs.connected)
             && Constants.getMode() != Mode.SIM
             && !Robot.isJITing());
+    isDriving = isDriving();
   }
 
   /** Set brake mode to {@code enabled} doesn't change brake mode if already set. */
@@ -513,7 +516,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * driveSpeedMultiplier * driveTestMultiplier;
+    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)
+        * driveSpeedMultiplier
+        * driveTestMultiplier;
   }
 
   /** Returns the maximum angular speed in radians per sec. */

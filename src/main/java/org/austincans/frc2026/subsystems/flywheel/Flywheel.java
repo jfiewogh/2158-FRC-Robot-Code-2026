@@ -35,6 +35,8 @@ import org.littletonrobotics.junction.Logger;
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+  public static boolean isShooting = false;
+  public static boolean isReadyToShoot = false;
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -47,6 +49,8 @@ public class Flywheel extends AdvancedSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
+    isShooting = io.isShooting();
+    isReadyToShoot = io.readyToShoot();
   }
 
   public void setVelocity(double velocityRPM) {

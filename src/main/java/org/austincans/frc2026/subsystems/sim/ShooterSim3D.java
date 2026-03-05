@@ -26,10 +26,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation3D;
+import org.ironmaple.simulation.MeshSimulation3D;
 import org.ironmaple.simulation.ShooterSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
@@ -88,12 +90,20 @@ public class ShooterSim3D {
             LinearVelocity.ofBaseUnits(exitVelocityMetersPerSec, MetersPerSecond);
         Angle shooterAngle = Angle.ofBaseUnits(hoodAngleSupplier.get().getRadians(), Radians);
 
-        shooterSim.shoot(
-            launchingSpeed,
-            shooterAngle,
-            (BulletBody) robotSimulation.getShooterBase().getBody(),
-            (BulletBody) robotSimulation.getTurret().getBody(),
-            (BulletBody) robotSimulation.getHood().getBody());
+        ArrayList<BulletBody> ignoredBodies = new ArrayList<BulletBody>();
+        MeshSimulation3D shooterBase = robotSimulation.getShooterBase();
+        if (shooterBase != null) {
+          ignoredBodies.add((BulletBody) shooterBase.getBody());
+        }
+        MeshSimulation3D turret = robotSimulation.getTurret();
+        if (turret != null) {
+          ignoredBodies.add((BulletBody) turret.getBody());
+        }
+        MeshSimulation3D hood = robotSimulation.getHood();
+        if (hood != null) {
+          ignoredBodies.add((BulletBody) hood.getBody());
+        }
+        shooterSim.shoot(launchingSpeed, shooterAngle, ignoredBodies);
       }
     }
   }

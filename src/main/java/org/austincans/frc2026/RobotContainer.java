@@ -51,6 +51,8 @@ import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
+import org.austincans.frc2026.subsystems.led.Led;
+import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretIOSim;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
@@ -83,6 +85,7 @@ public class RobotContainer {
   private Hood hood;
   private Intake intake;
   private Flywheel flywheel;
+  private Led led;
 
   // Subsystem Enabled // only important for real robot
   public static final boolean driveEnabled = true;
@@ -165,7 +168,9 @@ public class RobotContainer {
                       ObjectDetection.GamePieceType.FUEL,
                       LimelightConfig.LIMELIGHT_3G));
         }
-        if (true) {}
+        if (ledEnabled && flywheelEnabled && driveEnabled && intakeEnabled) {
+          led = new Led(new LedIOBlinkin());
+        }
       }
       case TEST -> {
         // Real robot, instantiate hardware IO implementations
@@ -209,6 +214,9 @@ public class RobotContainer {
                       ObjectDetection.GamePieceType.FUEL,
                       LimelightConfig.LIMELIGHT_3G));
         }
+        if (ledEnabled && flywheelEnabled && driveEnabled && intakeEnabled) {
+          led = new Led(new LedIOBlinkin());
+        }
       }
       case SIM -> {
         // TODO: Add option to choose between 2d and 3d sim
@@ -232,12 +240,19 @@ public class RobotContainer {
             "Fuel", 0.1, Constants.RobotConstants.kBumperWidthMeters, 0.1, 35);
         intakeSimulation = robotSimulation.getIntakeSimulation();
 
-        MeshSimulation3D model0 = new MeshSimulation3D("model_0.obj", 3);
-        robotSimulation.addShooterBase(model0);
-        MeshSimulation3D model1 = new MeshSimulation3D("model_1.obj", 1);
-        robotSimulation.addTurret(model1);
-        MeshSimulation3D model2 = new MeshSimulation3D("model_2.obj", 1);
-        robotSimulation.addHood(model2);
+        // Set whether models should exist in physics engine
+        boolean simulateShooterBase = false;
+        boolean simulateTurret = false;
+        boolean simulateHood = false;
+        if (simulateShooterBase) {
+          robotSimulation.addShooterBase(new MeshSimulation3D("model_0.obj", 3));
+        }
+        if (simulateTurret) {
+          robotSimulation.addTurret(new MeshSimulation3D("model_1.obj", 1));
+        }
+        if (simulateHood) {
+          robotSimulation.addHood(new MeshSimulation3D("model_2.obj", 1));
+        }
 
         drive =
             new Drive(

@@ -249,7 +249,7 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
    * @param velocity the muzzle velocity of the game piece
    * @param pitch the launch angle (up/down) relative to the shooter's horizontal
    */
-  public void shoot(LinearVelocity velocity, Angle pitch, BulletBody... ignoredBodies) {
+  public void shoot(LinearVelocity velocity, Angle pitch, ArrayList<BulletBody> ignoredBodies) {
     if (gamePiecesLoaded <= 0) return;
 
     gamePiecesLoaded--;
@@ -310,11 +310,11 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
     projectile.getPhysicsBody().setLinearVelocityMPS(initialVelocity);
 
     // Used to ignore specific bodies (ex. turret mesh)
-    PhysicsRigidBody[] ignored = new PhysicsRigidBody[ignoredBodies.length];
-    for (int i = 0; i < ignoredBodies.length; i++) {
-      ignored[i] = ignoredBodies[i].getRigidBody();
+    PhysicsRigidBody[] ignoredRigidBodies = new PhysicsRigidBody[ignoredBodies.size()];
+    for (int i = 0; i < ignoredRigidBodies.length; i++) {
+      ignoredRigidBodies[i] = ignoredBodies.get(i).getRigidBody();
     }
-    ((BulletBody) projectile.getPhysicsBody()).getRigidBody().setIgnoreList(ignored);
+    ((BulletBody) projectile.getPhysicsBody()).getRigidBody().setIgnoreList(ignoredRigidBodies);
 
     if (printGamePiecesShot) {
       System.out.printf(

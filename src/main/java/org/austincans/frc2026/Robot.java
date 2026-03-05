@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.austincans.frc2026.controllers.REVDigitController;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -39,9 +41,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
-  private TalonFX minion;
-  private TalonFX minion2;
+  private TalonFX motor1;
+  private TalonFX motor2;
   private Orchestra lebron;
+
+  private AdvancedSubsystem advancedSubsystem;
 
   public Robot() {
     // Record metadata
@@ -92,10 +96,10 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     lebron = new Orchestra();
-    minion = new TalonFX(26);
-    minion2 = new TalonFX(27);
-    lebron.addInstrument(minion);
-    lebron.addInstrument(minion2);
+    motor1 = new TalonFX(31);
+    motor2 = new TalonFX(32);
+    lebron.addInstrument(motor1);
+    lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
   }
 
@@ -126,6 +130,7 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {
     lebron.play();
     // robotContainer.resetSimulationField();
+    REVDigitController.getInstance().writeDigits("2158");
   }
 
   /** This function is called periodically when disabled. */
@@ -163,7 +168,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if (REVDigitController.getInstance().getA() && REVDigitController.getInstance().getB()) {
+      AdvancedSubsystem.sequentialCheck();
+    }
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

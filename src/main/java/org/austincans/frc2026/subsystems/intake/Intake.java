@@ -28,14 +28,18 @@ public class Intake extends AdvancedSubsystem {
 
   private final LaserCAN laserCAN = new LaserCAN(IntakeConstants.laserCANID);
 
+  public static boolean deployed = false;
+
   public Intake(IntakeIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
   }
 
-  public boolean distanceSensorActive() {
-    return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
+  public boolean intakeDeployed() {
+    // TODO: GET LIMIT SWTICH
+    // return laserCAN.getMeasurement().distance_mm < IntakeConstants.maxDistFromIntake;
+    return false;
   }
 
   public void setRelativeVelocity(double velocity) {
@@ -59,6 +63,7 @@ public class Intake extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
     io.checkForFaults().forEach(this::addHardwareFault);
+    deployed = intakeDeployed();
   }
 
   public Command systemCheckCommand() {
@@ -66,14 +71,18 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public Command deployCommand() {
-    return Commands.runOnce(() -> {
-      io.deploy();
-    },this);
+    return Commands.runOnce(
+        () -> {
+          io.deploy();
+        },
+        this);
   }
 
   public Command retractCommand() {
-    return Commands.runOnce(() -> {
-      io.retract();
-    },this);
+    return Commands.runOnce(
+        () -> {
+          io.retract();
+        },
+        this);
   }
 }

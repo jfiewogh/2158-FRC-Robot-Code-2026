@@ -25,25 +25,19 @@ import org.austincans.frc2026.subsystems.led.LedIO.LedState;
 public class Led extends SubsystemBase {
   private final LedIO io;
   private final LedIOInputsAutoLogged inputs = new LedIOInputsAutoLogged();
-  private final Flywheel flywheel;
-  private final Drive drive;
-  private final Intake intake;
 
-  public Led(LedIO io, Flywheel flywheel, Drive drive, Intake intake) {
-    this.flywheel = flywheel;
-    this.drive = drive;
-    this.intake = intake;
+  public Led(LedIO io) {
     this.io = io;
   }
 
   public void updateState() {
-    if (flywheel.readyToShoot()) {
+    if (Flywheel.isReadyToShoot) {
       io.setPattern(LedState.READYTOSHOOT);
-    } else if (flywheel.isShooting()) {
+    } else if (Flywheel.isShooting) {
       io.setPattern(LedState.SHOOTING);
-    } else if (drive.isDriving()) {
+    } else if (Drive.isDriving) {
       io.setPattern(LedState.DRIVING);
-    } else if (intake.distanceSensorActive()) {
+    } else if (Intake.deployed) {
       io.setPattern(LedState.INTAKED);
     } else if (TurretCommands.isShuttling) {
       io.setPattern(LedState.SHUTTLING);

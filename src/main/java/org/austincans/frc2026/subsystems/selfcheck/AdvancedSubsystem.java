@@ -38,10 +38,10 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
 
   public enum FaultCodes {}
 
-  private final List<SubsystemFault> subsystemFaults = new ArrayList<>();
+  private static final List<SubsystemFault> subsystemFaults = new ArrayList<>();
   private final List<HardwareFault> hardwareFaults = new ArrayList<>();
   private final List<SelfChecking> hardware = new ArrayList<>();
-  private final List<Command> checkCommands = new ArrayList<>();
+  private static final List<Command> checkCommands = new ArrayList<>();
   private final String statusTable;
   private final boolean checkErrors;
 
@@ -113,8 +113,8 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   }
 
   protected void addSubsystemFault(SubsystemFault fault) {
-    if (!this.subsystemFaults.contains(fault)) {
-      this.subsystemFaults.add(fault);
+    if (!AdvancedSubsystem.subsystemFaults.contains(fault)) {
+      AdvancedSubsystem.subsystemFaults.add(fault);
     }
   }
 
@@ -146,11 +146,11 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   }
 
   public List<SubsystemFault> getSubsystemFaults() {
-    return this.subsystemFaults;
+    return AdvancedSubsystem.subsystemFaults;
   }
 
   public void clearFaults() {
-    this.subsystemFaults.clear();
+    AdvancedSubsystem.subsystemFaults.clear();
     this.hardwareFaults.clear();
   }
 
@@ -169,7 +169,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
       }
     }
 
-    for (SubsystemFault f : this.subsystemFaults) {
+    for (SubsystemFault f : AdvancedSubsystem.subsystemFaults) {
       if (f.timestamp > Timer.getFPGATimestamp() - 10) {
         if (f.isWarning) {
           if (worstStatus != SystemStatus.ERROR) {
@@ -222,7 +222,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     checkCommands.add(command);
   }
 
-  public Command sequentialCheck() {
+  public static Command sequentialCheck() {
     return Commands.sequence(checkCommands.toArray(Command[]::new))
         .onlyWhile(() -> subsystemFaults.size() == 0)
         .handleInterrupt(
