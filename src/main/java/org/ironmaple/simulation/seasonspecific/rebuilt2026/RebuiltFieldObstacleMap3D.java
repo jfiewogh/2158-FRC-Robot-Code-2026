@@ -105,15 +105,15 @@ public class RebuiltFieldObstacleMap3D extends SimulatedArena3D.FieldMap3D {
     var trenchHingedBaseY = 6.638;
     var trenchHingedArmY = 6.561;
     var trenchHingedArmZ = 0.619;
-    addObstacle("meshes/trench_fixed.obj", new Pose3d(trenchX, trenchFixedY, 0, new Rotation3d()));
+    addObstacle("meshes/trench_fixed.obj", new Pose3d(trenchX, trenchFixedY, 0, new Rotation3d(0, 0, Math.PI)));
 
     // Blue Trench Hinged (+Y global relative to Right Bump)
     addObstacle(
         "meshes/trench_hinged_base.obj",
-        new Pose3d(trenchX, trenchHingedBaseY, 0, new Rotation3d()));
+        new Pose3d(trenchX, trenchHingedBaseY, 0, new Rotation3d(0, 0, Math.PI)));
     addObstacle(
         "meshes/trench_hinged_arm.obj",
-        new Pose3d(trenchX, trenchHingedArmY, trenchHingedArmZ, new Rotation3d()));
+        new Pose3d(trenchX, trenchHingedArmY, trenchHingedArmZ, new Rotation3d(0, 0, Math.PI)));
 
     // Red Trench Fixed (-Y global relative to Left Bump)
     addObstacle(
@@ -123,7 +123,7 @@ public class RebuiltFieldObstacleMap3D extends SimulatedArena3D.FieldMap3D {
     // Red Trench Hinged (+Y global relative to Right Bump)
     addObstacle(
         "meshes/trench_hinged_base.obj",
-        new Pose3d(FIELD_WIDTH - trenchX, trenchHingedBaseY, 0, new Rotation3d()));
+        new Pose3d(FIELD_WIDTH - trenchX, trenchHingedBaseY, 0, new Rotation3d(0, 0, Math.PI)));
     addObstacle(
         "meshes/trench_hinged_arm.obj",
         new Pose3d(
