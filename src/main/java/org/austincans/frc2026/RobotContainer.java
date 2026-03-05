@@ -238,6 +238,7 @@ public class RobotContainer {
         }
 
         // Initialize robot simulation
+        // TODO: Reduce drive simulation drifting
         RobotSimulation3D robotSimulation =
             new RobotSimulation3D(
                 new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero),
