@@ -15,20 +15,10 @@
 
 package org.austincans.frc2026.subsystems.intake;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -36,53 +26,21 @@ import org.austincans.frc2026.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOSparkFlex implements IntakeIO {
-  private final SparkFlex deployMotor;
   private final SparkFlex intakeMotor;
-  private final SelfCheckingSparkFlex deployMotorSelfCheck;
   private final SelfCheckingSparkFlex intakeMotorSelfCheck;
-
-  private final SparkFlexConfig config;
-  private final RelativeEncoder deployEncoder;
-  private final SparkClosedLoopController deployController;
 
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
-    deployMotor =
-        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0), MotorType.kBrushless);
     intakeMotor =
         new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0), MotorType.kBrushless);
 
-    deployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor", deployMotor);
     intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
-
-    config = new SparkFlexConfig();
-    config.idleMode(IntakeConstants.deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
-    ClosedLoopConfig closedLoop =
-        new ClosedLoopConfig().pid(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
-    config.apply(closedLoop);
-
-    // Configure deployEncoder
-    deployEncoder = deployMotor.getEncoder();
-    deployEncoder.setPosition(0);
-
-    deployController = deployMotor.getClosedLoopController();
-
-    // Save configuration
-    deployMotor.configureAsync(
-        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.deployMotorVoltage = deployMotor.getBusVoltage();
-    inputs.deployPositionRad = Units.rotationsToRadians(deployEncoder.getPosition());
-    inputs.deployTemperatureC = deployMotor.getMotorTemperature();
     inputs.intakeMotorVoltage = intakeMotor.getBusVoltage();
     inputs.intakeTemperatureC = intakeMotor.getMotorTemperature();
-  }
-
-  public void setDeployAngle(Angle angle) {
-    deployController.setSetpoint(angle.toRotations(), ControlType.kPosition);
   }
 
   @Override
@@ -97,18 +55,12 @@ public class IntakeIOSparkFlex implements IntakeIO {
 
   @Override
   public List<SelfChecking> getHardware() {
-    return List.of(deployMotorSelfCheck, intakeMotorSelfCheck);
+    return List.of(intakeMotorSelfCheck);
   }
 
   @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = new ArrayList<>();
-
-    List<HardwareFault> deployFault = deployMotorSelfCheck.checkForFaults();
-    if (deployFault != null) {
-      faults.addAll(deployFault);
-    }
-
     List<HardwareFault> intakeFault = intakeMotorSelfCheck.checkForFaults();
     if (intakeFault != null) {
       faults.addAll(intakeFault);
@@ -119,15 +71,5 @@ public class IntakeIOSparkFlex implements IntakeIO {
     } else {
       return faults;
     }
-  }
-
-  @Override
-  public void deploy() {
-    setDeployAngle(IntakeConstants.deployAngle);
-  }
-
-  @Override
-  public void retract() {
-    setDeployAngle(IntakeConstants.retractAngle);
   }
 }

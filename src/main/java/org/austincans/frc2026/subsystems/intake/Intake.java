@@ -16,50 +16,50 @@
 package org.austincans.frc2026.subsystems.intake;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import java.util.Set;
-
 import org.austincans.frc2026.controllers.LaserCAN;
-import org.austincans.frc2026.math.Angle;
+import org.austincans.frc2026.subsystems.intake.deploy.DeployIO;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {
-  private final IntakeIO io;
+  private final IntakeIO intakeIO;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final DeployIO deployIO;
 
   private final LaserCAN laserCAN = new LaserCAN(IntakeConstants.laserCANID);
-  private final DigitalInput magLimitSwitch = new DigitalInput(IntakeConstants.magLimitSwitchChannel);
+  private final DigitalInput magLimitSwitch =
+      new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
   public static boolean deployed = false;
 
-  public Intake(IntakeIO io) {
-    this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+  public Intake(IntakeIO intakeIO, DeployIO deployIO) {
+    this.intakeIO = intakeIO;
+    this.deployIO = deployIO;
+    this.intakeIO.getHardware().forEach(e -> registerHardware(e));
+    this.deployIO.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
   }
 
   public boolean intakeDeployed() {
-    // TODO: GET LIMIT SWTICH
-    // return laserCAN.getMeasurement().distance_mm <
-    // IntakeConstants.maxDistFromIntake;
     return magLimitSwitch.get();
-    // return false;
   }
 
   public void setRelativeVelocity(double velocity) {
-    io.setRelativeVelocity(velocity);
+    intakeIO.setRelativeVelocity(velocity);
   }
 
   public void setVoltage(double voltage) {
-    io.setVoltage(voltage);
+    intakeIO.setVoltage(voltage);
   }
 
-  public void setDeployAngle(Angle angle) {
-    io.setDeployAngle(angle);
+  public Command deploy() {
+    return Commands.runOnce(() -> deployIO.deploy(), this);
+  }
+
+  public Command retract() {
+    return Commands.runOnce(() -> deployIO.retract(), this);
   }
 
   public double getVelocityRadPerSec() {
@@ -68,33 +68,18 @@ public class Intake extends AdvancedSubsystem {
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
+    intakeIO.updateInputs(inputs);
+    intakeIO.checkForFaults().forEach(this::addHardwareFault);
+
+    deployIO.updateInputs(inputs);
+    deployIO.checkForFaults().forEach(this::addHardwareFault);
+
+    inputs.isDeployed = intakeDeployed();
+
     Logger.processInputs("Intake", inputs);
-    io.checkForFaults().forEach(this::addHardwareFault);
-    deployed = intakeDeployed();
   }
 
   public Command systemCheckCommand() {
-    return Commands.runOnce(() -> {
-    });
-  }
-
-  public Command deployCommand() {
-    return Commands.defer(
-        () -> Commands.runEnd(
-            () -> {
-              io.deploy();
-            },
-            () -> {
-              intakeDeployed();
-            },
-            this),
-        Set.of(this));
-  }
-
-  public Command retractCommand() {
-    return Commands.runOnce(() -> {
-      io.retract();
-    }, this);
+    return Commands.runOnce(() -> {});
   }
 }

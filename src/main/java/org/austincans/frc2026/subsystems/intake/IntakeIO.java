@@ -16,7 +16,6 @@
 package org.austincans.frc2026.subsystems.intake;
 
 import java.util.List;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -25,6 +24,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
   @AutoLog
   public class IntakeIOInputs {
+    public boolean isDeployed = false;
     public double deployMotorVoltage = 0;
     public double deployPositionRad = 0;
     public double deployTemperatureC = 0;
@@ -39,12 +39,6 @@ public interface IntakeIO {
   public void setRelativeVelocity(double velocity);
 
   public void setVoltage(double voltage);
-
-  public void setDeployAngle(Angle angle);
-
-  // degrees
-  public void deploy();
-  public void retract();
 
   public default List<HardwareFault> checkForFaults() {
     return List.of();

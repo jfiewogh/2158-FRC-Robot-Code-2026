@@ -21,11 +21,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.sim.IntakeSim3D;
 import org.ironmaple.simulation.IntakeSimulation3D;
-
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 
 public class IntakeIOSim3D implements IntakeIO {
   private final IntakeSim3D intakeSim;
@@ -87,18 +84,6 @@ public class IntakeIOSim3D implements IntakeIO {
   // public void setDeployAngle(Angle angle) {
   //   IntakeConstants.intakePIDController.setGoal(angle.toRadians());
   // }
-
-  @Override
-  public void deploy(){}
-
-  @Override
-  public void setDeployAngle(Angle angle) {
-    IntakeConstants.intakePIDController.setGoal(angle.toRadians());
-  }
-
-  @Override
-  public void retract(){}
-
   @Override
   public void setVoltage(double volts) {}
 }

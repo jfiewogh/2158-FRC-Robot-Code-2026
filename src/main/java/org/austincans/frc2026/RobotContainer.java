@@ -41,6 +41,7 @@ import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
+import org.austincans.frc2026.subsystems.battery.BatterySubsystem;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -50,9 +51,8 @@ import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.hood.HoodIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
-import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
-import org.austincans.frc2026.subsystems.intake.IntakeIOTalonFXS;
+import org.austincans.frc2026.subsystems.intake.deploy.DeployIOTalonFXS;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -85,6 +85,7 @@ public class RobotContainer {
   private Vision vision;
 
   private ObjectDetection objectDetection;
+  private BatterySubsystem batterySubsystem;
   private Turret turret;
   private Hood hood;
   private Intake intake;
@@ -139,6 +140,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
+        batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
           drive =
               new Drive(
@@ -164,7 +166,7 @@ public class RobotContainer {
           hood = new Hood(new HoodIOSparkFlex());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOTalonFXS());
+          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOTalonFXS());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());
@@ -210,7 +212,7 @@ public class RobotContainer {
           hood = new Hood(new HoodIOSparkFlex());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex());
+          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOTalonFXS());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());
@@ -296,7 +298,8 @@ public class RobotContainer {
                     driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
                     () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
 
-        intake = new Intake(new IntakeIOSim3D(intakeSimulation));
+        // TODO: DEPLOY SIM
+        // intake = new Intake(new IntakeIOSim3D(intakeSimulation), null);
 
         flywheel =
             new Flywheel(
@@ -509,7 +512,8 @@ public class RobotContainer {
               ? () ->
                   drive.setPose(
                       driveSimulation
-                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+              // during simulation
               : () ->
                   drive.setPose(
                       new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro

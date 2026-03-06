@@ -21,7 +21,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.sim.IntakeSim;
 import org.ironmaple.simulation.IntakeSimulation;
 
@@ -67,8 +66,8 @@ public class IntakeIOSim implements IntakeIO {
     rollerSim.setInputVoltage(intakeAppliedVolts);
     rollerSim.update(Constants.loopPeriodSecs);
 
-    inputs.deployMotorVoltage = deploySim.getInputVoltage();
-    inputs.deployTemperatureC = 0;
+    // inputs.deployMotorVoltage = deploySim.getInputVoltage();
+    // inputs.deployTemperatureC = 0;
     inputs.intakeMotorVoltage = rollerSim.getInputVoltage();
     inputs.intakeVelocityRadPerSec = rollerSim.getAngularVelocity().in(RadiansPerSecond);
     inputs.intakeTemperatureC = 0;
@@ -86,20 +85,4 @@ public class IntakeIOSim implements IntakeIO {
   public void setVoltage(double voltage) {
     intakeAppliedVolts = voltage;
   }
-
-  @Override
-  public void setDeployAngle(Angle angle) {
-    System.out.println(angle.toRadians());
-    IntakeConstants.intakePIDController.setGoal(angle.toRadians());
-  }
-
-
-  @Override
-  public void deploy() {
-    // System.out.println(angle.toRadians());
-    // IntakeConstants.intakePIDController.setGoal(angle.toRadians());
-  }
-
-  @Override
-  public void retract(){}
 }
