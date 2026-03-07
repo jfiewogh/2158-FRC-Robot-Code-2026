@@ -7,7 +7,6 @@ public abstract class MotorIOReal implements MotorIO {
         this.deviceId = deviceId;
     }
 
-    /** Can be used for remote CANcoder */
     public int getDeviceId() {
         return deviceId;
     }

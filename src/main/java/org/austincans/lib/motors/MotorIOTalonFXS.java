@@ -1,13 +1,10 @@
 package org.austincans.lib.motors;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -17,38 +14,28 @@ public class MotorIOTalonFXS extends MotorIOReal {
     private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
     private PositionVoltage positionVoltage = new PositionVoltage(0);
 
-    protected MotorIOTalonFXS(int deviceId, String canbus, TalonFXConfiguration motorConfig, PIDFFConfig pidffConfig,
-            SoftLimitConfig softLimitConfig, NeutralModeValue nuetralMode, InvertedValue isInverted) {
+    protected MotorIOTalonFXS(int deviceId, CANBus canbus, TalonFXSConfiguration motorConfig) {
         super(deviceId);
-        motor = new TalonFXS(deviceId, new CANBus(canbus));
-        motorConfig.Slot0.kP = pidffConfig.kP();
-        motorConfig.Slot0.kI = pidffConfig.kI();
-        motorConfig.Slot0.kD = pidffConfig.kD();
-        motorConfig.Slot0.kS = pidffConfig.kS();
-        motorConfig.Slot0.kG = pidffConfig.kG();
-        motorConfig.Slot0.kV = pidffConfig.kV();
-        motorConfig.Slot0.kA = pidffConfig.kA();
-        motorConfig.SoftwareLimitSwitch.withForwardSoftLimitEnable(softLimitConfig.forwardSoftLimitEnabled());
-        motorConfig.SoftwareLimitSwitch.withForwardSoftLimitThreshold(softLimitConfig.forwardSoftLimit());
-        motorConfig.SoftwareLimitSwitch.withReverseSoftLimitEnable(softLimitConfig.reverseSoftLimitEnabled());
-        motorConfig.SoftwareLimitSwitch.withReverseSoftLimitThreshold(softLimitConfig.reverseSoftLimit());
-        motorConfig.MotorOutput.withNeutralMode(nuetralMode);
-        motorConfig.MotorOutput.withInverted(isInverted);
+        motor = new TalonFXS(deviceId, canbus);
+        motor.getConfigurator().apply(motorConfig);
     }
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = getPositionRad();    
+        inputs.positionRad = getPositionRad();
+        inputs.velocityRadPerSec = getVelocityRadPerSec(); 
         inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
+        inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
+        inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
         inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
-        inputs.velocityRadPerSec = getVelocityRadPerSec();
     }
 
-    public double getPositionRad(){
+    public double getPositionRad() {
         return motor.getPosition().getValue().in(Radians);
     }
 
-    public double getVelocityRadPerSec(){
+    public double getVelocityRadPerSec() {
         return motor.getVelocity().getValue().in(RadiansPerSecond);
     }
 
@@ -67,7 +54,7 @@ public class MotorIOTalonFXS extends MotorIOReal {
         motor.setControl(positionVoltage.withPosition(positionRad));
     }
 
-    public TalonFXS getMotor(){
+    public TalonFXS getMotor() {
         return motor;
     }
 }
