@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -37,10 +38,18 @@ public class MotorIOTalonFXS extends MotorIOReal {
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = motor.getPosition().getValue().in(Radians);    
+        inputs.positionRad = getPositionRad();    
         inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
         inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
-        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
+        inputs.velocityRadPerSec = getVelocityRadPerSec();
+    }
+
+    public double getPositionRad(){
+        return motor.getPosition().getValue().in(Radians);
+    }
+
+    public double getVelocityRadPerSec(){
+        return motor.getVelocity().getValue().in(RadiansPerSecond);
     }
 
     @Override
@@ -56,5 +65,9 @@ public class MotorIOTalonFXS extends MotorIOReal {
     @Override
     public void setPosition(double positionRad) {
         motor.setControl(positionVoltage.withPosition(positionRad));
+    }
+
+    public TalonFXS getMotor(){
+        return motor;
     }
 }

@@ -62,6 +62,10 @@ public abstract class MotorIOSpark<Motor extends SparkBase, MotorConfig extends 
         return motor;
     }
 
+    public RelativeEncoder getEncder(){
+        return motor.getEncoder();
+    }
+
     public void setEncoderPosition(double positionRad) {
         encoder.setPosition(positionRad);
     }

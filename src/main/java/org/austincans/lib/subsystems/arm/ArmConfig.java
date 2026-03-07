@@ -9,7 +9,7 @@ public record ArmConfig(
     int encoderId,
     String encoderCanbus, // only for Talon
     double gearRatio,
-    double armLength,
+    double armLengthMeters,
     double minAngleRad,
     double maxAngleRad,
     double startingAngleRad,

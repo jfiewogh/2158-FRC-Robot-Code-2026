@@ -1,6 +1,9 @@
 package org.austincans.lib.motors;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -30,7 +33,13 @@ public class MotorFactory {
                 motorConfig);
     }
 
-    public static MotorIOTalonFX createTalonFX(int deviceId, String canbus, PIDFFConfig pidffConfig, TalonFXConfiguration motorConfig) {
-        return new MotorIOTalonFX(deviceId, canbus, pidffConfig, motorConfig);
+    public static MotorIOTalonFX createTalonFX(int deviceId, String canbus, TalonFXConfiguration motorConfig, PIDFFConfig pidffConfig,
+            SoftLimitConfig softLimitConfig, NeutralModeValue nuetralMode, InvertedValue isInverted) {
+        return new MotorIOTalonFX(deviceId, canbus, motorConfig, pidffConfig,softLimitConfig,nuetralMode,isInverted);
+    }
+
+    public static MotorIOTalonFXS createTalonFXS(int deviceId, String canbus, TalonFXSConfiguration config, PIDFFConfig pidffConfig,
+            SoftLimitConfig softLimitConfig, NeutralModeValue nuetralMode, InvertedValue isInverted) {
+        return new MotorIOTalonFXS(deviceId, canbus, config, pidffConfig,softLimitConfig,nuetralMode,isInverted);
     }
 }

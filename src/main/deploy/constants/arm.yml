@@ -5,7 +5,7 @@ ints:
 doubles:
   values:
     gearRatio: 0
-    armLength: 0
+    armLengthMeters: 0
     minAngleRad: 0
     maxAngleRad: 0
     startingAngleRad: 0
