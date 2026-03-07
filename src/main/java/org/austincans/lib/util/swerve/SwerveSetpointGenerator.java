@@ -26,8 +26,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.austincans.lib.util.EqualsUtil;
 import org.austincans.lib.util.GeomUtil;
@@ -41,12 +39,15 @@ import org.austincans.lib.util.GeomUtil;
  * robot will converge to the desired setpoint quickly while avoiding any intermediate state that is
  * kinematically infeasible (and can result in wheel slip or robot heading drift as a result).
  */
-@Builder
-@RequiredArgsConstructor
 @ExtensionMethod({GeomUtil.class, EqualsUtil.GeomExtensions.class})
 public class SwerveSetpointGenerator {
   private final SwerveDriveKinematics kinematics;
   private final Translation2d[] moduleLocations;
+
+  public SwerveSetpointGenerator(SwerveDriveKinematics kinematics) {
+    this.kinematics = kinematics;
+    moduleLocations = kinematics.getModules();
+  }
 
   /**
    * Check if it would be faster to go to the opposite of the goal heading (and reverse drive

@@ -1,6 +1,7 @@
 package org.austincans.lib.subsystems.drive;
 
 import org.austincans.lib.motors.PIDFFConfig;
+import org.austincans.lib.util.swerve.ModuleLimits;
 
 public record ModuleConfig(
     double drivekP,
@@ -16,6 +17,7 @@ public record ModuleConfig(
     double steerkV,
     double steerkA,
     double maxDriveMotorVelocityRadPerSec,
+    double maxDriveMotorAccelerationRadPerSecSq,
     double maxSteerMotorVelocityRadPerSec
 ) {
     public PIDFFConfig drivePIDFFConfig() {
@@ -24,4 +26,10 @@ public record ModuleConfig(
     public PIDFFConfig steerPIDFFConfig() {
         return new PIDFFConfig(steerkP, steerkI, steerkD, steerkS, 0, steerkV, steerkA, 0);
     } 
+    public ModuleLimits moduleLimitsFree() {
+        return new ModuleLimits(
+            maxDriveMotorVelocityRadPerSec,
+            maxDriveMotorAccelerationRadPerSecSq,
+            maxSteerMotorVelocityRadPerSec);
+    }
 }

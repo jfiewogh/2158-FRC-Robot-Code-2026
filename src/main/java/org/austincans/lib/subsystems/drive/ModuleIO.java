@@ -3,10 +3,13 @@ package org.austincans.lib.subsystems.drive;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public interface ModuleIO {
+public abstract interface ModuleIO {
     @AutoLog
     public class ModuleIOInputs {
+        public MotorIOInputsAutoLogged driveMotorInputs;
+        public EncoderIOInputsAutoLogged driveEncoderInputs;
         public boolean driveConnected = false;
         public double drivePositionRad = 0.0;
         public double driveVelocityRadPerSec = 0.0;
@@ -15,6 +18,8 @@ public interface ModuleIO {
         public double driveStatorCurrentAmps = 0.0;
         public double driveTorqueCurrentAmps = 0.0;
 
+        public MotorIOInputsAutoLogged steerMotorInputs;
+        public EncoderIOInputsAutoLogged steerEncoderInputs;
         public boolean turnConnected = false;
         public boolean turnEncoderConnected = false;
         public Rotation2d turnAbsolutePosition = Rotation2d.kZero;
@@ -28,7 +33,9 @@ public interface ModuleIO {
 
     public void updateInputs(ModuleIOInputs inputs);
 
-    public void setDriveVelocity(double velocityRadPerSec);
+    public void runSetpoint(SwerveModuleState state);
 
-    public void setSteerPosition(Rotation2d rotation);
+    public SwerveModulePosition getPosition();
+
+    public SwerveModuleState getState();
 }

@@ -15,12 +15,18 @@
 
 package org.austincans.lib.subsystems.drive;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.austincans.lib.Constants;
 import org.austincans.lib.motors.MotorIO;
 import org.austincans.lib.subsystems.drive.ModuleIO;
+import org.austincans.lib.util.swerve.ModuleLimits;
+import org.austincans.lib.util.swerve.SwerveSetpoint;
+import org.austincans.lib.util.swerve.SwerveSetpointGenerator;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -28,35 +34,65 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 
-public abstract class DriveIOSwerve<Motor extends MotorIO, Gyro extends GyroIO> implements DriveIO {
+public abstract class DriveIOSwerve<Module extends ModuleIO, Gyro extends GyroIO> implements DriveIO {
+  private final Translation2d[] moduleTranslations;
   private final SwerveDriveKinematics kinematics;
+  private final SwerveSetpointGenerator swerveSetpointGenerator;
 
-  private final ModuleIO[] modules; // FL, FR, BL, FR
+  private final DriveState 
 
-  public DriveIOSwerve(DriveConfig driveConfig, ModuleIO frontLeft, ModuleIO frontRight, ModuleIO backLeft, ModuleIO backRight) {
-    Translation2d[] moduleTranslations = {
+  private final ArrayList<Module> modules; // FL, FR, BL, FR // cannot have array of generics
+  private final ModuleLimits moduleLimitsFree;
+
+  private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
+    new ChassisSpeeds(),
+    new SwerveModuleState[] {
+      new SwerveModuleState(), 
+      new SwerveModuleState(),
+      new SwerveModuleState(),
+      new SwerveModuleState()
+    }
+  );
+  private boolean velocityMode = false;
+
+  public DriveIOSwerve(DriveConfig driveConfig, Module frontLeft, Module frontRight, Module backLeft, Module backRight) {
+    moduleTranslations = new Translation2d[] {
       new Translation2d(driveConfig.wheelbaseMeters() / 2, driveConfig.trackWidthMeters() / 2),
       new Translation2d(driveConfig.wheelbaseMeters() / 2, -driveConfig.trackWidthMeters() / 2),
       new Translation2d(-driveConfig.wheelbaseMeters() / 2, driveConfig.trackWidthMeters() / 2),
       new Translation2d(-driveConfig.wheelbaseMeters() / 2, -driveConfig.trackWidthMeters() / 2)
     };
     kinematics = new SwerveDriveKinematics(moduleTranslations);
-    modules = new ModuleIO[] {frontLeft, frontRight, backLeft, backRight};
+    swerveSetpointGenerator = new SwerveSetpointGenerator(kinematics);
+
+    modules = new ArrayList<Module>(List.of(frontLeft, frontRight, backLeft, backRight));
+    moduleLimitsFree = driveConfig.moduleConfig().moduleLimitsFree();
   }
 
   private SwerveModulePosition[] getModulePositions() {
-    SwerveModulePosition[] states = new SwerveModulePosition[4];
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
-      states[i] = modules[i].getPosition();
+      positions[i] = modules.get(i).getPosition();
+    }
+    return positions;
+  }
+
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules.get(i).getState();
     }
     return states;
   }
   
   public void updateInputs(DriveIOInputs inputs) {
-    modules[0].updateInputs(inputs.frontLeftInputs);
-    modules[1].updateInputs(inputs.frontRightInputs);
-    modules[2].updateInputs(inputs.backLeftInputs);
-    modules[3].updateInputs(inputs.backRightInputs);
+    if (!velocityMode) {
+      currentSetpoint = new SwerveSetpoint(get(), getModuleStates()));
+    }
+    modules.get(0).updateInputs(inputs.frontLeftInputs);
+    modules.get(1).updateInputs(inputs.frontRightInputs);
+    modules.get(2).updateInputs(inputs.backLeftInputs);
+    modules.get(3).updateInputs(inputs.backRightInputs);
   }
 
   /**
@@ -65,27 +101,63 @@ public abstract class DriveIOSwerve<Motor extends MotorIO, Gyro extends GyroIO> 
    */
   @Override
   public void runVelocities(ChassisSpeeds velocities) {
+    velocityMode = true;
+
+    // Calculate module setpoints
     ChassisSpeeds discreteVelocities = ChassisSpeeds.discretize(velocities, Constants.loopPeriodSec);
     SwerveModuleState[] setpointStatesUnoptimized = kinematics.toSwerveModuleStates(discreteVelocities);
+    currentSetpoint = swerveSetpointGenerator.generateSetpoint(
+      moduleLimitsFree,
+      currentSetpoint,
+      discreteVelocities,
+      Constants.loopPeriodSec);
+    SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
+
+    // Log unoptimized setpoints and setpoint speeds
+    Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized);
+    Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisSpeeds());
+
+    // Send setpoints to modules
+    for (int i = 0; i < 4; i++) {
+      modules.get(i).runSetpoint(setpointStates[i]);
+    }
+  }
+
+  /** Runs the drive in a straight line with the specified drive output. */
+  public void runCharacterization(double output) {
+    velocityMode = false;
+    for (ModuleIO module : modules) {
+      module.runCharacterization(output);
+    }
+  }
+
+  /** Runs the drive in a straight line with the specified drive output. */
+  public void runAngularCharacterization(double output) {
+    velocityMode = false;
+    for (ModuleIO module : modules) {
+      module.runAngularCharacterization(output);
+    }
+  }
+
+  /** Stops the drive. */
+  public void stop() {
+    runVelocities(new ChassisSpeeds());
   }
 
   /**
-   * Runs the drive at the desired velocity with setpoint module forces.
-   * @param speeds Speeds in meters/sec
-   * @param moduleForces The forces applied to each module
+   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
+   * return to their normal orientations the next time a nonzero velocity is requested.
    */
-  @Override
-  public void runVelocities(ChassisSpeeds velocities, List<Vector<N2>> moduleForces) {
-  }
-
-  public void runCharacterization() {
-
-  }
-
-  public void runAngularCharacterization() {
+  public void stopWithX() {
+    Rotation2d[] headings = new Rotation2d[4];
+    for (int i = 0; i < 4; i++) {
+      headings[i] = moduleTranslations[i].getAngle();
+    }
+    kinematics.resetHeadings(headings);
+    stop();
   }
   
-
   @Override
   public void resetPose2d(Pose2d pose) {
 

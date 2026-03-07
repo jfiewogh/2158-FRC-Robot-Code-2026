@@ -1,6 +1,7 @@
 package org.austincans.lib.subsystems.drive;
 
 public record DriveConfig(
+        double robotMassKg,
         double maxDriveSpeedMetersPerSec,
         double maxRotationSpeedRadPerSec,
         double trackWidthMeters, // distance between left and right motors
@@ -18,9 +19,10 @@ public record DriveConfig(
         double steerkV,
         double steerkA,
         double maxDriveMotorVelocityRadPerSec,
+        double maxDriveMotorAccelerationRadPerSecSq,
         double maxSteerMotorVelocityRadPerSec) {
     public ModuleConfig moduleConfig() {
         return new ModuleConfig(drivekP, drivekI, drivekD, drivekS, drivekV, drivekT, steerkP, steerkI, steerkD,
-                steerkS, steerkV, steerkA, maxDriveMotorVelocityRadPerSec, maxSteerMotorVelocityRadPerSec);
+                steerkS, steerkV, steerkA, maxDriveMotorVelocityRadPerSec, maxDriveMotorAccelerationRadPerSecSq, maxSteerMotorVelocityRadPerSec);
     }
 }
