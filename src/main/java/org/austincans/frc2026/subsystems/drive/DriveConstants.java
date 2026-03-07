@@ -28,9 +28,6 @@ import org.austincans.lib.util.swerve.ModuleLimits;
 
 // TODO Review with CAD Team
 public class DriveConstants {
-    public static final 
-
-
   public static final double odometryFrequency = 250;
   public static final double trackWidthX =
       Constants.getRobot() == RobotType.DEVBOT

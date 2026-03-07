@@ -3,7 +3,7 @@ package org.austincans.frc2026.subsystems.drive;
 import java.util.function.Consumer;
 
 import org.austincans.lib.subsystems.drive.DriveBase;
-import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.drive.DriveIOSwerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
 

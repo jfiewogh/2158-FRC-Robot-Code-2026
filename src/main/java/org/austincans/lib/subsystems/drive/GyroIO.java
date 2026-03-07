@@ -13,25 +13,33 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.swerve;
+package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.subsystems.drive.DriveIO;
+import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.List;
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+public interface GyroIO {
+  @AutoLog
+  public static class GyroIOInputs {
+    public boolean connected = false;
 
-public class DriveIOSwerve implements DriveIO {
-  public DriveConfig driveConfig;
+    public Rotation2d yawPosition = Rotation2d.kZero;
+    public double yawVelocityRadPerSec = 0.0;
+    public Rotation2d pitchPosition = Rotation2d.kZero;
+    public double pitchVelocityRadPerSec = 0.0;
+    public Rotation2d rollPosition = Rotation2d.kZero;
+    public double rollVelocityRadPerSec = 0.0;
 
-  public DriveIOSwerve(DriveConfig driveConfig) {
-
+    public double[] odometryYawTimestamps = new double[] {};
+    public double imuRate;
+    public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
   }
-  
-  public void updateInputs(DriveIOInputs inputs) {
 
-  }
+  public default void updateInputs(GyroIOInputs inputs) {}
 
-  @Override
-  public void runVelocities(ChassisSpeeds velocities) {
-
+  public default List<HardwareFault> checkForFaults() {
+    return List.of();
   }
 }

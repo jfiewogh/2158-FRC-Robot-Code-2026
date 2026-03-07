@@ -29,7 +29,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.drive.DriveIOSwerve;
 
 /**
  * Provides an interface for asynchronously reading high-frequency measurements to a set of queues.

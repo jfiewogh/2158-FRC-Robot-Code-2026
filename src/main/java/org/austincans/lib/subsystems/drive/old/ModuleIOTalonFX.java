@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.drive.DriveIOSwerve;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.differential;
+package org.austincans.lib.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -23,10 +23,10 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import java.util.function.DoubleSupplier;
 import org.austincans.lib.motors.MotorIO;
-import org.austincans.lib.subsystems.drive.DriveConfig;
-import org.austincans.lib.subsystems.drive.DriveIO;
+
 import com.pathplanner.lib.config.RobotConfig;
 
+// TODO: Finish this class
 public class DriveIODifferential implements DriveIO {
   private final DifferentialDriveKinematics kinematics;
 
@@ -91,6 +91,7 @@ public class DriveIODifferential implements DriveIO {
     inputs.velocities = getRobotRelativeVelocities();
   }
 
+  @Override
   public void runVelocities(ChassisSpeeds velocities) {
     DifferentialDriveWheelSpeeds wheelVelocities = kinematics.toWheelSpeeds(velocities);
     double leftVelocity = Math.min(
@@ -105,11 +106,14 @@ public class DriveIODifferential implements DriveIO {
     rightFollower.setVelocity(rightVelocity);
   }
 
+  @Override
+  public void resetPose2d(Pose2d pose) {
+    odometry.resetPose(pose);
+  }
+
   private Pose3d getPose() {
     return new Pose3d(odometry.getPoseMeters());
   }
-
-  private void resetPose(Pose2d pose) {}
 
   private ChassisSpeeds getRobotRelativeVelocities() {
     // TODO: add implementation

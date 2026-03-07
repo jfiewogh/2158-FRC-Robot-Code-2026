@@ -13,33 +13,31 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.gyros;
+package org.austincans.lib.subsystems.drive;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.littletonrobotics.junction.AutoLog;
+import org.austincans.lib.util.PhoenixUtil;
+import org.ironmaple.simulation.drivesims.GyroSimulation;
 
-public interface GyroIO {
-  @AutoLog
-  public static class GyroIOInputs {
-    public boolean connected = false;
+public class GyroIOSim implements GyroIO {
+  private final GyroSimulation gyroSimulation;
 
-    public Rotation2d yawPosition = Rotation2d.kZero;
-    public double yawVelocityRadPerSec = 0.0;
-    public Rotation2d pitchPosition = Rotation2d.kZero;
-    public double pitchVelocityRadPerSec = 0.0;
-    public Rotation2d rollPosition = Rotation2d.kZero;
-    public double rollVelocityRadPerSec = 0.0;
-
-    public double[] odometryYawTimestamps = new double[] {};
-    public double imuRate;
-    public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
+  public GyroIOSim(GyroSimulation gyroSimulation) {
+    this.gyroSimulation = gyroSimulation;
   }
 
-  public default void updateInputs(GyroIOInputs inputs) {}
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.connected = true;
+    inputs.yawPosition = gyroSimulation.getGyroReading();
+    inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
+    inputs.pitchPosition = Rotation2d.kZero;
+    inputs.pitchVelocityRadPerSec = 0.0;
+    inputs.rollPosition = Rotation2d.kZero;
+    inputs.rollVelocityRadPerSec = 0.0;
 
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
+    inputs.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
+    inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
   }
 }
