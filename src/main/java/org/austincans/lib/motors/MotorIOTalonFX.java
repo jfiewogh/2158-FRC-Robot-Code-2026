@@ -1,16 +1,26 @@
 package org.austincans.lib.motors;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.AngularVelocity;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 
 // TODO: Complete this class
 /** You can extend or update this class to add config */
 public class MotorIOTalonFX extends MotorIOReal {
-    @SuppressWarnings("unused")
     private final TalonFX motor;
 
-    protected MotorIOTalonFX(int deviceId, String canbus, PIDFFConfig pidffConfig, TalonFXConfiguration motorConfig) {
+    private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
+    private final PositionVoltage positionVoltage = new PositionVoltage(0);
+
+    protected MotorIOTalonFX(int deviceId, String canbus, TalonFXConfiguration motorConfig, PIDFFConfig pidffConfig,
+            SoftLimitConfig softLimitConfig, NeutralModeValue nuetralMode, InvertedValue isInverted) {
         super(deviceId);
         motor = new TalonFX(deviceId, new CANBus(canbus));
         motorConfig.Slot0.kP = pidffConfig.kP();
@@ -20,29 +30,34 @@ public class MotorIOTalonFX extends MotorIOReal {
         motorConfig.Slot0.kG = pidffConfig.kG();
         motorConfig.Slot0.kV = pidffConfig.kV();
         motorConfig.Slot0.kA = pidffConfig.kA();
+        motorConfig.SoftwareLimitSwitch.withForwardSoftLimitEnable(softLimitConfig.forwardSoftLimitEnabled());
+        motorConfig.SoftwareLimitSwitch.withForwardSoftLimitThreshold(softLimitConfig.forwardSoftLimit());
+        motorConfig.SoftwareLimitSwitch.withReverseSoftLimitEnable(softLimitConfig.reverseSoftLimitEnabled());
+        motorConfig.SoftwareLimitSwitch.withReverseSoftLimitThreshold(softLimitConfig.reverseSoftLimit());
+        motorConfig.MotorOutput.withNeutralMode(nuetralMode);
+        motorConfig.MotorOutput.withInverted(isInverted);
     }
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
+        inputs.positionRad = motor.getPosition().getValue().in(Radians);    
+        inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
     }
 
     @Override
     public void setVoltage(double voltage) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVoltage'");
+        motor.setVoltage(voltage);
     }
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
+        motor.setControl(velocityVoltage.withVelocity(AngularVelocity.ofBaseUnits(velocityRadPerSec, RadiansPerSecond))); 
     }
 
     @Override
     public void setPosition(double positionRad) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPosition'");
+        motor.setControl(positionVoltage.withPosition(positionRad));
     }
 }
