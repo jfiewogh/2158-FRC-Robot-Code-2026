@@ -13,15 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.old;
+package org.austincans.lib.subsystems.drive.gyros;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
-
-import org.austincans.frc2026.subsystems.drive.DriveConstants;
+import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
 
 public class GyroIORedux implements GyroIO {
   private final Canandgyro gyro = new Canandgyro(30);
@@ -29,11 +28,11 @@ public class GyroIORedux implements GyroIO {
   private final Queue<Double> yawTimestampQueue;
   private final Queue<Double> yawPositionQueue;
 
-  public GyroIORedux() {
+  public GyroIORedux(double odometryFrequencyHz) {
     // Configure the gyro
     CanandgyroSettings settings =
         new CanandgyroSettings()
-            .setYawFramePeriod(1.0 / DriveConstants.odometryFrequency)
+            .setYawFramePeriod(1.0 / odometryFrequencyHz)
             .setAngularPositionFramePeriod(0.01)
             .setAngularVelocityFramePeriod(0.01);
     gyro.setSettings(settings, 0.25, 5);

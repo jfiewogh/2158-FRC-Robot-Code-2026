@@ -7,5 +7,6 @@ public record PIDFFConfig(
     double kS,
     double kG,
     double kV,
-    double kA
+    double kA,
+    double kT
 ) {}

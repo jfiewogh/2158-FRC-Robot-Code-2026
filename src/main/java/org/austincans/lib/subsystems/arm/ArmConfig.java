@@ -31,7 +31,7 @@ public record ArmConfig(
     double reverseSoftLimit) 
 {
     public PIDFFConfig pidffConfig() {
-        return new PIDFFConfig(kP, kI, kD, kS, kG, kV, kA);
+        return new PIDFFConfig(kP, kI, kD, kS, kG, kV, kA, 0);
     }
     public SoftLimitConfig softLimitConfig() {
         return new SoftLimitConfig(forwardSoftLimitEnabled, forwardSoftLimit, reverseSoftLimitEnabled, reverseSoftLimit);

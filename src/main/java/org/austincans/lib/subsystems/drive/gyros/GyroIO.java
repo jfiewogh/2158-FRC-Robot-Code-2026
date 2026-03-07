@@ -13,11 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.old;
+package org.austincans.lib.subsystems.drive.gyros;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.littletonrobotics.junction.AutoLog;
 

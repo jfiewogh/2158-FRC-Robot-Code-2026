@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.old;
+package org.austincans.lib.subsystems.drive.gyros;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -26,11 +26,13 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Frequency;
+
 import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.lib.util.PhoenixUtil;
-import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
 
@@ -51,10 +53,10 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityXWorld();
   private final StatusSignal<AngularVelocity> rollVelocity = pigeon.getAngularVelocityYWorld();
 
-  public GyroIOPigeon2() {
+  public GyroIOPigeon2(Frequency odometryFrequency) {
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(DriveIOSwerve.ODOMETRY_FREQUENCY);
+    yaw.setUpdateFrequency(odometryFrequency);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();

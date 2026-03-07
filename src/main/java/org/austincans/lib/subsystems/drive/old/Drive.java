@@ -72,8 +72,8 @@ import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.lib.subsystems.drive.DriveConfig;
+import org.austincans.lib.subsystems.drive.gyros.GyroIO;
 import org.austincans.lib.subsystems.drive.old.DriveIO;
-import org.austincans.lib.subsystems.drive.old.GyroIO;
 import org.austincans.lib.subsystems.drive.old.Module;
 import org.austincans.lib.subsystems.drive.old.ModuleIO;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
@@ -88,7 +88,7 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
+public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
   public static double driveTestMultiplier = 1; // For when in testing mode
 
@@ -170,17 +170,12 @@ public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsume
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
   // TODO: pass in Controller into Drivebase, from SubsystemFactory
-  public DriveBaseOld(
-      DriveConfig config, // you can have SwerveDriveConfig for swerve and DifferentialDriveConfig for differential drive
-
-      DriveIO driveIO,
-      // IOs should be passed into DriveIO
+  public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-
       PathFollowingController pathFollowingController,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.driveIO = driveIO;

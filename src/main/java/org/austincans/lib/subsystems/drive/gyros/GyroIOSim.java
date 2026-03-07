@@ -13,10 +13,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.old;
+package org.austincans.lib.subsystems.drive.gyros;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.austincans.lib.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.GyroSimulation;

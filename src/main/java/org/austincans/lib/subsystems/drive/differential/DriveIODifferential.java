@@ -16,23 +16,19 @@
 package org.austincans.lib.subsystems.drive.differential;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.lib.motors.MotorIO;
-
-import com.pathplanner.lib.auto.AutoBuilder;
+import org.austincans.lib.subsystems.drive.DriveConfig;
+import org.austincans.lib.subsystems.drive.DriveIO;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPLTVController;
 
-public class DriveIODifferential {
-  private static final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(
-      DriveConstants.trackWidthY);
+public class DriveIODifferential implements DriveIO {
+  private final DifferentialDriveKinematics kinematics;
 
   private final MotorIO leftLeader;
   private final MotorIO leftFollower;
@@ -41,8 +37,10 @@ public class DriveIODifferential {
 
   private final DifferentialDriveOdometry odometry;
 
-  public DriveIODifferential(DifferentialDriveConfig driveConfig, MotorIO leftLeader, MotorIO leftFollower,
+  public DriveIODifferential(DriveConfig driveConfig, MotorIO leftLeader, MotorIO leftFollower,
       MotorIO rightLeader, MotorIO rightFollower) {
+    kinematics = new DifferentialDriveKinematics(driveConfig.trackWidthMeters());
+
     this.leftLeader = leftLeader;
     this.leftFollower = leftFollower;
     this.rightLeader = rightLeader;
@@ -87,13 +85,19 @@ public class DriveIODifferential {
     */
   }
 
-  public void runChassisSpeeds(ChassisSpeeds speeds) {
-    DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+  @Override
+  public void updateInputs(DriveIOInputs inputs) {
+    inputs.pose = getPose();
+    inputs.velocities = getRobotRelativeVelocities();
+  }
+
+  public void runVelocities(ChassisSpeeds velocities) {
+    DifferentialDriveWheelSpeeds wheelVelocities = kinematics.toWheelSpeeds(velocities);
     double leftVelocity = Math.min(
-        wheelSpeeds.leftMetersPerSecond / DriveConstants.maxLinearSpeed,
+        wheelVelocities.leftMetersPerSecond / DriveConstants.maxLinearSpeed,
         DriveConstants.maxLinearSpeed);
     double rightVelocity = Math.min(
-        wheelSpeeds.rightMetersPerSecond / DriveConstants.maxLinearSpeed,
+        wheelVelocities.rightMetersPerSecond / DriveConstants.maxLinearSpeed,
         DriveConstants.maxLinearSpeed);
     leftLeader.setVelocity(leftVelocity);
     leftFollower.setVelocity(leftVelocity);
@@ -101,17 +105,14 @@ public class DriveIODifferential {
     rightFollower.setVelocity(rightVelocity);
   }
 
-  public void arcadeDrive(DoubleSupplier xInput, DoubleSupplier omegaInput) {
-    runChassisSpeeds(new ChassisSpeeds(xInput.getAsDouble(), 0, omegaInput.getAsDouble()));
+  private Pose3d getPose() {
+    return new Pose3d(odometry.getPoseMeters());
   }
 
-  public Pose2d getPose() {
-    return Pose2d.kZero;
-  }
+  private void resetPose(Pose2d pose) {}
 
-  public void resetPose(Pose2d pose) {}
-
-  public ChassisSpeeds getRobotRelativeSpeeds() {
+  private ChassisSpeeds getRobotRelativeVelocities() {
+    // TODO: add implementation
     return new ChassisSpeeds();
   }
 }
