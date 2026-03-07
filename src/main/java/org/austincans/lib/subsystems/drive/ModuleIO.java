@@ -8,27 +8,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 public abstract interface ModuleIO {
     @AutoLog
     public class ModuleIOInputs {
-        public MotorIOInputsAutoLogged driveMotorInputs;
-        public EncoderIOInputsAutoLogged driveEncoderInputs;
         public boolean driveConnected = false;
-        public double drivePositionRad = 0.0;
-        public double driveVelocityRadPerSec = 0.0;
-        public double driveAppliedVolts = 0.0;
-        public double driveSupplyCurrentAmps = 0.0;
-        public double driveStatorCurrentAmps = 0.0;
-        public double driveTorqueCurrentAmps = 0.0;
+        public MotorIOInputsAutoLogged driveMotorInputs;
 
-        public MotorIOInputsAutoLogged steerMotorInputs;
-        public EncoderIOInputsAutoLogged steerEncoderInputs;
         public boolean turnConnected = false;
         public boolean turnEncoderConnected = false;
-        public Rotation2d turnAbsolutePosition = Rotation2d.kZero;
-        public Rotation2d turnPosition = Rotation2d.kZero;
-        public double turnVelocityRadPerSec = 0.0;
-        public double turnAppliedVolts = 0.0;
-        public double turnSupplyCurrentAmps = 0.0;
-        public double turnStatorCurrentAmps = 0.0;
-        public double turnTorqueCurrentAmps = 0.0; 
+        public MotorIOInputsAutoLogged steerMotorInputs;
+        public EncoderIOInputsAutoLogged steerEncoderInputs;
+        public Rotation2d steerAbsolutePosition = Rotation2d.kZero;
+        public Rotation2d steerRelativePosition = Rotation2d.kZero;
     }
 
     public void updateInputs(ModuleIOInputs inputs);

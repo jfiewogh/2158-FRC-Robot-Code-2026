@@ -12,7 +12,8 @@ public class DriveFactory {
             "Drive",
             new DriveIOSwerveReal<MotorIOTalonFX, GyroIOPigeon2>(
                 driveConfig,
-                MotorFactory.createTalonFX(0, null, null, null)
+                ModuleFactory.createTalonFXCANcoder();
+                ModuleFactory.createTalonFXCANcoder();
             ));
     }
 

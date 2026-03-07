@@ -20,12 +20,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public abstract class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
+public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
     protected final String name;
     protected final DriveIO io;
     protected final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
-    public DriveBase(String name, DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
+    protected DriveBase(String name, DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
         this.name = name;
         this.io = io;
 
@@ -56,6 +56,7 @@ public abstract class DriveBase extends AdvancedSubsystem implements Vision.Visi
     public Pose3d getPose3d() {
         return inputs.pose;
     }
+    
     public Pose2d getPose2d() {
         return getPose3d().toPose2d();
     }

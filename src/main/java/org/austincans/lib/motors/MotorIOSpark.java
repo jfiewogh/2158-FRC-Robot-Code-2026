@@ -7,31 +7,18 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-public abstract class MotorIOSpark<Motor extends SparkBase, MotorConfig extends SparkBaseConfig> extends MotorIOReal {
+public abstract class MotorIOSpark<Motor extends SparkBase, Config extends SparkBaseConfig> extends MotorIOReal {
     protected final Motor motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    protected MotorIOSpark(Motor motor, PIDFFConfig pidffConfig, SoftLimitConfig softLimitConfig, IdleMode idleMode, MotorConfig motorConfig) {
+    protected MotorIOSpark(Motor motor, Config config) {
         super(motor.getDeviceId());
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
-
-        motorConfig.closedLoop.pid(pidffConfig.kP(), pidffConfig.kI(), pidffConfig.kD());
-        motorConfig.closedLoop.feedForward.kS(pidffConfig.kS());
-        motorConfig.closedLoop.feedForward.kG(pidffConfig.kG());
-        motorConfig.closedLoop.feedForward.kV(pidffConfig.kV());
-        motorConfig.closedLoop.feedForward.kA(pidffConfig.kA());
-        motorConfig.softLimit.forwardSoftLimitEnabled(softLimitConfig.forwardSoftLimitEnabled());
-        motorConfig.softLimit.forwardSoftLimit(softLimitConfig.forwardSoftLimit());
-        motorConfig.softLimit.reverseSoftLimitEnabled(softLimitConfig.reverseSoftLimitEnabled());
-        motorConfig.softLimit.reverseSoftLimit(softLimitConfig.reverseSoftLimit());
-        motorConfig.idleMode(idleMode);
-
-        motor.configureAsync(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     @Override
@@ -39,7 +26,7 @@ public abstract class MotorIOSpark<Motor extends SparkBase, MotorConfig extends 
         inputs.positionRad = encoder.getPosition();
         inputs.velocityRadPerSec = encoder.getVelocity();
         inputs.appliedVolts = motor.getBusVoltage();
-        inputs.currentAmps = motor.getOutputCurrent();
+        inputs.statorCurrentAmps = motor.getOutputCurrent();
         inputs.temperatureCelsius = motor.getMotorTemperature();
     }
 

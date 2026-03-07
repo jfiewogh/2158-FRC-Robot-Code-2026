@@ -6,6 +6,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import org.littletonrobotics.junction.AutoLog;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -40,10 +43,13 @@ public class MotorIOTalonFX extends MotorIOReal {
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = getPositionRad();    
+        inputs.positionRad = getPositionRad();
+        inputs.velocityRadPerSec = getVelocityRadPerSec(); 
         inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
+        inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
+        inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
         inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
-        inputs.velocityRadPerSec = getVelocityRadPerSec();
     }
 
     public double getPositionRad(){

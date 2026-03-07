@@ -14,17 +14,23 @@ public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extend
         this.driveMotor = driveMotor;
         this.steerMotor = steerMotor;
         this.steerEncoder = steerEncoder;
-        
     }
 
+    /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
+        driveMotor.updateInputs(inputs.driveMotorInputs);
+        steerMotor.updateInputs(inputs.steerMotorInputs);
+        steerEncoder.updateInputs(inputs.steerEncoderInputs);
+        inputs.
 
     }
 
     @Override
     public void runSetpoint(SwerveModuleState state) {
-
+        state.optimize(getAngle());
+        driveMotor.setVelocity();
+        steerMotor.setPosition(getPositionMeters());
     }
 
     @Override

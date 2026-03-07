@@ -9,7 +9,9 @@ public interface MotorIO {
         public double positionRad;
         public double velocityRadPerSec;
         public double appliedVolts;
-        public double currentAmps;
+        public double supplyCurrentAmps;
+        public double statorCurrentAmps;
+        public double torqueCurrentAmps;
         public double temperatureCelsius;
     }    
 
