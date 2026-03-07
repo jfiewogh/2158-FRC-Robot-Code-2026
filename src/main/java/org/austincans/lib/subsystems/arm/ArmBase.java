@@ -20,10 +20,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import org.austincans.lib.subsystems.arm.ArmIOInputsAutoLogged;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.Logger;
 
-/** TODO: maybe rename to PivotBase */
 public class ArmBase extends AdvancedSubsystem {
   private final String name;
   private final ArmIO io;
@@ -36,7 +35,7 @@ public class ArmBase extends AdvancedSubsystem {
   private double maxAcceleration = 0;
   private double gearRatio = 0;
 
-  public ArmBase(String name, ArmIO io) {
+  protected ArmBase(String name, ArmIO io) {
     this.name = name;
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
@@ -103,6 +102,8 @@ public class ArmBase extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    Logger.processInputs(name, inputs);
+    
     io.checkForFaults().forEach(this::addHardwareFault);
   }
 

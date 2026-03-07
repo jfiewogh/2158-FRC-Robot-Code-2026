@@ -18,7 +18,7 @@ package org.austincans.lib.subsystems.drive;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import org.austincans.frc2026.util.PhoenixUtil;
+import org.austincans.lib.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 public class GyroIOSim implements GyroIO {

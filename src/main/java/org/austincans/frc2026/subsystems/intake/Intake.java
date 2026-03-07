@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
 
 import org.austincans.frc2026.controllers.LaserCAN;
-import org.austincans.frc2026.math.Angle;
+import org.austincans.lib.math.Angle;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 

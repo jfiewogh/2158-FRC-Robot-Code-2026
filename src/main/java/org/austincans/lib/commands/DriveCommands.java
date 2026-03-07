@@ -59,11 +59,6 @@ public class DriveCommands {
   @SuppressWarnings("unused")
   private static final OmegaMode omegaMode = OmegaMode.POSITION;
 
-  // if position, use joystickDriveAtAngle
-  // if speed, use joystickDrive
-
-  private static final double hasInputThreshold = 0.1;
-
   private DriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {

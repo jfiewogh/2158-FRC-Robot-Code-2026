@@ -19,39 +19,42 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.lib.Constants;
+import org.austincans.lib.motors.MotorIOSim;
 
 public class ArmIOSim implements ArmIO {
+  private final MotorIOSim motorIO;
+  private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
+
   private final DCMotor neoVortex = DCMotor.getNeoVortex(1);
 
   private final SingleJointedArmSim armSim;
   private double armAppliedVolts;
 
-  public ArmIOSim(ArmConfig config) {
+  public ArmIOSim(ArmConfig armConfig) {
     armSim = new SingleJointedArmSim(
           neoVortex,
-          config.gearRatio(),
+          armConfig.gearRatio(),
           0.001,
-          config.armLength(),
-          config.minAngleRad(),
-          config.maxAngleRad(),
+          armConfig.armLength(),
+          armConfig.minAngleRad(),
+          armConfig.maxAngleRad(),
           true,
-          config.startingAngleRad());
+          armConfig.startingAngleRad());
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     armSim.setInputVoltage(armAppliedVolts);
     armSim.update(Constants.loopPeriodSec);
-
-    inputs.position = armSim.getAngleRads();
-    inputs.velocity = armSim.getVelocityRadPerSec();
-    inputs.currentAmps = armSim.getCurrentDrawAmps();
-    inputs.currentVoltage = armAppliedVolts;
+    inputs.motorInputs.currentAmps = armSim.getCurrentDrawAmps();
+    inputs.positionRad = armSim.getAngleRads();
+    inputs.velocityRadPerSec = armSim.getVelocityRadPerSec();
   }
 
   @Override
   public void setVoltage(double volts) {
     armAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    motorIO.setVoltage(armAppliedVolts);
   }
 
   @Override

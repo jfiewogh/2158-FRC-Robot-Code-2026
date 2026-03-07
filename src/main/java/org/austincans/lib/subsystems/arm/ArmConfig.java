@@ -1,10 +1,13 @@
 package org.austincans.lib.subsystems.arm;
 
+import org.austincans.lib.motors.PIDFFConfig;
+import org.austincans.lib.motors.SoftLimitConfig;
+
 public record ArmConfig(
     int motorId,
     String motorCanbus, // only for Talon
     int encoderId,
-    String encoderCanbus,  // only for Talon
+    String encoderCanbus, // only for Talon
     double gearRatio,
     double armLength,
     double minAngleRad,
@@ -19,10 +22,18 @@ public record ArmConfig(
     double kG,
     double kV,
     double kA,
-    double statorCurrentLimit, // only for Talon
+    double statorCurrentLimit,
     boolean brakeModeEnabled,
+    boolean motorIsBrushless, // only for Spark
     boolean forwardSoftLimitEnabled,
     double forwardSoftLimit,
     boolean reverseSoftLimitEnabled,
-    double reverseSoftLimit
-) {}
+    double reverseSoftLimit) 
+{
+    public PIDFFConfig pidffConfig() {
+        return new PIDFFConfig(kP, kI, kD, kS, kG, kV, kA);
+    }
+    public SoftLimitConfig softLimitConfig() {
+        return new SoftLimitConfig(forwardSoftLimitEnabled, forwardSoftLimit, reverseSoftLimitEnabled, reverseSoftLimit);
+    }
+}

@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.controllers.REVDigitController;
+import org.austincans.lib.controllers.REVDigitController;
 
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {

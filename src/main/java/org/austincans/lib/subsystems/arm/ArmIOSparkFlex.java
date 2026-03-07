@@ -27,75 +27,54 @@ import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.List;
-import org.austincans.frc2026.subsystems.arm.ArmConstants;
 import org.austincans.lib.util.KalmanFilter1D;
+import org.austincans.lib.motors.MotorFactory;
+import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class ArmIOSparkFlex implements ArmIO {
-  /* Motor */
-  private final SparkFlex motor;
+  private final MotorIOSparkFlex motorIO;
+  private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
+
+  // TODO: Update selfchecking motor to take in a motor IO
   private SelfCheckingSparkFlex selfCheckingMotor;
-  private final RelativeEncoder encoder;
+
   @SuppressWarnings("unused")
   private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
-  private SparkFlexConfig config;
-  private final SparkClosedLoopController controller;
 
-  public ArmIOSparkFlex() {
+  public ArmIOSparkFlex(ArmConfig armConfig) {
+    SparkFlexConfig config = new SparkFlexConfig();
+    config.smartCurrentLimit((int) armConfig.statorCurrentLimit());
+
     // Initialize motor controller
-    motor = new SparkFlex(ArmConstants.canID, MotorType.kBrushless);
-    selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motor);
-
-    config = new SparkFlexConfig();
-    config.idleMode(ArmConstants.brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
-
-    ClosedLoopConfig closedLoop =
-        new ClosedLoopConfig().pid(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
-    config.apply(closedLoop);
-
-    SoftLimitConfig softLimit =
-        new SoftLimitConfig()
-            .forwardSoftLimit(ArmConstants.armForwardSoftLimit)
-            .forwardSoftLimitEnabled(ArmConstants.armForwardSoftLimitEnabled)
-            .reverseSoftLimit(ArmConstants.armReversedSoftLimit)
-            .reverseSoftLimitEnabled(ArmConstants.armReversedSoftLimitEnabled);
-    config.apply(softLimit);
+    motorIO = MotorFactory.createSparkFlex(armConfig.motorId(), armConfig.motorIsBrushless(), armConfig.pidffConfig(),
+        armConfig.softLimitConfig(), armConfig.brakeModeEnabled(), config);
+    selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motorIO.getMotor());
 
     // Configure encoder
-    encoder = motor.getEncoder();
-    encoder.setPosition(0);
-
-    // Set current limits
-    config.smartCurrentLimit(ArmConstants.statorCurrentLimit);
-
-    // Closed Loop Controller
-    controller = motor.getClosedLoopController();
-
-    // Save configuration
-    motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorIO.setEncoderPosition(0);
   }
 
   @Override
   public void setVoltage(double voltage) {
-    controller.setSetpoint(voltage, ControlType.kVoltage);
+    motorIO.setVoltage(voltage);
   }
 
-  public void setPosition(double position) {
-    controller.setSetpoint(position, ControlType.kPosition);
+  public void setPosition(double positionRad) {
+    motorIO.setPosition(positionRad);
   }
 
-  public void setVelocity(double velocity) {
-    controller.setSetpoint(velocity, ControlType.kVelocity);
+  public void setVelocity(double velocityRadPerSec) {
+    motorIO.setVelocity(velocityRadPerSec);
   }
 
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.currentVoltage = motor.getBusVoltage();
-    inputs.position = encoder.getPosition();
-    inputs.temperature = motor.getMotorTemperature();
-    inputs.velocity = encoder.getVelocity();
-    inputs.currentAmps = motor.getOutputCurrent();
+    inputs.motorInputs = motorInputs;
+    // TODO: convert motor position and velocity to mechanism position and velocity
+    inputs.positionRad = motorInputs.positionRad;
+    inputs.velocityRadPerSec = motorInputs.velocityRadPerSec;
   }
 
   public void stopMotor() {

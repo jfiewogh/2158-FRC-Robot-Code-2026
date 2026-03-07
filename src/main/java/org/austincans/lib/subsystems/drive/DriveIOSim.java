@@ -21,7 +21,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.util.swerve.SwerveSetpoint;
+import org.austincans.lib.util.swerve.SwerveSetpoint;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 

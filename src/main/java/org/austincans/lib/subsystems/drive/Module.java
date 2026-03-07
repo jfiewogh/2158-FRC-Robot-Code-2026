@@ -14,7 +14,6 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.drive;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -32,9 +31,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.util.ConfigUtil;
-import org.austincans.frc2026.util.LoggedTracer;
-import org.austincans.frc2026.util.LoggedTunableNumber;
+import org.austincans.lib.util.ConfigUtil;
+import org.austincans.lib.util.LoggedTracer;
+import org.austincans.lib.util.LoggedTunableNumber;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 

@@ -34,7 +34,7 @@ import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
-import org.austincans.frc2026.util.ShooterMath;
+import org.austincans.lib.util.ShooterMath;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretCommands {

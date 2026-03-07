@@ -29,7 +29,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.util.PhoenixUtil;
+import org.austincans.lib.util.PhoenixUtil;
 import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;

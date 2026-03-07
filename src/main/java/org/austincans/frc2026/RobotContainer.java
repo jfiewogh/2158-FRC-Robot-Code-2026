@@ -58,9 +58,10 @@ import org.austincans.frc2026.subsystems.turret.TurretIOSim;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
+import org.austincans.lib.RobotContainerBase;
 import org.austincans.lib.commands.DriveCommands;
+import org.austincans.lib.input.KeyboardHID;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.util.KeyboardHID;
 import org.ironmaple.simulation.IntakeSimulation3D;
 import org.ironmaple.simulation.MeshSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
@@ -76,7 +77,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer extends RobotContainerBase {
   // Subsystems
   private Drive drive;
 
@@ -119,8 +120,6 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   private IntakeSimulation3D intakeSimulation;
-
-  private DoubleSupplier leftY, leftX, rightY, rightX;
 
   // Commands
   private Command runIntakeCommand;

@@ -1,0 +1,129 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+
+package org.austincans.lib.input;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+/** Keyboard Human Interface Device */
+public class KeyboardHID {
+  private final Joystick joystick0;
+  private final Joystick joystick1;
+  private final Joystick joystick2;
+
+  public KeyboardHID() {
+    joystick0 = new Joystick(0);
+    joystick1 = new Joystick(1);
+    joystick2 = new Joystick(2);
+  }
+
+  /* Joystick 0 */
+
+  /** Axis from A and D keys. A is positive. D is negative. */
+  public double leftX() {
+    return -joystick0.getRawAxis(0);
+  }
+
+  /** Axis from W and S keys. W is positive. S is negative. */
+  public double leftY() {
+    return -joystick0.getRawAxis(1);
+  }
+
+  public JoystickButton z() {
+    return new JoystickButton(joystick0, 1);
+  }
+
+  public JoystickButton x() {
+    return new JoystickButton(joystick0, 2);
+  }
+
+  public JoystickButton c() {
+    return new JoystickButton(joystick0, 3);
+  }
+
+  public JoystickButton v() {
+    return new JoystickButton(joystick0, 4);
+  }
+
+  /** Axis from R and E keys. R is positive. E is negative. */
+  public double getLeftAxis2() {
+    return joystick0.getRawAxis(2);
+  }
+
+  /* Joystick 1 */
+
+  /** Axis from J and L keys. J is positive. L is negative. */
+  public double middleX() {
+    return -joystick1.getRawAxis(0);
+  }
+
+  /** Axis from I and K keys. I is positive. K is negative. */
+  public double middleY() {
+    return -joystick1.getRawAxis(1);
+  }
+
+  public JoystickButton m() {
+    return new JoystickButton(joystick1, 1);
+  }
+
+  public JoystickButton comma() {
+    return new JoystickButton(joystick1, 2);
+  }
+
+  public JoystickButton period() {
+    return new JoystickButton(joystick1, 3);
+  }
+
+  public JoystickButton slash() {
+    return new JoystickButton(joystick1, 4);
+  }
+
+  /* Joystick 2 */
+
+  /** Axis from left and right arrows. Left is positive. Right is negative. */
+  public double rightX() {
+    return -joystick2.getRawAxis(0);
+  }
+
+  /** Axis from up and down arrows. Up is positive. Down is negative. */
+  public double rightY() {
+    return -joystick2.getRawAxis(1);
+  }
+
+  public JoystickButton insert() {
+    return new JoystickButton(joystick2, 1);
+  }
+
+  public JoystickButton home() {
+    return new JoystickButton(joystick2, 2);
+  }
+
+  public JoystickButton pageUp() {
+    return new JoystickButton(joystick2, 3);
+  }
+
+  public JoystickButton delete() {
+    return new JoystickButton(joystick2, 4);
+  }
+
+  public JoystickButton end() {
+    return new JoystickButton(joystick2, 5);
+  }
+
+  public JoystickButton pageDown() {
+    return new JoystickButton(joystick2, 6);
+  }
+}

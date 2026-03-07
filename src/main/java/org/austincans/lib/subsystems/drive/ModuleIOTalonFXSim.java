@@ -15,12 +15,10 @@
 
 package org.austincans.lib.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import org.austincans.frc2026.util.PhoenixUtil;
+import org.austincans.lib.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
 /**

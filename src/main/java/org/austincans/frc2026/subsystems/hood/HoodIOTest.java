@@ -16,8 +16,9 @@
 package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import org.austincans.frc2026.math.Angle;
+
 import org.austincans.frc2026.simulation.RobotSimulation3D;
+import org.austincans.lib.math.Angle;
 import org.ironmaple.simulation.MeshSimulation3D;
 
 public class HoodIOTest implements HoodIO {

@@ -25,8 +25,8 @@ import edu.wpi.first.math.numbers.N2;
 import java.util.List;
 
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.util.swerve.SwerveSetpoint;
-import org.austincans.frc2026.util.swerve.SwerveSetpointGenerator;
+import org.austincans.lib.util.swerve.SwerveSetpoint;
+import org.austincans.lib.util.swerve.SwerveSetpointGenerator;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface DriveIO {

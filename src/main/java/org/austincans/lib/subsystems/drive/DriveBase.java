@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive.swerve;
+package org.austincans.lib.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
@@ -27,6 +27,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -89,7 +90,7 @@ import org.littletonrobotics.junction.Logger;
 public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
   public static double driveTestMultiplier = 1; // For when in testing mode
-  
+
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -167,22 +168,19 @@ public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsume
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
-  public static boolean joystickHasInput = true;
-
-  public static boolean isDriving = false;
-
-  public boolean isDriving() {
-    return joystickHasInput;
-  }
-
+  // TODO: pass in Controller into Drivebase, from SubsystemFactory
   public DriveBase(
-      SwerveDriveConfig config,
+      DriveConfig config, // you can have SwerveDriveConfig for swerve and DifferentialDriveConfig for differential drive
+
       DriveIO driveIO,
+      // IOs should be passed into DriveIO
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
+
+      PathFollowingController pathFollowingController,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.driveIO = driveIO;
     this.gyroIO = gyroIO;
@@ -210,8 +208,9 @@ public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsume
         this::setPose,
         this::getChassisSpeeds,
         (speeds, feedforwards) -> runVelocity(speeds),
-        new PPHolonomicDriveController(
-            new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
+        pathFollowingController,
+        // new PPHolonomicDriveController(
+        //     new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -355,7 +354,6 @@ public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsume
         !gyroConnectedDebouncer.calculate(gyroInputs.connected)
             && Constants.getMode() != Mode.SIM
             && !Robot.isJITing());
-    isDriving = isDriving();
   }
 
   /** Set brake mode to {@code enabled} doesn't change brake mode if already set. */

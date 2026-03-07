@@ -15,12 +15,13 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
+import org.austincans.lib.math.Angle;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import org.austincans.frc2026.math.Angle;
 
 public class HoodIOSim implements HoodIO {
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);

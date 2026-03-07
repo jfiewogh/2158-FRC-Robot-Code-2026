@@ -17,7 +17,8 @@ package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-import org.austincans.frc2026.math.Angle;
+
+import org.austincans.lib.math.Angle;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;

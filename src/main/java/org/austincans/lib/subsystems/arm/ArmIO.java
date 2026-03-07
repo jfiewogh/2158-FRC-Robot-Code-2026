@@ -16,19 +16,16 @@
 package org.austincans.lib.subsystems.arm;
 
 import java.util.List;
-
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   @AutoLog
-  class ArmIOInputs {
-    public double velocity = 0;
-    public double position = 0;
-    public double currentAmps = 0;
-    public double currentVoltage = 0;
-    public double temperature = 0;
+  public class ArmIOInputs {
+    public ModuleIOInputsAutoLogged motorInputs = new ModuleIOInputsAutoLogged();
+    public double positionRad = 0;
+    public double velocityRadPerSec = 0;
   }
 
   public void updateInputs(ArmIOInputs inputs);

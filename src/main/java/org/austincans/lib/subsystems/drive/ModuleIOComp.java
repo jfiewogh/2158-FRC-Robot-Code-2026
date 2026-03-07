@@ -15,8 +15,7 @@
 
 package org.austincans.lib.subsystems.drive;
 
-import static org.austincans.frc2026.util.PhoenixUtil.tryUntilOk;
-
+import static org.austincans.lib.util.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
