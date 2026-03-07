@@ -13,30 +13,33 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.old;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.lib.util.swerve.SwerveSetpoint;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation3D;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveIOReal implements DriveIO {
+public class DriveIOSim3D implements DriveIO {
+  private final AbstractDriveTrainSimulation3D simulation;
+
   private Module[] modules;
 
-  private SwerveSetpoint currentSetpoint =
-      new SwerveSetpoint(
-          new ChassisSpeeds(),
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          });
+  private SwerveSetpoint currentSetpoint;
+
+  public DriveIOSim3D(AbstractDriveTrainSimulation3D simulation) {
+    this.simulation = simulation;
+  }
+
+  @Override
+  public void updateInputs(DriveIOInputs inputs) {
+    inputs.pose = simulation.getSimulatedDriveTrainPose3dGroundRelative();
+    inputs.chassisSpeeds = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+  }
 
   @Override
   public void runVelocity(ChassisSpeeds speeds) {
@@ -46,7 +49,9 @@ public class DriveIOReal implements DriveIO {
     currentSetpoint =
         swerveSetpointGenerator.generateSetpoint(
             DriveConstants.moduleLimitsFree,
-            currentSetpoint,
+            currentSetpoint != null
+                ? currentSetpoint
+                : new SwerveSetpoint(new ChassisSpeeds(), getModuleStates()),
             discreteSpeeds,
             Constants.loopPeriodSecs);
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
@@ -63,24 +68,13 @@ public class DriveIOReal implements DriveIO {
   }
 
   @Override
-  public void updateInputs(DriveIOInputs inputs) {
-    inputs.pose = new Pose3d(RobotState.getInstance().getEstimatedPose());
-    inputs.chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
-  }
-
-  @Override
   public void setModules(Module[] modules) {
     this.modules = modules;
   }
 
   @Override
-  public void updateSetpoint(SwerveSetpoint setpoint) {
-    this.currentSetpoint = setpoint;
-  }
-
-  @Override
   public void resetPose(Pose2d pose) {
-    RobotState.getInstance().resetPose(pose);
+    simulation.setSimulationWorldPose(pose);
   }
 
   private SwerveModuleState[] getModuleStates() {

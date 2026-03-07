@@ -204,7 +204,7 @@ public class DriveCommands {
   public static TurnMode turnMode = TurnMode.ONE_AXIS;
 
   public static Command driveCommand(
-      DriveBase drive,
+      DriveBaseOld drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,

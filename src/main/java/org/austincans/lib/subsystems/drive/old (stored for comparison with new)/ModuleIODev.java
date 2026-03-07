@@ -13,43 +13,48 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.old;
 
-import static org.austincans.lib.util.PhoenixUtil.tryUntilOk;
+import static org.austincans.frc2026.util.PhoenixUtil.tryUntilOk;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.subsystems.drive.DriveConstants.ModuleConfig;
+import org.austincans.frc2026.util.ConfigUtil;
 import org.austincans.frc2026.util.PhoenixUtil;
 
-public class ModuleIOComp implements ModuleIO {
+public class ModuleIODev implements ModuleIO {
+  private static final double driveCurrentLimitAmps = 80;
+  private static final double turnCurrentLimitAmps = 40;
+  public static final double driveReduction = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
+  private static final double turnReduction = (150.0 / 7.0);
+
   // Hardware objects
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
-  private final CANcoder encoder;
+  private final AnalogInput encoder;
 
   // Config
   private final TalonFXConfiguration driveConfig = new TalonFXConfiguration();
@@ -74,7 +79,7 @@ public class ModuleIOComp implements ModuleIO {
   private final StatusSignal<Current> driveTorqueCurrentAmps;
 
   // Inputs from turn motor
-  private final StatusSignal<Angle> turnAbsolutePosition;
+  private final Supplier<Rotation2d> turnAbsolutePosition;
   private final StatusSignal<Angle> turnPosition;
   private final Queue<Double> turnPositionQueue;
   private final StatusSignal<AngularVelocity> turnVelocity;
@@ -83,19 +88,23 @@ public class ModuleIOComp implements ModuleIO {
   private final StatusSignal<Current> turnStatorCurrentAmps;
   private final StatusSignal<Current> turnTorqueCurrentAmps;
 
-  public ModuleIOComp(ModuleConfig config) {
+  public ModuleIODev(DriveConstants.ModuleConfig config) {
     driveTalon = new TalonFX(config.driveMotorId(), DriveConstants.moduleCANBus);
     turnTalon = new TalonFX(config.turnMotorId(), DriveConstants.moduleCANBus);
-    encoder = new CANcoder(config.encoderChannel(), DriveConstants.moduleCANBus);
+    encoder = new AnalogInput(config.encoderChannel());
     encoderOffset = config.encoderOffset();
 
     // Configure drive motor
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    driveConfig.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
-    driveConfig.Feedback.SensorToMechanismRatio = DriveConstants.driveReduction;
-    driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = DriveConstants.driveCurrentLimitAmps;
-    driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -DriveConstants.driveCurrentLimitAmps;
-    driveConfig.CurrentLimits.StatorCurrentLimit = DriveConstants.driveCurrentLimitAmps;
+    driveConfig.Slot0 =
+        new Slot0Configs()
+            .withKP(ConfigUtil.getConfigDouble("DRIVE_P", 0.0))
+            .withKI(0)
+            .withKD(ConfigUtil.getConfigDouble("DRIVE_D", 0.0));
+    driveConfig.Feedback.SensorToMechanismRatio = driveReduction;
+    driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps;
+    driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps;
+    driveConfig.CurrentLimits.StatorCurrentLimit = driveCurrentLimitAmps;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
@@ -103,14 +112,16 @@ public class ModuleIOComp implements ModuleIO {
 
     // Configure turn motor
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    turnConfig.Slot0 = new Slot0Configs().withKP(0).withKI(0).withKD(0);
-    turnConfig.Feedback.FeedbackRemoteSensorID = config.encoderChannel();
-    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    turnConfig.Feedback.RotorToSensorRatio = DriveConstants.turnReduction;
+    turnConfig.Slot0 =
+        new Slot0Configs()
+            .withKP(ConfigUtil.getConfigDouble("TURN_P", 0.0))
+            .withKI(0)
+            .withKD(ConfigUtil.getConfigDouble("TURN_D", 0.0));
+    turnConfig.Feedback.SensorToMechanismRatio = turnReduction;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-    turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = DriveConstants.turnCurrentLimitAmps;
-    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -DriveConstants.turnCurrentLimitAmps;
-    turnConfig.CurrentLimits.StatorCurrentLimit = DriveConstants.turnCurrentLimitAmps;
+    turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps;
+    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -turnCurrentLimitAmps;
+    turnConfig.CurrentLimits.StatorCurrentLimit = turnCurrentLimitAmps;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.MotorOutput.Inverted =
         config.turnInverted()
@@ -118,19 +129,18 @@ public class ModuleIOComp implements ModuleIO {
             : InvertedValue.CounterClockwise_Positive;
     tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
 
-    // Configure CANCoder
-    var cancoderConfig = new CANcoderConfiguration();
-    cancoderConfig.MagnetSensor.MagnetOffset = config.encoderOffset().getRotations();
-    cancoderConfig.MagnetSensor.SensorDirection =
-        config.encoderInverted()
-            ? SensorDirectionValue.Clockwise_Positive
-            : SensorDirectionValue.CounterClockwise_Positive;
-    tryUntilOk(5, () -> encoder.getConfigurator().apply(cancoderConfig));
+    // Configure absolute encoder and set position on turn talon
+    turnAbsolutePosition =
+        () ->
+            Rotation2d.fromRadians(
+                    encoder.getVoltage() / RobotController.getVoltage5V() * 2.0 * Math.PI)
+                .plus(encoderOffset);
+    tryUntilOk(5, () -> turnTalon.setPosition(turnAbsolutePosition.get().getRotations(), 0.25));
 
     // Create drive status signals
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
-        PhoenixOdometryThread.getInstance().registerSignal(driveTalon.getPosition().clone());
+        PhoenixOdometryThread.getInstance().registerSignal(driveTalon.getPosition());
     driveVelocity = driveTalon.getVelocity();
     driveAppliedVolts = driveTalon.getMotorVoltage();
     driveSupplyCurrentAmps = driveTalon.getSupplyCurrent();
@@ -138,19 +148,17 @@ public class ModuleIOComp implements ModuleIO {
     driveTorqueCurrentAmps = driveTalon.getTorqueCurrent();
 
     // Create turn status signals
-    turnAbsolutePosition = encoder.getAbsolutePosition();
     turnPosition = turnTalon.getPosition();
-    turnPositionQueue =
-        PhoenixOdometryThread.getInstance().registerSignal(turnTalon.getPosition().clone());
+    turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnTalon.getPosition());
     turnVelocity = turnTalon.getVelocity();
     turnAppliedVolts = turnTalon.getMotorVoltage();
     turnSupplyCurrentAmps = turnTalon.getSupplyCurrent();
-    turnStatorCurrentAmps = turnTalon.getStatorCurrent();
+    turnStatorCurrentAmps = turnTalon.getSupplyCurrent();
     turnTorqueCurrentAmps = turnTalon.getTorqueCurrent();
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
-        DriveConstants.odometryFrequency, drivePosition, turnPosition, turnAbsolutePosition);
+        DriveConstants.odometryFrequency, drivePosition, turnPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         driveVelocity,
@@ -163,7 +171,7 @@ public class ModuleIOComp implements ModuleIO {
         turnSupplyCurrentAmps,
         turnStatorCurrentAmps,
         turnTorqueCurrentAmps);
-    tryUntilOk(5, () -> ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon, encoder));
+    ParentDevice.optimizeBusUtilizationForAll(driveTalon, turnTalon);
 
     // Register signals for refresh
     PhoenixUtil.registerSignals(
@@ -175,7 +183,6 @@ public class ModuleIOComp implements ModuleIO {
         driveStatorCurrentAmps,
         driveTorqueCurrentAmps,
         turnPosition,
-        turnAbsolutePosition,
         turnVelocity,
         turnAppliedVolts,
         turnSupplyCurrentAmps,
@@ -210,9 +217,8 @@ public class ModuleIOComp implements ModuleIO {
             turnSupplyCurrentAmps,
             turnStatorCurrentAmps,
             turnTorqueCurrentAmps);
-    inputs.turnEncoderConnected = BaseStatusSignal.isAllGood(turnAbsolutePosition);
-    inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble()).minus(encoderOffset);
+    inputs.turnEncoderConnected = true;
+    inputs.turnAbsolutePosition = turnAbsolutePosition.get().minus(encoderOffset);
     inputs.turnPosition = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
     inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.getValueAsDouble());
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();

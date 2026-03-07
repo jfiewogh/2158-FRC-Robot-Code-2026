@@ -169,7 +169,7 @@ public class AutonCommands {
             () ->
                 intake.getVelocityRadPerSec() != 0
                         && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
-                    || DriveBase.joystickHasInput)
+                    || DriveBaseOld.joystickHasInput)
         .finallyDo(
             () -> {
               System.out.println("end drive intake command");
@@ -272,7 +272,7 @@ public class AutonCommands {
               }
               targetRotation = minRotation;
             })
-        .until(() -> DriveBase.joystickHasInput)
+        .until(() -> DriveBaseOld.joystickHasInput)
         .finallyDo(
             () -> {
               drive.stop();
