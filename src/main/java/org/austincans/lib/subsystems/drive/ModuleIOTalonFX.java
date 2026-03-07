@@ -45,9 +45,11 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXPro;
+import org.austincans.frc2026.subsystems.drive.DriveConstants;
+import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
   protected final SwerveModuleConstants<
@@ -178,7 +180,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
 
     // Configure periodic frames
     BaseStatusSignal.setUpdateFrequencyForAll(
-        Drive.ODOMETRY_FREQUENCY, turnAbsolutePosition, drivePosition);
+        DriveIOSwerve.ODOMETRY_FREQUENCY, turnAbsolutePosition, drivePosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         driveVelocity,

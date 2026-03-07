@@ -24,7 +24,7 @@ import edu.wpi.first.math.util.Units;
 import java.util.function.Supplier;
 import lombok.Builder;
 import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.util.LoggedTunableNumber;
+import org.austincans.lib.util.LoggedTunableNumber;
 
 public class VisionConstants {
   // AprilTag layout

@@ -29,9 +29,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXS;
+
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 public class TurretIOTalonFX extends TurretIOReal {
   private static final boolean feedforwardEnabled = true;

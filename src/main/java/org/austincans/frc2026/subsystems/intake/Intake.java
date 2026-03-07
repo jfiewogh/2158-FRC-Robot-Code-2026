@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.austincans.frc2026.controllers.LaserCAN;
 import org.austincans.frc2026.math.Angle;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {

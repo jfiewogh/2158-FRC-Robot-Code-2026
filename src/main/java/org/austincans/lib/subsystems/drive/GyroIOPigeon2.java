@@ -29,9 +29,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingPigeon2;
 import org.austincans.frc2026.util.PhoenixUtil;
+import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerve;
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
@@ -53,7 +54,7 @@ public class GyroIOPigeon2 implements GyroIO {
   public GyroIOPigeon2() {
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
+    yaw.setUpdateFrequency(DriveIOSwerve.ODOMETRY_FREQUENCY);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();

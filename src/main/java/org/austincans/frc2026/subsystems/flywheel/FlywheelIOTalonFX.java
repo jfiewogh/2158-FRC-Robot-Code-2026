@@ -21,9 +21,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXPro;
+
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
 
 public class FlywheelIOTalonFX extends FlywheelIOReal {
   private final TalonFX motor = new TalonFX(FlywheelConstants.motorId, FlywheelConstants.canBus);

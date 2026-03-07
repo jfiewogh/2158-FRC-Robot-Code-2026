@@ -43,6 +43,7 @@ import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.intake.Intake;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
+import org.austincans.lib.commands.DriveCommands;
 
 public class AutonCommands {
   private static PIDController drivePIDX = new PIDController(3, 0.0, 0);
@@ -168,7 +169,7 @@ public class AutonCommands {
             () ->
                 intake.getVelocityRadPerSec() != 0
                         && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
-                    || Drive.joystickHasInput)
+                    || DriveBase.joystickHasInput)
         .finallyDo(
             () -> {
               System.out.println("end drive intake command");
@@ -271,7 +272,7 @@ public class AutonCommands {
               }
               targetRotation = minRotation;
             })
-        .until(() -> Drive.joystickHasInput)
+        .until(() -> DriveBase.joystickHasInput)
         .finallyDo(
             () -> {
               drive.stop();

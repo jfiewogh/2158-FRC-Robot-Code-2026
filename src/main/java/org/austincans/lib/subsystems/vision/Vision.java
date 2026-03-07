@@ -15,8 +15,6 @@
 
 package org.austincans.lib.subsystems.vision;
 
-import static org.austincans.frc2026.subsystems.vision.VisionConstants.*;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;

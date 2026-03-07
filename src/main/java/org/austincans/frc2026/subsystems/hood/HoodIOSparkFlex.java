@@ -26,9 +26,9 @@ import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.math.Angle;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class HoodIOSparkFlex implements HoodIO {
   private SparkFlex motor = new SparkFlex(HoodConstants.flexMotorID, MotorType.kBrushless);

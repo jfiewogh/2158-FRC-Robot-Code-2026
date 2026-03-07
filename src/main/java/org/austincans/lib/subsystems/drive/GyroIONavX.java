@@ -22,7 +22,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 import java.util.Queue;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
+
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {

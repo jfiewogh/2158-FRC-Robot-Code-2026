@@ -17,7 +17,8 @@ package org.austincans.frc2026.subsystems.sim;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import org.austincans.frc2026.subsystems.elevator.ElevatorConstants;
+
+import org.austincans.lib.subsystems.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 // Visualizes the elevator stages based on the given position in meters

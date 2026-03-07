@@ -21,6 +21,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
 
+import org.austincans.frc2026.subsystems.drive.DriveConstants;
+
 public class GyroIORedux implements GyroIO {
   private final Canandgyro gyro = new Canandgyro(30);
 

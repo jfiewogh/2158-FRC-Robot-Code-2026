@@ -31,11 +31,11 @@ import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.math.Angle;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXS;
 import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 /** Add your docs here. */
 public class IntakeIOTalonFXS implements IntakeIO {

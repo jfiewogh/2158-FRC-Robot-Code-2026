@@ -17,7 +17,8 @@ package org.austincans.lib.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
+
+import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
