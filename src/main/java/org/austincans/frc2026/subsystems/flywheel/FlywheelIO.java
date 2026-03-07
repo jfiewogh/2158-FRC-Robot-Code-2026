@@ -17,6 +17,7 @@ package org.austincans.frc2026.subsystems.flywheel;
 
 import java.util.List;
 
+import org.austincans.lib.sensors.SensorIO.SensorIOInputs;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -24,6 +25,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelIO {
   @AutoLog
   public class FlywheelIOInputs {
+    public SensorIOInputsAutoLogged inputs1 = new SensorIOInputsAutoLogged();
+    public SensorIOInputsAutoLogged inputs2 = new SensorIOInputsAutoLogged();
     public double appliedVolts = 0;
     public double velocityRPM = 0;
     public double temperatureC = 0;
