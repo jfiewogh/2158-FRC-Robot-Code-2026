@@ -10,7 +10,7 @@ public record ModuleConfig(
     double maxDriveMotorVelocityRadPerSec,
     double maxDriveMotorAccelerationRadPerSecSq,
     double maxSteerMotorVelocityRadPerSec,
-    double wheelRadius) {
+    double wheelRadiusMeters) {
     public ModuleLimits moduleLimitsFree() {
         return new ModuleLimits(
             maxDriveMotorVelocityRadPerSec,

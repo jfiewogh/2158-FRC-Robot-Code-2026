@@ -27,8 +27,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
-    MotorIOInputs motorInputs;
-    double hoodAngleRad; //only for servo
+    public MotorIOInputs motorInputs;
+    public double hoodAngleRad; //only for servo
   }
 
   public void updateInputs(HoodIOInputs inputs);

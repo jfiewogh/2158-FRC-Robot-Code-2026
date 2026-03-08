@@ -33,6 +33,7 @@ public class CANcoderIO implements AbsoluteEncoderIO {
         inputs.velocityRadPerSec = velocity.getValue().in(RadiansPerSecond);
     }
 
+    @Override
     public double getAbsolutePositionRotations() {
         return absolutePosition.getValue().in(Rotations);
     }

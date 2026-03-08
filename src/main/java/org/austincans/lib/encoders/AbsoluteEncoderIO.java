@@ -3,7 +3,6 @@ package org.austincans.lib.encoders;
 import org.littletonrobotics.junction.AutoLog;
 
 public abstract interface AbsoluteEncoderIO {
-    @AutoLog
     public class AbsoluteEncoderIOInputs {
         public boolean connected = false;
         public double absolutePositionRad;
@@ -12,4 +11,6 @@ public abstract interface AbsoluteEncoderIO {
     }
 
     public void updateInputs(AbsoluteEncoderIOInputs inputs);
+
+    public double getAbsolutePositionRotations();
 }
