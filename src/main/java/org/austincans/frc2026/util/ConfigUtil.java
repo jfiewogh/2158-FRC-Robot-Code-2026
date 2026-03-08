@@ -15,8 +15,6 @@
 
 package org.austincans.frc2026.util;
 
-import edu.wpi.first.wpilibj.Filesystem;
-import java.nio.file.FileSystems;
 import org.austincans.frc2026.config.Configuration;
 import org.austincans.frc2026.config.ConfigurationLoader;
 
@@ -73,11 +71,7 @@ public class ConfigUtil {
    */
   public Configuration getConfiguration() {
     Configuration config =
-        ConfigurationLoader.fromFile(
-                Filesystem.getDeployDirectory().getPath()
-                    + FileSystems.getDefault().getSeparator()
-                    + CONFIG_FILE)
-            .load();
+        ConfigurationLoader.fromFile("/home/lvuser/deploy/" + CONFIG_FILE).load();
     return config;
   }
 

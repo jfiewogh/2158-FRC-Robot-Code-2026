@@ -15,12 +15,12 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.units.Units;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
@@ -28,36 +28,46 @@ import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class FlywheelIOSparkFlex extends FlywheelIOReal {
-  private final SparkFlex motor = new SparkFlex(FlywheelConstants.motorId, MotorType.kBrushless);
-  private final SelfCheckingSparkFlex selfCheckMotor = new SelfCheckingSparkFlex("flywheel", motor);
+  private final SparkFlex motor1 = new SparkFlex(FlywheelConstants.motor1Id, MotorType.kBrushless);
+  private final SelfCheckingSparkFlex selfCheckMotor1 =
+      new SelfCheckingSparkFlex("flywheel motor 1", motor1);
+  private final SparkFlex motor2 = new SparkFlex(FlywheelConstants.motor2Id, MotorType.kBrushless);
+  private final SelfCheckingSparkFlex selfCheckMotor2 =
+      new SelfCheckingSparkFlex("flywheel motor 2", motor2);
+  // private final CANcoder encoder =
+  //     new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
+  private final SparkClosedLoopController controller = motor1.getClosedLoopController();
+  private final SparkFlexConfig config = new SparkFlexConfig();
 
-  private final CANcoder encoder =
-      new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
-  private final SparkClosedLoopController controller = motor.getClosedLoopController();
-
-  public FlywheelIOSparkFlex() {}
+  public FlywheelIOSparkFlex() {
+    config.follow(motor1, true);
+    // config.inverted(true);
+    motor2.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.appliedVolts = motor.getBusVoltage();
-    inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
-    inputs.temperatureC = motor.getMotorTemperature();
+    inputs.appliedVolts = motor1.getBusVoltage();
+    inputs.velocityRPM = motor1.getEncoder().getVelocity();
+    // inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
+    inputs.temperatureC = motor1.getMotorTemperature();
   }
 
   @Override
   public void runVoltage(double volts) {
-    controller.setSetpoint(volts, ControlType.kVoltage);
+    motor1.setVoltage(volts);
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
-    controller.setSetpoint(velocityRPM, ControlType.kVelocity);
+  public void runRelativeVelocity(double velocityRPM) {
+    motor1.set(velocityRPM);
   }
 
   @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> motorFaults = selfCheckMotor.checkForFaults();
+    List<HardwareFault> motorFaults = selfCheckMotor1.checkForFaults();
+    motorFaults.addAll(selfCheckMotor2.checkForFaults());
     if (motorFaults != null) {
       faults.addAll(motorFaults);
     }
@@ -70,6 +80,6 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
 
   @Override
   public List<SelfChecking> getHardware() {
-    return List.of(selfCheckMotor);
+    return List.of(selfCheckMotor1, selfCheckMotor2);
   }
 }

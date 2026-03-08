@@ -26,7 +26,7 @@ import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXPro;
 
 public class FlywheelIOTalonFX extends FlywheelIOReal {
-  private final TalonFX motor = new TalonFX(FlywheelConstants.motorId, FlywheelConstants.canBus);
+  private final TalonFX motor = new TalonFX(FlywheelConstants.motor1Id, FlywheelConstants.canBus);
   private final SelfCheckingTalonFXPro selfCheckMotor =
       new SelfCheckingTalonFXPro("flywheel", motor);
 
@@ -48,7 +48,7 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
+  public void runRelativeVelocity(double velocityRPM) {
     motor.setControl(new VelocityVoltage(velocityRPM).withVelocity(velocityRPM / 60.0));
   }
 

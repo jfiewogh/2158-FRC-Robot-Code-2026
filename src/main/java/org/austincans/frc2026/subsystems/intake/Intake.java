@@ -18,9 +18,11 @@ package org.austincans.frc2026.subsystems.intake;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Set;
 import org.austincans.frc2026.controllers.LaserCAN;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIO;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {
@@ -32,14 +34,38 @@ public class Intake extends AdvancedSubsystem {
   private final DigitalInput magLimitSwitch =
       new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
-  public static boolean deployed = false;
+  @AutoLogOutput public static boolean deployed = false;
 
   public Intake(IntakeIO intakeIO, DeployIO deployIO) {
     this.intakeIO = intakeIO;
     this.deployIO = deployIO;
-    this.intakeIO.getHardware().forEach(e -> registerHardware(e));
-    this.deployIO.getHardware().forEach(e -> registerHardware(e));
-    registerCheckCommand(systemCheckCommand());
+    try {
+      this.intakeIO
+          .getHardware()
+          .forEach(
+              e -> {
+                if (e == null) {
+                  return;
+                }
+                this.registerHardware(e);
+              });
+    } catch (NullPointerException e) {
+      System.out.println("Null Hardware intake");
+    }
+    try {
+      this.deployIO
+          .getHardware()
+          .forEach(
+              e -> {
+                if (e == null) {
+                  return;
+                }
+                this.registerHardware(e);
+              });
+    } catch (NullPointerException e) {
+      System.out.println("Null Hardware deploy");
+    }
+    this.registerCheckCommand(systemCheckCommand());
   }
 
   public boolean intakeDeployed() {
@@ -69,11 +95,33 @@ public class Intake extends AdvancedSubsystem {
   @Override
   public void periodic() {
     intakeIO.updateInputs(inputs);
-    intakeIO.checkForFaults().forEach(this::addHardwareFault);
-
-    deployIO.updateInputs(inputs);
-    deployIO.checkForFaults().forEach(this::addHardwareFault);
-
+    try {
+      intakeIO
+          .checkForFaults()
+          .forEach(
+              e -> {
+                if (e == null) {
+                  return;
+                }
+                this.addHardwareFault(e);
+              });
+    } catch (NullPointerException e) {
+      System.out.println("Null Faults intake");
+    }
+    try {
+      deployIO.updateInputs(inputs);
+      deployIO
+          .checkForFaults()
+          .forEach(
+              e -> {
+                if (e == null) {
+                  return;
+                }
+                this.addHardwareFault(e);
+              });
+    } catch (NullPointerException e) {
+      System.out.println("Null pointer deploy");
+    }
     inputs.isDeployed = intakeDeployed();
 
     Logger.processInputs("Intake", inputs);
@@ -81,5 +129,27 @@ public class Intake extends AdvancedSubsystem {
 
   public Command systemCheckCommand() {
     return Commands.runOnce(() -> {});
+  }
+
+  public Command deployCommand() {
+    return Commands.defer(
+        () ->
+            Commands.runEnd(
+                () -> {
+                  deployIO.deploy();
+                },
+                () -> {
+                  intakeDeployed();
+                },
+                this),
+        Set.of(this));
+  }
+
+  public Command retractCommand() {
+    return Commands.runOnce(
+        () -> {
+          deployIO.retract();
+        },
+        this);
   }
 }

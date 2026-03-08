@@ -32,7 +32,8 @@ public class IntakeIOSparkFlex implements IntakeIO {
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
     intakeMotor =
-        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ENCODER_ID", 0), MotorType.kBrushless);
+        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 28), MotorType.kBrushless);
+    // FIX ME: SparkFlex keeps initializing as default int
 
     intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
   }
@@ -67,7 +68,7 @@ public class IntakeIOSparkFlex implements IntakeIO {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }

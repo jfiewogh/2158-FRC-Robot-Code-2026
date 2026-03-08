@@ -41,7 +41,6 @@ import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
-import org.austincans.frc2026.subsystems.battery.BatterySubsystem;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -85,7 +84,7 @@ public class RobotContainer {
   private Vision vision;
 
   private ObjectDetection objectDetection;
-  private BatterySubsystem batterySubsystem;
+  // private BatterySubsystem batterySubsystem;
   private Turret turret;
   private Hood hood;
   private Intake intake;
@@ -94,10 +93,10 @@ public class RobotContainer {
 
   // Subsystem Enabled // only matters for real robot
   private static final boolean driveEnabled = true;
-  private static final boolean visionEnabled = true;
-  private static final boolean objectDetectionEnabled = true;
-  private static final boolean turretEnabled = true;
-  private static final boolean hoodEnabled = true;
+  private static final boolean visionEnabled = false;
+  private static final boolean objectDetectionEnabled = false;
+  private static final boolean turretEnabled = false;
+  private static final boolean hoodEnabled = false;
   private static final boolean intakeEnabled = true;
   private static final boolean flywheelEnabled = true;
   private static final boolean ledEnabled = true;
@@ -140,7 +139,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
-        batterySubsystem = new BatterySubsystem();
+        // batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
           drive =
               new Drive(
@@ -472,8 +471,8 @@ public class RobotContainer {
             .x()
             .whileTrue(
                 Commands.runEnd(
-                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
-                    () -> flywheel.setVelocity(0)));
+                    () -> flywheel.setRelativeVelocity(FlywheelConstants.maxRPM),
+                    () -> flywheel.setRelativeVelocity(0)));
 
         keyboardHID.c().whileTrue(shootToHubCommand);
 
@@ -505,8 +504,34 @@ public class RobotContainer {
     if (driveEnabled) {
       // Switch to X pattern when X button is pressed
       driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+      if (intakeEnabled) {
+        operatorController
+            .y()
+            .whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(1), intake))
+            .onFalse(Commands.runOnce(() -> intake.setRelativeVelocity(0), intake));
+        operatorController.x().onTrue(intake.deployCommand());
+        operatorController.b().onTrue(intake.retractCommand());
+      }
+      if (flywheelEnabled) {
+        operatorController
+            .a()
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                      flywheel.runShooter();
+                      System.out.println("RAN FLYWHEEL");
+                    },
+                    flywheel))
+            .onFalse(
+                Commands.runOnce(
+                    () -> {
+                      flywheel.stopShooter();
+                    },
+                    flywheel));
+      }
 
       // Reset gyro / odometry
+
       final Runnable resetGyro =
           Constants.currentMode == Constants.Mode.SIM
               ? () ->

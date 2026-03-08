@@ -100,7 +100,7 @@ public class TurretCommands {
     Translation2d turretTranslation =
         futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
-    flywheel.setVelocity(0);
+    flywheel.setRelativeVelocity(0);
 
     // TOTAL VALUES
     double totalVelocityMetersPerSec = getActualExitVelocityMetersPerSec(FLYWHEEL_SHOOT_SPEED);
@@ -143,7 +143,7 @@ public class TurretCommands {
         System.out.println("Cannot Rotate Turret to Position");
       } else {
         // Should run only if angle is possible
-        flywheel.setVelocity(FLYWHEEL_SHOOT_SPEED);
+        flywheel.setRelativeVelocity(FLYWHEEL_SHOOT_SPEED);
         turret.setDesiredAngleFieldRelative(turretAngle, futureRobotRotation);
         Logger.recordOutput("turret field rel angle", turretAngle);
         hood.setAngle(Rotation2d.fromRadians(hoodAngleRad));
@@ -198,7 +198,7 @@ public class TurretCommands {
         .until(flywheel::noGamePiecesToShoot)
         .finallyDo(
             () -> {
-              flywheel.setVelocity(0);
+              flywheel.setRelativeVelocity(0);
               Drive.driveSpeedMultiplier = 1;
               isShuttling = false;
             });
@@ -236,7 +236,7 @@ public class TurretCommands {
         .finallyDo(
             () -> {
               System.out.println("no game pieces to shoot");
-              flywheel.setVelocity(0);
+              flywheel.setRelativeVelocity(0);
               Drive.driveSpeedMultiplier = 1;
             });
   }
@@ -259,7 +259,7 @@ public class TurretCommands {
             hood)
         .finallyDo(
             () -> {
-              flywheel.setVelocity(0);
+              flywheel.setRelativeVelocity(0);
               Drive.driveSpeedMultiplier = 1;
             });
   }

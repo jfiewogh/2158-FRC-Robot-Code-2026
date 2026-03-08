@@ -96,7 +96,7 @@ public class FlywheelIOSim implements FlywheelIO {
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
+  public void runRelativeVelocity(double velocityRPM) {
     sim.setAngularVelocity(Units.rotationsToRadians(velocityRPM) / 60);
   }
 

@@ -53,7 +53,7 @@ public class FlywheelIOSim3D implements FlywheelIO {
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
+  public void runRelativeVelocity(double velocityRPM) {
     this.velocityRPM = velocityRPM;
   }
 

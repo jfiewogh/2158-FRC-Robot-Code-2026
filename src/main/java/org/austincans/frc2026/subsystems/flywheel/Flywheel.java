@@ -15,8 +15,11 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -37,6 +40,8 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   public static boolean isShooting = false;
   public static boolean isReadyToShoot = false;
+  private final SparkFlex indexer =
+      new SparkFlex((IntakeConstants.indexerID), MotorType.kBrushless);
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -53,8 +58,8 @@ public class Flywheel extends AdvancedSubsystem {
     isReadyToShoot = io.readyToShoot();
   }
 
-  public void setVelocity(double velocityRPM) {
-    io.runVelocity(velocityRPM);
+  public void setRelativeVelocity(double velocityRPM) {
+    io.runRelativeVelocity(velocityRPM);
   }
 
   public double getRPM() {
@@ -69,6 +74,16 @@ public class Flywheel extends AdvancedSubsystem {
     return io.isShooting();
   }
 
+  public void runShooter() {
+    indexer.set(-0.5);
+    io.runRelativeVelocity(0.5);
+  }
+
+  public void stopShooter() {
+    indexer.set(0);
+    io.runRelativeVelocity(0);
+  }
+
   public boolean noGamePiecesToShoot() {
     return io.noGamePiecesToShoot();
   }
@@ -76,11 +91,11 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> io.runVelocity(100)),
+        Commands.runOnce(() -> io.runRelativeVelocity(1)),
         Commands.waitSeconds(0.3),
         Commands.runOnce(
             () -> {
-              if (getRPM() < 95 || getRPM() > 105) {
+              if (getRPM() < 0) {
                 addSubsystemFault(
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }

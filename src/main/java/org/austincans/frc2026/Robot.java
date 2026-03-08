@@ -15,6 +15,7 @@
 
 package org.austincans.frc2026;
 
+import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -48,6 +49,7 @@ public class Robot extends LoggedRobot {
   private AdvancedSubsystem advancedSubsystem;
 
   public Robot() {
+    CanBridge.runTCP();
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);

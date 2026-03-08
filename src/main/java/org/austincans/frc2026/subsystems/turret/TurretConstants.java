@@ -47,7 +47,7 @@ public class TurretConstants {
       ConfigUtil.getConfigBoolean("TURRET_IS_BRAKE_MODE", false);
 
   // values only used by TalonFX
-  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158"));
+  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158_CAN"));
 
   // values only used by SparkFlex
   public static final boolean isBrushlessMotor =

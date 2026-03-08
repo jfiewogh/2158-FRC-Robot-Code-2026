@@ -29,7 +29,8 @@ public class FlywheelConstants {
       ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_2", 30);
 
   /* REAL */
-  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);
+  public static final int motor1Id = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_1_ID", 22);
+  public static final int motor2Id = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_2_ID", 23);
   public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEEL_ENCODER_ID", 0);
   public static final int lasarCan1Id = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_ID_1", 0);
   public static final int lasarCan2Id = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_ID_2", 1);

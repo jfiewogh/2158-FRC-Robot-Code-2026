@@ -15,14 +15,10 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.subsystems.intake.IntakeConstants;
@@ -36,9 +32,11 @@ public class DeployIOTalonFXS implements DeployIO {
   private final TalonFXS deployMotor2;
   private final SelfCheckingTalonFXS deploy1MotorSelfCheck;
   private final SelfCheckingTalonFXS deploy2MotorSelfCheck;
-  private final TalonFXSConfiguration config;
-  private final DigitalInput magLimitSwitch =
-      new DigitalInput(IntakeConstants.magLimitSwitchChannel);
+
+  // private final TalonFXSConfiguration config;
+
+  // private final DigitalInput magLimitSwitch =
+  //     new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
   // private final CANcoder deployEncoder;
 
@@ -50,24 +48,24 @@ public class DeployIOTalonFXS implements DeployIO {
     deploy1MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 1", deployMotor1);
     deploy2MotorSelfCheck = new SelfCheckingTalonFXS("Intake Deploy Motor 2", deployMotor2);
 
-    config = new TalonFXSConfiguration();
-    config.MotorOutput.NeutralMode =
-        IntakeConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    config.Slot0.kP = IntakeConstants.kP;
-    config.Slot0.kI = IntakeConstants.kI;
-    config.Slot0.kD = IntakeConstants.kD;
-    config.Slot0.kS = IntakeConstants.kS;
-    config.Slot0.kG = IntakeConstants.kG;
-    config.Slot0.kV = IntakeConstants.kV;
-    config.Slot0.kA = IntakeConstants.kA;
+    // config = new TalonFXSConfiguration();
+    // config.MotorOutput.NeutralMode =
+    //     IntakeConstants.brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    // config.Slot0.kP = IntakeConstants.kP;
+    // config.Slot0.kI = IntakeConstants.kI;
+    // config.Slot0.kD = IntakeConstants.kD;
+    // config.Slot0.kS = IntakeConstants.kS;
+    // config.Slot0.kG = IntakeConstants.kG;
+    // config.Slot0.kV = IntakeConstants.kV;
+    // config.Slot0.kA = IntakeConstants.kA;
 
     // config.ExternalFeedback.FeedbackRemoteSensorID = deployEncoder.getDeviceID();
     // config.ExternalFeedback.ExternalFeedbackSensorSource =
     // ExternalFeedbackSensorSourceValue.FusedCANcoder;
     // config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    deployMotor1.getConfigurator().apply(config);
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    deployMotor2.getConfigurator().apply(config);
+    // deployMotor1.getConfigurator().apply(config);
+    // config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    // deployMotor2.getConfigurator().apply(config);
     deployMotor2.setControl(
         new Follower(IntakeConstants.deployCanID1, MotorAlignmentValue.Aligned));
     // deployEncoder.setPosition(0);
@@ -75,12 +73,14 @@ public class DeployIOTalonFXS implements DeployIO {
 
   @Override
   public void deploy() {
-    deployMotor1.set(0.3); // TODO: CHANGE ME
+    System.out.println("DEPLOY");
+    deployMotor1.set(1); // TODO: CHANGE ME
   }
 
   @Override
   public void retract() {
-    deployMotor2.setVoltage(-0.3);
+    System.out.println("RETRACT");
+    deployMotor2.set(-1);
   }
 
   @Override
@@ -100,7 +100,7 @@ public class DeployIOTalonFXS implements DeployIO {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }
