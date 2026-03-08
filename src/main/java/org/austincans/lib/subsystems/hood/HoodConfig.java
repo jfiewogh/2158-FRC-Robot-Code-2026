@@ -1,7 +1,7 @@
 package org.austincans.lib.subsystems.hood;
 
-import org.austincans.lib.motors.PIDFFConfig;
-import org.austincans.lib.motors.SoftLimitConfig;
+import org.austincans.lib.configs.PIDFFConfig;
+import org.austincans.lib.configs.SoftLimitConfig;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;

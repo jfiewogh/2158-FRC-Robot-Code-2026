@@ -35,7 +35,7 @@ public class ArmIOSim implements ArmIO {
           neoVortex,
           armConfig.gearRatio(),
           0.001,
-          armConfig.armLength(),
+          armConfig.armLengthMeters(),
           armConfig.minAngleRad(),
           armConfig.maxAngleRad(),
           true,
@@ -46,7 +46,7 @@ public class ArmIOSim implements ArmIO {
   public void updateInputs(ArmIOInputs inputs) {
     armSim.setInputVoltage(armAppliedVolts);
     armSim.update(Constants.loopPeriodSec);
-    inputs.motorInputs.currentAmps = armSim.getCurrentDrawAmps();
+    inputs.motorInputs.supplyCurrentAmps = armSim.getCurrentDrawAmps();
     inputs.positionRad = armSim.getAngleRads();
     inputs.velocityRadPerSec = armSim.getVelocityRadPerSec();
   }

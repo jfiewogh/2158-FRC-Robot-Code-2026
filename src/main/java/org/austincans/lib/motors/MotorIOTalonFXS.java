@@ -7,6 +7,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class MotorIOTalonFXS extends MotorIOReal {
@@ -22,21 +24,13 @@ public class MotorIOTalonFXS extends MotorIOReal {
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = getPositionRad();
-        inputs.velocityRadPerSec = getVelocityRadPerSec(); 
+        inputs.positionRad = motor.getPosition().getValue().in(Radians);
+        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
         inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
         inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
         inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
         inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
         inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
-    }
-
-    public double getPositionRad() {
-        return motor.getPosition().getValue().in(Radians);
-    }
-
-    public double getVelocityRadPerSec() {
-        return motor.getVelocity().getValue().in(RadiansPerSecond);
     }
 
     @Override
@@ -46,15 +40,13 @@ public class MotorIOTalonFXS extends MotorIOReal {
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
-        motor.setControl(velocityVoltage.withVelocity(AngularVelocity.ofBaseUnits(velocityRadPerSec, RadiansPerSecond)));
+        motor.setControl(velocityVoltage.withVelocity(
+            AngularVelocity.ofBaseUnits(velocityRadPerSec, RadiansPerSecond))); 
     }
 
     @Override
     public void setPosition(double positionRad) {
-        motor.setControl(positionVoltage.withPosition(positionRad));
-    }
-
-    public TalonFXS getMotor() {
-        return motor;
+        motor.setControl(positionVoltage.withPosition(
+            Units.radiansToRotations(positionRad)));
     }
 }

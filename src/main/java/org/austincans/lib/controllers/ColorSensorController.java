@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.controllers;
+package org.austincans.lib.controllers;
 
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
-import org.austincans.frc2026.util.LoggedTracer;
+import org.austincans.lib.util.LoggedTracer;
 
 /**
  * This is a simple example to show how the REV Color Sensor V3 can be used to detect pre-configured

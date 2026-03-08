@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import edu.wpi.first.math.util.Units;
 
 public abstract class MotorIOSpark<Motor extends SparkBase, Config extends SparkBaseConfig> extends MotorIOReal {
     protected final Motor motor;
@@ -23,8 +24,8 @@ public abstract class MotorIOSpark<Motor extends SparkBase, Config extends Spark
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = encoder.getPosition();
-        inputs.velocityRadPerSec = encoder.getVelocity();
+        inputs.positionRad = Units.rotationsToRadians(encoder.getPosition());
+        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
         inputs.appliedVolts = motor.getBusVoltage();
         inputs.statorCurrentAmps = motor.getOutputCurrent();
         inputs.temperatureCelsius = motor.getMotorTemperature();
@@ -37,20 +38,12 @@ public abstract class MotorIOSpark<Motor extends SparkBase, Config extends Spark
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
-        controller.setSetpoint(velocityRadPerSec, ControlType.kVoltage);
+        controller.setSetpoint(velocityRadPerSec, ControlType.kMAXMotionVelocityControl);
     }
 
     @Override
     public void setPosition(double positionRad) {
-        controller.setSetpoint(positionRad, ControlType.kVoltage);
-    }
-
-    public Motor getMotor() {
-        return motor;
-    }
-
-    public RelativeEncoder getEncder(){
-        return motor.getEncoder();
+        controller.setSetpoint(positionRad, ControlType.kMAXMotionVelocityControl);
     }
 
     public void setEncoderPosition(double positionRad) {

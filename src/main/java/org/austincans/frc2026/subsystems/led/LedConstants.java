@@ -15,7 +15,7 @@
 
 package org.austincans.frc2026.subsystems.led;
 
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 public class LedConstants {
   public static final int PWMPort = ConfigUtil.getConfigInt("PWM_LED_PORT", 0);

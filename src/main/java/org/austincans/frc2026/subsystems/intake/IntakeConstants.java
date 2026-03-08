@@ -20,7 +20,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 import org.austincans.lib.math.Angle;
 
 public class IntakeConstants {

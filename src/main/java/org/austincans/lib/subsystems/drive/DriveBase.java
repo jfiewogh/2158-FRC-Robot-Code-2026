@@ -1,15 +1,12 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.frc2026.subsystems.drive.DriveIOInputsAutoLogged;
 import org.austincans.lib.subsystems.drive.DriveIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.vision.Vision;
 import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PathFollowingController;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -20,7 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
+public abstract class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
     protected final String name;
     protected final DriveIO io;
     protected final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
@@ -62,7 +59,7 @@ public class DriveBase extends AdvancedSubsystem implements Vision.VisionConsume
     }
 
     public void setPose2d(Pose2d pose) {
-        return io.resetPose2d(pose);
+        io.resetPose2d(pose);
     }
 
     public ChassisSpeeds getVelocities() {

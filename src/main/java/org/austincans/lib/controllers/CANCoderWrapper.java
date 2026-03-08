@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.controllers;
+package org.austincans.lib.controllers;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;

@@ -31,7 +31,7 @@ import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 import org.austincans.lib.math.Angle;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;

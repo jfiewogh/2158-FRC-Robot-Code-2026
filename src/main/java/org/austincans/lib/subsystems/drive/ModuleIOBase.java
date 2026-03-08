@@ -2,15 +2,18 @@ package org.austincans.lib.subsystems.drive;
 
 import org.austincans.lib.encoders.EncoderIO;
 import org.austincans.lib.motors.MotorIO;
+
+import com.revrobotics.AbsoluteEncoder;
+
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extends MotorIO, Encoder extends EncoderIO> implements ModuleIO {
+public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extends MotorIO, Encoder extends AbsoluteEncoderIO> implements ModuleIO {
     private final DriveMotor driveMotor;
     private final SteerMotor steerMotor;
-    private final Encoder steerEncoder;
+    private final AbsoluteEncoder steerEncoder;
 
-    public ModuleIOBase(ModuleConfig moduleConfig, DriveMotor driveMotor, SteerMotor steerMotor, Encoder steerEncoder) {
+    public ModuleIOBase(ModuleConfig moduleConfig, DriveMotor driveMotor, SteerMotor steerMotor, AbsoluteEncoder steerEncoder) {
         this.driveMotor = driveMotor;
         this.steerMotor = steerMotor;
         this.steerEncoder = steerEncoder;
@@ -22,7 +25,8 @@ public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extend
         driveMotor.updateInputs(inputs.driveMotorInputs);
         steerMotor.updateInputs(inputs.steerMotorInputs);
         steerEncoder.updateInputs(inputs.steerEncoderInputs);
-        inputs.
+        inputs.steerPosition = steerEncoder.getPosition();
+        inputs.steerPositionWithoutOffset = steerEncoder.getPosition();
 
     }
 

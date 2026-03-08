@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.controllers;
+package org.austincans.lib.controllers;
 
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoHub;
@@ -21,7 +21,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class LinearActuatorServoHub {
   private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
-  private ServoHub hub = ServoHubController.getInstance().hub;
+  private ServoHub hub = ServoHubController.hub;
   private ServoChannel linearActuator;
 
   // L16-100-35-6-R

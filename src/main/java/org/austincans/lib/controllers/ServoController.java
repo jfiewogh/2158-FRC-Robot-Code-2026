@@ -13,10 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.controllers;
+package org.austincans.lib.controllers;
 
 import edu.wpi.first.wpilibj.Servo;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 // This class is used to control the servo that is used to rotate the color pie
 // The servo is mounted on the robot and is used to rotate the color pie

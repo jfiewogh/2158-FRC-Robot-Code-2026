@@ -17,7 +17,7 @@ package org.austincans.frc2026.subsystems.turret;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.util.Units;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 public class TurretConstants {
   // values used by SparkFlex and TalonFX

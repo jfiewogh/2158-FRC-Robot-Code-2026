@@ -15,7 +15,7 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 public class HoodConstants {
   static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);

@@ -39,7 +39,7 @@ public abstract class DriveIOSwerve<Module extends ModuleIO, Gyro extends GyroIO
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
 
-  private final DriveState 
+  // private final DriveState driveState;
 
   private final ArrayList<Module> modules; // FL, FR, BL, FR // cannot have array of generics
   private final ModuleLimits moduleLimitsFree;

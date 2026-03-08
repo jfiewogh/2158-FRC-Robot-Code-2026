@@ -16,13 +16,12 @@
 package org.austincans.frc2026.subsystems.intake;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.util.Set;
 
-import org.austincans.frc2026.controllers.LaserCAN;
+import org.austincans.lib.controllers.LaserCAN;
 import org.austincans.lib.math.Angle;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;

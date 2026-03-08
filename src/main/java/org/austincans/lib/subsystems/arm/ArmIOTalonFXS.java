@@ -29,7 +29,7 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
-public class ArmIOTalonFXS implements ArmIO {
+public class ArmIOTalonFXS extends ArmIOReal {
   /* Motor */
   private final TalonFXS motor;
   private SelfCheckingTalonFXS motorSelfCheck;

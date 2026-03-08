@@ -20,10 +20,11 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ArmIO {
+public abstract interface ArmIO {
   @AutoLog
   public class ArmIOInputs {
-    public ModuleIOInputsAutoLogged motorInputs = new ModuleIOInputsAutoLogged();
+    public MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
+    public AbsoluteEncoderIOInputsAutoLogged absoluteEncoderInputs = new AbsoluteEncoderIOInputsAutoLogged();
     public double positionRad = 0;
     public double velocityRadPerSec = 0;
   }
@@ -32,20 +33,13 @@ public interface ArmIO {
 
   public void setVoltage(double voltage);
 
-  // Encoder Values
-  public void setPosition(double position);
+  public void setPosition(double positionRad);
 
-  // Meters per second
-  public void setVelocity(double velocity);
+  public void setVelocity(double velocityRadPerSec);
 
-  public default void stopMotor() {}
-  ;
+  public void stopMotor();
 
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
+  public List<HardwareFault> checkForFaults();
 
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
+  public List<SelfChecking> getHardware();
 }

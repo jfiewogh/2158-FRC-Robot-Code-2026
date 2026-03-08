@@ -75,16 +75,6 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
-    Drive.joystickHasInput = false;
-    for (DoubleSupplier supplier : suppliers) {
-      if (Math.abs(supplier.getAsDouble()) >= hasInputThreshold) {
-        Drive.joystickHasInput = true;
-        break;
-      }
-    }
-  }
-
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */

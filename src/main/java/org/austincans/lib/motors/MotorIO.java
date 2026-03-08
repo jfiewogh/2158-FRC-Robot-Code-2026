@@ -6,6 +6,7 @@ public interface MotorIO {
     /** Includes values that are common for all motors. Values that are not common are separated into SensorIOs. */
     @AutoLog
     public class MotorIOInputs {
+        public boolean connected = false;
         public double positionRad;
         public double velocityRadPerSec;
         public double appliedVolts;

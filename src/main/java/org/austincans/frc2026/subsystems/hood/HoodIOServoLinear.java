@@ -17,7 +17,7 @@ package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import org.austincans.frc2026.controllers.LinearActuatorController;
+import org.austincans.lib.controllers.LinearActuatorController;
 import org.austincans.lib.math.Angle;
 
 public class HoodIOServoLinear implements HoodIO {

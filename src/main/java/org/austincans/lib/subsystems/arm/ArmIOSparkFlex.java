@@ -34,7 +34,7 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
-public class ArmIOSparkFlex implements ArmIO {
+public class ArmIOSparkFlex extends ArmIOReal {
   private final MotorIOSparkFlex motorIO;
   private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
 

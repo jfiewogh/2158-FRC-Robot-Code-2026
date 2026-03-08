@@ -13,13 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.controllers;
+package org.austincans.lib.controllers;
 
 import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 public class ServoHubController {
   public static ServoHub hub = new ServoHub(ConfigUtil.getConfigInt("REV_SERVOHUB_ID", 0));

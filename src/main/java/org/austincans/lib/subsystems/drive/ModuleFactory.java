@@ -1,9 +1,11 @@
 package org.austincans.lib.subsystems.drive;
 
-public class ModuleFactory {
-    public static void createTalonFXCANCoder(ModuleConfig moduleConfig) {
-        return new ModuleIOTalonFXCANcoder(
+import org.austincans.lib.subsystems.drive.ModuleIOTalonFXCANcoder;
 
+public class ModuleFactory {
+    public static ModuleIOTalonFXCANcoder createTalonFXCANCoder(ModuleConfig moduleConfig) {
+        return new ModuleIOTalonFXCANcoder(
+            
         );
     }
 }

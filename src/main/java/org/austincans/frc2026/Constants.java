@@ -35,7 +35,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running

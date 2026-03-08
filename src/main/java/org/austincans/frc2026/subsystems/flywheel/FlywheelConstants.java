@@ -16,7 +16,7 @@
 package org.austincans.frc2026.subsystems.flywheel;
 
 import com.ctre.phoenix6.CANBus;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.lib.util.ConfigUtil;
 
 public class FlywheelConstants {
   // TODO: get from config
