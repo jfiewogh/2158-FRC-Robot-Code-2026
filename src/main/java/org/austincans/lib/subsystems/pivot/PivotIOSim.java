@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.lib.Constants;
 import org.austincans.lib.motors.MotorIOFake;
 
-public class ArmIOSim implements ArmIO {
+public class PivotIOSim implements PivotIO {
   private final MotorIOFake motorIO;
   private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
 
@@ -30,7 +30,7 @@ public class ArmIOSim implements ArmIO {
   private final SingleJointedArmSim armSim;
   private double armAppliedVolts;
 
-  public ArmIOSim(ArmConfig armConfig) {
+  public PivotIOSim(PivotConfig armConfig) {
     armSim = new SingleJointedArmSim(
           neoVortex,
           armConfig.gearRatio(),

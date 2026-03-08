@@ -1,9 +1,9 @@
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import org.austincans.lib.encoders.AbsoluteEncoderConfig;
 import org.austincans.lib.motors.MotorConfig;
 
-public record ArmConfig(
+public record PivotConfig(
     MotorConfig motorConfig,
     AbsoluteEncoderConfig absoluteEncoderConfig,
     double gearRatio,

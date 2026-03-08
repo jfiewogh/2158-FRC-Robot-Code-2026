@@ -1,13 +1,13 @@
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.motors.MotorIOReal;
 
-public abstract class ArmIOReal<T extends MotorIOReal, U extends AbsoluteEncoderIO> implements ArmIO {
+public abstract class PivotIOReal<T extends MotorIOReal, U extends AbsoluteEncoderIO> implements PivotIO {
     protected final T motorIO;
     protected final U absoluteEncoderIO;
 
-    protected ArmIOReal(T motorIO, U absoluteEncoderIO) {
+    protected PivotIOReal(T motorIO, U absoluteEncoderIO) {
         this.motorIO = motorIO;
         this.absoluteEncoderIO = absoluteEncoderIO;
     }

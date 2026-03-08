@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
@@ -21,7 +21,7 @@ import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
 /** PivotIO */
-public interface ArmIO {
+public interface PivotIO {
   @AutoLog
   public class ArmIOInputs {
     public MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();

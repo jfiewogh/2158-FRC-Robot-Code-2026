@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -26,11 +26,11 @@ import org.austincans.frc2026.subsystems.arm.ArmIOInputsAutoLogged;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
-public class ArmBase extends AdvancedSubsystem {
-  private final ArmIO armIO;
+public class Pivot extends AdvancedSubsystem {
+  private final PivotIO armIO;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
   
-  protected ArmBase(ArmIO armIO) {
+  protected Pivot(PivotIO armIO) {
     this.armIO = armIO;
     armIO.getHardware().forEach(e -> {
           if (e != null) {

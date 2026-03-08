@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
 import org.austincans.lib.util.KalmanFilter1D;
@@ -25,13 +25,13 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
-public class ArmIOSparkFlexCANcoder extends ArmIOReal<MotorIOSparkFlex, CANcoderIO> {
+public class PivotIOSparkFlexCANcoder extends PivotIOReal<MotorIOSparkFlex, CANcoderIO> {
   private final SelfCheckingSparkFlex selfCheckingMotor;
 
   @SuppressWarnings("unused")
   private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
 
-  public ArmIOSparkFlexCANcoder(ArmConfig armConfig) {
+  public PivotIOSparkFlexCANcoder(PivotConfig armConfig) {
     super(
       MotorFactory.createSparkFlex(armConfig.motorConfig()), 
       AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));

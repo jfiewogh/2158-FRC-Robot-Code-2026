@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.arm;
+package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
@@ -25,10 +25,10 @@ import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 // TODO: have SelfChecking as generic
-public class ArmIOTalonFXSCANcoder extends ArmIOReal<MotorIOTalonFXS, CANcoderIO> {
+public class PivotIOTalonFXSCANcoder extends PivotIOReal<MotorIOTalonFXS, CANcoderIO> {
   private SelfCheckingTalonFXS motorSelfCheck;
 
-  public ArmIOTalonFXSCANcoder(ArmConfig armConfig) {
+  public PivotIOTalonFXSCANcoder(PivotConfig armConfig) {
     super(
       MotorFactory.createTalonFXSWithFusedCANcoder(armConfig.motorConfig(), armConfig.absoluteEncoderConfig().deviceId()),
       AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
