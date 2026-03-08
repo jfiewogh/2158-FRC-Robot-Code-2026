@@ -1,4 +1,5 @@
 package org.austincans.lib.subsystems.hood;
+
 import org.austincans.lib.configs.AbsoluteEncoderConfig;
 import org.austincans.lib.configs.MotorConfig;
 

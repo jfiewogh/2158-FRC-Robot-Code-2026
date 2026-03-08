@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.hood;
+package org.austincans.lib.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
