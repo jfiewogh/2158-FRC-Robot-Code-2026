@@ -8,29 +8,20 @@ import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFX;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
-
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 
 public class HoodIOTalonFX implements HoodIO {
     private MotorIOTalonFX motorIO;
-    private TalonFXConfiguration config = new TalonFXConfiguration();
     private SelfCheckingTalonFXPro hoodMotorCheck;
 
     public HoodIOTalonFX(HoodConfig hoodConfig){
-        motorIO = MotorFactory.createTalonFX(hoodConfig.deviceID(), hoodConfig.motorCanbus(), config, hoodConfig.pidffConfig(), hoodConfig.softLimitConfig(), hoodConfig.nuetralMode(), hoodConfig.isInverted());
+        motorIO = MotorFactory.createTalonFX(hoodConfig.motorConfig());
         hoodMotorCheck = new SelfCheckingTalonFXPro("Hood Motor", motorIO.getMotor());
     }
 
     @Override
     public void updateInputs(HoodIOInputs inputs) {
-        inputs.hoodAngleDeg = Units.radiansToDegrees(motorIO.getPositionRad());
-        inputs.motorPositionRad = motorIO.getPositionRad();
-        inputs.temperatureCelsius = motorIO.getMotor().getDeviceTemp().getValueAsDouble();
-        inputs.velocityRadPerSec = motorIO.getVelocityRadPerSec();
+        motorIO.updateInputs(inputs.motorInputs);
     }
 
     @Override
@@ -45,12 +36,12 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public Angle getAngle() {
-        return Angle.fromRadians(motorIO.getPositionRad());
+        return Angle.fromRotations(motorIO.getMotor().getPosition().getValueAsDouble());
     }
 
     @Override
     public Rotation2d getAngleRotation2d() {
-        return Rotation2d.fromRotations(motorIO.getPositionRad());
+        return Rotation2d.fromRotations(motorIO.getMotor().getPosition().getValueAsDouble());
     }
 
     @Override

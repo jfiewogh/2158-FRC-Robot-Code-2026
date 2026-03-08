@@ -25,18 +25,18 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class HoodIOSim implements HoodIO {
   private final DCMotor motorBase = DCMotor.getKrakenX60(1);
-  private DCMotorSim motor =
-      new DCMotorSim(
+  private DCMotorSim motor;
+
+  public HoodIOSim(HoodConfig hoodConfig){
+    motor = new DCMotorSim(
           LinearSystemId.createDCMotorSystem(
-              motorBase, HoodConstants.rotationalInertiaMetersSq, HoodConstants.gearing),
+              motorBase, hoodConfig.rotationalInertiaMetersSq(), hoodConfig.gearing()),
           motorBase);
+  }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = getAngle().toDegrees(0);
-    inputs.temperatureCelsius = 0;
-    inputs.motorPositionRad = getAngle().toRadians();
-    inputs.velocityRadPerSec = motor.getAngularVelocityRadPerSec();
+    
   }
 
   @Override

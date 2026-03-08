@@ -16,12 +16,14 @@
 package org.austincans.lib.subsystems.hood;
 
 
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.austincans.lib.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.math.Angle;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
@@ -31,25 +33,28 @@ import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class HoodIOSparkFlex implements HoodIO {
   private MotorIOSparkFlex motorIO;
+  private RelativeEncoder encoder;
+  private CANcoderIO absoluteEncoderIO;
   private SelfCheckingSparkFlex hoodMotorCheck;
 
   public HoodIOSparkFlex(HoodConfig hoodConfig){
-    SparkFlexConfig config = new SparkFlexConfig();
-    motorIO = MotorFactory.createSparkFlex(hoodConfig.deviceID(), hoodConfig.motorIsBrushless(), hoodConfig.pidffConfig(),
-        hoodConfig.softLimitConfig(), hoodConfig.brakeModeEnabled(), config);
+    motorIO = MotorFactory.createSparkFlex(hoodConfig.motorConfig());
     hoodMotorCheck = new SelfCheckingSparkFlex("Hood Motor", motorIO.getMotor());
+    absoluteEncoderIO = AbsoluteEncoderFactory.createCANcoder(hoodConfig.encoderConfig());
+    encoder = motorIO.getMotor().getEncoder();
+    encoder.setPosition(absoluteEncoderIO.getAbsolutePositionRotations());
   }
 
 
 
   @Override
   public Angle getAngle() {
-    return Angle.fromRadians(Units.rotationsToRadians(motorIO.getEncder().getPosition()));
+    return Angle.fromRadians(Units.rotationsToRadians(encoder.getPosition()));
   }
 
   @Override
   public Rotation2d getAngleRotation2d() {
-    return Rotation2d.fromRadians(Units.rotationsToRadians(motorIO.getEncder().getPosition()));
+    return Rotation2d.fromRadians(Units.rotationsToRadians(encoder.getPosition()));
   }
 
   public void setAngle(Angle setpoint) {
@@ -57,10 +62,7 @@ public class HoodIOSparkFlex implements HoodIO {
   }
 
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = getAngle().getRotation2d().getDegrees();
-    inputs.temperatureCelsius = motorIO.getMotor().getMotorTemperature();
-    inputs.motorPositionRad = Units.rotationsToRadians(motorIO.getEncder().getPosition());
-    inputs.velocityRadPerSec = Units.rotationsToRadians(motorIO.getEncder().getVelocity()) / 60;
+    motorIO.updateInputs(inputs.motorInputs);
   }
 
   public void setAngleRotation2d(Rotation2d angle) {

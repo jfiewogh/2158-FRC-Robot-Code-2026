@@ -14,18 +14,10 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.hood;
-
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFXS;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.austincans.lib.math.Angle;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFXS;
@@ -40,12 +32,13 @@ public class HoodIOTalonFXS implements HoodIO {
   TalonFXSConfiguration config = new TalonFXSConfiguration();
 
   public HoodIOTalonFXS(HoodConfig hoodConfig) {
-    motorIO = MotorFactory.createTalonFXS(hoodConfig.deviceID(), hoodConfig.motorCanbus(), config, hoodConfig.pidffConfig(), hoodConfig.softLimitConfig(), hoodConfig.nuetralMode(), hoodConfig.isInverted());
+    motorIO = MotorFactory.createTalonFXS(hoodConfig.motorConfig());
+    hoodMotorCheck = new SelfCheckingTalonFXS("Hood Motor", motorIO.getMotor());
   }
 
   @Override
   public Angle getAngle() {
-    return Angle.fromRadians(motorIO.getPositionRad());
+    return Angle.fromRotations(motorIO.getMotor().getPosition().getValueAsDouble());
   }
 
   public void setAngle(Angle setpoint) {
@@ -59,7 +52,7 @@ public class HoodIOTalonFXS implements HoodIO {
 
   @Override
   public Rotation2d getAngleRotation2d() {
-    return Rotation2d.fromRotations(motorIO.getPositionRad());
+    return Rotation2d.fromRotations(motorIO.getMotor().getPosition().getValueAsDouble());
   }
 
   @Override
@@ -68,10 +61,7 @@ public class HoodIOTalonFXS implements HoodIO {
   }
 
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = Units.radiansToDegrees(motorIO.getPositionRad());
-    inputs.temperatureCelsius = motorIO.getMotor().getDeviceTemp().getValueAsDouble();
-    inputs.motorPositionRad = motorIO.getPositionRad();
-    inputs.velocityRadPerSec = motorIO.getVelocityRadPerSec();
+    motorIO.updateInputs(inputs.motorInputs);
   }
 
   @Override

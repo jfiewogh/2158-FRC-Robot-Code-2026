@@ -25,8 +25,8 @@ public class HoodIOServoLinear implements HoodIO {
   InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
   Angle currentAngle = Angle.fromDegrees(0);
 
-  public HoodIOServoLinear() {
-    this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
+  public HoodIOServoLinear(HoodConfig hoodConfig) {
+    this.linearActuator = new LinearActuatorController(hoodConfig.ServoLinearId());
     angles.put(0.0, 0.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
 
     // if (HoodConstants.potentiometer == true);
@@ -34,7 +34,7 @@ public class HoodIOServoLinear implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = currentAngle.getRotation2d().getDegrees();
+    inputs.hoodAngleRad = currentAngle.getRotation2d().getRadians();
   }
 
   @Override

@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 
 import org.austincans.lib.math.Angle;
+import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -26,10 +27,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
-    public double hoodAngleDeg;
-    public double temperatureCelsius;
-    public double motorPositionRad;
-    public double velocityRadPerSec;
+    MotorIOInputs motorInputs;
+    double hoodAngleRad; //only for servo
   }
 
   public void updateInputs(HoodIOInputs inputs);

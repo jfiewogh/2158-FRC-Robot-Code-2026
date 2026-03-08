@@ -21,13 +21,13 @@ import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.lib.math.Angle;
 import org.ironmaple.simulation.MeshSimulation3D;
 
-public class HoodIOTest implements HoodIO {
+public class HoodIOFake implements HoodIO {
   private final RobotSimulation3D robotSimulation;
 
   private Rotation2d currentAngle = Rotation2d.kZero;
   private double velocityRadPerSec = 0;
 
-  public HoodIOTest(RobotSimulation3D robotSimulation) {
+  public HoodIOFake(RobotSimulation3D robotSimulation) {
     this.robotSimulation = robotSimulation;
   }
 
