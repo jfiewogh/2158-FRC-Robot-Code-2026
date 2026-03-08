@@ -8,7 +8,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Frequency;
 
 public class CANcoderIO implements AbsoluteEncoderIO {
     private final CANcoder encoder;
@@ -17,8 +16,8 @@ public class CANcoderIO implements AbsoluteEncoderIO {
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
 
-    public CANcoderIO(AbsoluteEncoderConfig absoluteEncoderConfig, CANcoderConfiguration config, Frequency positionUpdateFrequency, boolean isCanivore) {
-        encoder = new CANcoder(absoluteEncoderConfig.deviceId(), new CANBus(absoluteEncoderConfig.canbus()));
+    protected CANcoderIO(int deviceId, CANBus canbus, CANcoderConfiguration config) {
+        encoder = new CANcoder(deviceId, canbus);
         encoder.getConfigurator().apply(config);
         absolutePosition = encoder.getAbsolutePosition();
         position = encoder.getPosition(); // relative to start

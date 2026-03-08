@@ -15,6 +15,7 @@
 
 package org.austincans.lib.subsystems.arm;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -28,31 +29,27 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.List;
 import org.austincans.lib.util.KalmanFilter1D;
+import org.austincans.lib.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.encoders.CANcoderIO;
+import org.austincans.lib.motors.MotorConfig;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
-public class ArmIOSparkFlex extends ArmIOReal {
-  private final MotorIOSparkFlex motorIO;
-  private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
-
-  // TODO: Update selfchecking motor to take in a motor IO
-  private SelfCheckingSparkFlex selfCheckingMotor;
+public class ArmIOSparkFlexCANcoder extends ArmIOReal<MotorIOSparkFlex, CANcoderIO> {
+  private final SelfCheckingSparkFlex selfCheckingMotor;
 
   @SuppressWarnings("unused")
   private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
 
-  public ArmIOSparkFlex(ArmConfig armConfig) {
-    SparkFlexConfig config = new SparkFlexConfig();
-    config.smartCurrentLimit((int) armConfig.statorCurrentLimit());
-
-    // Initialize motor controller
-    motorIO = MotorFactory.createSparkFlex(armConfig.motorId(), armConfig.motorIsBrushless(), armConfig.pidffConfig(),
-        armConfig.softLimitConfig(), armConfig.brakeModeEnabled(), config);
+  public ArmIOSparkFlexCANcoder(ArmConfig armConfig) {
+    super(
+      MotorFactory.createSparkFlex(armConfig.motorConfig()), 
+      AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
+    motorIO.setEncoderPosition(absoluteEncoderIO.getPosition());
     selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motorIO.getMotor());
-
     // Configure encoder
     motorIO.setEncoderPosition(0);
   }
@@ -72,7 +69,6 @@ public class ArmIOSparkFlex extends ArmIOReal {
 
   public void updateInputs(ArmIOInputs inputs) {
     inputs.motorInputs = motorInputs;
-    // TODO: convert motor position and velocity to mechanism position and velocity
     inputs.positionRad = motorInputs.positionRad;
     inputs.velocityRadPerSec = motorInputs.velocityRadPerSec;
   }
@@ -84,7 +80,6 @@ public class ArmIOSparkFlex extends ArmIOReal {
   @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = selfCheckingMotor.checkForFaults();
-
     if (faults.isEmpty()) {
       return null;
     } else {

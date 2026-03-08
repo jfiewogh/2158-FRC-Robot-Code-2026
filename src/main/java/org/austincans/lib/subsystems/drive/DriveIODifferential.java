@@ -27,18 +27,18 @@ import org.austincans.lib.motors.MotorIO;
 import com.pathplanner.lib.config.RobotConfig;
 
 // TODO: Finish this class
-public class DriveIODifferential<Motor extends MotorIO> implements DriveIO {
+public class DriveIODifferential<T extends MotorIO> implements DriveIO {
   private final DifferentialDriveKinematics kinematics;
 
-  private final Motor leftLeader;
-  private final Motor leftFollower;
-  private final Motor rightLeader;
-  private final Motor rightFollower;
+  private final T leftLeader;
+  private final T leftFollower;
+  private final T rightLeader;
+  private final T rightFollower;
 
   private final DifferentialDriveOdometry odometry;
 
-  public DriveIODifferential(DriveConfig driveConfig, Motor leftLeader, Motor leftFollower,
-      Motor rightLeader, Motor rightFollower) {
+  public DriveIODifferential(DriveConfig driveConfig, T leftLeader, T leftFollower,
+      T rightLeader, T rightFollower) {
     kinematics = new DifferentialDriveKinematics(driveConfig.trackWidthMeters());
 
     this.leftLeader = leftLeader;

@@ -20,7 +20,8 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
-public abstract interface ArmIO {
+/** PivotIO */
+public interface ArmIO {
   @AutoLog
   public class ArmIOInputs {
     public MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
@@ -37,9 +38,13 @@ public abstract interface ArmIO {
 
   public void setVelocity(double velocityRadPerSec);
 
-  public void stopMotor();
+  public void stop();
 
-  public List<HardwareFault> checkForFaults();
+  public default List<HardwareFault> checkForFaults() {
+    return List.of();
+  }
 
-  public List<SelfChecking> getHardware();
+  public default List<SelfChecking> getHardware() {
+    return List.of();
+  }
 }

@@ -46,7 +46,8 @@ public class ArmIOSim implements ArmIO {
   public void updateInputs(ArmIOInputs inputs) {
     armSim.setInputVoltage(armAppliedVolts);
     armSim.update(Constants.loopPeriodSec);
-    inputs.motorInputs.supplyCurrentAmps = armSim.getCurrentDrawAmps();
+
+    motorIO.updateInputs(inputs.motorInputs);
     inputs.positionRad = armSim.getAngleRads();
     inputs.velocityRadPerSec = armSim.getVelocityRadPerSec();
   }
@@ -67,5 +68,10 @@ public class ArmIOSim implements ArmIO {
   public void setVelocity(double velocity) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
+  }
+
+  @Override
+  public void stop() {
+    motorIO.setVoltage(0);
   }
 }

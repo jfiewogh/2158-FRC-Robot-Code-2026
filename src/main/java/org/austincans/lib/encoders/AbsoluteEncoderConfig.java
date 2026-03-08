@@ -2,7 +2,8 @@ package org.austincans.lib.encoders;
 
 public record AbsoluteEncoderConfig(
     int deviceId,
-    double offsetRad,
+    double offsetRotations,
+    double discontinuityPoint,
     boolean isInverted,
     String canbus // CTRE only
 ) {}

@@ -7,7 +7,7 @@ import org.austincans.lib.subsystems.drive.swerve.DriveIOSwerveReal;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
-    public static DriveBase createSwerveTalonFXPigeon2(DriveConfig driveConfig) {
+    public static SwerveDrive createSwerveTalonFXPigeon2(DriveConfig driveConfig) {
         return new DriveBase(
             "Drive",
             new DriveIOSwerveReal<MotorIOTalonFX, GyroIOPigeon2>(

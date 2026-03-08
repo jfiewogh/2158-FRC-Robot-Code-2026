@@ -34,14 +34,14 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 
-public abstract class DriveIOSwerve<Module extends ModuleIO, Gyro extends GyroIO> implements DriveIO {
+public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implements DriveIO {
   private final Translation2d[] moduleTranslations;
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
 
   // private final DriveState driveState;
 
-  private final ArrayList<Module> modules; // FL, FR, BL, FR // cannot have array of generics
+  private final ArrayList<T> modules; // FL, FR, BL, FR // cannot have array of generics
   private final ModuleLimits moduleLimitsFree;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
@@ -65,7 +65,7 @@ public abstract class DriveIOSwerve<Module extends ModuleIO, Gyro extends GyroIO
     kinematics = new SwerveDriveKinematics(moduleTranslations);
     swerveSetpointGenerator = new SwerveSetpointGenerator(kinematics);
 
-    modules = new ArrayList<Module>(List.of(frontLeft, frontRight, backLeft, backRight));
+    modules = new ArrayList<T>(List.of(frontLeft, frontRight, backLeft, backRight));
     moduleLimitsFree = driveConfig.moduleConfig().moduleLimitsFree();
   }
 
@@ -87,7 +87,7 @@ public abstract class DriveIOSwerve<Module extends ModuleIO, Gyro extends GyroIO
   
   public void updateInputs(DriveIOInputs inputs) {
     if (!velocityMode) {
-      currentSetpoint = new SwerveSetpoint(get(), getModuleStates()));
+      currentSetpoint = new SwerveSetpoint(getVelocities(), getModuleStates()));
     }
     modules.get(0).updateInputs(inputs.frontLeftInputs);
     modules.get(1).updateInputs(inputs.frontRightInputs);

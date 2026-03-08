@@ -32,7 +32,7 @@ public class MotorFactory {
     config.closedLoop.feedForward.kG(ffConfig.kG());
     config.closedLoop.feedForward.kV(ffConfig.kV());
     config.closedLoop.feedForward.kA(ffConfig.kA());
-    config.closedLoop.maxMotion.cruiseVelocity(motorConfig.maxSpeedRotationsPerSec());
+    config.closedLoop.maxMotion.cruiseVelocity(motorConfig.maxSpeedRotationsPerSec() * 60);
     config.closedLoop.maxMotion.maxAcceleration(motorConfig.maxAccelerationRotationsPerSecSq());
     config.closedLoop.allowedClosedLoopError(motorConfig.allowedClosedLoopErrorRad(), ClosedLoopSlot.kSlot0);
     SoftLimitConfig softLimitConfig = motorConfig.softLimitConfig();

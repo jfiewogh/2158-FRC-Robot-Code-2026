@@ -15,6 +15,7 @@
 
 package org.austincans.lib.subsystems.arm;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,129 +25,92 @@ import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmBase extends AdvancedSubsystem {
-  private final String name;
-  private final ArmIO io;
+  private final ArmIO armIO;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
   
-  private double targetPosition = 0.0;
-  private double targetVelocity = 0.0;
-
-  private double maxVelocity = 0;
-  private double maxAcceleration = 0;
-  private double gearRatio = 0;
-
-  protected ArmBase(String name, ArmIO io) {
-    this.name = name;
-    this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+  protected ArmBase(ArmIO armIO) {
+    this.armIO = armIO;
+    armIO.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
-  }
-
-  /**
-   * @return Returns the position value divided by the gear ratio.
-   */
-  public double getPosition() {
-    return inputs.position / gearRatio;
-  }
-
-  public Command moveToAngleCommand(double angleDegrees) {
-    return new ConditionalCommand(
-        new InstantCommand(
-            () -> {
-              io.setPosition(angleDegrees / gearRatio);
-            }),
-        null,
-        () -> {
-          double currentAngle = Units.radiansToDegrees(getPositionRadians());
-          return Math.abs(angleDegrees - currentAngle) < 2.0;
-        });
-  }
-
-  public Command stopCommand() {
-    return new InstantCommand(() -> io.setVoltage(0));
-  }
-
-  public Command moveAtVelocityCommand(double velocityDegPerSec) {
-    return new InstantCommand(() -> io.setVoltage(velocityDegPerSec));
-  }
-
-  public double getVelocity() {
-    return inputs.velocity;
-  }
-
-  public double getPositionRadians() {
-    double rotations = getPosition();
-    return rotations * 2.0 * Math.PI;
-  }
-
-  public double getAmps() {
-    return inputs.currentAmps;
-  }
-
-  public double getCurrentVoltage() {
-    return inputs.currentVoltage;
-  }
-
-  public double getTemperature() {
-    return inputs.temperature;
-  }
-
-  public void setAngle(double angleDegrees) {
-    io.setPosition(angleDegrees);
-  }
-
-  public Command setAngleCommand(double angleDegrees) {
-    return new InstantCommand(() -> setAngle(angleDegrees));
   }
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
-    Logger.processInputs(name, inputs);
+    armIO.updateInputs(inputs);
+    Logger.processInputs(getName(), inputs);
     
-    io.checkForFaults().forEach(this::addHardwareFault);
+    armIO.checkForFaults().forEach(this::addHardwareFault);
+  }
+
+  public void setAngle(Rotation2d angle) {
+    armIO.setPosition(angle.getRadians());
+  }
+
+  public double getPositionRad() {
+    return inputs.position;
+  }
+
+  public double getVelocityRadPerSec() {
+    return inputs.velocity;
+  }
+
+  public Command setAngleCommand(Rotation2d rotation) {
+    return Commands.runOnce(() -> setAngle(rotation));
+  }
+
+  public Command moveToAngleCommand(Rotation2d angle) {
+    return Commands.runOnce(() -> armIO.setPosition(angle.getRadians()))
+      .until(() -> Math.abs(angle.getRadians() - getPositionRad()) < Units.degreesToRadians(2));
+  }
+
+  public Command stopCommand() {
+    return new InstantCommand(() -> armIO.setVoltage(0));
+  }
+
+  public Command moveAtVelocityCommand(double velocityDegPerSec) {
+    return new InstantCommand(() -> armIO.setVoltage(velocityDegPerSec));
   }
 
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(() -> io.setVelocity(2)),
+            Commands.runOnce(() -> armIO.setVelocity(2)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(
                 () -> {
-                  if (getVelocity() < 0.1) {
+                  if (getVelocityRadPerSec() < 0.1) {
                     addSubsystemFault(
-                        name, "[System Check] Extension velocity measured too slow", false);
+                        getName(), "[System Check] Extension velocity measured too slow", false);
                   }
-                  io.setVelocity(0);
+                  armIO.setVelocity(0);
                 },
                 this),
-            Commands.runOnce(() -> setAngle(0), this),
+            Commands.runOnce(() -> setAngle(Rotation2d.fromDegrees(0)), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Units.rotationsToDegrees(getPosition()) < -15
-                      || Units.rotationsToDegrees(getPosition()) > 15) {
+                  if (getPositionRad() < Units.degreesToRadians(-15) || 
+                      getPositionRad() > Units.degreesToRadians(15)) {
                     addSubsystemFault(
-                        name, "[System Check] Joint did not reach target position", false);
+                        getName(), "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this),
-            Commands.runOnce(() -> setAngle(90), this),
+            Commands.runOnce(() -> setAngle(Rotation2d.fromDegrees(90)), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Units.rotationsToDegrees(getPosition()) < 75
-                      || Units.rotationsToDegrees(getPosition()) > 115) {
+                  if (getPositionRad() < Units.degreesToRadians(75) ||
+                      getPositionRad() > Units.degreesToRadians(115)) {
                     addSubsystemFault(
-                        name, "[System Check] Joint did not reach target position", false);
+                        getName(), "[System Check] Joint did not reach target position", false);
                   }
                 },
                 this))
         .andThen(
             Commands.runOnce(
                 () -> {
-                  io.setVoltage(0);
+                  armIO.setVoltage(0);
                 },
                 this));
   }

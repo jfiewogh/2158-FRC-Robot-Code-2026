@@ -18,12 +18,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public abstract class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
-    protected final String name;
     protected final DriveIO io;
     protected final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
-    protected DriveBase(String name, DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
-        this.name = name;
+    protected DriveBase(DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
         this.io = io;
 
         AutoBuilder.configure(
@@ -40,7 +38,7 @@ public abstract class DriveBase extends AdvancedSubsystem implements Vision.Visi
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs(name, inputs);
+        Logger.processInputs(getName(), inputs);
     }
 
     public void runVelocities(ChassisSpeeds velocities) {

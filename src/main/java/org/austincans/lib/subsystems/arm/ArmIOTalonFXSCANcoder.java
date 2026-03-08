@@ -29,7 +29,7 @@ import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
-public class ArmIOTalonFXS extends ArmIOReal {
+public class ArmIOTalonFXSCANcoder extends ArmIOReal<MotorIOTalonFXS, CANcoderIO> {
   /* Motor */
   private final TalonFXS motor;
   private SelfCheckingTalonFXS motorSelfCheck;
@@ -40,24 +40,10 @@ public class ArmIOTalonFXS extends ArmIOReal {
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
   private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
-  public ArmIOTalonFXS(ArmConfig armConfig) {
+  public ArmIOTalonFXSCANcoder(ArmConfig armConfig) {
     // Initialize motor controller
     motor = new TalonFXS(armConfig.motorId(), new CANBus(armConfig.motorCanbus()));
     motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
-
-    config = new TalonFXSConfiguration();
-    config.MotorOutput.NeutralMode = armConfig.brakeModeEnabled() ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    config.CurrentLimits.StatorCurrentLimit = armConfig.statorCurrentLimit();
-    config.Slot0.kP = armConfig.kP();
-    config.Slot0.kI = armConfig.kI();
-    config.Slot0.kD = armConfig.kD();
-    config.Slot0.kS = armConfig.kS();
-    config.Slot0.kG = armConfig.kG();
-    config.Slot0.kV = armConfig.kV();
-    config.Slot0.kA = armConfig.kA();
-
-    // Configure encoder
-    encoder = new CANcoder(armConfig.encoderId());
 
     config.ExternalFeedback.FeedbackRemoteSensorID = encoder.getDeviceID();
     config.ExternalFeedback.ExternalFeedbackSensorSource =

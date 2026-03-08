@@ -1,8 +1,5 @@
 package org.austincans.lib.subsystems.arm;
 
-import org.austincans.lib.configs.PIDConfig;
-import org.austincans.lib.configs.FFConfig;
-import org.austincans.lib.configs.SoftLimitConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderConfig;
 import org.austincans.lib.motors.MotorConfig;
 

@@ -9,12 +9,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import edu.wpi.first.math.util.Units;
 
-public abstract class MotorIOSpark<Motor extends SparkBase, Config extends SparkBaseConfig> extends MotorIOReal {
-    protected final Motor motor;
+public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfig> extends MotorIOReal {
+    protected final T motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    protected MotorIOSpark(Motor motor, Config config) {
+    protected MotorIOSpark(T motor, U config) {
         super(motor.getDeviceId());
         this.motor = motor;
         encoder = motor.getEncoder();
@@ -38,15 +38,22 @@ public abstract class MotorIOSpark<Motor extends SparkBase, Config extends Spark
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
-        controller.setSetpoint(velocityRadPerSec, ControlType.kMAXMotionVelocityControl);
+        controller.setSetpoint(
+            Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), 
+            ControlType.kMAXMotionVelocityControl);
     }
 
     @Override
     public void setPosition(double positionRad) {
-        controller.setSetpoint(positionRad, ControlType.kMAXMotionVelocityControl);
+        controller.setSetpoint(
+            Units.radiansToRotations(positionRad), ControlType.kMAXMotionVelocityControl);
     }
 
-    public void setEncoderPosition(double positionRad) {
-        encoder.setPosition(positionRad);
+    public void setEncoderPosition(double positionRotations) {
+        encoder.setPosition(positionRotations);
+    }
+
+    public T getMotor() {
+        return motor;
     }
 }

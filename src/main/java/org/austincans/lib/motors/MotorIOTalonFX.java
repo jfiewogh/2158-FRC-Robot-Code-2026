@@ -50,4 +50,12 @@ public class MotorIOTalonFX extends MotorIOReal {
         motor.setControl(positionVoltage.withPosition(
             Units.radiansToRotations(positionRad)));
     }
+
+    public void setEncoderPosition(double positionRotations) {
+        motor.setPosition(positionRotations);
+    }
+
+    public TalonFX getMotor() {
+        return motor;
+    }
 }
