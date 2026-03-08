@@ -18,13 +18,13 @@ package org.austincans.lib.subsystems.elevator;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.austincans.lib.motors.MotorFactory;
+import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -32,60 +32,45 @@ import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 public class ElevatorIOSpark implements ElevatorIO {
   // TODO: move constants to config
 
-  private final int canID = 0;
   private final boolean brakeMode = true;
 
-  private final SparkFlex motor;
+  private final MotorIOSparkFlex motorIO;
   private final SelfCheckingSparkFlex motorSelfCheck;
   private final RelativeEncoder encoder;
   private SparkFlexConfig config;
 
-  @SuppressWarnings("unused")
-  private final boolean enableStatorLimit = true;
-
-  private final double statorCurrentLimit = 40;
-
-  @SuppressWarnings("unused")
-  private final boolean enableSupplyLimit = false;
-
-  @SuppressWarnings("unused")
-  private final double supplyCurrentLimit = 40;
-
-  public ElevatorIOSpark() {
-    motor = new SparkFlex(canID, MotorType.kBrushless);
-    motorSelfCheck = new SelfCheckingSparkFlex("Elevator Motor", motor);
+  public ElevatorIOSpark(ElevatorConfig elevatorConfig) {
+    motorIO = MotorFactory.createSparkFlex(elevatorConfig.motorConfig);
+    motorSelfCheck = new SelfCheckingSparkFlex("Elevator Motor", motorIO.getMotor());
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
     // Configure encoder
-    encoder = motor.getEncoder();
+    encoder = motorIO.getMotor().getEncoder();
     config.encoder.positionConversionFactor(
-        Math.PI * 2 * ElevatorConstants.drumRadius / ElevatorConstants.gearRatio);
+        Math.PI * 2 * ElevatorConfig.drumRadius / ElevatorConfig.gearRatio);
     config.encoder.velocityConversionFactor(
-        Math.PI * 2 * ElevatorConstants.drumRadius / (ElevatorConstants.gearRatio * 60.0));
+        Math.PI * 2 * ElevatorConfig.drumRadius / (ElevatorConfig.gearRatio * 60.0));
 
     encoder.setPosition(0);
 
     // Set current limits
-    config.smartCurrentLimit((int) statorCurrentLimit);
+    config.smartCurrentLimit((int) ElevatorConfig.statorCurrentLimit);
 
     // Save configuration
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorIO.getMotor().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
   public void runVoltage(double voltage) {
-    motor.setVoltage(voltage);
+    motorIO.setVoltage(voltage);
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.heightMeters = encoder.getPosition();
     inputs.velocityMetersPerSec = encoder.getVelocity();
-
-    inputs.voltage = motor.getBusVoltage();
-    inputs.current = motor.getOutputCurrent();
-    inputs.temperatureC = motor.getMotorTemperature();
+    motorIO.updateInputs(inputs.motorInputs);
   }
 
   @Override

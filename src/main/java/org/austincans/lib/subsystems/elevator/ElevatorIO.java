@@ -17,6 +17,7 @@ package org.austincans.lib.subsystems.elevator;
 
 import java.util.List;
 
+import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -24,12 +25,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public class ElevatorIOInputs {
-    boolean connected = false;
     double heightMeters = 0.0;
     double velocityMetersPerSec = 0.0;
-    double voltage = 0.0;
-    double current = 0.0;
-    double temperatureC = 0.0;
+    MotorIOInputs motorInputs;
   }
 
   public void updateInputs(ElevatorIOInputs inputs);

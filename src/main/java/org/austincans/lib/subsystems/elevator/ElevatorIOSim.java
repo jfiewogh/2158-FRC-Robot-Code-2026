@@ -27,11 +27,11 @@ public class ElevatorIOSim implements ElevatorIO {
   private final ElevatorSim elevatorSim =
       new ElevatorSim(
           motorModel, // Motor type
-          ElevatorConstants.gearRatio,
+          ElevatorConfig.gearRatio,
           5, // Carriage mass (kg)
-          ElevatorConstants.drumRadius, // Drum radius (m)
-          ElevatorConstants.minHeightMeters, // Min height (m)
-          ElevatorConstants.maxHeightMeters, // Max height (m)
+          ElevatorConfig.drumRadius, // Drum radius (m)
+          ElevatorConfig.minHeightMeters, // Min height (m)
+          ElevatorConfig.maxHeightMeters, // Max height (m)
           true, // Simulate gravity
           0 // Starting height (m)
           );
@@ -49,14 +49,10 @@ public class ElevatorIOSim implements ElevatorIO {
     elevatorSim.setInputVoltage(appliedVolts);
     elevatorSim.update(Constants.loopPeriodSecs);
 
-    inputs.connected = false;
     inputs.heightMeters = elevatorSim.getPositionMeters();
     inputs.velocityMetersPerSec = elevatorSim.getVelocityMetersPerSecond();
-    inputs.voltage = appliedVolts;
-    inputs.current = elevatorSim.getCurrentDrawAmps();
-    inputs.temperatureC = 0.0;
-
     elevatorViz.update(inputs.heightMeters);
+    
   }
 
   @Override
