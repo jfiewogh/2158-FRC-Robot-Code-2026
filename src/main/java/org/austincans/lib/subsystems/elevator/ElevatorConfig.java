@@ -29,12 +29,14 @@ public class ElevatorConfig {
 
     public static final double supplyCurrentLimit = 40;
 
+    // these values are for 2025 only so change it if you need to
     public static enum ElevatorState {
         GROUND(0),
         L1(0.25),
         L2(0.6),
         L3(1.02),
         L4(1.73562);
+
 
         private double setpointMeters;
 

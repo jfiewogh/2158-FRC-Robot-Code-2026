@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.Constants;
 import org.austincans.lib.subsystems.elevator.ElevatorIOInputsAutoLogged;
-import org.austincans.lib.subsystems.elevator.ElevatorConstants.ElevatorState;
+import org.austincans.lib.subsystems.elevator.ElevatorConfig.ElevatorState;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,8 +36,8 @@ public class Elevator extends AdvancedSubsystem {
           0,
           0,
           new TrapezoidProfile.Constraints(
-              ElevatorConstants.maxVelocityMetersPerSec,
-              ElevatorConstants.maxAccelerationMetersPerSecSq));
+              ElevatorConfig.maxVelocityMetersPerSec,
+              ElevatorConfig.maxAccelerationMetersPerSecSq));
 
   private final ElevatorFeedforward feedforward =
       new ElevatorFeedforward(
@@ -55,7 +55,7 @@ public class Elevator extends AdvancedSubsystem {
           }
         });
     registerCheckCommand(systemCheckCommand());
-    elevatorPID.setTolerance(ElevatorConstants.pidTolerance);
+    elevatorPID.setTolerance(ElevatorConfig.pidTolerance);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class Elevator extends AdvancedSubsystem {
 
     double feedbackOutput = elevatorPID.calculate(getHeight()) * Constants.maxVoltage;
     double feedforwardOutput = feedforward.calculate(elevatorPID.getSetpoint().velocity);
-    double output = Math.max(feedbackOutput + feedforwardOutput, ElevatorConstants.minVoltage);
+    double output = Math.max(feedbackOutput + feedforwardOutput, ElevatorConfig.minVoltage);
     io.runVoltage(output);
   }
 
@@ -103,7 +103,7 @@ public class Elevator extends AdvancedSubsystem {
     return Commands.runOnce(
         () ->
             io.runVoltage(
-                velocity / ElevatorConstants.maxVelocityMetersPerSec * Constants.maxVoltage));
+                velocity / ElevatorConfig.maxVelocityMetersPerSec * Constants.maxVoltage));
   }
 
   public Command stopCommand() {
