@@ -132,7 +132,7 @@ public class IntakeIOTalonFXS implements IntakeIO {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }

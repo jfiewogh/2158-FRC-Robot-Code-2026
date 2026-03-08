@@ -148,7 +148,7 @@ public class TurretIOTalonFX extends TurretIOReal {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }
