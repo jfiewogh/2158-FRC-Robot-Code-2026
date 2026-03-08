@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import org.austincans.frc2026.subsystems.arm.ArmIOInputsAutoLogged;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,7 +32,11 @@ public class ArmBase extends AdvancedSubsystem {
   
   protected ArmBase(ArmIO armIO) {
     this.armIO = armIO;
-    armIO.getHardware().forEach(e -> registerHardware(e));
+    armIO.getHardware().forEach(e -> {
+          if (e != null) {
+            registerHardware(e);
+          }
+        });
     registerCheckCommand(systemCheckCommand());
   }
 

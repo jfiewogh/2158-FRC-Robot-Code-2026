@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
+import org.austincans.frc2026.subsystems.drive.ModuleIOInputsAutoLogged;
 import org.austincans.lib.util.ConfigUtil;
 import org.austincans.lib.util.LoggedTracer;
 import org.austincans.lib.util.LoggedTunableNumber;
@@ -121,7 +122,11 @@ public class ModuleOld extends AdvancedSubsystem {
         new Alert(
             "Disconnected turn encoder on module " + Integer.toString(index) + ".",
             AlertType.kError);
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.getHardware().forEach(e -> {
+          if (e != null) {
+            registerHardware(e);
+          }
+        });
   }
 
   public void periodic() {
