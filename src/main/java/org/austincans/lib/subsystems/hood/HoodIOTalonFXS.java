@@ -89,7 +89,7 @@ public class HoodIOTalonFXS implements HoodIO {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }

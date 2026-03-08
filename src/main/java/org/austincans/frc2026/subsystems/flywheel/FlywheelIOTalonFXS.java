@@ -60,7 +60,7 @@ public class FlywheelIOTalonFXS extends FlywheelIOReal {
       faults.addAll(motorFaults);
     }
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }

@@ -55,7 +55,7 @@ public class ArmIOSparkFlexCANcoder extends ArmIOReal<MotorIOSparkFlex, CANcoder
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = selfCheckingMotor.checkForFaults();
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }

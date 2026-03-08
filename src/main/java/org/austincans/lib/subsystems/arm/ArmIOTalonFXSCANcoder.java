@@ -52,7 +52,7 @@ public class ArmIOTalonFXSCANcoder extends ArmIOReal<MotorIOTalonFXS, CANcoderIO
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = motorSelfCheck.checkForFaults();
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }
