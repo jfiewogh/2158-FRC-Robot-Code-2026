@@ -26,6 +26,8 @@ public interface TurretIO {
   class TurretIOInputs {
     public double positionRad = 0.0; // robot relative
     public double velocityRadPerSec = 0.0; // robot relative
+    public double motorPositionRotations = 0.0;
+    public double motorVelocityRotationsPerSec;
     public double voltage = 0.0;
     public double currentAmps = 0.0;
     public double temperatureCelsius = 0.0;

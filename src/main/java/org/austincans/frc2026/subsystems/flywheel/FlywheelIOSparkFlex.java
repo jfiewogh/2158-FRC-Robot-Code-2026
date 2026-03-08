@@ -23,6 +23,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -34,6 +36,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   private final SparkFlex motor2 = new SparkFlex(FlywheelConstants.motor2Id, MotorType.kBrushless);
   private final SelfCheckingSparkFlex selfCheckMotor2 =
       new SelfCheckingSparkFlex("flywheel motor 2", motor2);
+
   // private final CANcoder encoder =
   //     new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
   private final SparkClosedLoopController controller = motor1.getClosedLoopController();
@@ -48,7 +51,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.appliedVolts = motor1.getBusVoltage();
-    inputs.velocityRPM = motor1.getEncoder().getVelocity();
+    inputs.velocityRPM = motor1.getEncoder().getVelocity() * FlywheelConstants.flywheelGearRation;
     // inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
     inputs.temperatureC = motor1.getMotorTemperature();
   }

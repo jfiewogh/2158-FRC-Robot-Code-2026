@@ -15,24 +15,26 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import org.austincans.frc2026.controllers.LaserCAN;
+
 // Includes the sensors used in a real flywheel
 public abstract class FlywheelIOReal implements FlywheelIO {
-  // private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
-  // private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
+  private LaserCAN lasarCan1 = new LaserCAN(FlywheelConstants.lasarCan1Id);
+  private LaserCAN laserCan2 = new LaserCAN(FlywheelConstants.lasarCan2Id);
 
-  // @Override
-  // public boolean readyToShoot() {
-  //   return lasarCan1.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan1;
-  // }
+  @Override
+  public boolean readyToShoot() {
+    return lasarCan1.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan1;
+  }
 
-  // @Override
-  // public boolean isShooting() {
-  //   return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
-  // }
+  @Override
+  public boolean isShooting() {
+    return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
+  }
 
-  // // TODO: complete
-  // @Override
-  // public boolean noGamePiecesToShoot() {
-  //   return false;
-  // }
+  // TODO: complete
+  @Override
+  public boolean noGamePiecesToShoot() {
+    return false;
+  }
 }

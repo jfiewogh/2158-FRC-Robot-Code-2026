@@ -145,6 +145,10 @@ public class Turret extends AdvancedSubsystem {
         this);
   }
 
+  public Command runTurret(double velocityRadPerSec){
+    return Commands.run(() -> setTurretVelocity(velocityRadPerSec));
+  }
+
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(

@@ -15,7 +15,9 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,11 +45,17 @@ public class Flywheel extends AdvancedSubsystem {
   private final SparkFlex indexer =
       new SparkFlex((IntakeConstants.indexerID), MotorType.kBrushless);
 
+  private final SparkClosedLoopController controller = indexer.getClosedLoopController();
+
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
+  }
+
+  public void runIndexer(double velocityRotationsPerMinute){
+    controller.setSetpoint(velocityRotationsPerMinute, ControlType.kVelocity);
   }
 
   @Override
@@ -100,5 +108,14 @@ public class Flywheel extends AdvancedSubsystem {
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }));
+  }
+
+  public Command runIndexerAndFlywheel(double velocity){
+    return Commands.run(() -> {
+      setRelativeVelocity(velocity);
+      if (indexer.getEncoder().getVelocity() == inputs.velocityRPM){
+        runIndexer(velocity);
+      }
+    });
   }
 }

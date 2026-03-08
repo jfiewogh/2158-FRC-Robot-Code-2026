@@ -16,6 +16,7 @@
 package org.austincans.frc2026.subsystems.turret;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -23,6 +24,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,6 +37,7 @@ import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class TurretIOSparkFlex extends TurretIOReal {
   private final SparkFlex motor;
+  private final RelativeEncoder relativeEncoder;
   private final SparkClosedLoopController controller;
   private final SelfCheckingSparkFlex selfCheckingMotor;
 
@@ -52,13 +55,19 @@ public class TurretIOSparkFlex extends TurretIOReal {
     motorConfig.closedLoop.feedForward.kV(TurretConstants.kV);
     motorConfig.closedLoop.feedForward.kA(TurretConstants.kA);
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
-    motorConfig.softLimit.forwardSoftLimit(TurretConstants.forwardSoftLimit);
+    motorConfig.softLimit.forwardSoftLimit(TurretConstants.forwardSoftLimit / TurretConstants.gearing);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);
-    motorConfig.softLimit.reverseSoftLimit(TurretConstants.reverseSoftLimit);
+    motorConfig.softLimit.reverseSoftLimit(TurretConstants.reverseSoftLimit / TurretConstants.gearing);
+    motorConfig.closedLoop.maxMotion.cruiseVelocity(TurretConstants.maxVelocityRotationsPerSec);
+    motorConfig.closedLoop.maxMotion.maxAcceleration(TurretConstants.maxAccelerationRotationsPerSecSq);
     motorConfig.smartCurrentLimit(TurretConstants.smartCurrentLimit);
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+    motorConfig.encoder.positionConversionFactor(1 / TurretConstants.gearing);
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    relativeEncoder = motor.getEncoder();
+    relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
     controller = motor.getClosedLoopController();
   }
@@ -71,18 +80,19 @@ public class TurretIOSparkFlex extends TurretIOReal {
   @Override
   public void setDesiredAngle(Rotation2d angle) {
     double rotations = MathUtil.inputModulus(angle.getRotations(), TurretConstants.turretMaxRotation, TurretConstants.turretMinimumRotation);
-    // rotations = MathUtil.clamp(angle.getRotations(), TurretConstants.turretMaxRotation, TurretConstants.turretMinimumRotation);
-    controller.setSetpoint(rotations, ControlType.kPosition);
+    controller.setSetpoint(rotations, ControlType.kMAXMotionPositionControl);
   }
 
   @Override
   public void setVelocity(double radiansPerSec) {
-    controller.setSetpoint(Units.radiansToRotations(radiansPerSec), ControlType.kVelocity);
+    controller.setSetpoint(Units.radiansToRotations(radiansPerSec), ControlType.kMAXMotionVelocityControl);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     super.updateInputs(inputs);
+    inputs.motorPositionRotations = relativeEncoder.getPosition();
+    inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
     inputs.voltage = motor.getBusVoltage();
     inputs.temperatureCelsius = motor.getMotorTemperature();

@@ -92,12 +92,12 @@ public class RobotContainer {
   private Led led;
 
   // Subsystem Enabled // only matters for real robot
-  private static final boolean driveEnabled = true;
+  private static final boolean driveEnabled = false;
   private static final boolean visionEnabled = false;
   private static final boolean objectDetectionEnabled = false;
   private static final boolean turretEnabled = false;
   private static final boolean hoodEnabled = false;
-  private static final boolean intakeEnabled = true;
+  private static final boolean intakeEnabled = false;
   private static final boolean flywheelEnabled = true;
   private static final boolean ledEnabled = true;
 
