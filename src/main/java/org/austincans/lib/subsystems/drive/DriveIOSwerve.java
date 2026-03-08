@@ -18,6 +18,8 @@ package org.austincans.lib.subsystems.drive;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.lib.Constants;
+import org.austincans.lib.configs.DriveConfig;
+import org.austincans.lib.configs.SwerveDriveConfig;
 import org.austincans.lib.motors.MotorIO;
 import org.austincans.lib.subsystems.drive.ModuleIO;
 import org.austincans.lib.util.swerve.ModuleLimits;
@@ -34,15 +36,18 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 
+// TODO: Maybe create Vision.java, a class for handling vision
 public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implements DriveIO {
   private final Translation2d[] moduleTranslations;
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
 
-  // private final DriveState driveState;
-
   private final ArrayList<T> modules; // FL, FR, BL, FR // cannot have array of generics
   private final ModuleLimits moduleLimitsFree;
+
+  private final U gyroIO;
+
+  private final SwerveDriveState swerveDriveState;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -55,20 +60,23 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   );
   private boolean velocityMode = false;
 
-  public DriveIOSwerve(DriveConfig driveConfig, Module frontLeft, Module frontRight, Module backLeft, Module backRight) {
+  public DriveIOSwerve(SwerveDriveConfig config, T frontLeft, T frontRight, T backLeft, T backRight, U gyroIO) {
+    this.gyroIO = gyroIO;
+
+    modules = new ArrayList<T>(List.of(frontLeft, frontRight, backLeft, backRight));
+    moduleLimitsFree = config.moduleConfig.moduleLimitsFree();
+    
     moduleTranslations = new Translation2d[] {
-      new Translation2d(driveConfig.wheelbaseMeters() / 2, driveConfig.trackWidthMeters() / 2),
-      new Translation2d(driveConfig.wheelbaseMeters() / 2, -driveConfig.trackWidthMeters() / 2),
-      new Translation2d(-driveConfig.wheelbaseMeters() / 2, driveConfig.trackWidthMeters() / 2),
-      new Translation2d(-driveConfig.wheelbaseMeters() / 2, -driveConfig.trackWidthMeters() / 2)
+      new Translation2d(config.wheelbaseMeters / 2, config.trackWidthMeters / 2),
+      new Translation2d(config.wheelbaseMeters / 2, -config.trackWidthMeters / 2),
+      new Translation2d(-config.wheelbaseMeters / 2, config.trackWidthMeters / 2),
+      new Translation2d(-config.wheelbaseMeters / 2, -config.trackWidthMeters / 2)
     };
     kinematics = new SwerveDriveKinematics(moduleTranslations);
     swerveSetpointGenerator = new SwerveSetpointGenerator(kinematics);
-
-    modules = new ArrayList<T>(List.of(frontLeft, frontRight, backLeft, backRight));
-    moduleLimitsFree = driveConfig.moduleConfig().moduleLimitsFree();
   }
 
+  /** Used for odometry */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
@@ -93,6 +101,8 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
     modules.get(1).updateInputs(inputs.frontRightInputs);
     modules.get(2).updateInputs(inputs.backLeftInputs);
     modules.get(3).updateInputs(inputs.backRightInputs);
+
+    swerveDriveState
   }
 
   /**
@@ -161,5 +171,9 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   @Override
   public void resetPose2d(Pose2d pose) {
 
+  }
+
+  private ChassisSpeeds getVelocities() {
+    return 
   }
 }

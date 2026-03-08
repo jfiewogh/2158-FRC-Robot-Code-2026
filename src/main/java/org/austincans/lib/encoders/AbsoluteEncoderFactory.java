@@ -1,5 +1,7 @@
 package org.austincans.lib.encoders;
 
+import org.austincans.lib.configs.AbsoluteEncoderConfig;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.signals.SensorDirectionValue;

@@ -16,6 +16,8 @@
 package org.austincans.lib.subsystems.arm;
 
 import java.util.List;
+
+import org.austincans.lib.configs.ArmConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;

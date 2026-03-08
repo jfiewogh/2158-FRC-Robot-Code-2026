@@ -1,6 +1,6 @@
 package org.austincans.lib.subsystems.hood;
-import org.austincans.lib.encoders.AbsoluteEncoderConfig;
-import org.austincans.lib.motors.MotorConfig;
+import org.austincans.lib.configs.AbsoluteEncoderConfig;
+import org.austincans.lib.configs.MotorConfig;
 
 public record HoodConfig(
     MotorConfig motorConfig,

@@ -1,7 +1,4 @@
-package org.austincans.lib.subsystems.arm;
-
-import org.austincans.lib.encoders.AbsoluteEncoderConfig;
-import org.austincans.lib.motors.MotorConfig;
+package org.austincans.lib.configs;
 
 public record ArmConfig(
     MotorConfig motorConfig,

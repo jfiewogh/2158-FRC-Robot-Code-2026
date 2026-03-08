@@ -22,6 +22,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import java.util.function.DoubleSupplier;
+
+import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.motors.MotorIO;
 
 import com.pathplanner.lib.config.RobotConfig;

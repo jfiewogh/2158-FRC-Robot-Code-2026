@@ -1,4 +1,4 @@
-package org.austincans.lib.encoders;
+package org.austincans.lib.configs;
 
 public record AbsoluteEncoderConfig(
     int deviceId,

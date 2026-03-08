@@ -71,7 +71,7 @@ import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.lib.subsystems.drive.DriveConfig;
+import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.subsystems.drive.GyroIO;
 import org.austincans.lib.subsystems.drive.old.DriveIO;
 import org.austincans.lib.subsystems.drive.old.Module;
@@ -105,9 +105,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = DriveConstants.robotMassKG;
-  private static final double ROBOT_MOI = DriveConstants.robotMOI;
-  private static final double WHEEL_COF = DriveConstants.wheelCOF;
+  private static final double ROBOT_MASS_KG = SwerveDriveStateConstants.robotMassKG;
+  private static final double ROBOT_MOI = SwerveDriveStateConstants.robotMOI;
+  private static final double WHEEL_COF = SwerveDriveStateConstants.wheelCOF;
   public static final RobotConfig PP_CONFIG =
       new RobotConfig(
           ROBOT_MASS_KG,
@@ -295,7 +295,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                     0.0,
                     0.0,
                     Math.abs(gyroInputs.pitchPosition.getRadians())
-                        * DriveConstants.trackWidthX
+                        * SwerveDriveStateConstants.trackWidthX
                         / 2.0,
                     0.0,
                     gyroInputs.pitchPosition.getRadians(),
@@ -305,7 +305,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                     0.0,
                     0.0,
                     Math.abs(gyroInputs.rollPosition.getRadians())
-                        * DriveConstants.trackWidthY
+                        * SwerveDriveStateConstants.trackWidthY
                         / 2.0,
                     gyroInputs.rollPosition.getRadians(),
                     0.0,

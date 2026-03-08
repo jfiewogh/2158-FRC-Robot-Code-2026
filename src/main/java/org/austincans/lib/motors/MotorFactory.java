@@ -1,6 +1,7 @@
 package org.austincans.lib.motors;
 
 import org.austincans.lib.configs.FFConfig;
+import org.austincans.lib.configs.MotorConfig;
 import org.austincans.lib.configs.PIDConfig;
 import org.austincans.lib.configs.SoftLimitConfig;
 import com.ctre.phoenix6.CANBus;

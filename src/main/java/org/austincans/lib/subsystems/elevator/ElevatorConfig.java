@@ -1,6 +1,6 @@
 package org.austincans.lib.subsystems.elevator;
 
-import org.austincans.lib.motors.MotorConfig;
+import org.austincans.lib.configs.MotorConfig;
 
 public class ElevatorConfig {
     public MotorConfig motorConfig;

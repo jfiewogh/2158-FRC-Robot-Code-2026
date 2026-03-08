@@ -1,8 +1,4 @@
-package org.austincans.lib.motors;
-
-import org.austincans.lib.configs.PIDConfig;
-import org.austincans.lib.configs.SoftLimitConfig;
-import org.austincans.lib.configs.FFConfig;
+package org.austincans.lib.configs;
 
 /** Add or modify variables if necessary */
 public record MotorConfig(

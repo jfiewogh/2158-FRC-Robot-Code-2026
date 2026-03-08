@@ -1,7 +1,5 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.configs;
 
-import org.austincans.lib.configs.FFConfig;
-import org.austincans.lib.configs.PIDConfig;
 import org.austincans.lib.util.swerve.ModuleLimits;
 
 public record ModuleConfig(
@@ -11,7 +9,7 @@ public record ModuleConfig(
     FFConfig steerFFConfig,
     double maxDriveMotorVelocityRadPerSec,
     double maxDriveMotorAccelerationRadPerSecSq,
-    double maxSteerMotorVelocityRadPerSec
+    double maxSteerMotorVelocityRadPerSec,
     double wheelRadius) {
     public ModuleLimits moduleLimitsFree() {
         return new ModuleLimits(

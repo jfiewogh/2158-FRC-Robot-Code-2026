@@ -30,8 +30,8 @@ import edu.wpi.first.units.measure.Frequency;
 
 import java.util.List;
 import java.util.Queue;
-import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.lib.util.PhoenixUtil;
+import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
@@ -40,6 +40,7 @@ import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon =
       new Pigeon2(
+
           TunerConstants.DrivetrainConstants.Pigeon2Id,
           new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
   private SelfCheckingPigeon2 pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
@@ -53,10 +54,12 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityXWorld();
   private final StatusSignal<AngularVelocity> rollVelocity = pigeon.getAngularVelocityYWorld();
 
-  public GyroIOPigeon2(Frequency odometryFrequency) {
-    pigeon.getConfigurator().apply(new Pigeon2Configuration());
+  public GyroIOPigeon2(GyroConfigPigeon2 gyroConfig, Pigeon2Configuration config) {
+    pigeon.getConfigurator().apply(config);
     pigeon.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(odometryFrequency);
+    yaw.setUpdateFrequency(new Frequency() {
+      
+    });
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
