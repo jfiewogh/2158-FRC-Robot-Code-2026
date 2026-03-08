@@ -48,8 +48,6 @@ public class ArmIOSim implements ArmIO {
     armSim.update(Constants.loopPeriodSec);
 
     motorIO.updateInputs(inputs.motorInputs);
-    inputs.positionRad = armSim.getAngleRads();
-    inputs.velocityRadPerSec = armSim.getVelocityRadPerSec();
   }
 
   @Override
