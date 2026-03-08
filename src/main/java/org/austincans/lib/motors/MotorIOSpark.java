@@ -49,6 +49,10 @@ public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfi
             Units.radiansToRotations(positionRad), ControlType.kMAXMotionVelocityControl);
     }
 
+    public void stop() {
+        motor.stopMotor();
+    }
+
     public void setEncoderPosition(double positionRotations) {
         encoder.setPosition(positionRotations);
     }

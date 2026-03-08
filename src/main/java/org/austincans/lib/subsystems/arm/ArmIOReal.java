@@ -17,4 +17,19 @@ public abstract class ArmIOReal<T extends MotorIOReal, U extends AbsoluteEncoder
         motorIO.updateInputs(inputs.motorInputs);
         absoluteEncoderIO.updateInputs(inputs.absoluteEncoderInputs);
     }    
+
+    @Override
+    public void setVoltage(double voltage) {
+        motorIO.setVoltage(voltage);
+    }
+
+    @Override
+    public void setPosition(double positionRad) {
+        motorIO.setPosition(positionRad);
+    }
+
+    @Override
+    public void setVelocity(double velocityRadPerSec) {
+        motorIO.setVelocity(velocityRadPerSec);
+    }
 }

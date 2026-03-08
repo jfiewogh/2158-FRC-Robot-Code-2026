@@ -15,71 +15,37 @@
 
 package org.austincans.lib.subsystems.arm;
 
-import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import java.util.List;
+import org.austincans.lib.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.encoders.CANcoderIO;
+import org.austincans.lib.motors.MotorFactory;
+import org.austincans.lib.motors.MotorIOTalonFXS;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
+// TODO: have SelfChecking as generic
 public class ArmIOTalonFXSCANcoder extends ArmIOReal<MotorIOTalonFXS, CANcoderIO> {
-  /* Motor */
-  private final TalonFXS motor;
   private SelfCheckingTalonFXS motorSelfCheck;
-  private final TalonFXSConfiguration config;
-  private final CANcoder encoder;
-
-  private final VoltageOut voltageRequest = new VoltageOut(0);
-  private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
-  private final PositionVoltage positionRequest = new PositionVoltage(0).withSlot(0);
 
   public ArmIOTalonFXSCANcoder(ArmConfig armConfig) {
-    // Initialize motor controller
-    motor = new TalonFXS(armConfig.motorId(), new CANBus(armConfig.motorCanbus()));
-    motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motor);
+    super(
+      MotorFactory.createTalonFXSWithFusedCANcoder(armConfig.motorConfig(), armConfig.absoluteEncoderConfig().deviceId()),
+      AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
 
-    config.ExternalFeedback.FeedbackRemoteSensorID = encoder.getDeviceID();
-    config.ExternalFeedback.ExternalFeedbackSensorSource =
-        ExternalFeedbackSensorSourceValue.FusedCANcoder;
+    motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motorIO.getMotor());
 
-    motor.getConfigurator().apply(config);
-
-    encoder.setPosition(0);
-  }
-
-  @Override
-  public void setVoltage(double voltage) {
-    motor.setControl(voltageRequest.withOutput(voltage));
-  }
-
-  @Override
-  public void setPosition(double position) {
-    motor.setControl(positionRequest.withPosition(position));
-  }
-
-  @Override
-  public void setVelocity(double velocity) {
-    motor.setControl(velocityRequest.withVelocity(velocity));
-  }
-
-  public void stopMotor() {
-    setVoltage(0);
+    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePositionRotations());
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.currentVoltage = motor.getMotorVoltage().getValueAsDouble();
-    inputs.position = motor.getPosition().getValueAsDouble();
-    inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
-    inputs.velocity = motor.getVelocity().getValueAsDouble();
-    inputs.currentAmps = motor.getStatorCurrent().getValueAsDouble();
+    super.updateInputs(inputs);
+  }
+
+  @Override
+  public void stop() {
+    setVoltage(0);
   }
 
   @Override

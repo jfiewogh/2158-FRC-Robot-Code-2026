@@ -15,23 +15,10 @@
 
 package org.austincans.lib.subsystems.arm;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SoftLimitConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.List;
 import org.austincans.lib.util.KalmanFilter1D;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
-import org.austincans.lib.motors.MotorConfig;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
@@ -48,33 +35,20 @@ public class ArmIOSparkFlexCANcoder extends ArmIOReal<MotorIOSparkFlex, CANcoder
     super(
       MotorFactory.createSparkFlex(armConfig.motorConfig()), 
       AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
-    motorIO.setEncoderPosition(absoluteEncoderIO.getPosition());
+
     selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motorIO.getMotor());
-    // Configure encoder
-    motorIO.setEncoderPosition(0);
+
+    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePositionRotations());
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    motorIO.setVoltage(voltage);
-  }
-
-  public void setPosition(double positionRad) {
-    motorIO.setPosition(positionRad);
-  }
-
-  public void setVelocity(double velocityRadPerSec) {
-    motorIO.setVelocity(velocityRadPerSec);
-  }
-
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.motorInputs = motorInputs;
-    inputs.positionRad = motorInputs.positionRad;
-    inputs.velocityRadPerSec = motorInputs.velocityRadPerSec;
+    super.updateInputs(inputs);
   }
 
-  public void stopMotor() {
-    setVoltage(0);
+  @Override
+  public void stop() {
+    motorIO.stop();
   }
 
   @Override
