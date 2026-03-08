@@ -1,5 +1,6 @@
 package org.austincans.lib.subsystems.drive;
 
+import org.austincans.lib.configs.ModuleConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.encoders.EncoderIO;
 import org.austincans.lib.motors.MotorIO;

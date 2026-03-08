@@ -19,6 +19,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.lib.Constants;
+import org.austincans.lib.configs.ArmConfig;
 import org.austincans.lib.motors.MotorIOFake;
 
 public class PivotIOSim implements PivotIO {

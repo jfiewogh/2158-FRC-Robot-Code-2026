@@ -1,19 +1,18 @@
 package org.austincans.lib.subsystems.drive;
 
+import org.austincans.lib.configs.SwerveDriveConfig;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.subsystems.drive.old.ModuleIOTalonFX;
+import com.pathplanner.lib.config.ModuleConfig;
 
-public class DriveIOSwerveTalonFXPigeon2 extends DriveIOSwerve<ModuleIOTalonFX, GyroIOPigeon2> {
-    public DriveIOSwerveTalonFXPigeon2(DriveConfig driveConfig) {
+public class DriveIOSwerveTalonFXPigeon2 extends DriveIOSwerve<ModuleIOTalonFXCANcoder, GyroIOPigeon2> {
+    public DriveIOSwerveTalonFXPigeon2(SwerveDriveConfig swerveDriveConfig, ModuleConfig moduleConfig) {
         super(
-            driveConfig,
-            MotorFactory.createSparkMax(
-                0, 
-                false, 
-                null, 
-                null, 
-                false, 
-                null)
+            swerveDriveConfig,
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            GyroFactory.createPigeon2();
         );
     }
 }

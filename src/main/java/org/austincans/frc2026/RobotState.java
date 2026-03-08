@@ -30,7 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.util.GeomUtil;
+import org.austincans.lib.util.GeomUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 @ExtensionMethod({GeomUtil.class})

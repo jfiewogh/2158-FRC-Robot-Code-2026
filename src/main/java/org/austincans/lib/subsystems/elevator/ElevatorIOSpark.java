@@ -22,7 +22,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;

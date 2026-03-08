@@ -17,6 +17,7 @@ package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
 import org.austincans.lib.util.KalmanFilter1D;
+import org.austincans.lib.configs.ArmConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;
