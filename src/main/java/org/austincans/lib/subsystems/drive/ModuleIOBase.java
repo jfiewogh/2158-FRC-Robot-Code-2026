@@ -9,26 +9,23 @@ import com.revrobotics.AbsoluteEncoder;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extends MotorIO, Encoder extends AbsoluteEncoderIO> implements ModuleIO {
-    private final DriveMotor driveMotor;
-    private final SteerMotor steerMotor;
-    private final AbsoluteEncoder steerEncoder;
+public abstract class ModuleIOBase<T extends MotorIO, U extends MotorIO, V extends AbsoluteEncoderIO> implements ModuleIO {
+    private final T driveMotorIO;
+    private final U steerMotorIO;
+    private final V steerAbsoluteEncoderIO;
 
-    public ModuleIOBase(ModuleConfig moduleConfig, DriveMotor driveMotor, SteerMotor steerMotor, AbsoluteEncoder steerEncoder) {
-        this.driveMotor = driveMotor;
-        this.steerMotor = steerMotor;
-        this.steerEncoder = steerEncoder;
+    public ModuleIOBase(ModuleConfig moduleConfig, T driveMotorIO, U steerMotorIO, V steerAbsoluteEncoderIO) {
+        this.driveMotorIO = driveMotorIO;
+        this.steerMotorIO = steerMotorIO;
+        this.steerAbsoluteEncoderIO = steerAbsoluteEncoderIO;
     }
 
     /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        driveMotor.updateInputs(inputs.driveMotorInputs);
-        steerMotor.updateInputs(inputs.steerMotorInputs);
-        steerEncoder.updateInputs(inputs.steerEncoderInputs);
-        inputs.steerPosition = steerEncoder.getPosition();
-        inputs.steerPositionWithoutOffset = steerEncoder.getPosition();
-
+        driveMotorIO.updateInputs(inputs.driveMotorInputs);
+        steerMotorIO.updateInputs(inputs.steerMotorInputs);
+        steerAbsoluteEncoderIO.updateInputs(inputs.steerEncoderInputs);
     }
 
     @Override

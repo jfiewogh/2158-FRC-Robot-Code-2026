@@ -10,7 +10,7 @@ public abstract interface ModuleIO {
     public class ModuleIOInputs {
         public MotorIOInputsAutoLogged driveMotorInputs = new MotorIOInputsAutoLogged();
         public MotorIOInputsAutoLogged steerMotorInputs = new MotorIOInputsAutoLogged();
-        public AbsoluteEncoderIOInputsAutoLogged steerEncoderInputs = new AbsoluteEncoderIOInputsAutoLogged();
+        public AbsoluteEncoderIOInputsAutoLogged steerAbsoluteEncoderInputs = new AbsoluteEncoderIOInputsAutoLogged();
     }
 
     public void updateInputs(ModuleIOInputs inputs);

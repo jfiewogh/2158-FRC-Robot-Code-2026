@@ -27,7 +27,7 @@ import org.austincans.lib.motors.MotorIO;
 import com.pathplanner.lib.config.RobotConfig;
 
 // TODO: Finish this class
-public class DriveIODifferential<T extends MotorIO> implements DriveIO {
+public class DriveIODifferential<T extends MotorIO, U extends GyroIO> implements DriveIO {
   private final DifferentialDriveKinematics kinematics;
 
   private final T leftLeader;
@@ -35,10 +35,11 @@ public class DriveIODifferential<T extends MotorIO> implements DriveIO {
   private final T rightLeader;
   private final T rightFollower;
 
+  private final U gyroIO;
+
   private final DifferentialDriveOdometry odometry;
 
-  public DriveIODifferential(DriveConfig driveConfig, T leftLeader, T leftFollower,
-      T rightLeader, T rightFollower) {
+  public DriveIODifferential(DriveConfig driveConfig, T leftLeader, T leftFollower, T rightLeader, T rightFollower, U gyroIO) {
     kinematics = new DifferentialDriveKinematics(driveConfig.trackWidthMeters());
 
     this.leftLeader = leftLeader;
@@ -46,46 +47,10 @@ public class DriveIODifferential<T extends MotorIO> implements DriveIO {
     this.rightLeader = rightLeader;
     this.rightFollower = rightFollower;
 
-    odometry = new DifferentialDriveOdometry(null, null, null);
+    this.gyroIO = gyroIO;
 
-    RobotConfig robotConfig;
-    try {
-      robotConfig = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-    }
+    odometry = new DifferentialDriveOdometry(gyroIO., null, null);
 
-    // TODO: AutoBuilder.configure must take in the subsystem. Fix this
-    /*
-     * AutoBuilder.configure(
-     * this::getPose, // Robot pose supplier
-     * this::resetPose, // Method to reset odometry (will be called if your auto has
-     * a starting pose)
-     * this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT
-     * RELATIVE
-     * (speeds, feedforwards) -> runChassisSpeeds(speeds), // Method that will drive
-     * the robot given ROBOT RELATIVE
-     * // ChassisSpeeds. Also optionally outputs individual module
-     * // feedforwards
-     * new PPLTVController(0.02), // PPLTVController is the built in path following
-     * controller for differential
-     * // drive trains
-     * robotConfig, // The robot configuration
-     * () -> {
-     * // Boolean supplier that controls when the path will be mirrored for the red
-     * // alliance
-     * // This will flip the path being followed to the red side of the field.
-     * // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-     * var alliance = DriverStation.getAlliance();
-     * if (alliance.isPresent()) {
-     * return alliance.get() == DriverStation.Alliance.Red;
-     * }
-     * return false;
-     * },
-     * this // Reference to this subsystem to set requirements
-     * );
-     */
   }
 
   @Override

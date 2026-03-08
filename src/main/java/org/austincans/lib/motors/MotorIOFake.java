@@ -1,6 +1,6 @@
 package org.austincans.lib.motors;
 
-public class MotorIOSim implements MotorIO {
+public class MotorIOFake implements MotorIO {
     private double appliedVolts;
     private double velocityRadPerSec;
     private double positionRad;

@@ -1,11 +1,14 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.configs.PIDFFConfig;
+import org.austincans.lib.configs.FFConfig;
+import org.austincans.lib.configs.PIDConfig;
 import org.austincans.lib.util.swerve.ModuleLimits;
 
 public record ModuleConfig(
-    PIDFFConfig drivePIDFFConfig,
-    PIDFFConfig steerPIDFFConfig,
+    PIDConfig drivePIDConfig,
+    FFConfig driveFFConfig,
+    PIDConfig steerPIDConfig,
+    FFConfig steerFFConfig,
     double maxDriveMotorVelocityRadPerSec,
     double maxDriveMotorAccelerationRadPerSecSq,
     double maxSteerMotorVelocityRadPerSec

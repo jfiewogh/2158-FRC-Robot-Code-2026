@@ -16,11 +16,13 @@
 package org.austincans.lib.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+
 import java.util.List;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface GyroIO {
+public abstract interface GyroIO {
   @AutoLog
   public static class GyroIOInputs {
     public boolean connected = false;
@@ -42,4 +44,6 @@ public interface GyroIO {
   public default List<HardwareFault> checkForFaults() {
     return List.of();
   }
+
+  public Rotation3d getRotation3d();
 }
