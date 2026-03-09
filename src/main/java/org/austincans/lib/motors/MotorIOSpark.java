@@ -24,6 +24,7 @@ public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfi
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
+        inputs.connected = true; // TODO: make this based on some property of the motor
         inputs.positionRad = Units.rotationsToRadians(encoder.getPosition());
         inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
         inputs.appliedVolts = motor.getBusVoltage();
@@ -55,9 +56,5 @@ public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfi
 
     public void setEncoderPosition(double positionRotations) {
         encoder.setPosition(positionRotations);
-    }
-
-    public T getMotor() {
-        return motor;
     }
 }

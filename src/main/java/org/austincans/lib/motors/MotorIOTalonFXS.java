@@ -24,6 +24,7 @@ public class MotorIOTalonFXS extends MotorIOReal {
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
+        inputs.connected = motor.isConnected();
         inputs.positionRad = motor.getPosition().getValue().in(Radians);
         inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
         inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
@@ -52,9 +53,5 @@ public class MotorIOTalonFXS extends MotorIOReal {
 
     public void setEncoderPosition(double positionRotations) {
         motor.setPosition(positionRotations);
-    }
-
-    public TalonFXS getMotor() {
-        return motor;
     }
 }
