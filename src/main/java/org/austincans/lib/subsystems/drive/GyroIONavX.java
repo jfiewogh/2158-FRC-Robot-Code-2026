@@ -19,12 +19,9 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import java.util.List;
 import java.util.Queue;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {
@@ -62,28 +59,5 @@ public class GyroIONavX implements GyroIO {
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
     inputs.imuRate = navX.getRate();
-  }
-
-  // TODO: add check for faults
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  private double getYawRad() {
-    return Units.degreesToRadians(-navX.getYaw());
-  }
-
-  private double getPitchRad() {
-    return Units.degreesToRadians(-navX.getPitch());
-  }
-
-  private double getRollRad() {
-    return Units.degreesToRadians(-navX.getRoll());
-  }
-
-  @Override
-  public Rotation3d getRotation3d() {
-    return new Rotation3d(getRollRad(), getPitchRad(), getYawRad());
   }
 }

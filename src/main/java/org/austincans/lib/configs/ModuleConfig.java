@@ -3,19 +3,15 @@ package org.austincans.lib.configs;
 import org.austincans.lib.util.swerve.ModuleLimits;
 
 public record ModuleConfig(
-    PIDConfig drivePIDConfig,
-    FFConfig driveFFConfig,
-    PIDConfig steerPIDConfig,
-    FFConfig steerFFConfig,
-    double maxDriveMotorVelocityRadPerSec,
-    double maxDriveMotorAccelerationRadPerSecSq,
-    double maxSteerMotorVelocityRadPerSec,
+    MotorConfig driveMotorConfig,
+    MotorConfig steerMotorConfig,
+    AbsoluteEncoderConfig absoluteEncoderConfig,
     double wheelRadiusMeters,
     double driveSpeedMultiplier) {
     public ModuleLimits moduleLimitsFree() {
         return new ModuleLimits(
-            maxDriveMotorVelocityRadPerSec,
-            maxDriveMotorAccelerationRadPerSecSq,
-            maxSteerMotorVelocityRadPerSec);
+            driveMotorConfig.maxSpeedRotationsPerSec(),
+            driveMotorConfig.maxAccelerationRotationsPerSecSq(),
+            steerMotorConfig.maxAccelerationRotationsPerSecSq());
     }
 }

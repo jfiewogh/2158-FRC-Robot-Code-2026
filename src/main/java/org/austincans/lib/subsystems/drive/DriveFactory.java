@@ -3,28 +3,17 @@ package org.austincans.lib.subsystems.drive;
 import org.austincans.lib.ConfigManager;
 import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.configs.DriveConfigSwerve;
+import org.austincans.lib.configs.ModuleConfig;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkMax;
 import org.austincans.lib.motors.MotorIOTalonFX;
-import com.pathplanner.lib.config.ModuleConfig;
+
 import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
-    private static <T extends ModuleIO, U extends GyroIO> SwerveDrive createSwerveDrive(DriveConfigSwerve swerveConfig) {
-        DriveIOSwerve swerveIO = new DriveIOSwerve<T, U>(null, null, null);
-        return new SwerveDrive(null, null, robotConfig)
-        return new SwerveDrive();
-    }
-
-    public static SwerveDrive createSwerveTalonFXPigeon2(DriveConfigSwerve swerveConfig) {
-        RobotConfig robotConfig;
-        try {
-            robotConfig = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            // Handle exception as needed
-            e.printStackTrace();
-        }
+    public static SwerveDrive createSwerveTalonFXPigeon2FromPathPlanner(DriveConfigSwerve swerveConfig) {
+        RobotConfig robotConfig = RobotConfig.fromGUISettings();
         ModuleConfig moduleConfig = swerveConfig.moduleConfig;
         DriveIOSwerve<ModuleIO, GyroIO> swerveIO = new DriveIOSwerve<ModuleIO, GyroIO>(
             swerveConfig,

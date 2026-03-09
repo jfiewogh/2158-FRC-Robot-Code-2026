@@ -6,6 +6,7 @@ import org.austincans.lib.motors.MotorIO.MotorIOInputs;
  * Wrapper class for interacting with MotorIO. 
  * Should be instance variables of subsystems and IOs. 
  */
+// TODO: add self checking to motors (motor IOs) with logging
 public class Motor {
     private final MotorIO io;
     private final MotorIOInputs inputs;

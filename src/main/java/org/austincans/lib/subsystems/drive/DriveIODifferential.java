@@ -42,7 +42,7 @@ public class DriveIODifferential<T extends MotorIO, U extends GyroIO> implements
   private final DifferentialDriveOdometry odometry;
 
   public DriveIODifferential(DriveConfig driveConfig, T leftLeader, T leftFollower, T rightLeader, T rightFollower, U gyroIO) {
-    kinematics = new DifferentialDriveKinematics(driveConfig.trackWidthMeters());
+    kinematics = new DifferentialDriveKinematics(driveConfig.trackWidthMeters);
 
     this.leftLeader = leftLeader;
     this.leftFollower = leftFollower;

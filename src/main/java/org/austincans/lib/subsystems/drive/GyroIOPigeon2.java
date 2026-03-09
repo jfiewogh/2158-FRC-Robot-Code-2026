@@ -15,6 +15,7 @@
 
 package org.austincans.lib.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
@@ -27,44 +28,48 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
-
-import java.util.List;
 import java.util.Queue;
 import org.austincans.lib.util.PhoenixUtil;
 import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon =
-      new Pigeon2(
+  private final Pigeon2 pigeon;
+  private SelfCheckingPigeon2 pigeonSelfChecker; // TODO: this is unused
 
-          TunerConstants.DrivetrainConstants.Pigeon2Id,
-          new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
-  private SelfCheckingPigeon2 pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
-
-  private final StatusSignal<Angle> yaw = pigeon.getYaw();
-  private final StatusSignal<Angle> pitch = pigeon.getPitch();
-  private final StatusSignal<Angle> roll = pigeon.getRoll();
+  private final StatusSignal<Angle> yaw;
+  private final StatusSignal<Angle> pitch;
+  private final StatusSignal<Angle> roll;
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
-  private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
-  private final StatusSignal<AngularVelocity> pitchVelocity = pigeon.getAngularVelocityXWorld();
-  private final StatusSignal<AngularVelocity> rollVelocity = pigeon.getAngularVelocityYWorld();
+  private final StatusSignal<AngularVelocity> yawVelocity;
+  private final StatusSignal<AngularVelocity> pitchVelocity;
+  private final StatusSignal<AngularVelocity> rollVelocity;
 
   public GyroIOPigeon2(GyroConfigPigeon2 gyroConfig, Pigeon2Configuration config) {
+    pigeon = new Pigeon2(gyroConfig.deviceId, new CANBus(gyroConfig.canbus));
     pigeon.getConfigurator().apply(config);
     pigeon.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(new Frequency() {
-      
-    });
+
+    pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
+
+    yaw = pigeon.getYaw();
+    pitch = pigeon.getPitch();
+    roll = pigeon.getRoll();
+    yawVelocity = pigeon.getAngularVelocityZWorld();
+    pitchVelocity = pigeon.getAngularVelocityXWorld();
+    rollVelocity = pigeon.getAngularVelocityYWorld();
+
+    yaw.setUpdateFrequency(Frequency.ofBaseUnits(gyroConfig.updateFrequencyHz, Hertz));
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
+
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(yaw);
+
     PhoenixUtil.registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
     PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(0.0, 0.25));
   }
@@ -91,10 +96,5 @@ public class GyroIOPigeon2 implements GyroIO {
     yawPositionQueue.clear();
 
     inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
-  }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    return pigeonSelfChecker.checkForFaults();
   }
 }

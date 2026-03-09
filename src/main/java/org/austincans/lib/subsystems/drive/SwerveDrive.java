@@ -4,7 +4,7 @@ import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 
-public class SwerveDrive extends DriveBase {
+public class SwerveDrive extends Drive {
     public SwerveDrive(DriveIOSwerve<?, ?> swerveIO, HolonomicDriveController pathFollowingController, RobotConfig robotConfig) {
         super(swerveIO, pathFollowingController, robotConfig);
 

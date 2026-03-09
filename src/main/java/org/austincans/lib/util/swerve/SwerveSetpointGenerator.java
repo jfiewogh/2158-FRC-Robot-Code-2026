@@ -212,8 +212,8 @@ public class SwerveSetpointGenerator {
 
     SwerveModuleState[] desiredModuleState = kinematics.toSwerveModuleStates(desiredState);
     // Make sure desiredState respects velocity limits.
-    if (limits.maxDriveVelocity() > 0.0) {
-      SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleState, limits.maxDriveVelocity());
+    if (limits.maxDriveVelocityMetersPerSec() > 0.0) {
+      SwerveDriveKinematics.desaturateWheelSpeeds(desiredModuleState, limits.maxDriveVelocityMetersPerSec());
       desiredState = kinematics.toChassisSpeeds(desiredModuleState);
     }
 
@@ -294,7 +294,7 @@ public class SwerveSetpointGenerator {
     // and then backing out the maximum interpolant between start and goal states. We remember the
     // minimum across all modules, since
     // that is the active constraint.
-    final double max_theta_step = dt * limits.maxSteeringVelocity();
+    final double max_theta_step = dt * limits.maxSteerVelocityRadPerSec();
     for (int i = 0; i < modules.length; ++i) {
       if (!need_to_steer) {
         overrideSteering.add(Optional.of(prevSetpoint.moduleStates()[i].angle));
@@ -356,7 +356,7 @@ public class SwerveSetpointGenerator {
     }
 
     // Enforce drive wheel acceleration limits.
-    final double max_vel_step = dt * limits.maxDriveAcceleration();
+    final double max_vel_step = dt * limits.maxDriveAccelerationMetersPerSecSq();
     for (int i = 0; i < modules.length; ++i) {
       if (min_s == 0.0) {
         // No need to carry on.

@@ -16,4 +16,6 @@
 package org.austincans.lib.util.swerve;
 
 public record ModuleLimits(
-    double maxDriveVelocity, double maxDriveAcceleration, double maxSteeringVelocity) {}
+    double maxDriveVelocityMetersPerSec, 
+    double maxDriveAccelerationMetersPerSecSq, 
+    double maxSteerVelocityRadPerSec) {}

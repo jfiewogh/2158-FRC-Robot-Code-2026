@@ -17,9 +17,11 @@ package org.austincans.lib.subsystems.drive;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.austincans.frc2026.RobotState;
 import org.austincans.lib.Constants;
 import org.austincans.lib.configs.DriveConfig;
-import org.austincans.lib.configs.SwerveDriveConfig;
+import org.austincans.lib.configs.DriveConfigSwerve;
 import org.austincans.lib.motors.MotorIO;
 import org.austincans.lib.subsystems.drive.ModuleIO;
 import org.austincans.lib.util.swerve.ModuleLimits;
@@ -37,16 +39,14 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 
 // TODO: Maybe create Vision.java, a class for handling vision
-public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implements DriveIO {
+public abstract class DriveIOSwerve implements DriveIO {
   private final Translation2d[] moduleTranslations;
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
-
-  private final Module<T, U>[] modules;
-  private final ArrayList<T> modules; // FL, FR, BL, FR // cannot have array of generics
   private final ModuleLimits moduleLimitsFree;
 
-  private final U gyroIO;
+  private final Module[] modules;
+  private final Gyro gyro;
 
   private final SwerveDriveState swerveDriveState;
 
@@ -61,11 +61,10 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   );
   private boolean velocityMode = false;
 
-  public DriveIOSwerve(SwerveDriveConfig config, T frontLeft, T frontRight, T backLeft, T backRight, U gyroIO) {
-    this.gyroIO = gyroIO;
+  public DriveIOSwerve(DriveConfigSwerve config, Module frontLeft, Module frontRight, Module backLeft, Module backRight, Gyro gyro) {
+    modules = new Module[] {frontLeft, frontRight, backLeft, backRight};
+    this.gyro = gyro;
 
-    modules 
-    modules = new ArrayList<T>(List.of(frontLeft, frontRight, backLeft, backRight));
     moduleLimitsFree = config.moduleConfig.moduleLimitsFree();
     
     moduleTranslations = new Translation2d[] {
@@ -82,7 +81,7 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
-      positions[i] = modules.get(i).getPosition();
+      positions[i] = modules[i].getPosition();
     }
     return positions;
   }
@@ -90,21 +89,15 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
-      states[i] = modules.get(i).getState();
+      states[i] = modules[i].getState();
     }
     return states;
   }
   
   public void updateInputs(DriveIOInputs inputs) {
-    if (!velocityMode) {
-      currentSetpoint = new SwerveSetpoint(getVelocities(), getModuleStates());
+    for (Module module : modules) {
+      module.periodic();
     }
-    modules.get(0).updateInputs(inputs.frontLeftInputs);
-    modules.get(1).updateInputs(inputs.frontRightInputs);
-    modules.get(2).updateInputs(inputs.backLeftInputs);
-    modules.get(3).updateInputs(inputs.backRightInputs);
-
-    swerveDriveState
   }
 
   /**
@@ -132,14 +125,14 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
-      modules.get(i).runSetpoint(setpointStates[i]);
+      modules[i].runSetpoint(setpointStates[i]);
     }
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
     velocityMode = false;
-    for (ModuleIO module : modules) {
+    for (Module module : modules) {
       module.runCharacterization(output);
     }
   }
@@ -147,8 +140,8 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   /** Runs the drive in a straight line with the specified drive output. */
   public void runAngularCharacterization(double output) {
     velocityMode = false;
-    for (ModuleIO module : modules) {
-      module.runAngularCharacterization(output);
+    for (int i = 0; i < 4; i++) {
+      modules[i].runAngularCharacterization(output, moduleTranslations[i]);
     }
   }
 
@@ -172,10 +165,6 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   
   @Override
   public void resetPose2d(Pose2d pose) {
-
-  }
-
-  private ChassisSpeeds getVelocities() {
-    return 
+    RobotState.getInstance().resetPose(pose);
   }
 }

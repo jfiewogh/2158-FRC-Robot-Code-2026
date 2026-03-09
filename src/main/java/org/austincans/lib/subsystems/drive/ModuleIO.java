@@ -15,7 +15,13 @@ public abstract interface ModuleIO {
 
     public void updateInputs(ModuleIOInputs inputs);
 
+    public void setDriveOpenLoop(double output);
+
+    public void setSteerOpenLoop(double output);
+
     public void setDriveVelocity(double velocityRadPerSec);
 
     public void setSteerAngle(Rotation2d angle);
+
+    public void stop();
 }

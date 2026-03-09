@@ -16,7 +16,6 @@
 package org.austincans.lib.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 
 import java.util.List;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
@@ -37,13 +36,9 @@ public abstract interface GyroIO {
     public double[] odometryYawTimestamps = new double[] {};
     public double imuRate;
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
+
+    public List<HardwareFault> faults;
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public Rotation3d getRotation3d();
 }

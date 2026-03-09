@@ -23,6 +23,16 @@ public abstract class ModuleIOBase<T extends MotorIO, U extends MotorIO, V exten
     }
 
     @Override
+    public void setDriveOpenLoop(double output) {
+        driveMotorIO.setVoltage(output);
+    }
+
+    @Override
+    public void setSteerOpenLoop(double output) {
+        steerMotorIO.setVoltage(output);
+    }
+
+    @Override
     public void setDriveVelocity(double velocityRadPerSec) {
         driveMotorIO.setVelocity(velocityRadPerSec);
     }
@@ -30,5 +40,11 @@ public abstract class ModuleIOBase<T extends MotorIO, U extends MotorIO, V exten
     @Override
     public void setSteerAngle(Rotation2d angle) {
         steerMotorIO.setPosition(angle.getRadians());
+    }
+
+    @Override
+    public void stop() {
+        driveMotorIO.setVoltage(0);
+        steerMotorIO.setVoltage(0);
     }
 }

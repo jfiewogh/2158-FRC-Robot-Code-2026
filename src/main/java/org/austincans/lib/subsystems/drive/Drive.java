@@ -17,13 +17,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public abstract class DriveBase extends AdvancedSubsystem implements Vision.VisionConsumer {
+public abstract class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     protected final DriveIO io;
     protected final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
-    protected DriveBase(DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
+    protected Drive(DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
         this.io = io;
-
         AutoBuilder.configure(
             this::getPose2d,
             this::setPose2d,
@@ -44,6 +43,7 @@ public abstract class DriveBase extends AdvancedSubsystem implements Vision.Visi
     public void runVelocities(ChassisSpeeds velocities) {
         io.runVelocities(velocities);
     }
+
     public void runVelocities(double vxMetersPerSec, double vyMetersPerSec, double omegaRadPerSec) {
         runVelocities(new ChassisSpeeds(vxMetersPerSec, vyMetersPerSec, omegaRadPerSec));
     }
@@ -56,12 +56,13 @@ public abstract class DriveBase extends AdvancedSubsystem implements Vision.Visi
         return getPose3d().toPose2d();
     }
 
-    public void setPose2d(Pose2d pose) {
-        io.resetPose2d(pose);
-    }
-
     public ChassisSpeeds getVelocities() {
         return inputs.velocities;
+    }
+
+
+    public void setPose2d(Pose2d pose) {
+        io.resetPose2d(pose);
     }
 
     @Override
