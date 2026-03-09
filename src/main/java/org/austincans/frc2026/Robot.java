@@ -18,6 +18,10 @@ package org.austincans.frc2026;
 import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
@@ -103,6 +107,8 @@ public class Robot extends LoggedRobot {
     lebron.addInstrument(motor1);
     lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
+
+    CameraServer.startAutomaticCapture();
   }
 
   /** This function is called periodically during all modes. */
