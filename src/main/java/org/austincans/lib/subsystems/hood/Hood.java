@@ -30,7 +30,12 @@ public class Hood extends AdvancedSubsystem {
 
   public Hood(HoodIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.getHardware().forEach(
+        e -> {
+          if (e != null) {
+            registerHardware(e);
+          }
+        });
     registerCheckCommand(systemCheckCommand());
   }
 
@@ -70,36 +75,36 @@ public class Hood extends AdvancedSubsystem {
 
   public Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  clearFaults();
-                  io.setAngle(Angle.fromDegrees(10));
-                },
-                this),
-            Commands.waitSeconds(0.1),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.velocityRadPerSec < Math.PI * 2) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
-                  }
-                },
-                this),
-            Commands.run(
-                    () -> {
-                      io.setAngle(Angle.fromDegrees(20));
-                    },
-                    this)
-                .withTimeout(1.0),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood did not reach target position", false);
-                  }
-                },
-                this),
-            Commands.waitSeconds(0.25))
+        Commands.runOnce(
+            () -> {
+              clearFaults();
+              io.setAngle(Angle.fromDegrees(10));
+            },
+            this),
+        Commands.waitSeconds(0.1),
+        Commands.runOnce(
+            () -> {
+              if (inputs.velocityRadPerSec < Math.PI * 2) {
+                addSubsystemFault(
+                    "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
+              }
+            },
+            this),
+        Commands.run(
+            () -> {
+              io.setAngle(Angle.fromDegrees(20));
+            },
+            this)
+            .withTimeout(1.0),
+        Commands.runOnce(
+            () -> {
+              if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
+                addSubsystemFault(
+                    "HOOD", "[System Check] Hood did not reach target position", false);
+              }
+            },
+            this),
+        Commands.waitSeconds(0.25))
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
 }

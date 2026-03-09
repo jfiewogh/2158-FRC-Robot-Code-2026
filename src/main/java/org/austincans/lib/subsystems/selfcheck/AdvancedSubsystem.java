@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.lib.controllers.REVDigitController;
+import org.littletonrobotics.junction.Logger;
 
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {
@@ -91,20 +92,20 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
 
   private void publishStatus() {
     SystemStatus status = getSystemStatus();
-    SmartDashboard.putString(statusTable + "/Status", status.name());
-    SmartDashboard.putBoolean(statusTable + "/SystemOK", status == SystemStatus.OK);
+    Logger.recordOutput(statusTable + "/Status", status.name());
+    Logger.recordOutput(statusTable + "/SystemOK", status == SystemStatus.OK);
 
     String[] faultStrings = new String[this.hardwareFaults.size()];
     for (int i = 0; i < this.hardwareFaults.size(); i++) {
       HardwareFault fault = this.hardwareFaults.get(i);
       faultStrings[i] = String.format("[%.2f] %s", fault.timestamp, fault.description);
     }
-    SmartDashboard.putStringArray(statusTable + "/Faults", faultStrings);
+    Logger.recordOutput(statusTable + "/Faults", faultStrings);
 
     if (faultStrings.length > 0) {
-      SmartDashboard.putString(statusTable + "/LastFault", faultStrings[faultStrings.length - 1]);
+      Logger.recordOutput(statusTable + "/LastFault", faultStrings[faultStrings.length - 1]);
     } else {
-      SmartDashboard.putString(statusTable + "/LastFault", "");
+      Logger.recordOutput(statusTable + "/LastFault", "");
     }
   }
 

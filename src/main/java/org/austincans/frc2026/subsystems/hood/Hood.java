@@ -30,7 +30,11 @@ public class Hood extends AdvancedSubsystem {
 
   public Hood(HoodIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.getHardware().forEach(e -> {
+          if (e != null) {
+            registerHardware(e);
+          }
+        });
     registerCheckCommand(systemCheckCommand());
   }
 
