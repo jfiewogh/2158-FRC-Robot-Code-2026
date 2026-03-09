@@ -8,12 +8,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
     public static SwerveDrive createSwerveTalonFXPigeon2(DriveConfig driveConfig) {
-        return new DriveBase(
+        return (SwerveDrive) new DriveBase(
             "Drive",
             new DriveIOSwerveReal<MotorIOTalonFX, GyroIOPigeon2>(
                 driveConfig,
-                ModuleFactory.createTalonFXCANcoder();
-                ModuleFactory.createTalonFXCANcoder();
+                ModuleFactory.createTalonFXCANcoder(),
+                ModuleFactory.createTalonFXCANcoder()
             ));
     }
 

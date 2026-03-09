@@ -13,8 +13,7 @@ public class DriveIOSwerveTalonFXPigeon2 extends DriveIOSwerve<ModuleIOTalonFX, 
                 null, 
                 null, 
                 false, 
-                null),
-            
+                null)
         );
     }
 }

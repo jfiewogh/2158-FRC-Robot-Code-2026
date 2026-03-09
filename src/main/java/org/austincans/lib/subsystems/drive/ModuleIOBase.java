@@ -1,5 +1,6 @@
 package org.austincans.lib.subsystems.drive;
 
+import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.encoders.EncoderIO;
 import org.austincans.lib.motors.MotorIO;
 
@@ -48,6 +49,6 @@ public abstract class ModuleIOBase<DriveMotor extends MotorIO, SteerMotor extend
     }
 
     private double getPositionMeters() {
-        return driveMotor.
+        return driveMotor.ModuleIOInputs.positionRad * moduleConfig.WheelRadius;
     }
 }

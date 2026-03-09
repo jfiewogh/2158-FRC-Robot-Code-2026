@@ -8,7 +8,8 @@ public record ModuleConfig(
     PIDFFConfig steerPIDFFConfig,
     double maxDriveMotorVelocityRadPerSec,
     double maxDriveMotorAccelerationRadPerSecSq,
-    double maxSteerMotorVelocityRadPerSec) {
+    double maxSteerMotorVelocityRadPerSec
+    double wheelRadius) {
     public ModuleLimits moduleLimitsFree() {
         return new ModuleLimits(
             maxDriveMotorVelocityRadPerSec,

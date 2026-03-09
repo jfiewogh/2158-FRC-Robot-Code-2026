@@ -87,7 +87,7 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   
   public void updateInputs(DriveIOInputs inputs) {
     if (!velocityMode) {
-      currentSetpoint = new SwerveSetpoint(getVelocities(), getModuleStates()));
+      currentSetpoint = new SwerveSetpoint(getVelocities(), getModuleStates());
     }
     modules.get(0).updateInputs(inputs.frontLeftInputs);
     modules.get(1).updateInputs(inputs.frontRightInputs);
