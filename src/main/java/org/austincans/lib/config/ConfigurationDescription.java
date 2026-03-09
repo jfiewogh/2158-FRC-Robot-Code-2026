@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.config;
+package org.austincans.lib.config;
 
 /**
  * An interface which tells that an enum is used as a manner of instructing a {@link

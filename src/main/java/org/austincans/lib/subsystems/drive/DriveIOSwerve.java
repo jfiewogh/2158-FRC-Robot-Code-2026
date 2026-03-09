@@ -42,6 +42,7 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
 
+  private final Module<T, U>[] modules;
   private final ArrayList<T> modules; // FL, FR, BL, FR // cannot have array of generics
   private final ModuleLimits moduleLimitsFree;
 
@@ -63,6 +64,7 @@ public abstract class DriveIOSwerve<T extends ModuleIO, U extends GyroIO> implem
   public DriveIOSwerve(SwerveDriveConfig config, T frontLeft, T frontRight, T backLeft, T backRight, U gyroIO) {
     this.gyroIO = gyroIO;
 
+    modules 
     modules = new ArrayList<T>(List.of(frontLeft, frontRight, backLeft, backRight));
     moduleLimitsFree = config.moduleConfig.moduleLimitsFree();
     

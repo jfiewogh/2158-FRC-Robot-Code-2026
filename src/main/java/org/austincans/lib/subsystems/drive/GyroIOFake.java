@@ -5,4 +5,7 @@ public class GyroIOFake implements GyroIO {
     public void updateInputs(GyroIOInputs inputs) {
 
     }
+    
+    @Override
+    public Rotation3d 
 }

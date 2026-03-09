@@ -21,18 +21,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import org.austincans.frc2026.subsystems.arm.ArmIOInputsAutoLogged;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends AdvancedSubsystem {
-  private final PivotIO armIO;
-  private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+  private final PivotIO pivotIO;
+  private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
   
-  protected Pivot(PivotIO armIO) {
-    this.armIO = armIO;
-    armIO.getHardware().forEach(e -> {
+  protected Pivot(PivotIO pivotIO) {
+    this.pivotIO = pivotIO;
+    pivotIO.getHardware().forEach(e -> {
           if (e != null) {
             registerHardware(e);
           }
@@ -42,14 +40,14 @@ public class Pivot extends AdvancedSubsystem {
 
   @Override
   public void periodic() {
-    armIO.updateInputs(inputs);
+    pivotIO.updateInputs(inputs);
     Logger.processInputs(getName(), inputs);
     
-    armIO.checkForFaults().forEach(this::addHardwareFault);
+    pivotIO.checkForFaults().forEach(this::addHardwareFault);
   }
 
   public void setAngle(Rotation2d angle) {
-    armIO.setPosition(angle.getRadians());
+    pivotIO.setPosition(angle.getRadians());
   }
 
   public double getPositionRad() {
@@ -65,22 +63,22 @@ public class Pivot extends AdvancedSubsystem {
   }
 
   public Command moveToAngleCommand(Rotation2d angle) {
-    return Commands.runOnce(() -> armIO.setPosition(angle.getRadians()))
+    return Commands.runOnce(() -> pivotIO.setPosition(angle.getRadians()))
       .until(() -> Math.abs(angle.getRadians() - getPositionRad()) < Units.degreesToRadians(2));
   }
 
   public Command stopCommand() {
-    return new InstantCommand(() -> armIO.setVoltage(0));
+    return new InstantCommand(() -> pivotIO.setVoltage(0));
   }
 
   public Command moveAtVelocityCommand(double velocityDegPerSec) {
-    return new InstantCommand(() -> armIO.setVoltage(velocityDegPerSec));
+    return new InstantCommand(() -> pivotIO.setVoltage(velocityDegPerSec));
   }
 
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(() -> armIO.setVelocity(2)),
+            Commands.runOnce(() -> pivotIO.setVelocity(2)),
             Commands.waitSeconds(0.5),
             Commands.runOnce(
                 () -> {
@@ -88,7 +86,7 @@ public class Pivot extends AdvancedSubsystem {
                     addSubsystemFault(
                         getName(), "[System Check] Extension velocity measured too slow", false);
                   }
-                  armIO.setVelocity(0);
+                  pivotIO.setVelocity(0);
                 },
                 this),
             Commands.runOnce(() -> setAngle(Rotation2d.fromDegrees(0)), this),
@@ -116,7 +114,7 @@ public class Pivot extends AdvancedSubsystem {
         .andThen(
             Commands.runOnce(
                 () -> {
-                  armIO.setVoltage(0);
+                  pivotIO.setVoltage(0);
                 },
                 this));
   }

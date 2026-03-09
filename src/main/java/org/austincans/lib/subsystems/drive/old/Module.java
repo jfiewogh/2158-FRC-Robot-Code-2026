@@ -38,7 +38,7 @@ import org.austincans.lib.util.LoggedTunableNumber;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
-public class ModuleOld extends AdvancedSubsystem {
+public class Module extends AdvancedSubsystem {
   private static final LoggedTunableNumber drivekS =
       new LoggedTunableNumber("Drive/Module/DrivekS");
   private static final LoggedTunableNumber drivekV =
@@ -98,7 +98,7 @@ public class ModuleOld extends AdvancedSubsystem {
   private final Alert turnDisconnectedAlert;
   private final Alert turnEncoderDisconnectedAlert;
 
-  public ModuleOld(
+  public Module(
       ModuleIO io,
       int index,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>

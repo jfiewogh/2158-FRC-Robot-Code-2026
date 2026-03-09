@@ -17,7 +17,7 @@ package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
 
-import org.austincans.lib.configs.ArmConfig;
+import org.austincans.lib.configs.PivotConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;
@@ -41,7 +41,7 @@ public class PivotIOTalonFXSCANcoder extends PivotIOReal<MotorIOTalonFXS, CANcod
   }
 
   @Override
-  public void updateInputs(ArmIOInputs inputs) {
+  public void updateInputs(PivotIOInputs inputs) {
     super.updateInputs(inputs);
   }
 

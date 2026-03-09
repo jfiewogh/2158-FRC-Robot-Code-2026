@@ -19,32 +19,33 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.austincans.lib.Constants;
-import org.austincans.lib.configs.ArmConfig;
+import org.austincans.lib.configs.PivotConfig;
 import org.austincans.lib.motors.MotorIOFake;
 
 public class PivotIOSim implements PivotIO {
   private final MotorIOFake motorIO;
-  private final MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
 
   private final DCMotor neoVortex = DCMotor.getNeoVortex(1);
 
   private final SingleJointedArmSim armSim;
   private double armAppliedVolts;
 
-  public PivotIOSim(PivotConfig armConfig) {
+  public PivotIOSim(PivotConfig pivotConfig) {
+    motorIO = new MotorIOFake();
+
     armSim = new SingleJointedArmSim(
           neoVortex,
-          armConfig.gearRatio(),
+          pivotConfig.gearRatio(),
           0.001,
-          armConfig.armLengthMeters(),
-          armConfig.minAngleRad(),
-          armConfig.maxAngleRad(),
+          pivotConfig.armLengthMeters(),
+          pivotConfig.minAngleRad(),
+          pivotConfig.maxAngleRad(),
           true,
-          armConfig.startingAngleRad());
+          pivotConfig.startingAngleRad());
   }
 
   @Override
-  public void updateInputs(ArmIOInputs inputs) {
+  public void updateInputs(PivotIOInputs inputs) {
     armSim.setInputVoltage(armAppliedVolts);
     armSim.update(Constants.loopPeriodSec);
 

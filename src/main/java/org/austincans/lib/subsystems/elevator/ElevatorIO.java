@@ -25,9 +25,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public class ElevatorIOInputs {
-    double heightMeters = 0.0;
-    double velocityMetersPerSec = 0.0;
-    MotorIOInputs motorInputs;
+    public MotorIOInputs motorInputs;
+    public double heightMeters = 0.0;
+    public double velocityMetersPerSec = 0.0;
   }
 
   public void updateInputs(ElevatorIOInputs inputs);

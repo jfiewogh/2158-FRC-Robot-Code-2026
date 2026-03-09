@@ -13,7 +13,7 @@ public abstract class PivotIOReal<T extends MotorIOReal, U extends AbsoluteEncod
     }
 
     @Override
-    public void updateInputs(ArmIOInputs inputs) {
+    public void updateInputs(PivotIOInputs inputs) {
         motorIO.updateInputs(inputs.motorInputs);
         absoluteEncoderIO.updateInputs(inputs.absoluteEncoderInputs);
     }    

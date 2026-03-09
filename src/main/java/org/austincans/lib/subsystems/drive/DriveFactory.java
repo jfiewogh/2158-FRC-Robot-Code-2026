@@ -36,7 +36,7 @@ public class DriveFactory {
         return new SwerveDrive(swerveIO, null, robotConfig);
     }
 
-    public static DriveBase createSwerveTalonFXPigeon2FromYAML(String pathName) {
+    public static SwerveDrive createSwerveTalonFXPigeon2FromYAML(String pathName) {
         // TODO: maybe pass ConfigManager into subsystem as optional so values can be updated while deployed.
         ConfigManager<SwerveDriveConfig> configManager = new ConfigManager<SwerveDriveConfig>(pathName, null);
 

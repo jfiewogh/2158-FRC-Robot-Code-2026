@@ -2,7 +2,6 @@ package org.austincans.lib.subsystems.roller;
 
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -24,7 +23,7 @@ public class Roller extends AdvancedSubsystem {
 
     @Override
     public void periodic() {
-        Logger.processInputs("Roller/Inputs", inputs);
+        Logger.processInputs(getName(), inputs);
         io.updateInputs(inputs);
     }
 

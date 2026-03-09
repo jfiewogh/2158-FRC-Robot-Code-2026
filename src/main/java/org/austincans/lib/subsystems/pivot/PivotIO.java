@@ -16,6 +16,8 @@
 package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
+import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
+import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -23,12 +25,12 @@ import org.littletonrobotics.junction.AutoLog;
 /** PivotIO */
 public interface PivotIO {
   @AutoLog
-  public class ArmIOInputs {
-    public MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
-    public AbsoluteEncoderIOInputsAutoLogged absoluteEncoderInputs = new AbsoluteEncoderIOInputsAutoLogged();
+  public class PivotIOInputs {
+    public MotorIOInputs motorInputs;
+    public AbsoluteEncoderIOInputs absoluteEncoderInputs;
   }
 
-  public void updateInputs(ArmIOInputs inputs);
+  public void updateInputs(PivotIOInputs inputs);
 
   public void setVoltage(double voltage);
 

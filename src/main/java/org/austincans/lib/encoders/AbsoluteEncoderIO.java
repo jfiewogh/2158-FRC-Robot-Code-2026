@@ -1,7 +1,5 @@
 package org.austincans.lib.encoders;
 
-import org.littletonrobotics.junction.AutoLog;
-
 public abstract interface AbsoluteEncoderIO {
     public class AbsoluteEncoderIOInputs {
         public boolean connected = false;

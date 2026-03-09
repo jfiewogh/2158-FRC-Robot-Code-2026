@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface RollerIO {
     @AutoLog
     public class RollerIOInputs {
-        MotorIOInputs motorInputs;
+        public MotorIOInputs motorInputs;
     }
 
     public void setVelocity(double velocityRPM);
