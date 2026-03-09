@@ -15,20 +15,13 @@
 
 package org.austincans.lib.subsystems.drive;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.austincans.frc2026.RobotState;
 import org.austincans.lib.Constants;
-import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.configs.DriveConfigSwerve;
-import org.austincans.lib.motors.MotorIO;
-import org.austincans.lib.subsystems.drive.ModuleIO;
+import org.austincans.lib.configs.ModuleConfig;
 import org.austincans.lib.util.swerve.ModuleLimits;
 import org.austincans.lib.util.swerve.SwerveSetpoint;
 import org.austincans.lib.util.swerve.SwerveSetpointGenerator;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,10 +29,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N2;
 
 // TODO: Maybe create Vision.java, a class for handling vision
-public abstract class DriveIOSwerve implements DriveIO {
+public class DriveIOSwerve implements DriveIO {
   private final Translation2d[] moduleTranslations;
   private final SwerveDriveKinematics kinematics;
   private final SwerveSetpointGenerator swerveSetpointGenerator;
@@ -61,8 +53,14 @@ public abstract class DriveIOSwerve implements DriveIO {
   );
   private boolean velocityMode = false;
 
-  public DriveIOSwerve(DriveConfigSwerve config, Module frontLeft, Module frontRight, Module backLeft, Module backRight, Gyro gyro) {
-    modules = new Module[] {frontLeft, frontRight, backLeft, backRight};
+  public DriveIOSwerve(DriveConfigSwerve config, ModuleIO frontLeft, ModuleIO frontRight, ModuleIO backLeft, ModuleIO backRight, Gyro gyro) {
+    ModuleConfig moduleConfig = config.moduleConfig;
+    modules = new Module[] {
+      new Module(frontLeft, moduleConfig), 
+      new Module(frontRight, moduleConfig), 
+      new Module(backLeft, moduleConfig), 
+      new Module(backRight, moduleConfig)
+    };
     this.gyro = gyro;
 
     moduleLimitsFree = config.moduleConfig.moduleLimitsFree();
@@ -75,6 +73,8 @@ public abstract class DriveIOSwerve implements DriveIO {
     };
     kinematics = new SwerveDriveKinematics(moduleTranslations);
     swerveSetpointGenerator = new SwerveSetpointGenerator(kinematics);
+
+    swerveDriveState = new SwerveDriveState(kinematics);
   }
 
   /** Used for odometry */
@@ -165,6 +165,6 @@ public abstract class DriveIOSwerve implements DriveIO {
   
   @Override
   public void resetPose2d(Pose2d pose) {
-    RobotState.getInstance().resetPose(pose);
+    swerveDriveState.resetPose(pose);
   }
 }

@@ -59,7 +59,7 @@ import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
 import org.austincans.lib.RobotContainerBase;
-import org.austincans.lib.commands.DriveCommands;
+import org.austincans.lib.commands.SwerveDriveCommands;
 import org.austincans.lib.input.KeyboardHID;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.ironmaple.simulation.IntakeSimulation3D;
@@ -373,7 +373,7 @@ public class RobotContainer extends RobotContainerBase {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
     if (driveEnabled) {
-      setTurnMode = DriveCommands.setTurnMode(drive);
+      setTurnMode = SwerveDriveCommands.setTurnMode(drive);
     }
 
     // Set up auto routines
@@ -382,9 +382,9 @@ public class RobotContainer extends RobotContainerBase {
 
     // Set up SysId routines
     autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        "Drive Wheel Radius Characterization", SwerveDriveCommands.wheelRadiusCharacterization(drive));
     autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        "Drive Simple FF Characterization", SwerveDriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -408,7 +408,7 @@ public class RobotContainer extends RobotContainerBase {
 
     // Default command, normal field-relative drive
     if (driveEnabled) {
-      drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightX, rightY));
+      drive.setDefaultCommand(SwerveDriveCommands.driveCommand(drive, leftY, leftX, rightX, rightY));
     }
 
     // Configure the button bindings

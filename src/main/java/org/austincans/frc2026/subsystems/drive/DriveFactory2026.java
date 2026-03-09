@@ -7,13 +7,7 @@ import org.austincans.lib.subsystems.drive.DriveFactory;
 import org.austincans.lib.subsystems.drive.SwerveDrive;
 
 public class DriveFactory2026 extends DriveFactory {
-    public static SwerveDrive createSwerveTalonFXPigeon2FromYAML(String pathName) {
-        // TODO: maybe pass ConfigManager into subsystem as optional so values can be updated while deployed.
-        ConfigManager<DriveConfigSwerve> configManager = new ConfigManager<DriveConfigSwerve>(pathName, null);
-
-    }
-
-    public static SwerveDrive createSwerveTalonFXPigeon2FromTunerConstants() {
+    // public static SwerveDrive createSwerveTalonFXPigeon2FromTunerConstants() {
         
-    }
+    // }
 }

@@ -6,11 +6,4 @@ import org.austincans.lib.subsystems.drive.DriveIO;
 import org.austincans.lib.subsystems.drive.SwerveDrive;
 import edu.wpi.first.math.geometry.Pose2d;
 
-public class Drive extends SwerveDrive {
-    public Drive() {
-        super(
-            driveIO, 
-            null, 
-            null);
-    }
-}
+public class Drive {}

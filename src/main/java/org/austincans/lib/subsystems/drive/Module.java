@@ -10,13 +10,12 @@ import edu.wpi.first.math.util.Units;
 
 public class Module {
     private final ModuleIO io;
-    private final ModuleIOInputs inputs;
+    private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final double wheelRadiusMeters;
     private double driveSpeedMultiplier;
 
-    public Module(ModuleIO io, ModuleIOInputs inputs, ModuleConfig moduleConfig) {
+    public Module(ModuleIO io, ModuleConfig moduleConfig) {
         this.io = io;
-        this.inputs = inputs;
         wheelRadiusMeters = moduleConfig.wheelRadiusMeters();
         driveSpeedMultiplier = moduleConfig.driveSpeedMultiplier();
     }

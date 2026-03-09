@@ -2,6 +2,7 @@ package org.austincans.lib.subsystems.drive;
 
 import org.austincans.lib.ConfigManager;
 import org.austincans.lib.configs.DriveConfig;
+import org.austincans.lib.configs.DriveConfigDifferential;
 import org.austincans.lib.configs.DriveConfigSwerve;
 import org.austincans.lib.configs.ModuleConfig;
 import org.austincans.lib.motors.MotorFactory;
@@ -15,39 +16,22 @@ public class DriveFactory {
     public static SwerveDrive createSwerveTalonFXPigeon2FromPathPlanner(DriveConfigSwerve swerveConfig) {
         RobotConfig robotConfig = RobotConfig.fromGUISettings();
         ModuleConfig moduleConfig = swerveConfig.moduleConfig;
-        DriveIOSwerve<ModuleIO, GyroIO> swerveIO = new DriveIOSwerve<ModuleIO, GyroIO>(
+        DriveIOSwerve swerveIO = new DriveIOSwerve(
             swerveConfig,
-            ModuleFactory.createTalonFXCANCoder(moduleConfig),
-            ModuleFactory.createTalonFXCANCoder(moduleConfig),
-            ModuleFactory.createTalonFXCANCoder(moduleConfig),
-            ModuleFactory.createTalonFXCANCoder(moduleConfig),
-            GyroFactory.);
-        return new SwerveDrive(swerveIO, null, robotConfig);
+            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
+            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
+            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
+            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
+            new Gyro(GyroFactory.createPigeon2(gyroConfig)));
+        return new SwerveDrive(swerveConfig, swerveIO);
     }
 
-    public static SwerveDrive createSwerveTalonFXPigeon2FromYAML(String pathName) {
+    public static void createSwerveTalonFXPigeon2FromYAML(String pathName) {
         // TODO: maybe pass ConfigManager into subsystem as optional so values can be updated while deployed.
-        ConfigManager<SwerveDriveConfig> configManager = new ConfigManager<SwerveDriveConfig>(pathName, null);
+        ConfigManager<DriveConfigSwerve> configManager = new ConfigManager<DriveConfigSwerve>(pathName, null);
 
     }
 
-    public static DriveBase createDifferentialSparkMax(DriveConfig driveConfig, double leftLeaderId,
-            double leftFollowerId, double rightLeaderId, double rightFollowerId) {
-
-            
-        return new DifferentialDrive<MotorIOSparkMax>(null, null, null);
-
-
-            "Drive",
-            new DriveIODifferential(
-                driveConfig, 
-                MotorFactory.createSparkMax(
-                    leftLeaderId, false, null, null, false, null), 
-                MotorFactory.createSparkMax(
-                    leftLeaderId, false, null, null, false, null), 
-                MotorFactory.createSparkMax(
-                    leftLeaderId, false, null, null, false, null), 
-                MotorFactory.createSparkMax(
-                    leftLeaderId, false, null, null, false, null)));
+    public static void createDifferentialSparkMax(DriveConfigDifferential driveConfig) {
     }
 }

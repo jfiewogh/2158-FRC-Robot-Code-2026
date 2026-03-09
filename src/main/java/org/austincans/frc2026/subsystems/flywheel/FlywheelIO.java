@@ -25,8 +25,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelIO {
   @AutoLog
   public class FlywheelIOInputs {
-    public SensorIOInputsAutoLogged inputs1 = new SensorIOInputsAutoLogged();
-    public SensorIOInputsAutoLogged inputs2 = new SensorIOInputsAutoLogged();
+    public SensorIOInputs inputs1 = new SensorIOInputs();
+    public SensorIOInputs inputs2 = new SensorIOInputs();
     public double appliedVolts = 0;
     public double velocityRPM = 0;
     public double temperatureC = 0;

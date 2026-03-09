@@ -37,10 +37,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.lib.subsystems.drive.swerve.DriveBase;
 
-public class DriveCommands {
+import org.austincans.lib.subsystems.drive.SwerveDrive;
+
+public class SwerveDriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
@@ -59,7 +59,7 @@ public class DriveCommands {
   @SuppressWarnings("unused")
   private static final OmegaMode omegaMode = OmegaMode.POSITION;
 
-  private DriveCommands() {}
+  private SwerveDriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
@@ -79,7 +79,7 @@ public class DriveCommands {
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(
-      Drive drive,
+      SwerveDrive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,

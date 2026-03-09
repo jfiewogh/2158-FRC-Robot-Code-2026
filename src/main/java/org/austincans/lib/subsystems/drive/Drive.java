@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public abstract class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     protected final DriveIO io;
-    protected final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
+    protected static final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
     protected Drive(DriveIO io, PathFollowingController pathFollowingController, RobotConfig robotConfig) {
         this.io = io;

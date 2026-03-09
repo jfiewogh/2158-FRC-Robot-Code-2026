@@ -43,7 +43,7 @@ import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.intake.Intake;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
-import org.austincans.lib.commands.DriveCommands;
+import org.austincans.lib.commands.SwerveDriveCommands;
 
 public class AutonCommands {
   private static PIDController drivePIDX = new PIDController(3, 0.0, 0);
@@ -282,6 +282,6 @@ public class AutonCommands {
   }
 
   private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {
-    return Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers));
+    return Commands.run(() -> SwerveDriveCommands.updateJoystickHasInput(suppliers));
   }
 }

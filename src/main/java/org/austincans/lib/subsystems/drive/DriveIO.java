@@ -11,10 +11,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 public interface DriveIO {
     @AutoLog
     public class DriveIOInputs {
-        public ModuleIOInputs frontLeftInputs;
-        public ModuleIOInputs frontRightInputs;
-        public ModuleIOInputs backLeftInputs;
-        public ModuleIOInputs backRightInputs;
+        public final ModuleIOInputs frontLeftInputs = new ModuleIOInputs();
+        public final ModuleIOInputs frontRightInputs = new ModuleIOInputs();
+        public final ModuleIOInputs backLeftInputs = new ModuleIOInputs();
+        public final ModuleIOInputs backRightInputs = new ModuleIOInputs();
         public GyroIOInputs gyroInputs;
         public Pose3d pose;
         public ChassisSpeeds velocities; // either field or robot relative
