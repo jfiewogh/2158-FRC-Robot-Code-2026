@@ -26,8 +26,6 @@ public interface ArmIO {
   public class ArmIOInputs {
     public MotorIOInputsAutoLogged motorInputs = new MotorIOInputsAutoLogged();
     public AbsoluteEncoderIOInputsAutoLogged absoluteEncoderInputs = new AbsoluteEncoderIOInputsAutoLogged();
-    public double positionRad = 0;
-    public double velocityRadPerSec = 0;
   }
 
   public void updateInputs(ArmIOInputs inputs);

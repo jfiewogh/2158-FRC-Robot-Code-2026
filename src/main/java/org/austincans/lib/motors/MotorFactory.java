@@ -146,17 +146,25 @@ public class MotorFactory {
     return new MotorIOTalonFXS(motorConfig.deviceId(), new CANBus(motorConfig.canbus()), config);
   }
 
-  public static MotorIOTalonFXS createTalonFXS(MotorConfig motorConfig, int cancoderId) {
+  public static MotorIOTalonFXS createTalonFXS(MotorConfig motorConfig) {
     TalonFXSConfiguration config = new TalonFXSConfiguration();
     config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
     config.ExternalFeedback.SensorToMechanismRatio = motorConfig.gearRatio();
     return createTalonFXS(motorConfig, config);
   }
 
-  public static MotorIOTalonFXS createTalonFXSWithRemoteCANcoder(MotorConfig motorConfig, int cancoderId) {
+  private static MotorIOTalonFXS createTalonFXSWithCANcoder(MotorConfig motorConfig, int cancoderId, ExternalFeedbackSensorSourceValue sensorSource) {
     TalonFXSConfiguration config = new TalonFXSConfiguration();
-    config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
+    config.ExternalFeedback.ExternalFeedbackSensorSource = sensorSource;
     config.ExternalFeedback.FeedbackRemoteSensorID = cancoderId;
     return createTalonFXS(motorConfig, config);
+  }
+
+  public static MotorIOTalonFXS createTalonFXSWithRemoteCANcoder(MotorConfig motorConfig, int cancoderId) {
+    return createTalonFXSWithCANcoder(motorConfig, cancoderId, ExternalFeedbackSensorSourceValue.RemoteCANcoder);
+  }
+
+  public static MotorIOTalonFXS createTalonFXSWithFusedCANcoder(MotorConfig motorConfig, int cancoderId) {
+    return createTalonFXSWithCANcoder(motorConfig, cancoderId, ExternalFeedbackSensorSourceValue.FusedCANcoder);
   }
 }
