@@ -15,10 +15,14 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.subsystems.intake.IntakeConstants;
@@ -44,6 +48,9 @@ public class Flywheel extends AdvancedSubsystem {
   public static boolean isReadyToShoot = false;
   private final SparkFlex indexer =
       new SparkFlex((IntakeConstants.indexerID), MotorType.kBrushless);
+  private final SparkFlex spindexer =
+      new SparkFlex((IntakeConstants.spindexerID), MotorType.kBrushless);
+  private final SparkFlexConfig config = new SparkFlexConfig();
 
   private final SparkClosedLoopController controller = indexer.getClosedLoopController();
 
@@ -52,10 +59,14 @@ public class Flywheel extends AdvancedSubsystem {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
+    config.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
+    config.closedLoop.feedForward.kV(0.00017);
+    indexer.configureAsync(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
-  public void runIndexer(double velocityRotationsPerMinute){
-    controller.setSetpoint(velocityRotationsPerMinute, ControlType.kVelocity);
+  public void runSpindexer() {
+    spindexer.set(0.35);
   }
 
   @Override
@@ -83,8 +94,9 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public void runShooter() {
-    indexer.set(-0.5);
-    io.runRelativeVelocity(0.5);
+    indexer.set(-1);
+    io.runRelativeVelocity(1);
+    // if (Math.abs(inputs.velocityRPM - indexer.get))
   }
 
   public void stopShooter() {
@@ -110,12 +122,31 @@ public class Flywheel extends AdvancedSubsystem {
             }));
   }
 
-  public Command runIndexerAndFlywheel(double velocity){
-    return Commands.run(() -> {
-      setRelativeVelocity(velocity);
-      if (indexer.getEncoder().getVelocity() == inputs.velocityRPM){
-        runIndexer(velocity);
-      }
-    });
+  public void stopMotors() {
+    indexer.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
+    setRelativeVelocity(0);
+    spindexer.set(0);
+  }
+
+  public void testing() {
+    controller.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    io.runRelativeVelocity(10000);
+    // spindexer.stopMotor();
+    // indexer.stopMotor();
+  }
+
+  public Command runIndexerAndFlywheel(double velocity) {
+    return Commands.run(
+        () -> {
+          io.runRelativeVelocity(velocity);
+          indexer
+              .getClosedLoopController()
+              .setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+          if (Math.abs(inputs.velocityRPM) > (velocity * 0.9)
+              && indexer.getEncoder().getVelocity() > 10) {
+            runSpindexer();
+          }
+        },
+        this);
   }
 }

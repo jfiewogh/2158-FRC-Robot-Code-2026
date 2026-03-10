@@ -69,7 +69,7 @@ public class ElevatorIOSpark implements ElevatorIO {
     config.smartCurrentLimit((int) statorCurrentLimit);
 
     // Save configuration
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override

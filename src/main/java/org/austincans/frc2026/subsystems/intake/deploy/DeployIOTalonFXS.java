@@ -74,13 +74,13 @@ public class DeployIOTalonFXS implements DeployIO {
   @Override
   public void deploy() {
     System.out.println("DEPLOY");
-    deployMotor1.set(1); // TODO: CHANGE ME
+    deployMotor1.set(0.05); // TODO: CHANGE ME
   }
 
   @Override
   public void retract() {
     System.out.println("RETRACT");
-    deployMotor2.set(-1);
+    deployMotor2.set(-0.05);
   }
 
   @Override

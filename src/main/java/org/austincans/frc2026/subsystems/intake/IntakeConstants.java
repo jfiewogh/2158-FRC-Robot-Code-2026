@@ -81,4 +81,5 @@ public class IntakeConstants {
       Angle.fromRotations(ConfigUtil.getConfigDouble("INTAKE_RETRACT_ANGLE", 0));
 
   public static int indexerID = ConfigUtil.getConfigInt("INDEXER_MOTOR_ID", 21);
+  public static int spindexerID = ConfigUtil.getConfigInt("SPINDEXER_MOTOR_ID", 20);
 }

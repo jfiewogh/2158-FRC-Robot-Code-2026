@@ -28,4 +28,6 @@ public class HoodConstants {
   public static final double rotationalInertiaMetersSq =
       ConfigUtil.getConfigDouble("HOOD_ROTATIONAL_INERTIAL_METERS_SQ", 5);
   public static final double gearing = ConfigUtil.getConfigDouble("HOOD_GEARING", 5);
+
+  // public static final double maxAngle = ConfigUtil.getConfigDouble("Max Hood Angle", 45);
 }

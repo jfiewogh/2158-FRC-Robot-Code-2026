@@ -66,7 +66,7 @@ public class DeployIOSparkFlex implements DeployIO {
 
     // Save configuration
     deployMotor1.configureAsync(
-        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override

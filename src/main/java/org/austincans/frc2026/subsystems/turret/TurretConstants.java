@@ -31,12 +31,12 @@ public class TurretConstants {
   public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
-  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
+  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 2);
   public static final double turretHeightMeters =
       ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(20));
 
-    public static final double maxVelocityRotationsPerSec = 0.2;
-    public static final double maxAccelerationRotationsPerSecSq = 1;
+  public static final double maxVelocityRotationsPerSec = 0.2;
+  public static final double maxAccelerationRotationsPerSecSq = 1;
 
   public static final boolean forwardSoftLimitEnabled =
       ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED", true);

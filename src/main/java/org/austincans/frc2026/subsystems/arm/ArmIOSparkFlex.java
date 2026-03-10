@@ -72,7 +72,7 @@ public class ArmIOSparkFlex implements ArmIO {
     controller = motor.getClosedLoopController();
 
     // Save configuration
-    motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override

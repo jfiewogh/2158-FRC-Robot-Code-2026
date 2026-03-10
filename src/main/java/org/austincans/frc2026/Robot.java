@@ -19,9 +19,6 @@ import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.CvSink;
-import edu.wpi.first.cscore.CvSource;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
@@ -108,13 +105,7 @@ public class Robot extends LoggedRobot {
     lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
 
-    UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
-    CvSink cvSink0 = CameraServer.getVideo(camera0);
-    CvSource outputStream0 = CameraServer.putVideo("Camera 0", 640, 480);
-
-    UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
-    CvSink cvSink1 = CameraServer.getVideo(camera1);
-    CvSource outputStream1 = CameraServer.putVideo("Camera 1", 640, 480);
+    CameraServer.startAutomaticCapture();
   }
 
   /** This function is called periodically during all modes. */

@@ -24,8 +24,6 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -50,21 +48,20 @@ public class TurretIOSparkFlex extends TurretIOReal {
     selfCheckingMotor = new SelfCheckingSparkFlex("Turret", motor);
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
-    motorConfig.closedLoop.pid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD);
-    motorConfig.closedLoop.feedForward.kS(TurretConstants.kS);
-    motorConfig.closedLoop.feedForward.kV(TurretConstants.kV);
-    motorConfig.closedLoop.feedForward.kA(TurretConstants.kA);
+    // motorConfig.closedLoop.pidf(0.06, 0.000009, 0.95, 0.0003);
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
-    motorConfig.softLimit.forwardSoftLimit(TurretConstants.forwardSoftLimit / TurretConstants.gearing);
+    motorConfig.softLimit.forwardSoftLimit(3.2);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);
-    motorConfig.softLimit.reverseSoftLimit(TurretConstants.reverseSoftLimit / TurretConstants.gearing);
+    motorConfig.softLimit.reverseSoftLimit(-3.2);
     motorConfig.closedLoop.maxMotion.cruiseVelocity(TurretConstants.maxVelocityRotationsPerSec);
-    motorConfig.closedLoop.maxMotion.maxAcceleration(TurretConstants.maxAccelerationRotationsPerSecSq);
+    motorConfig.closedLoop.maxMotion.maxAcceleration(
+        TurretConstants.maxAccelerationRotationsPerSecSq);
     motorConfig.smartCurrentLimit(TurretConstants.smartCurrentLimit);
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
     motorConfig.encoder.positionConversionFactor(1 / TurretConstants.gearing);
 
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motor.configure(
+        motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
     relativeEncoder = motor.getEncoder();
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
@@ -79,13 +76,18 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
   @Override
   public void setDesiredAngle(Rotation2d angle) {
-    double rotations = MathUtil.inputModulus(angle.getRotations(), TurretConstants.turretMaxRotation, TurretConstants.turretMinimumRotation);
+    double rotations =
+        MathUtil.inputModulus(
+            angle.getRotations(),
+            TurretConstants.turretMaxRotation,
+            TurretConstants.turretMinimumRotation);
     controller.setSetpoint(rotations, ControlType.kMAXMotionPositionControl);
   }
 
   @Override
   public void setVelocity(double radiansPerSec) {
-    controller.setSetpoint(Units.radiansToRotations(radiansPerSec), ControlType.kMAXMotionVelocityControl);
+    controller.setSetpoint(
+        Units.radiansToRotations(radiansPerSec), ControlType.kMAXMotionVelocityControl);
   }
 
   @Override

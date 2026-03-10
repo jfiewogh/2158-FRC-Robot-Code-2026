@@ -17,14 +17,14 @@ package org.austincans.frc2026.subsystems.flywheel;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -41,17 +41,24 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   //     new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
   private final SparkClosedLoopController controller = motor1.getClosedLoopController();
   private final SparkFlexConfig config = new SparkFlexConfig();
+  private final SparkFlexConfig config2 = new SparkFlexConfig();
 
   public FlywheelIOSparkFlex() {
-    config.follow(motor1, true);
+    config.closedLoop.pid(0.00019999999494757503, 0, 0.004999999888241291, ClosedLoopSlot.kSlot0);
+    config.closedLoop.feedForward.kV(0.000088557);
+    config.encoder.velocityConversionFactor(2);
+    config.encoder.positionConversionFactor(2);
+    motor1.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    config2.follow(motor1, true);
     // config.inverted(true);
-    motor2.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    motor2.configureAsync(
+        config2, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     inputs.appliedVolts = motor1.getBusVoltage();
-    inputs.velocityRPM = motor1.getEncoder().getVelocity() * FlywheelConstants.flywheelGearRation;
+    inputs.velocityRPM = motor1.getEncoder().getVelocity();
     // inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
     inputs.temperatureC = motor1.getMotorTemperature();
   }
@@ -63,7 +70,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
 
   @Override
   public void runRelativeVelocity(double velocityRPM) {
-    motor1.set(velocityRPM);
+    controller.setSetpoint(velocityRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override

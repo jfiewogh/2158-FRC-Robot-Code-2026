@@ -41,6 +41,7 @@ import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
+import org.austincans.frc2026.subsystems.battery.BatterySubsystem;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
@@ -84,7 +85,7 @@ public class RobotContainer {
   private Vision vision;
 
   private ObjectDetection objectDetection;
-  // private BatterySubsystem batterySubsystem;
+  private BatterySubsystem batterySubsystem;
   private Turret turret;
   private Hood hood;
   private Intake intake;
@@ -92,12 +93,12 @@ public class RobotContainer {
   private Led led;
 
   // Subsystem Enabled // only matters for real robot
-  private static final boolean driveEnabled = false;
+  private static final boolean driveEnabled = true;
   private static final boolean visionEnabled = false;
   private static final boolean objectDetectionEnabled = false;
   private static final boolean turretEnabled = false;
   private static final boolean hoodEnabled = false;
-  private static final boolean intakeEnabled = false;
+  private static final boolean intakeEnabled = true;
   private static final boolean flywheelEnabled = true;
   private static final boolean ledEnabled = true;
 
@@ -139,7 +140,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Real robot, instantiate hardware IO implementations
-        // batterySubsystem = new BatterySubsystem();
+        batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
           drive =
               new Drive(
@@ -507,7 +508,7 @@ public class RobotContainer {
       if (intakeEnabled) {
         operatorController
             .y()
-            .whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(1), intake))
+            .whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(0.4), intake))
             .onFalse(Commands.runOnce(() -> intake.setRelativeVelocity(0), intake));
         operatorController.x().onTrue(intake.deployCommand());
         operatorController.b().onTrue(intake.retractCommand());
@@ -516,16 +517,13 @@ public class RobotContainer {
         operatorController
             .a()
             .whileTrue(
-                Commands.runOnce(
+                Commands.runEnd(
                     () -> {
-                      flywheel.runShooter();
+                      flywheel.testing();
                       System.out.println("RAN FLYWHEEL");
                     },
-                    flywheel))
-            .onFalse(
-                Commands.runOnce(
                     () -> {
-                      flywheel.stopShooter();
+                      flywheel.stopMotors();
                     },
                     flywheel));
       }

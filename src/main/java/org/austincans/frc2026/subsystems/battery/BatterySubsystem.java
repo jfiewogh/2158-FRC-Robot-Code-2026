@@ -17,6 +17,7 @@ package org.austincans.frc2026.subsystems.battery;
 
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -33,7 +34,7 @@ public class BatterySubsystem extends SubsystemBase {
 
   private Timer timer = new Timer();
   private Timer currentTimer = new Timer();
-  private PowerDistribution powerDistribution = new PowerDistribution();
+  private PowerDistribution powerDistribution = new PowerDistribution(1, ModuleType.kRev);
 
   private Alert lowVoltageWarning = new Alert("Change the Battery Soon! (VY)", AlertType.kWarning);
   private Alert lowVoltageError = new Alert("Change the Battery Soon! (VY)", AlertType.kError);
@@ -43,6 +44,7 @@ public class BatterySubsystem extends SubsystemBase {
   public BatterySubsystem() {
     Logger.recordOutput("Battery/Voltage", voltage);
     Logger.recordOutput("Battery/Current", current);
+    Logger.recordOutput("Battery/AllCurrent", powerDistribution.getAllCurrents());
     Logger.recordOutput("Battery/simVoltage", simVoltage);
     Logger.recordOutput("Battery/Timer", loggedTimer);
     timer.start();

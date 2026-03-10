@@ -26,7 +26,7 @@ public class LinearActuatorController extends SubsystemBase {
   // L16-100-35-6-R
   public LinearActuatorController(int linearActuatorDeviceID) {
     linearActuator = new Servo(linearActuatorDeviceID);
-    linearActuator.setBoundsMicroseconds(2000, 0, 1000, 0, 1);
+    linearActuator.setBoundsMicroseconds(2000, 1550, 1500, 1450, 1000);
   }
 
   public void setSpeed(double speed) {

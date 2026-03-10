@@ -19,15 +19,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
+import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+  private final DigitalInput magLimitSwitch =
+      new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
   public Turret(TurretIO io) {
     this.io = io;
@@ -101,7 +106,8 @@ public class Turret extends AdvancedSubsystem {
    * @return Command to move turret to resting position
    */
   public Command turretRestingCommand() {
-    return Commands.run(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0)), this);
+    return Commands.run(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0)), this)
+        .until(() -> magLimitSwitch.get());
   }
 
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
@@ -145,7 +151,7 @@ public class Turret extends AdvancedSubsystem {
         this);
   }
 
-  public Command runTurret(double velocityRadPerSec){
+  public Command runTurret(double velocityRadPerSec) {
     return Commands.run(() -> setTurretVelocity(velocityRadPerSec));
   }
 
@@ -184,7 +190,21 @@ public class Turret extends AdvancedSubsystem {
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
-                this))
+                this),
+            Commands.runOnce(
+                () -> {
+                  io.setDesiredAngle(Rotation2d.fromDegrees(0));
+                },
+                this),
+            Commands.waitSeconds(2),
+            Commands.runOnce(
+                () -> {
+                  if (magLimitSwitch.get() != true) {
+                    addSubsystemFault(
+                        "TRRT", "[System Check] Turret did not reach it's zero position");
+                  }
+                }),
+            null)
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
   }
 }
