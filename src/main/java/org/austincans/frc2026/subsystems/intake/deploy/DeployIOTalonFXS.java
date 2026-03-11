@@ -15,9 +15,7 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.Units;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +30,7 @@ public class DeployIOTalonFXS implements DeployIO {
   private final TalonFXS deployMotor2;
   private final SelfCheckingTalonFXS deploy1MotorSelfCheck;
   private final SelfCheckingTalonFXS deploy2MotorSelfCheck;
+  private boolean deployed = false;
 
   // private final TalonFXSConfiguration config;
 
@@ -66,25 +65,35 @@ public class DeployIOTalonFXS implements DeployIO {
     // deployMotor1.getConfigurator().apply(config);
     // config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     // deployMotor2.getConfigurator().apply(config);
-    deployMotor2.setControl(
-        new Follower(IntakeConstants.deployCanID1, MotorAlignmentValue.Aligned));
+    // deployMotor2.setControl(
+    //     new Follower(IntakeConstants.deployCanID1, MotorAlignmentValue.Aligned));
     // deployEncoder.setPosition(0);
   }
 
   @Override
-  public void deploy() {
-    System.out.println("DEPLOY");
-    deployMotor1.set(0.05); // TODO: CHANGE ME
+  public void stopMotors() {
+    deployMotor1.stopMotor();
   }
 
   @Override
-  public void retract() {
-    System.out.println("RETRACT");
+  public void deploy() {
+    deployed = true;
+    System.out.println("DEPLOY");
+    deployMotor1.set(0.05); // TODO: CHANGE ME
     deployMotor2.set(-0.05);
   }
 
   @Override
+  public void retract() {
+    deployed = false;
+    System.out.println("RETRACT");
+    deployMotor1.set(-0.05);
+    deployMotor2.set(0.05);
+  }
+
+  @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    inputs.isDeployed = deployed;
     inputs.deployMotorVoltage = deployMotor1.getMotorVoltage().getValueAsDouble();
     inputs.deployPositionRad = deployMotor1.getPosition().getValue().in(Units.Radians);
     inputs.deployTemperatureC = deployMotor1.getDeviceTemp().getValueAsDouble();

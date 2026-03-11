@@ -49,6 +49,7 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     // motorConfig.closedLoop.pidf(0.06, 0.000009, 0.95, 0.0003);
+    // motorConfig.closedLoop.pidf(0.05, 0.000009, 0.02, 0);
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
     motorConfig.softLimit.forwardSoftLimit(3.2);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);
@@ -58,8 +59,6 @@ public class TurretIOSparkFlex extends TurretIOReal {
         TurretConstants.maxAccelerationRotationsPerSecSq);
     motorConfig.smartCurrentLimit(TurretConstants.smartCurrentLimit);
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
-    motorConfig.encoder.positionConversionFactor(1 / TurretConstants.gearing);
-
     motor.configure(
         motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
@@ -81,7 +80,7 @@ public class TurretIOSparkFlex extends TurretIOReal {
             angle.getRotations(),
             TurretConstants.turretMaxRotation,
             TurretConstants.turretMinimumRotation);
-    controller.setSetpoint(rotations, ControlType.kMAXMotionPositionControl);
+    controller.setSetpoint(rotations * 10, ControlType.kPosition); // 10:1 motor to turret rotations
   }
 
   @Override

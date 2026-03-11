@@ -30,9 +30,8 @@ public abstract class TurretIOReal implements TurretIO {
 
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    encoderConfig.MagnetSensor.MagnetOffset = 0.4140625;
     encoder.getConfigurator().apply(encoderConfig);
-
-    encoder.setPosition(0);
   }
 
   @Override

@@ -66,6 +66,7 @@ public class Intake extends AdvancedSubsystem {
       System.out.println("Null Hardware deploy");
     }
     this.registerCheckCommand(systemCheckCommand());
+    deployIO.retract();
   }
 
   public boolean intakeDeployed() {
@@ -81,7 +82,7 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public Command deploy() {
-    return Commands.runOnce(() -> deployIO.deploy(), this);
+    return Commands.runOnce(() -> deployIO.deploy(), this).until(() -> intakeDeployed());
   }
 
   public Command retract() {
@@ -132,22 +133,18 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public Command deployCommand() {
-    return Commands.defer(
-        () ->
-            Commands.runEnd(
-                () -> {
-                  deployIO.deploy();
-                },
-                () -> {
-                  intakeDeployed();
-                },
-                this),
-        Set.of(this));
+    return Commands.runOnce(
+     () -> {
+      deployIO.deploy();
+     },
+     this
+    );
   }
 
   public Command retractCommand() {
     return Commands.runOnce(
         () -> {
+          intakeIO.setRelativeVelocity(0);
           deployIO.retract();
         },
         this);

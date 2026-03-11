@@ -83,7 +83,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
-  public static double driveTestMultiplier = 1; // For when in testing mode
+  public static double driveTestMultiplier = 0.5; // For when in testing mode
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -398,6 +398,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
+  }
+
+  public void resetGyro() {
+    gyroIO.resetGyro();
   }
 
   /**

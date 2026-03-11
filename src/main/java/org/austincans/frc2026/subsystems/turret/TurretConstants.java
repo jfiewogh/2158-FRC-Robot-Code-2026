@@ -28,10 +28,10 @@ public class TurretConstants {
   public static final double kS = ConfigUtil.getConfigDouble("TURRET_S", 0);
   public static final double kA = ConfigUtil.getConfigDouble("TURRET_A", 0);
 
-  public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 0);
+  public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 24);
   public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
 
-  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 2);
+  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
   public static final double turretHeightMeters =
       ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(20));
 
@@ -63,6 +63,7 @@ public class TurretConstants {
       ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
 
   public static final double turretMinimumRotation =
-      ConfigUtil.getConfigDouble("TURRET_MIN_ROT", 0);
-  public static final double turretMaxRotation = ConfigUtil.getConfigDouble("TURRET_MAX_ROT", 0);
+      ConfigUtil.getConfigDouble("TURRET_MIN_ROT", -2.8 - 0.453);
+  public static final double turretMaxRotation =
+      ConfigUtil.getConfigDouble("TURRET_MAX_ROT", 3.6 - 0.453);
 }

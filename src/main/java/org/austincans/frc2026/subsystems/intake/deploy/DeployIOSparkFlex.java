@@ -43,19 +43,18 @@ public class DeployIOSparkFlex implements DeployIO {
   private final SparkFlexConfig config;
   private final RelativeEncoder deployEncoder;
   private final SparkClosedLoopController deployController;
+  private boolean deployed = false;
 
   public DeployIOSparkFlex() {
-    deployMotor1 =
-        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0), MotorType.kBrushless);
-    deployMotor2 =
-        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 0), MotorType.kBrushless);
+    deployMotor1 = new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 26), MotorType.kBrushless);
+    deployMotor2 = new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 27), MotorType.kBrushless);
     deployMotorSelfCheck1 = new SelfCheckingSparkFlex("Intake Deploy Motor 1", deployMotor1);
-    deployMotorSelfCheck2 = new SelfCheckingSparkFlex("Intake Deploy Motor 2", deployMotor1);
+    deployMotorSelfCheck2 = new SelfCheckingSparkFlex("Intake Deploy Motor 2", deployMotor2);
 
     config = new SparkFlexConfig();
     config.idleMode(IntakeConstants.deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
-    ClosedLoopConfig closedLoop =
-        new ClosedLoopConfig().pid(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
+    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(IntakeConstants.kP, IntakeConstants.kI,
+        IntakeConstants.kD);
     config.apply(closedLoop);
 
     // Configure deployEncoder
@@ -67,22 +66,27 @@ public class DeployIOSparkFlex implements DeployIO {
     // Save configuration
     deployMotor1.configureAsync(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    deployMotor2.configureAsync(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
   public void deploy() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deploy'");
+    deployed = true;
+    deployMotor1.set(0.05);
+    deployMotor2.set(-0.05);
   }
 
   @Override
   public void retract() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'retract'");
+    deployed = false;
+    deployMotor1.set(0.1);
+    deployMotor2.set(-0.1);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    inputs.isDeployed = deployed;
     inputs.deployMotorVoltage = deployMotor1.getBusVoltage();
     inputs.deployPositionRad = Units.rotationsToRadians(deployEncoder.getPosition());
     inputs.deployTemperatureC = deployMotor1.getMotorTemperature();
@@ -104,9 +108,15 @@ public class DeployIOSparkFlex implements DeployIO {
     }
 
     if (faults.isEmpty()) {
-      return null;
+      return List.of();
     } else {
       return faults;
     }
+  }
+
+  @Override
+  public void stopMotors() {
+    deployMotor1.stopMotor();
+    deployMotor2.stopMotor();
   }
 }

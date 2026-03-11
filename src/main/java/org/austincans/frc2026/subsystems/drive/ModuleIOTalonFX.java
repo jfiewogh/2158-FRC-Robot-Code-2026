@@ -23,6 +23,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -61,6 +62,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   private final SelfCheckingTalonFXPro driveTalonSelfCheck;
   private final SelfCheckingTalonFXPro turnTalonSelfCheck;
 
+  protected final PositionDutyCycle positionRequest = new PositionDutyCycle(0);
   protected final VoltageOut voltageRequest = new VoltageOut(0);
   protected final MotionMagicVoltage positionVoltageRequest = new MotionMagicVoltage(0.0);
   protected final VelocityVoltage velocityVoltageRequest = new VelocityVoltage(0.0);
@@ -270,11 +272,13 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   @Override
   public void setTurnPosition(Rotation2d rotation) {
     turnTalon.setControl(
-        switch (constants.SteerMotorClosedLoopOutput) {
-          case Voltage -> positionVoltageRequest.withPosition(rotation.getRotations());
-          case TorqueCurrentFOC ->
-              positionTorqueCurrentRequest.withPosition(rotation.getRotations());
-        });
+        positionRequest.withPosition(rotation.getRotations())
+        // switch (constants.SteerMotorClosedLoopOutput) {
+        //   case Voltage -> positionVoltageRequest.withPosition(rotation.getRotations());
+        //   case TorqueCurrentFOC ->
+        //       positionTorqueCurrentRequest.withPosition(rotation.getRotations());
+        // }
+        );
   }
 
   @Override

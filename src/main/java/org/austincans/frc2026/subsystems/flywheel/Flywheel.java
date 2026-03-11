@@ -135,18 +135,12 @@ public class Flywheel extends AdvancedSubsystem {
     // indexer.stopMotor();
   }
 
-  public Command runIndexerAndFlywheel(double velocity) {
-    return Commands.run(
-        () -> {
-          io.runRelativeVelocity(velocity);
-          indexer
-              .getClosedLoopController()
-              .setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-          if (Math.abs(inputs.velocityRPM) > (velocity * 0.9)
-              && indexer.getEncoder().getVelocity() > 10) {
-            runSpindexer();
-          }
-        },
-        this);
+  public void runIndexerAndFlywheel(double velocity) {
+    io.runRelativeVelocity(velocity);
+    controller.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (Math.abs(inputs.velocityRPM) > (velocity * 0.9)
+        && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
+      runSpindexer();
+    }
   }
 }

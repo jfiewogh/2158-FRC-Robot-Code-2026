@@ -23,7 +23,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -94,9 +96,9 @@ public class RobotContainer {
 
   // Subsystem Enabled // only matters for real robot
   private static final boolean driveEnabled = true;
-  private static final boolean visionEnabled = false;
+  private static final boolean visionEnabled = true;
   private static final boolean objectDetectionEnabled = false;
-  private static final boolean turretEnabled = false;
+  private static final boolean turretEnabled = true;
   private static final boolean hoodEnabled = false;
   private static final boolean intakeEnabled = true;
   private static final boolean flywheelEnabled = true;
@@ -153,11 +155,29 @@ public class RobotContainer {
                   (pose) -> {});
         }
         if (visionEnabled) {
+          // toward back of robot is positive x
+          // right is positive
+          // up is positive z
+          Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
+              new Translation3d(
+                  Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
+          double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
           vision =
               new Vision(
                   drive,
-                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                  // new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOPhotonVision(
+                      VisionConstants.camera1Name,
+                      () -> {
+                        Transform3d robotToTurret =
+                            new Transform3d(
+                                robotCenterToTurretCenterWithCameraHeightMeters, Rotation3d.kZero);
+                        Transform3d turretCenterToCamera =
+                            new Transform3d(
+                                new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
+                                new Rotation3d(0, 0, turret.getTurretAngle()));
+                        return robotToTurret.plus(turretCenterToCamera);
+                      }));
         }
         if (turretEnabled) {
           turret = new Turret(new TurretIOSparkFlex());
@@ -281,9 +301,11 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                    camera0Name, () -> robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                 new VisionIOPhotonVisionSim(
-                    camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                    camera1Name,
+                    () -> robotToCamera1,
+                    driveSimulation::getSimulatedDriveTrainPose));
 
         hood = new Hood(new HoodIOTest(robotSimulation));
 
@@ -329,10 +351,10 @@ public class RobotContainer {
     // Initialize drive suppliers
     switch (Constants.controlMode) {
       case JOYSTICK -> {
-        leftX = () -> -driverController.getLeftX();
-        leftY = () -> -driverController.getLeftY();
-        rightX = () -> -driverController.getRightX();
-        rightY = () -> -driverController.getRightY();
+        leftX = () -> -driverController.getLeftX() / Drive.driveTestMultiplier;
+        leftY = () -> -driverController.getLeftY() / Drive.driveTestMultiplier;
+        rightX = () -> -driverController.getRightX() / Drive.driveTestMultiplier;
+        rightY = () -> -driverController.getRightY() / Drive.driveTestMultiplier;
       }
       case KEYBOARD -> {
         leftX = keyboardHID::leftX;
@@ -378,7 +400,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
     if (driveEnabled) {
-      setTurnMode = DriveCommands.setTurnMode(drive);
+      // setTurnMode = DriveCommands.setTurnMode(drive);
     }
 
     // Set up auto routines
@@ -413,7 +435,12 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     if (driveEnabled) {
-      drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightX, rightY));
+      drive.setDefaultCommand(
+          DriveCommands.joystickDrive(
+              drive,
+              () -> -driverController.getLeftY(),
+              () -> -driverController.getLeftX(),
+              () -> driverController.getRightX()));
     }
 
     // Configure the button bindings
@@ -445,18 +472,17 @@ public class RobotContainer {
         if (shootCommand != null) {
           driverController.rightBumper().whileTrue(shootCommand);
         }
-
         if (setTurnMode != null) {
           driverController.b().onTrue(setTurnMode);
         }
 
         // Testing
-        if (driveAndIntakeCommand != null) {
-          operatorController.a().onTrue(driveAndIntakeCommand);
-        }
-        if (driveAndScoreCommand != null) {
-          operatorController.b().onTrue(driveAndScoreCommand);
-        }
+        // if (driveAndIntakeCommand != null) {
+        //   operatorController.a().onTrue(driveAndIntakeCommand);
+        // }
+        // if (driveAndScoreCommand != null) {
+        //   operatorController.b().onTrue(driveAndScoreCommand);
+        // }
       }
       case KEYBOARD -> {
         hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()), hood));
@@ -504,6 +530,7 @@ public class RobotContainer {
 
     if (driveEnabled) {
       // Switch to X pattern when X button is pressed
+      driverController.back().onTrue(Commands.runOnce(() -> drive.resetGyro()));
       driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
       if (intakeEnabled) {
         operatorController
@@ -519,13 +546,29 @@ public class RobotContainer {
             .whileTrue(
                 Commands.runEnd(
                     () -> {
-                      flywheel.testing();
+                      flywheel.runIndexerAndFlywheel(10000);
                       System.out.println("RAN FLYWHEEL");
                     },
                     () -> {
                       flywheel.stopMotors();
                     },
                     flywheel));
+      }
+      if (turretEnabled) {
+        // operatorController.leftBumper().onTrue(runTurret()
+        // ));
+        // operatorController.rightBumper().onTrue(Commands.runOnce(
+        //   () -> turret.setTurretVelocity(-0.05)
+        // ));
+        operatorController
+            .leftTrigger()
+            .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(0)));
+        operatorController
+            .rightTrigger()
+            .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(90)));
+        operatorController
+            .start()
+            .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(-90)));
       }
 
       // Reset gyro / odometry

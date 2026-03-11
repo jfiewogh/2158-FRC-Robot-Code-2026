@@ -105,7 +105,8 @@ public class Robot extends LoggedRobot {
     lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
 
-    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(1);
   }
 
   /** This function is called periodically during all modes. */

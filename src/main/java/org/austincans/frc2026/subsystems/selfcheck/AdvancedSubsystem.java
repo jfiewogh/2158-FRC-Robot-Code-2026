@@ -246,5 +246,6 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   public void periodic() {
     checkForFaults();
     publishStatus();
+    Timer.delay(0.5);
   }
 }

@@ -19,12 +19,14 @@ import java.util.List;
 import org.austincans.frc2026.subsystems.intake.IntakeIO.IntakeIOInputs;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface DeployIO {
-
   public void deploy();
 
   public void retract();
+
+  public void stopMotors();
 
   public void updateInputs(IntakeIOInputs inputs);
 
