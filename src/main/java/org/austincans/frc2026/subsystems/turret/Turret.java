@@ -21,6 +21,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -33,6 +36,7 @@ public class Turret extends AdvancedSubsystem {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
+    io.setDesiredAngle(Rotation2d.fromDegrees(0));
   }
 
   @Override
