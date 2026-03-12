@@ -44,6 +44,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.Constants;
@@ -106,7 +108,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   protected ModuleIOTalonFX(
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-    SmartDashboard.putData("Tuning", new Commands.runOnce(() -> updateTurningConfigs()));
+    SmartDashboard.putData("Tuning", new Commands.runOnce(() -> updateTurnConfigs()));
     this.constants = constants;
 
     driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.moduleCANBus);
