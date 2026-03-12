@@ -36,8 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -49,6 +49,18 @@ public class DriveCommands {
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  private enum OmegaMode {
+    POSITION,
+    SPEED
+  }
+
+  @SuppressWarnings("unused")
+  private static final OmegaMode omegaMode = OmegaMode.POSITION;
+
+  // if position, use joystickDriveAtAngle
+  // if speed, use joystickDrive
+
   private static final double hasInputThreshold = 0.1;
 
   private DriveCommands() {}
@@ -62,8 +74,8 @@ public class DriveCommands {
     linearMagnitude = linearMagnitude * linearMagnitude;
 
     // Return new linear velocity
-    return new Pose2d(Translation2d.kZero, linearDirection)
-        .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
+    return new Pose2d(new Translation2d(), linearDirection)
+        .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
 
@@ -84,15 +96,18 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaXSupplier,
+      DoubleSupplier omegaYSupplier) {
     return Commands.run(
         () -> {
+          updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+
           // Get linear velocity
           Translation2d linearVelocity =
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          double omega = MathUtil.applyDeadband(omegaXSupplier.getAsDouble(), DEADBAND);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
@@ -103,6 +118,7 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
+
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
@@ -121,11 +137,14 @@ public class DriveCommands {
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
    */
+  private static Rotation2d lastRotation = Rotation2d.kZero;
+
   public static Command joystickDriveAtAngle(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier) {
+      DoubleSupplier omegaXSupplier,
+      DoubleSupplier omegaYSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -139,14 +158,35 @@ public class DriveCommands {
     // Construct command
     return Commands.run(
             () -> {
+              Rotation2d rotation =
+                  Rotation2d.fromRadians(
+                      Math.atan2(omegaXSupplier.getAsDouble(), omegaYSupplier.getAsDouble()));
+
+              updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+
               // Get linear velocity
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+
               // Calculate angular speed
+              Rotation2d desiredRotation;
+              if (Math.abs(omegaXSupplier.getAsDouble()) > 0.1
+                  && Math.abs(omegaYSupplier.getAsDouble()) > 0.1) {
+                desiredRotation = isFlipped ? rotation.plus(Rotation2d.k180deg) : rotation;
+                lastRotation = desiredRotation;
+              } else {
+                // I don't think this is being called
+                desiredRotation = lastRotation;
+              }
+              Logger.recordOutput("Desired Rotation Rad", desiredRotation);
+
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+                      drive.getRotation().getRadians(), desiredRotation.getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -154,14 +194,11 @@ public class DriveCommands {
                       linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                       linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                       omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
                       isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          ? drive.getRotation().plus(Rotation2d.k180deg)
                           : drive.getRotation()));
             },
             drive)
@@ -187,14 +224,9 @@ public class DriveCommands {
         () -> {
           if (turnMode == TurnMode.TWO_AXIS) {
             return joystickDriveAtAngle(
-                drive,
-                xSupplier,
-                ySupplier,
-                () ->
-                    Rotation2d.fromRadians(
-                        Math.atan2(omegaXSupplier.getAsDouble(), omegaYSupplier.getAsDouble())));
+                drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
           }
-          return joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier);
+          return joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
         },
         Set.of(drive));
   }
@@ -364,7 +396,7 @@ public class DriveCommands {
 
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
-    Rotation2d lastAngle = Rotation2d.kZero;
+    Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
   }
 }

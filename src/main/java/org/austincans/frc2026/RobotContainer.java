@@ -457,11 +457,12 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     if (driveEnabled) {
       drive.setDefaultCommand(
-          DriveCommands.joystickDrive(
+          DriveCommands.driveCommand(
               drive,
               () -> -driverController.getLeftY(),
               () -> -driverController.getLeftX(),
-              () -> driverController.getRightX()));
+              () -> driverController.getRightX(),
+              () -> driverController.getRightY()));
     }
 
     // Configure the button bindings
