@@ -422,7 +422,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
     if (driveEnabled) {
-      // setTurnMode = DriveCommands.setTurnMode(drive);
+      setTurnMode = DriveCommands.setTurnMode(drive);
     }
 
     // Set up auto routines
