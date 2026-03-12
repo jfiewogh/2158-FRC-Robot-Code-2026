@@ -108,7 +108,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   protected ModuleIOTalonFX(
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-    SmartDashboard.putData("Tuning", new Commands.runOnce(() -> updateTurnConfigs()));
+    SmartDashboard.putData("Tuning", Commands.runOnce(() -> updateTurnConfigs()));
     this.constants = constants;
 
     driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.moduleCANBus);
