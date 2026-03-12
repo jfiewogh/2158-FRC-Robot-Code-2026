@@ -19,7 +19,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
@@ -34,9 +33,6 @@ import java.util.function.Supplier;
 
 import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.RobotState.VisionObservation;
-
-// TODO: add object detection
-// results should be put into GameTrack
 
 /** IO implementation for real Limelight hardware. */
 public class VisionIOLimelight implements VisionIO {
