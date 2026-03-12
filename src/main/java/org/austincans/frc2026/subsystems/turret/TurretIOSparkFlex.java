@@ -48,8 +48,6 @@ public class TurretIOSparkFlex extends TurretIOReal {
     selfCheckingMotor = new SelfCheckingSparkFlex("Turret", motor);
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
-    // motorConfig.closedLoop.pidf(0.06, 0.000009, 0.95, 0.0003);
-    // motorConfig.closedLoop.pidf(0.05, 0.000009, 0.02, 0);
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
     motorConfig.softLimit.forwardSoftLimit(3.2);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);

@@ -23,7 +23,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -50,11 +49,12 @@ import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSim3D;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.frc2026.subsystems.hood.HoodIOServoLinear;
 import org.austincans.frc2026.subsystems.hood.HoodIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
-import org.austincans.frc2026.subsystems.intake.deploy.DeployIOTalonFXS;
+import org.austincans.frc2026.subsystems.intake.deploy.DeployIOSparkFlex;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -99,7 +99,7 @@ public class RobotContainer {
   private static final boolean visionEnabled = true;
   private static final boolean objectDetectionEnabled = false;
   private static final boolean turretEnabled = true;
-  private static final boolean hoodEnabled = false;
+  private static final boolean hoodEnabled = true;
   private static final boolean intakeEnabled = true;
   private static final boolean flywheelEnabled = true;
   private static final boolean ledEnabled = true;
@@ -144,15 +144,33 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
-          drive =
-              new Drive(
-                  new DriveIOReal(),
-                  new GyroIOPigeon2(),
-                  new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                  new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                  new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                  new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                  (pose) -> {});
+          if (turretEnabled) {
+            drive =
+                new Drive(
+                    new DriveIOReal(),
+                    new GyroIOPigeon2(),
+                    new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                    new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                    new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                    new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                    (pose) -> {},
+                    () -> {
+                      return Rotation2d.fromRadians(turret.getTurretAngle());
+                    });
+          } else {
+            drive =
+                new Drive(
+                    new DriveIOReal(),
+                    new GyroIOPigeon2(),
+                    new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                    new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                    new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                    new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                    (pose) -> {},
+                    () -> {
+                      return Rotation2d.kZero;
+                    });
+          }
         }
         if (visionEnabled) {
           // toward back of robot is positive x
@@ -164,29 +182,29 @@ public class RobotContainer {
           double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
           vision =
               new Vision(
-                  drive,
-                  // new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                  new VisionIOPhotonVision(
-                      VisionConstants.camera1Name,
-                      () -> {
-                        Transform3d robotToTurret =
-                            new Transform3d(
-                                robotCenterToTurretCenterWithCameraHeightMeters, Rotation3d.kZero);
-                        Transform3d turretCenterToCamera =
-                            new Transform3d(
-                                new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
-                                new Rotation3d(0, 0, turret.getTurretAngle()));
-                        return robotToTurret.plus(turretCenterToCamera);
-                      }));
+                  drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation)
+                  // new VisionIOPhotonVision(
+                  //     VisionConstants.camera1Name,
+                  //     () -> {
+                  //       Transform3d robotToTurret =
+                  //           new Transform3d(
+                  //               robotCenterToTurretCenterWithCameraHeightMeters,
+                  // Rotation3d.kZero);
+                  //       Transform3d turretCenterToCamera =
+                  //           new Transform3d(
+                  //               new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
+                  //               new Rotation3d(0, 0, turret.getTurretAngle()));
+                  //       return robotToTurret.plus(turretCenterToCamera);
+                  );
         }
         if (turretEnabled) {
           turret = new Turret(new TurretIOSparkFlex());
         }
         if (hoodEnabled) {
-          hood = new Hood(new HoodIOSparkFlex());
+          hood = new Hood(new HoodIOServoLinear());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOTalonFXS());
+          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOSparkFlex());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());
@@ -216,7 +234,8 @@ public class RobotContainer {
                   new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                   new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                   new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                  (pose) -> {});
+                  (pose) -> {},
+                  () -> Rotation2d.kZero);
         }
         if (visionEnabled) {
           vision =
@@ -232,7 +251,7 @@ public class RobotContainer {
           hood = new Hood(new HoodIOSparkFlex());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOTalonFXS());
+          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOSparkFlex());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());
@@ -295,7 +314,8 @@ public class RobotContainer {
                 // new ModuleIOSim(driveSimulation.getModules()[1]),
                 // new ModuleIOSim(driveSimulation.getModules()[2]),
                 // new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+                driveSimulation::setSimulationWorldPose,
+                () -> Rotation2d.kZero);
 
         vision =
             new Vision(
@@ -343,7 +363,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                (pose) -> {});
+                (pose) -> {},
+                () -> Rotation2d.kZero);
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
       }
     }
@@ -368,7 +389,8 @@ public class RobotContainer {
     // TODO: runIntakeCommand should deploy intake before it can run it
     if (intakeEnabled) {
       runIntakeCommand =
-          Commands.runEnd(() -> intake.setRelativeVelocity(1), () -> intake.setRelativeVelocity(0));
+          Commands.runEnd(
+              () -> intake.setRelativeVelocity(0.5), () -> intake.setRelativeVelocity(0));
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
     } else {
       NamedCommands.registerCommand("runIntake", Commands.none());
@@ -532,13 +554,40 @@ public class RobotContainer {
       // Switch to X pattern when X button is pressed
       driverController.back().onTrue(Commands.runOnce(() -> drive.resetGyro()));
       driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
       if (intakeEnabled) {
         operatorController
             .y()
-            .whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(0.4), intake))
+            .whileTrue(Commands.runOnce(() -> intake.setRelativeVelocity(0.5), intake))
             .onFalse(Commands.runOnce(() -> intake.setRelativeVelocity(0), intake));
-        operatorController.x().onTrue(intake.deployCommand());
-        operatorController.b().onTrue(intake.retractCommand());
+
+        operatorController
+            .leftBumper()
+            .whileTrue(
+                Commands.runEnd(
+                    () -> {
+                      System.out.println("deploy positive direction");
+                      intake.deploy();
+                    },
+                    intake::stopDeploy, // intake.runDeployVelocity(0)
+                    intake));
+        operatorController
+            .rightBumper()
+            .whileTrue(
+                Commands.runEnd(
+                    () -> {
+                      System.out.println("deploy negative direction");
+                      intake.retract();
+                    },
+                    intake::stopDeploy, // intake.runDeployVelocity(0)
+                    intake));
+
+        // operatorController.x().onTrue(intake.deployCommand());
+        // operatorController.b().onTrue(intake.retractCommand());
+      }
+      if (hoodEnabled) {
+        operatorController.x().onTrue(Commands.runOnce(() -> hood.setHood(1000), hood));
+        operatorController.b().onTrue(Commands.runOnce(() -> hood.setHood(1750), hood));
       }
       if (flywheelEnabled) {
         operatorController
@@ -546,7 +595,7 @@ public class RobotContainer {
             .whileTrue(
                 Commands.runEnd(
                     () -> {
-                      flywheel.runIndexerAndFlywheel(10000);
+                      flywheel.runIndexerAndFlywheel(7500);
                       System.out.println("RAN FLYWHEEL");
                     },
                     () -> {

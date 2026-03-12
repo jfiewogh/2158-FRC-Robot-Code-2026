@@ -56,7 +56,7 @@ public class IntakeConstants {
   public static ProfiledPIDController intakePIDController =
       new ProfiledPIDController(kP, kI, kD, constraints);
 
-  public static boolean deployBreakEnabled = ConfigUtil.getConfigBoolean("INTAKE_BRAKE_MODE", true);
+  public static boolean deployBrakeEnabled = ConfigUtil.getConfigBoolean("INTAKE_BRAKE_MODE", true);
   public static boolean brakeMode = ConfigUtil.getConfigBoolean("INTAKE_BRAKE_MODE", false);
   public static final double intakeGearing = ConfigUtil.getConfigDouble("INTAKE_GEAR_RATIO", 1);
   public static final double deployGearing =

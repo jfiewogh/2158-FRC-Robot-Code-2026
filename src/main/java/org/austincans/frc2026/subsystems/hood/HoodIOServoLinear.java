@@ -15,19 +15,22 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
+import com.revrobotics.servohub.ServoChannel.ChannelId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import org.austincans.frc2026.controllers.LinearActuatorController;
+import org.austincans.frc2026.controllers.ServoHubController;
 import org.austincans.frc2026.math.Angle;
 
 public class HoodIOServoLinear implements HoodIO {
-  LinearActuatorController linearActuator;
+  ServoHubController servoHub = new ServoHubController();
+  // LinearActuatorController linearActuator;
   InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
   Angle currentAngle = Angle.fromDegrees(0);
 
   public HoodIOServoLinear() {
-    this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
-    angles.put(0.0, 0.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
+    // this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
+    // angles.put(0.0, 1000.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
+    // angles.put(90.0, 2000.0);
 
     // if (HoodConstants.potentiometer == true);
   }
@@ -43,14 +46,19 @@ public class HoodIOServoLinear implements HoodIO {
   }
 
   @Override
-  public void setAngle(Angle setPoint) {
-    linearActuator.setSpeed(angles.get(setPoint.toDegrees()));
-    currentAngle = Angle.fromDegrees(setPoint.toDegrees());
+  public void setAngle(Angle setpoint) {
+    servoHub.setPulse(ChannelId.kChannelId0, (int) setpoint.getRotation2d().getDegrees());
+    // currentAngle = Angle.fromDegrees(setPoint.toDegrees());
+  }
+
+  @Override
+  public void set(int pulseWidth) {
+    servoHub.setPulse(ChannelId.kChannelId0, pulseWidth);
   }
 
   @Override
   public void setAngleRotation2d(Rotation2d angle) {
-    linearActuator.setSpeed(angles.get(angle.getDegrees()));
+    servoHub.setPulse(ChannelId.kChannelId0, (angles.get(angle.getDegrees()).intValue()));
     currentAngle = Angle.fromDegrees(angle.getDegrees());
   }
 

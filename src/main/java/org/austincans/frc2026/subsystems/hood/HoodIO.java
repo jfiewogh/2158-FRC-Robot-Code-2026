@@ -47,6 +47,8 @@ public interface HoodIO {
 
   public void setVoltage(double voltage);
 
+  public void set(int value);
+
   public default List<HardwareFault> checkForFaults() {
     return List.of();
   }

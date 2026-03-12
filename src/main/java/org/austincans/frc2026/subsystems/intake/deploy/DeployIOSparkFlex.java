@@ -15,108 +15,112 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
-import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.intake.IntakeIO.IntakeIOInputs;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2026.util.ConfigUtil;
 
 public class DeployIOSparkFlex implements DeployIO {
-  private final SparkFlex deployMotor1;
-  private final SparkFlex deployMotor2;
-  private final SelfCheckingSparkFlex deployMotorSelfCheck1;
-  private final SelfCheckingSparkFlex deployMotorSelfCheck2;
+  private final SparkFlex leftDeployMotor;
+  private final SparkFlex rightDeployMotor;
+  private final SelfCheckingSparkFlex leftDeployMotorSelfCheck;
+  private final SelfCheckingSparkFlex rightDeployMotorSelfCheck;
 
-  private final SparkFlexConfig config;
-  private final RelativeEncoder deployEncoder;
-  private final SparkClosedLoopController deployController;
+  private final RelativeEncoder rightDeployEncoder;
+  private final RelativeEncoder leftDeployEncoder;
+  private final SparkClosedLoopController rightDeployController;
+  private final SparkClosedLoopController leftDeployController;
   private boolean deployed = false;
 
   public DeployIOSparkFlex() {
-    deployMotor1 = new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 26), MotorType.kBrushless);
-    deployMotor2 = new SparkFlex(ConfigUtil.getConfigInt("INTAKE_DEPLOY_ID", 27), MotorType.kBrushless);
-    deployMotorSelfCheck1 = new SelfCheckingSparkFlex("Intake Deploy Motor 1", deployMotor1);
-    deployMotorSelfCheck2 = new SelfCheckingSparkFlex("Intake Deploy Motor 2", deployMotor2);
+    leftDeployMotor = new SparkFlex(26, MotorType.kBrushless);
+    rightDeployMotor = new SparkFlex(27, MotorType.kBrushless);
+    leftDeployMotorSelfCheck = new SelfCheckingSparkFlex("Intake Deploy Motor 1", leftDeployMotor);
+    rightDeployMotorSelfCheck =
+        new SelfCheckingSparkFlex("Intake Deploy Motor 2", rightDeployMotor);
 
-    config = new SparkFlexConfig();
-    config.idleMode(IntakeConstants.deployBreakEnabled ? IdleMode.kBrake : IdleMode.kCoast);
-    ClosedLoopConfig closedLoop = new ClosedLoopConfig().pid(IntakeConstants.kP, IntakeConstants.kI,
-        IntakeConstants.kD);
-    config.apply(closedLoop);
+    // SparkFlexConfig rightConfig = new SparkFlexConfig();
+    // rightConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    // rightConfig.softLimit.forwardSoftLimit(7.8);
+    // rightConfig.softLimit.reverseSoftLimit(0);
+    // rightConfig.closedLoop.pid(0, 0, 0);
+    // rightConfig.inverted(true);
+    // rightDeployMotor.configureAsync(
+    //     rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-    // Configure deployEncoder
-    deployEncoder = deployMotor1.getEncoder();
-    deployEncoder.setPosition(0);
+    // SparkFlexConfig leftConfig = new SparkFlexConfig();
+    // leftConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    // leftConfig.softLimit.forwardSoftLimit(7.8);
+    // leftConfig.softLimit.reverseSoftLimit(0);
+    // leftConfig.closedLoop.pid(0, 0, 0);
+    // leftConfig.follow(rightDeployMotor);
+    // leftDeployMotor.configureAsync(
+    //     leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    leftDeployEncoder = leftDeployMotor.getEncoder();
 
-    deployController = deployMotor1.getClosedLoopController();
+    rightDeployController = rightDeployMotor.getClosedLoopController();
+    rightDeployEncoder = rightDeployMotor.getEncoder();
+    leftDeployController = leftDeployMotor.getClosedLoopController();
+  }
 
-    // Save configuration
-    deployMotor1.configureAsync(
-        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    deployMotor2.configureAsync(
-        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  public void setVelocity(double velocityRotationsPerSec) {
+    rightDeployMotor.set(velocityRotationsPerSec);
+    leftDeployMotor.set(velocityRotationsPerSec);
+    // rightDeployController.setSetpoint(velocityRotationsPerSec, ControlType.kVelocity);
   }
 
   @Override
   public void deploy() {
-    deployed = true;
-    deployMotor1.set(0.05);
-    deployMotor2.set(-0.05);
+    System.out.println("Deploy");
+    leftDeployController.setSetpoint(0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    rightDeployController.setSetpoint(0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    // leftDeployMotor.set(0.3);
+    // rightDeployMotor.set(0.3);
   }
 
   @Override
   public void retract() {
-    deployed = false;
-    deployMotor1.set(0.1);
-    deployMotor2.set(-0.1);
+    System.out.println("Retract");
+    leftDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    rightDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.isDeployed = deployed;
-    inputs.deployMotorVoltage = deployMotor1.getBusVoltage();
-    inputs.deployPositionRad = Units.rotationsToRadians(deployEncoder.getPosition());
-    inputs.deployTemperatureC = deployMotor1.getMotorTemperature();
+    inputs.deployMotorVoltage = rightDeployMotor.getBusVoltage();
+    inputs.deployPositionRad = Units.rotationsToRadians(rightDeployEncoder.getPosition());
+    inputs.deployTemperatureC = rightDeployMotor.getMotorTemperature();
   }
 
   @Override
   public List<SelfChecking> getHardware() {
-    return List.of(deployMotorSelfCheck1, deployMotorSelfCheck2);
+    return List.of(leftDeployMotorSelfCheck, rightDeployMotorSelfCheck);
   }
 
   @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = new ArrayList<>();
-
-    List<HardwareFault> deployFault = deployMotorSelfCheck1.checkForFaults();
-    deployFault.addAll(deployMotorSelfCheck2.checkForFaults());
+    List<HardwareFault> deployFault = leftDeployMotorSelfCheck.checkForFaults();
+    deployFault.addAll(rightDeployMotorSelfCheck.checkForFaults());
     if (deployFault != null) {
       faults.addAll(deployFault);
     }
-
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
+    return faults;
   }
 
   @Override
   public void stopMotors() {
-    deployMotor1.stopMotor();
-    deployMotor2.stopMotor();
+    leftDeployMotor.stopMotor();
+    rightDeployMotor.stopMotor();
   }
 }

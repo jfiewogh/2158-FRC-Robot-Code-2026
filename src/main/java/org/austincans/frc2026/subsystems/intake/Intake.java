@@ -18,7 +18,6 @@ package org.austincans.frc2026.subsystems.intake;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Set;
 import org.austincans.frc2026.controllers.LaserCAN;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIO;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -66,7 +65,6 @@ public class Intake extends AdvancedSubsystem {
       System.out.println("Null Hardware deploy");
     }
     this.registerCheckCommand(systemCheckCommand());
-    deployIO.retract();
   }
 
   public boolean intakeDeployed() {
@@ -81,12 +79,20 @@ public class Intake extends AdvancedSubsystem {
     intakeIO.setVoltage(voltage);
   }
 
-  public Command deploy() {
-    return Commands.runOnce(() -> deployIO.deploy(), this).until(() -> intakeDeployed());
+  public void deploy() {
+    deployIO.deploy();
   }
 
-  public Command retract() {
-    return Commands.runOnce(() -> deployIO.retract(), this);
+  public void retract() {
+    deployIO.retract();
+  }
+
+  public void stopDeploy() {
+    deployIO.stopMotors();
+  }
+
+  public void runDeployVelocity(double velocityRotationsPerSec) {
+    deployIO.setVelocity(velocityRotationsPerSec);
   }
 
   public double getVelocityRadPerSec() {
@@ -96,6 +102,8 @@ public class Intake extends AdvancedSubsystem {
   @Override
   public void periodic() {
     intakeIO.updateInputs(inputs);
+    deployIO.updateInputs(inputs);
+
     try {
       intakeIO
           .checkForFaults()
@@ -134,11 +142,10 @@ public class Intake extends AdvancedSubsystem {
 
   public Command deployCommand() {
     return Commands.runOnce(
-     () -> {
-      deployIO.deploy();
-     },
-     this
-    );
+        () -> {
+          deployIO.deploy();
+        },
+        this);
   }
 
   public Command retractCommand() {

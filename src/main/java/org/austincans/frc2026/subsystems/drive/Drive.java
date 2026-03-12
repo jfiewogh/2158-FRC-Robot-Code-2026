@@ -38,7 +38,10 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -47,6 +50,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -62,6 +66,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import lombok.Setter;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Constants.Mode;
@@ -71,6 +76,7 @@ import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
 import org.austincans.frc2026.util.LoggedTunableNumber;
@@ -160,8 +166,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   private final Timer lastMovementTimer = new Timer();
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
+  private Supplier<Rotation2d> turretAngleSupplier;
 
-  public static boolean joystickHasInput = true;
+  public static boolean joystickHasInput = false;
 
   public static boolean isDriving = false;
 
@@ -176,10 +183,12 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      Consumer<Pose2d> resetSimulationPoseCallBack) {
+      Consumer<Pose2d> resetSimulationPoseCallBack,
+      Supplier<Rotation2d> turretAngleSupplier) {
     this.driveIO = driveIO;
     this.gyroIO = gyroIO;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
+    this.turretAngleSupplier = turretAngleSupplier;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
@@ -502,6 +511,26 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
+    Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
+        new Translation3d(
+            -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
+    double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
+    Transform3d robotToTurret =
+        new Transform3d(robotCenterToTurretCenterWithCameraHeightMeters, Rotation3d.kZero);
+    Transform3d turretCenterToCamera =
+        new Transform3d(
+            new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
+            new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
+    robotToTurret = robotToTurret.plus(turretCenterToCamera);
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        "",
+        robotToTurret.getX(),
+        0,
+        robotToTurret.getZ(),
+        0,
+        0,
+        Units.radiansToDegrees(robotToTurret.getRotation().getAngle()));
     resetSimulationPoseCallBack.accept(pose);
     driveIO.resetPose(pose);
   }

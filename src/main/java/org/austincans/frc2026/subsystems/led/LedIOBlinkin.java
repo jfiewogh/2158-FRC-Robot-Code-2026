@@ -15,6 +15,7 @@
 
 package org.austincans.frc2026.subsystems.led;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import java.util.Optional;
@@ -160,6 +161,7 @@ public class LedIOBlinkin implements LedIO {
 
   public LedIOBlinkin() {
     m_blinkin = new Spark(LedConstants.blinkinID);
+    alliance = DriverStation.getAlliance();
   }
 
   @Override
@@ -178,8 +180,15 @@ public class LedIOBlinkin implements LedIO {
         m_blinkin.set(BlinkinPattern.RAINBOW_OCEAN_PALETTE.value);
         break;
       case DRIVING:
-        m_blinkin.set(BlinkinPattern.BLUE.value);
-        break;
+        {
+          if (alliance.get() == Alliance.Blue) {
+            m_blinkin.set(BlinkinPattern.BLUE.value);
+          } else if (alliance.get() == Alliance.Red) {
+            m_blinkin.set(BlinkinPattern.RED.value);
+          } else {
+            m_blinkin.set(BlinkinPattern.YELLOW.value);
+          }
+        }
       case CLIMBING:
         m_blinkin.set(BlinkinPattern.RAINBOW_FOREST_PALETTE.value);
         break;
@@ -196,7 +205,7 @@ public class LedIOBlinkin implements LedIO {
         m_blinkin.set(BlinkinPattern.YELLOW.value);
         break;
       case SHOOTING:
-        m_blinkin.set(BlinkinPattern.RED.value);
+        m_blinkin.set(BlinkinPattern.RAINBOW_FOREST_PALETTE.value);
         break;
       default:
         m_blinkin.set(BlinkinPattern.BLACK.value);

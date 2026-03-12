@@ -16,24 +16,26 @@
 package org.austincans.frc2026.controllers;
 
 import com.revrobotics.ResetMode;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
-import org.austincans.frc2026.util.ConfigUtil;
 
 public class ServoHubController {
-  public static ServoHub hub = new ServoHub(ConfigUtil.getConfigInt("REV_SERVOHUB_ID", 0));
+  public ServoHub hub = new ServoHub(44);
   ServoHubConfig config = new ServoHubConfig();
 
   public ServoHubController() {
     config
         .channel0
-        .pulseRange(500, 1500, 2500)
+        .pulseRange(1000, 1500, 2000)
         .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
     hub.configure(config, ResetMode.kNoResetSafeParameters);
   }
 
-  public static ServoHubController getInstance() {
-    return ServoHubController.getInstance();
+  public void setPulse(ChannelId id, int pulseMicroSec) {
+    hub.getServoChannel(id).setEnabled(true);
+    hub.getServoChannel(id).setPowered(true);
+    hub.getServoChannel(id).setPulseWidth(pulseMicroSec);
   }
 }

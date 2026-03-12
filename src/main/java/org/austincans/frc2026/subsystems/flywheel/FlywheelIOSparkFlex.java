@@ -44,8 +44,8 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   private final SparkFlexConfig config2 = new SparkFlexConfig();
 
   public FlywheelIOSparkFlex() {
-    config.closedLoop.pid(0.00019999999494757503, 0, 0.004999999888241291, ClosedLoopSlot.kSlot0);
-    config.closedLoop.feedForward.kV(0.000088557);
+    config.closedLoop.pid(0.00125, 0, 0.15, ClosedLoopSlot.kSlot0);
+    config.closedLoop.feedForward.kV(0.001);
     config.encoder.velocityConversionFactor(2);
     config.encoder.positionConversionFactor(2);
     motor1.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -71,6 +71,9 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   @Override
   public void runRelativeVelocity(double velocityRPM) {
     controller.setSetpoint(velocityRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (velocityRPM == 0) {
+      controller.setSetpoint(0, ControlType.kDutyCycle);
+    }
   }
 
   @Override

@@ -20,6 +20,7 @@ import static org.austincans.frc2026.util.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -49,6 +50,7 @@ import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXPro;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
   protected final SwerveModuleConstants<
@@ -95,9 +97,16 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
+  LoggedTunableNumber steer_kP = new LoggedTunableNumber("Tuning/Steer_KP", 2.6);
+  LoggedTunableNumber steer_kI = new LoggedTunableNumber("Tuning/Steer_KI", 0);
+  LoggedTunableNumber steer_kD = new LoggedTunableNumber("Tuning/Steer_KD", 0);
+  LoggedTunableNumber steer_kS = new LoggedTunableNumber("Tuning/Steer_KS", 0.0125);
+  LoggedTunableNumber steer_KV = new LoggedTunableNumber("Tuning/Steer_KV", 0);
+
   protected ModuleIOTalonFX(
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
+    SmartDashboard.putData("Tuning", new Commands.runOnce(() -> updateTurningConfigs()));
     this.constants = constants;
 
     driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.moduleCANBus);
@@ -126,6 +135,11 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     var turnConfig = new TalonFXConfiguration();
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.Slot0 = constants.SteerMotorGains;
+    // constants.SteerMotorGains.withKP(steer_kP.get())
+    // .withKI(steer_kI.get())
+    // .withKD(steer_kD.get()) // 0.08000000149011612
+    // .withKS(steer_kS.get())
+    // .withKV(steer_KV.get());
     if (Constants.currentMode == Constants.Mode.SIM)
       turnConfig.Slot0.withKD(0.5).withKS(0); // during simulation, gains are slightly different
 
@@ -237,6 +251,18 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     inputs.turnSupplyCurrentAmps = turnSupplyCurrent.getValueAsDouble();
     inputs.turnStatorCurrentAmps = turnStatorCurrent.getValueAsDouble();
     inputs.turnTorqueCurrentAmps = turnTorqueCurrent.getValueAsDouble();
+  }
+
+  public void updateTurnConfigs() {
+    var turnConfig = new TalonFXConfiguration();
+    turnConfig.Slot0 =
+        new Slot0Configs()
+            .withKP(steer_kP.get())
+            .withKI(steer_kI.get())
+            .withKD(steer_kD.get())
+            .withKS(steer_kS.get())
+            .withKV(steer_KV.get());
+    turnTalon.getConfigurator().apply(turnConfig);
   }
 
   @Override

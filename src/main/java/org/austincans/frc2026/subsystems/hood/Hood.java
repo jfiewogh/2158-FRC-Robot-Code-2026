@@ -33,8 +33,12 @@ public class Hood extends AdvancedSubsystem {
     registerCheckCommand(systemCheckCommand());
   }
 
-  Command runHoodMotorCommand(Angle angle) {
-    return Commands.run((() -> io.setAngle(angle)));
+  public Command runHoodMotorCommand(Rotation2d angle) {
+    return Commands.run((() -> io.setAngleRotation2d(angle)));
+  }
+
+  public void setHood(int value) {
+    io.set(value);
   }
 
   // TODO: Only IO with setVelocity implementation is HoodIOTest

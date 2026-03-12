@@ -20,7 +20,7 @@ import org.austincans.frc2026.util.ConfigUtil;
 public class HoodConstants {
   static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);
   static int talonMotorID = ConfigUtil.getConfigInt("HOOD_TALON_ID", 0);
-  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACTUATOR_ID", 0);
+  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACTUATOR_ID", 20);
   static double kP = ConfigUtil.getConfigDouble("HOOD_P", 0);
   static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
   static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);

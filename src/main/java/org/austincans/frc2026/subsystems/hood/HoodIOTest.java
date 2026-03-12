@@ -71,4 +71,10 @@ public class HoodIOTest implements HoodIO {
   public void setVelocity(double velocityRadPerSec) {
     this.velocityRadPerSec = velocityRadPerSec;
   }
+
+  @Override
+  public void set(int value) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'set'");
+  }
 }

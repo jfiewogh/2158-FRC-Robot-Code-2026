@@ -40,7 +40,7 @@ public class TunerConstants {
       new Slot0Configs()
           .withKP(2.6000000476837158)
           .withKI(0)
-          .withKD(0.08000000149011612)
+          .withKD(0) // 0.08000000149011612
           .withKS(0.0125)
           .withKV(0)
           .withKA(0)
@@ -155,68 +155,74 @@ public class TunerConstants {
   private static final int kFrontLeftDriveMotorId = 31;
   private static final int kFrontLeftSteerMotorId = 32;
   private static final int kFrontLeftEncoderId = 41;
-  //   private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.18701171875);
-  //   private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.1337890625);
+  // private static final Angle kFrontLeftEncoderOffset =
+  // Rotations.of(-0.18701171875);
+  // private static final Angle kFrontLeftEncoderOffset =
+  // Rotations.of(-0.1337890625);
   private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.183837890625);
   private static final boolean kFrontLeftSteerMotorInverted = false;
   private static final boolean kFrontLeftEncoderInverted = false;
 
-  //   private static final Distance kFrontLeftXPos = Inches.of(-14);
-  //   private static final Distance kFrontLeftYPos = Inches.of(14);
+  // private static final Distance kFrontLeftXPos = Inches.of(-14);
+  // private static final Distance kFrontLeftYPos = Inches.of(14);
   private static final Distance kFrontLeftXPos = Inches.of(14);
   private static final Distance kFrontLeftYPos = Inches.of(14);
-  //   private static final Distance kFrontLeftXPos = Inches.of(10.5);
-  //   private static final Distance kFrontLeftYPos = Inches.of(10.5);
+  // private static final Distance kFrontLeftXPos = Inches.of(10.5);
+  // private static final Distance kFrontLeftYPos = Inches.of(10.5);
 
   // Front Right
   private static final int kFrontRightDriveMotorId = 33;
   private static final int kFrontRightSteerMotorId = 34;
   private static final int kFrontRightEncoderId = 42;
   private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.3388671875);
-  //   private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.39599609375);
-  //   private static final Angle kFrontRightEncoderOffset = Rotations.of(0.3186);
-  //   private static final Angle kFrontRightEncoderOffset = Rotations.of(0.406005859375);
+  // private static final Angle kFrontRightEncoderOffset =
+  // Rotations.of(-0.39599609375);
+  // private static final Angle kFrontRightEncoderOffset = Rotations.of(0.3186);
+  // private static final Angle kFrontRightEncoderOffset =
+  // Rotations.of(0.406005859375);
   private static final boolean kFrontRightSteerMotorInverted = false;
   private static final boolean kFrontRightEncoderInverted = false;
 
-  //   private static final Distance kFrontRightXPos = Inches.of(14);
-  //   private static final Distance kFrontRightYPos = Inches.of(14);
+  // private static final Distance kFrontRightXPos = Inches.of(14);
+  // private static final Distance kFrontRightYPos = Inches.of(14);
   private static final Distance kFrontRightXPos = Inches.of(14);
   private static final Distance kFrontRightYPos = Inches.of(-14);
-  //   private static final Distance kFrontRightXPos = Inches.of(10.5);
-  //   private static final Distance kFrontRightYPos = Inches.of(-10.5);
+  // private static final Distance kFrontRightXPos = Inches.of(10.5);
+  // private static final Distance kFrontRightYPos = Inches.of(-10.5);
 
   // Back Left
   private static final int kBackLeftDriveMotorId = 35;
   private static final int kBackLeftSteerMotorId = 36;
   private static final int kBackLeftEncoderId = 43;
-  //   private static final Angle kBackLeftEncoderOffset = Rotations.of(0.093505859375);
+  // private static final Angle kBackLeftEncoderOffset =
+  // Rotations.of(0.093505859375);
   private static final Angle kBackLeftEncoderOffset = Rotations.of(0.39892578125);
   private static final boolean kBackLeftSteerMotorInverted = false;
   private static final boolean kBackLeftEncoderInverted = false;
 
-  //   private static final Distance kBackLeftXPos = Inches.of(-14);
-  //   private static final Distance kBackLeftYPos = Inches.of(-14);
+  // private static final Distance kBackLeftXPos = Inches.of(-14);
+  // private static final Distance kBackLeftYPos = Inches.of(-14);
   private static final Distance kBackLeftXPos = Inches.of(-14);
   private static final Distance kBackLeftYPos = Inches.of(14);
-  //   private static final Distance kBackLeftXPos = Inches.of(-10.5);
-  //   private static final Distance kBackLeftYPos = Inches.of(10.5);
+  // private static final Distance kBackLeftXPos = Inches.of(-10.5);
+  // private static final Distance kBackLeftYPos = Inches.of(10.5);
 
   // Back Right
   private static final int kBackRightDriveMotorId = 37;
   private static final int kBackRightSteerMotorId = 38;
   private static final int kBackRightEncoderId = 44;
   private static final Angle kBackRightEncoderOffset = Rotations.of(0.21826171875);
-  //   private static final Angle kBackRightEncoderOffset = Rotations.of(0.433837890625);
+  // private static final Angle kBackRightEncoderOffset =
+  // Rotations.of(0.433837890625);
   private static final boolean kBackRightSteerMotorInverted = false;
   private static final boolean kBackRightEncoderInverted = false;
 
-  //   private static final Distance kBackRightXPos = Inches.of(14);
-  //   private static final Distance kBackRightYPos = Inches.of(-14);
+  // private static final Distance kBackRightXPos = Inches.of(14);
+  // private static final Distance kBackRightYPos = Inches.of(-14);
   private static final Distance kBackRightXPos = Inches.of(-14);
   private static final Distance kBackRightYPos = Inches.of(-14);
-  //   private static final Distance kBackRightXPos = Inches.of(-10.5);
-  //   private static final Distance kBackRightYPos = Inches.of(-10.5);
+  // private static final Distance kBackRightXPos = Inches.of(-10.5);
+  // private static final Distance kBackRightYPos = Inches.of(-10.5);
 
   public static final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
