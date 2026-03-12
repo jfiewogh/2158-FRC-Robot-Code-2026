@@ -485,6 +485,9 @@ public abstract class SimulatedArena3D implements Arena {
     replaceValueInMatchBreakDown(true, "TotalScore", blueScore);
     replaceValueInMatchBreakDown(false, "TotalScore", redScore);
 
+    Logger.recordOutput("Blue Score", blueScore);
+    Logger.recordOutput("Red Score", redScore);
+
     if (shouldPublishMatchBreakdown) {
       publishBreakdown();
       matchClockPublisher.set(matchClock);

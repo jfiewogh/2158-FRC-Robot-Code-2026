@@ -104,9 +104,9 @@ public class RobotContainer {
   /* Sim Booleans */
   private static final boolean isThreaded = false;
   // Set whether models should exist in physics engine
-  private static final boolean simulateShooterBase = true;
-  private static final boolean simulateTurret = true;
-  private static final boolean simulateHood = true;
+  private static final boolean simulateShooterBase = false;
+  private static final boolean simulateTurret = false;
+  private static final boolean simulateHood = false;
 
   private SwerveDriveSimulation3D driveSimulation;
 
@@ -509,7 +509,8 @@ public class RobotContainer {
               ? () ->
                   drive.setPose(
                       driveSimulation
-                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
+              // during simulation
               : () ->
                   drive.setPose(
                       new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
