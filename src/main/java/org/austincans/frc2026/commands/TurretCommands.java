@@ -263,4 +263,24 @@ public class TurretCommands {
               Drive.driveSpeedMultiplier = 1;
             });
   }
+
+  public static Command pointToHub(Turret turret, Drive drive) {
+    return Commands.run(
+        () -> {
+          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+          TrackingTargets target =
+              allianceOptional.get() == Alliance.Blue
+                  ? TrackingTargets.blueHub
+                  : TrackingTargets.redHub;
+          Translation3d targetTrans = target.getTranslation3d();
+          Translation3d robotTrans = drive.getPose3d().getTranslation();
+          double angRad =
+              Math.atan2(
+                  targetTrans.getY() - robotTrans.getY(), targetTrans.getX() - robotTrans.getX());
+          Logger.recordOutput("turret angle deg", Units.radiansToDegrees(angRad));
+          turret.setDesiredAngleFieldRelative(
+              Rotation2d.fromRadians(angRad), drive.getPose().getRotation());
+        },
+        turret);
+  }
 }

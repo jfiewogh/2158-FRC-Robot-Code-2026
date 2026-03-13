@@ -38,7 +38,10 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -47,6 +50,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -72,6 +76,7 @@ import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
 import org.austincans.frc2026.util.LoggedTunableNumber;
@@ -191,24 +196,26 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
     driveIO.setModules(modules);
     registerCheckCommand(systemCheckCommand());
-    // Translation3d robotCenterToTurretCenterWithCameraHeightMeters = new Translation3d(
-    //     -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
-    // double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
-    // Transform3d robotToTurret = new Transform3d(robotCenterToTurretCenterWithCameraHeightMeters,
-    // Rotation3d.kZero);
-    // Transform3d turretCenterToCamera = new Transform3d(
-    //     new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
-    //     new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
-    // robotToTurret = robotToTurret.plus(turretCenterToCamera);
+    Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
+        new Translation3d(
+            -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
+    double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
+    Transform3d robotToTurret =
+        new Transform3d(robotCenterToTurretCenterWithCameraHeightMeters, Rotation3d.kZero);
+    Transform3d turretCenterToCamera =
+        new Transform3d(
+            new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
+            new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
+    robotToTurret = robotToTurret.plus(turretCenterToCamera);
 
-    // LimelightHelpers.setCameraPose_RobotSpace(
-    //     "",
-    //     robotToTurret.getX(),
-    //     0,
-    //     robotToTurret.getZ(),
-    //     0,
-    //     0,
-    //     Units.radiansToDegrees(robotToTurret.getRotation().getAngle()));
+    LimelightHelpers.setCameraPose_RobotSpace(
+        "limelight",
+        robotToTurret.getX(),
+        0,
+        robotToTurret.getZ(),
+        0,
+        0,
+        Units.radiansToDegrees(robotToTurret.getRotation().getAngle()));
 
     lastMovementTimer.start();
     setBrakeMode(true);

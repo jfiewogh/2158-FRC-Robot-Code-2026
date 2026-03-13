@@ -121,7 +121,7 @@ public class Turret extends AdvancedSubsystem {
    */
   public void setDesiredAngleFieldRelative(
       Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
-    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation));
+    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation).unaryMinus());
   }
 
   /**
