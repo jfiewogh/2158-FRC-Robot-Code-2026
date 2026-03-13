@@ -17,9 +17,11 @@ package org.austincans.frc2026;
 
 import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,13 +52,16 @@ public class Robot extends LoggedRobot {
   private AdvancedSubsystem advancedSubsystem;
 
   public Robot() {
-    CanBridge.runTCP();
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    SignalLogger.enableAutoLogging(false);
+    RobotController.setBrownoutVoltage(6);
+    SignalLogger.stop();
+    CanBridge.runTCP();
     switch (BuildConstants.DIRTY) {
       case 0:
         Logger.recordMetadata("GitDirty", "All changes committed");
@@ -73,7 +78,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
+        Logger.addDataReceiver(new WPILOGWriter("/u/logs"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -93,7 +98,7 @@ public class Robot extends LoggedRobot {
     }
 
     // Start AdvantageKit logger
-    Logger.start();
+    // Logger.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -107,6 +112,8 @@ public class Robot extends LoggedRobot {
 
     CameraServer.startAutomaticCapture(0);
     CameraServer.startAutomaticCapture(1);
+
+    Threads.setCurrentThreadPriority(true, 10);
   }
 
   /** This function is called periodically during all modes. */

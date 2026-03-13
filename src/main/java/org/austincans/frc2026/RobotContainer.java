@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -73,7 +74,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
 import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -98,7 +98,7 @@ public class RobotContainer {
 
   // Subsystem Enabled // only matters for real robot
   private static final boolean driveEnabled = true;
-  private static final boolean visionEnabled = true;
+  private static final boolean visionEnabled = false;
   private static final boolean objectDetectionEnabled = false;
   private static final boolean turretEnabled = true;
   private static final boolean hoodEnabled = true;
@@ -122,7 +122,7 @@ public class RobotContainer {
   private final KeyboardHID keyboardHID = new KeyboardHID();
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
 
   private IntakeSimulation3D intakeSimulation;
 
@@ -143,6 +143,7 @@ public class RobotContainer {
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL -> {
+        // Logger.end();
         // Real robot, instantiate hardware IO implementations
         batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
@@ -371,10 +372,10 @@ public class RobotContainer {
     // Initialize drive suppliers
     switch (Constants.controlMode) {
       case JOYSTICK -> {
-        leftX = () -> -driverController.getLeftX() / Drive.driveTestMultiplier;
-        leftY = () -> -driverController.getLeftY() / Drive.driveTestMultiplier;
-        rightX = () -> -driverController.getRightX() / Drive.driveTestMultiplier;
-        rightY = () -> -driverController.getRightY() / Drive.driveTestMultiplier;
+        leftX = () -> -driverController.getLeftX() * Drive.driveTestMultiplier;
+        leftY = () -> -driverController.getLeftY() * Drive.driveTestMultiplier;
+        rightX = () -> -driverController.getRightX() * Drive.driveTestMultiplier;
+        rightY = () -> -driverController.getRightY() * Drive.driveTestMultiplier;
       }
       case KEYBOARD -> {
         leftX = keyboardHID::leftX;
@@ -395,10 +396,9 @@ public class RobotContainer {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
+      // shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
       shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
       shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
-      NamedCommands.registerCommand("shoot", shootToHubCommand);
       NamedCommands.registerCommand("shuttle", shuttleCommand);
     } else {
       NamedCommands.registerCommand("shoot", Commands.none());
@@ -425,8 +425,7 @@ public class RobotContainer {
     }
 
     // Set up auto routines
-    autoChooser =
-        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("Top Auto"));
+    autoChooser = new SendableChooser<Command>();
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -454,6 +453,10 @@ public class RobotContainer {
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
     autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
 
+    autoChooser.addOption("Auto1", AutoBuilder.buildAuto("Auto1"));
+    autoChooser.addOption("Auto2", AutoBuilder.buildAuto("Auto2"));
+    autoChooser.addOption("Auto3", AutoBuilder.buildAuto("Auto3"));
+
     // Default command, normal field-relative drive
     if (driveEnabled) {
       drive.setDefaultCommand(
@@ -467,6 +470,10 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    autoChooser.addOption("shoot", AutoBuilder.buildAuto("shoot"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -486,6 +493,8 @@ public class RobotContainer {
     // () -> -controller.getLeftX(),
     // () -> new Rotation2d()));
 
+    Command pointToHubCommand;
+
     switch (Constants.controlMode) {
       case JOYSTICK -> {
         if (driveEnabled) {
@@ -494,18 +503,20 @@ public class RobotContainer {
           driverController.back().onTrue(Commands.runOnce(() -> drive.resetGyro()));
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
           if (flywheelEnabled) {
-            driverController
-                .rightBumper()
-                .whileTrue(
-                    Commands.runEnd(
+            shootCommand =
+                Commands.run(
                         () -> {
                           flywheel.runIndexerAndFlywheel(7500);
                           System.out.println("RAN FLYWHEEL");
                         },
+                        flywheel)
+                    .finallyDo(
                         () -> {
                           flywheel.stopMotors();
-                        },
-                        flywheel));
+                        })
+                    .withTimeout(5);
+            driverController.rightBumper().whileTrue(shootCommand);
+            NamedCommands.registerCommand("shoot", shootCommand);
           }
           if (setTurnMode != null) {
             driverController.b().onTrue(setTurnMode);
@@ -523,7 +534,7 @@ public class RobotContainer {
                         intake::stopDeploy, // intake.runDeployVelocity(0)
                         intake));
             driverController
-                .rightBumper()
+                .rightTrigger()
                 .whileTrue(
                     Commands.runEnd(
                         () -> {
@@ -537,21 +548,33 @@ public class RobotContainer {
             // operatorController.b().onTrue(intake.retractCommand());
           }
           if (hoodEnabled) {
-            operatorController.x().onTrue(Commands.runOnce(() -> hood.setHood(1000), hood));
-            operatorController.b().onTrue(Commands.runOnce(() -> hood.setHood(1750), hood));
+            operatorController.x().onTrue(Commands.runOnce(() -> hood.incrementHood(50), hood));
+            operatorController.b().onTrue(Commands.runOnce(() -> hood.decrementHood(50), hood));
+            NamedCommands.registerCommand(
+                "turretAngleFar", Commands.runOnce(() -> hood.setHood(1150), hood));
+          } else {
+            NamedCommands.registerCommand("turretAngleFar", Commands.none());
           }
           if (turretEnabled) {
-            operatorController.leftTrigger().onTrue(TurretCommands.pointToHub(turret, drive));
-
+            pointToHubCommand = TurretCommands.pointToHub(turret, drive);
+            operatorController.leftTrigger().whileTrue(pointToHubCommand);
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(
-                    turret, drive, operatorController::getRightY, operatorController::getRightX));
+                    turret,
+                    drive,
+                    operatorController::getRightY,
+                    () ->
+                        operatorController
+                            .getRightX())); // axis values not flipped b/c turret is 180 off robot 0
+            NamedCommands.registerCommand("point to hub", pointToHubCommand);
             // operatorController
             //     .rightTrigger()
             //     .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(90)));
             // operatorController
             //     .start()
             //     .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(-90)));
+          } else {
+            NamedCommands.registerCommand("point to hub", Commands.none());
           }
 
           // Reset gyro / odometry
@@ -610,6 +633,7 @@ public class RobotContainer {
       }
       default -> {}
     }
+
     SmartDashboard.putData("SeqSystemCheck", AdvancedSubsystem.sequentialCheck());
   }
 
@@ -619,7 +643,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    // return AutoBuilder.buildAuto("shoot");
+    return autoChooser.getSelected();
   }
 
   public void resetSimulationField() {

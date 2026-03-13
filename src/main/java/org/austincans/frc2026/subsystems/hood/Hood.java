@@ -26,6 +26,7 @@ import org.littletonrobotics.junction.Logger;
 public class Hood extends AdvancedSubsystem {
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+  private int value = 1000;
 
   public Hood(HoodIO io) {
     this.io = io;
@@ -38,7 +39,15 @@ public class Hood extends AdvancedSubsystem {
   }
 
   public void setHood(int value) {
-    io.set(value);
+    this.value = value;
+  }
+
+  public void incrementHood(int value) {
+    this.value += value;
+  }
+
+  public void decrementHood(int value) {
+    this.value -= value;
   }
 
   // TODO: Only IO with setVelocity implementation is HoodIOTest
@@ -60,6 +69,7 @@ public class Hood extends AdvancedSubsystem {
 
   @Override
   public void periodic() {
+    io.set(value);
     Logger.processInputs("Hood/Inputs", inputs);
     io.updateInputs(inputs);
   }

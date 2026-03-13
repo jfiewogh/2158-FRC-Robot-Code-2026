@@ -89,7 +89,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
-  public static double driveTestMultiplier = 0.5; // For when in testing mode
+  public static double driveTestMultiplier = 0.25; // For when in testing mode
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -196,27 +196,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
     driveIO.setModules(modules);
     registerCheckCommand(systemCheckCommand());
-    Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
-        new Translation3d(
-            -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
-    double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
-    Transform3d robotToTurret =
-        new Transform3d(robotCenterToTurretCenterWithCameraHeightMeters, Rotation3d.kZero);
-    Transform3d turretCenterToCamera =
-        new Transform3d(
-            new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
-            new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
-    robotToTurret = robotToTurret.plus(turretCenterToCamera);
-
-    LimelightHelpers.setCameraPose_RobotSpace(
-        "limelight",
-        robotToTurret.getX(),
-        0,
-        robotToTurret.getZ(),
-        0,
-        0,
-        Units.radiansToDegrees(robotToTurret.getRotation().getAngle()));
-
     lastMovementTimer.start();
     setBrakeMode(true);
 
@@ -280,6 +259,41 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public void periodic() {
     driveIO.updateInputs(driveInputs);
     Logger.processInputs("Drive/Inputs", driveInputs);
+
+    Transform3d robotCenterToTurretCenterWithCameraHeightMeters =
+        new Transform3d(
+            Units.inchesToMeters(8.140 - (6.875 / 2)),
+            0,
+            Units.inchesToMeters(18.375 + 5.5),
+            new Rotation3d(Rotation2d.k180deg));
+    // Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
+    // new Translation3d(
+    //     -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
+    double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
+    Transform3d turretCenterToCamera =
+        new Transform3d(
+            new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
+            new Rotation3d(0, 0, turretAngleSupplier.get().unaryMinus().getRadians()));
+    Transform3d robotToCamera =
+        robotCenterToTurretCenterWithCameraHeightMeters.plus(turretCenterToCamera);
+    Pose3d robotRelativeCameraPose = Pose3d.kZero.transformBy(robotToCamera);
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        "limelight",
+        robotRelativeCameraPose.getX(),
+        -robotRelativeCameraPose.getY(),
+        robotRelativeCameraPose.getZ(),
+        0,
+        0,
+        robotRelativeCameraPose.getRotation().toRotation2d().getRadians() + Math.PI);
+    // Units.radiansToDegrees(
+    //     RobotState.getInstance()
+    //         .getRotation()
+    //         // .minus(Rotation2d.k180deg)
+    //         .plus(turretAngleSupplier.get())
+    //         // .minus(Rotation2d.fromDegrees(90))
+    //         .getRadians()));
+    // turretAngleSupplier.get().plus(Rotation2d.fromDegrees(90)).getRadians());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -556,7 +570,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
+    return getMaxLinearSpeedMetersPerSec() 
+        * driveSpeedMultiplier 
+        * driveTestMultiplier
+        / DRIVE_BASE_RADIUS;
   }
 
   /** Returns an array of module translations. */

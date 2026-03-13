@@ -268,22 +268,24 @@ public class TurretCommands {
   // TODO: fix
   public static Command pointToHub(Turret turret, Drive drive) {
     return Commands.run(
-        () -> {
-          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-          TrackingTargets target =
-              allianceOptional.get() == Alliance.Blue
-                  ? TrackingTargets.blueHub
-                  : TrackingTargets.redHub;
-          Translation3d targetTrans = target.getTranslation3d();
-          Translation3d robotTrans = drive.getPose3d().getTranslation();
-          double angRad =
-              Math.atan2(
-                  targetTrans.getY() - robotTrans.getY(), targetTrans.getX() - robotTrans.getX());
-          Logger.recordOutput("turret angle deg", Units.radiansToDegrees(angRad));
-          turret.setDesiredAngleFieldRelative(
-              Rotation2d.fromRadians(angRad), drive.getPose().getRotation());
-        },
-        turret);
+            () -> {
+              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+              TrackingTargets target =
+                  allianceOptional.get() == Alliance.Blue
+                      ? TrackingTargets.blueHub
+                      : TrackingTargets.redHub;
+              Translation3d targetTrans = target.getTranslation3d();
+              Translation3d robotTrans = drive.getPose3d().getTranslation();
+              double angRad =
+                  Math.atan2(
+                      targetTrans.getY() - robotTrans.getY(),
+                      targetTrans.getX() - robotTrans.getX());
+              Logger.recordOutput("turret angle deg", Units.radiansToDegrees(angRad));
+              turret.setDesiredAngleFieldRelative(
+                  Rotation2d.fromRadians(angRad), drive.getPose().getRotation());
+            },
+            turret)
+        .withTimeout(5);
   }
 
   private static Rotation2d setpointJoystickTurretAngle =
@@ -298,8 +300,8 @@ public class TurretCommands {
             setpointJoystickTurretAngle =
                 Rotation2d.fromRadians(
                     Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
-            turret.setDesiredAngleFieldRelative(
-                setpointJoystickTurretAngle, drive.getPose().getRotation());
+            turret.setDesiredAngleRobotRelative(
+                setpointJoystickTurretAngle); // , drive.getPose().getRotation());
           }
         },
         turret);

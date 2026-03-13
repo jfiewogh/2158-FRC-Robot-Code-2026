@@ -58,7 +58,7 @@
     "rotation": -71.77492488864553
   },
   "reversed": false,
-  "folder": "Shuttling Auto Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

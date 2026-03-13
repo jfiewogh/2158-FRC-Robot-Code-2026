@@ -21,9 +21,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -110,7 +107,7 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
-    io.setDesiredAngle(robotRelativeAngle);
+    io.setDesiredAngle(robotRelativeAngle.unaryMinus());
   }
 
   /**
@@ -121,7 +118,8 @@ public class Turret extends AdvancedSubsystem {
    */
   public void setDesiredAngleFieldRelative(
       Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
-    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation).unaryMinus());
+    io.setDesiredAngle(
+        fieldRelativeAngle.minus(robotRotation).unaryMinus().plus(Rotation2d.k180deg));
   }
 
   /**

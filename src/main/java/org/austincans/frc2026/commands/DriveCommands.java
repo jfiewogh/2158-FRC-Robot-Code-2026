@@ -37,14 +37,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
+  private static final double DEADBAND = 0.04;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double ANGLE_MAX_VELOCITY = 4;
+  private static final double ANGLE_MAX_ACCELERATION = 10.0;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -160,6 +159,7 @@ public class DriveCommands {
             () -> {
               Rotation2d rotation =
                   Rotation2d.fromRadians(
+                      // horizontal / vertical (x on joystick is horiz, y on joystick is vert)
                       Math.atan2(omegaXSupplier.getAsDouble(), omegaYSupplier.getAsDouble()));
 
               updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
@@ -179,10 +179,9 @@ public class DriveCommands {
                 desiredRotation = isFlipped ? rotation.plus(Rotation2d.k180deg) : rotation;
                 lastRotation = desiredRotation;
               } else {
-                // I don't think this is being called
                 desiredRotation = lastRotation;
               }
-              Logger.recordOutput("Desired Rotation Rad", desiredRotation);
+              // Logger.recordOutput("Desired Rotation Rad", desiredRotation);
 
               double omega =
                   angleController.calculate(
