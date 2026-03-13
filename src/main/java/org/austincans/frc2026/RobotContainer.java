@@ -53,7 +53,9 @@ import org.austincans.frc2026.subsystems.hood.HoodIOServoLinear;
 import org.austincans.frc2026.subsystems.hood.HoodIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
+import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
+import org.austincans.frc2026.subsystems.intake.deploy.DeployIOFake;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIOSparkFlex;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
@@ -338,8 +340,7 @@ public class RobotContainer {
                     driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
                     () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
 
-        // TODO: DEPLOY SIM
-        // intake = new Intake(new IntakeIOSim3D(intakeSimulation), null);
+        intake = new Intake(new IntakeIOSim3D(intakeSimulation), new DeployIOFake());
 
         flywheel =
             new Flywheel(
@@ -541,6 +542,10 @@ public class RobotContainer {
           }
           if (turretEnabled) {
             operatorController.leftTrigger().onTrue(TurretCommands.pointToHub(turret, drive));
+
+            turret.setDefaultCommand(
+                TurretCommands.joystickTurretAngleCommand(
+                    turret, drive, operatorController::getRightY, operatorController::getRightX));
             // operatorController
             //     .rightTrigger()
             //     .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(90)));

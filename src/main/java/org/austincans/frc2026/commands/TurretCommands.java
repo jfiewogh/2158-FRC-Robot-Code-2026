@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
@@ -264,6 +265,7 @@ public class TurretCommands {
             });
   }
 
+  // TODO: fix
   public static Command pointToHub(Turret turret, Drive drive) {
     return Commands.run(
         () -> {
@@ -280,6 +282,25 @@ public class TurretCommands {
           Logger.recordOutput("turret angle deg", Units.radiansToDegrees(angRad));
           turret.setDesiredAngleFieldRelative(
               Rotation2d.fromRadians(angRad), drive.getPose().getRotation());
+        },
+        turret);
+  }
+
+  private static Rotation2d setpointJoystickTurretAngle =
+      Rotation2d.kZero; // should be zero on start
+
+  public static Command joystickTurretAngleCommand(
+      Turret turret, Drive drive, DoubleSupplier vertSupplier, DoubleSupplier horizSupplier) {
+    return Commands.run(
+        () -> {
+          if (Math.abs(vertSupplier.getAsDouble()) > 0.1
+              && Math.abs(horizSupplier.getAsDouble()) > 0.1) {
+            setpointJoystickTurretAngle =
+                Rotation2d.fromRadians(
+                    Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
+            turret.setDesiredAngleFieldRelative(
+                setpointJoystickTurretAngle, drive.getPose().getRotation());
+          }
         },
         turret);
   }

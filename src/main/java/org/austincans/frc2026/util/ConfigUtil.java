@@ -15,6 +15,10 @@
 
 package org.austincans.frc2026.util;
 
+import edu.wpi.first.wpilibj.Filesystem;
+import java.io.File;
+
+import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.config.Configuration;
 import org.austincans.frc2026.config.ConfigurationLoader;
 
@@ -70,8 +74,9 @@ public class ConfigUtil {
    * @return The configuration object for the robot.
    */
   public Configuration getConfiguration() {
-    Configuration config =
-        ConfigurationLoader.fromFile("/home/lvuser/deploy/" + CONFIG_FILE).load();
+    Configuration config = Constants.currentMode == Constants.Mode.REAL
+        ? ConfigurationLoader.fromFile("/home/lvuser/deploy/" + CONFIG_FILE).load()
+        : ConfigurationLoader.fromFile(new File(Filesystem.getDeployDirectory(), CONFIG_FILE)).load();
     return config;
   }
 

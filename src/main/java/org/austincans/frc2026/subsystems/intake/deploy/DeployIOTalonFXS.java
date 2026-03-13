@@ -76,6 +76,10 @@ public class DeployIOTalonFXS implements DeployIO {
   }
 
   @Override
+  public void setVelocity(double velocityRotationsPerSec) {}
+  ;
+
+  @Override
   public void deploy() {
     deployed = true;
     System.out.println("DEPLOY");

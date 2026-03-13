@@ -21,7 +21,7 @@ import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 
 public interface DeployIO {
-  public default void setVelocity(double velocityRotationsPerSec) {}
+  public void setVelocity(double velocityRotationsPerSec);
 
   public void deploy();
 
