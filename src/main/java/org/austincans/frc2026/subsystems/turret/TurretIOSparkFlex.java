@@ -89,7 +89,8 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-    super.updateInputs(inputs);
+    // super.updateInputs(inputs);
+    inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / 10);
     inputs.motorPositionRotations = relativeEncoder.getPosition();
     inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
