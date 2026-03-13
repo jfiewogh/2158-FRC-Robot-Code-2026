@@ -512,22 +512,22 @@ public class RobotContainer {
           }
 
           if (intakeEnabled) {
-            operatorController
-                .leftBumper()
+            driverController
+                .leftTrigger()
                 .whileTrue(
                     Commands.runEnd(
                         () -> {
-                          System.out.println("deploy positive direction");
+                          System.out.println("deploy");
                           intake.deploy();
                         },
                         intake::stopDeploy, // intake.runDeployVelocity(0)
                         intake));
-            operatorController
+            driverController
                 .rightBumper()
                 .whileTrue(
                     Commands.runEnd(
                         () -> {
-                          System.out.println("deploy negative direction");
+                          System.out.println("retract direction");
                           intake.retract();
                         },
                         intake::stopDeploy, // intake.runDeployVelocity(0)

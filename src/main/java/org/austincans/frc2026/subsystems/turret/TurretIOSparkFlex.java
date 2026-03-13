@@ -64,6 +64,7 @@ public class TurretIOSparkFlex extends TurretIOReal {
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
     controller = motor.getClosedLoopController();
+    controller.setSetpoint(0, ControlType.kPosition);
   }
 
   @Override
