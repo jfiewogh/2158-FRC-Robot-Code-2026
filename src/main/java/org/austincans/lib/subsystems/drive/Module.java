@@ -1,5 +1,6 @@
 package org.austincans.lib.subsystems.drive;
 
+import org.austincans.frc2026.subsystems.drive.ModuleIOInputsAutoLogged;
 import org.austincans.lib.configs.ModuleConfig;
 import org.austincans.lib.subsystems.drive.ModuleIO.ModuleIOInputs;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,8 +8,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
-public class Module {
+public class Module extends AdvancedSubsystem {
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final double wheelRadiusMeters;
@@ -20,6 +23,7 @@ public class Module {
         driveSpeedMultiplier = moduleConfig.driveSpeedMultiplier();
     }
 
+    @Override // override to get rid of periodic 
     public void periodic() {
         io.updateInputs(inputs);
     }
@@ -96,4 +100,62 @@ public class Module {
     public void setDriveSpeedMultiplier(double driveSpeedMultiplier) {
         this.driveSpeedMultiplier = driveSpeedMultiplier;
     }
+
+    public Command systemCheckCommand() {
+        return Commands.sequence(
+                Commands.runOnce(
+                    () -> {
+                    clearFaults();
+                    stop();
+                    io.setTurnPosition(new Rotation2d(20));
+                    },
+                    this),
+                Commands.waitSeconds(0.3),
+                Commands.runOnce(
+                    () -> {
+                    if (Units.radiansToDegrees(inputs.turnVelocityRadPerSec) < 20) {
+                        addSubsystemFault(
+                            "SWRV" + String.valueOf(index),
+                            "[System Check] Rotation motor encoder velocity measured too slow",
+                            false);
+                    }
+                    },
+                    this),
+                Commands.run(
+                        () -> {
+                        io.setTurnPosition(Rotation2d.fromDegrees(90));
+                        },
+                        this)
+                    .withTimeout(1.0),
+                Commands.runOnce(
+                    () -> {
+                    if (inputs.turnAbsolutePosition.getDegrees() < 70
+                        || inputs.turnAbsolutePosition.getDegrees() > 110) {
+                        addSubsystemFault(
+                            "SWRV" + String.valueOf(index),
+                            "[System Check] Rotation Motor did not reach target position",
+                            false);
+                    }
+                    },
+                    this),
+                Commands.runOnce(
+                    () -> {
+                    io.setDriveVelocity(Units.degreesToRadians(90));
+                    },
+                    this),
+                Commands.waitSeconds(0.5),
+                Commands.runOnce(
+                    () -> {
+                    if (Units.radiansToDegrees(inputs.driveVelocityRadPerSec) < 0.25) {
+                        addSubsystemFault(
+                            "SWRV" + String.valueOf(index),
+                            "[System Check] Drive motor encoder velocity too slow",
+                            false);
+                    }
+                    io.setDriveVelocity(0);
+                    },
+                    this),
+                Commands.waitSeconds(0.25))
+            .andThen(Commands.runOnce(this::stop, this));
+  }
 }

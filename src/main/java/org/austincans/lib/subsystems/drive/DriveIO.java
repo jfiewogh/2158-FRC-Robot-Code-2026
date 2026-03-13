@@ -1,7 +1,5 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.subsystems.drive.GyroIO.GyroIOInputs;
-import org.austincans.lib.subsystems.drive.ModuleIO.ModuleIOInputs;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -11,11 +9,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 public interface DriveIO {
     @AutoLog
     public class DriveIOInputs {
-        public final ModuleIOInputs frontLeftInputs = new ModuleIOInputs();
-        public final ModuleIOInputs frontRightInputs = new ModuleIOInputs();
-        public final ModuleIOInputs backLeftInputs = new ModuleIOInputs();
-        public final ModuleIOInputs backRightInputs = new ModuleIOInputs();
-        public GyroIOInputs gyroInputs;
         public Pose3d pose;
         public ChassisSpeeds velocities; // either field or robot relative
     }
