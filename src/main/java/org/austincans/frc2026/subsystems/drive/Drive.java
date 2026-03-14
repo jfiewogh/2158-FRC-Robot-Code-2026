@@ -89,7 +89,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
-  public static double driveTestMultiplier = 0.25; // For when in testing mode
+  public static double driveTestMultiplier = 0.4; // For when in testing mode
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -547,6 +547,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public void setPose(Pose2d pose) {
     resetSimulationPoseCallBack.accept(pose);
     driveIO.resetPose(pose);
+    RobotState.getInstance().resetPose(pose);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -570,8 +571,8 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return getMaxLinearSpeedMetersPerSec() 
-        * driveSpeedMultiplier 
+    return getMaxLinearSpeedMetersPerSec()
+        * driveSpeedMultiplier
         * driveTestMultiplier
         / DRIVE_BASE_RADIUS;
   }

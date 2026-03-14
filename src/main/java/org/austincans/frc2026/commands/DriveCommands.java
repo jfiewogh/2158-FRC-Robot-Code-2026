@@ -40,8 +40,8 @@ import org.austincans.frc2026.subsystems.drive.Drive;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.04;
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
+  private static final double ANGLE_KP = 1.0;
+  private static final double ANGLE_KD = 0.0;
   private static final double ANGLE_MAX_VELOCITY = 4;
   private static final double ANGLE_MAX_ACCELERATION = 10.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -185,7 +185,7 @@ public class DriveCommands {
 
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(), desiredRotation.getRadians());
+                      drive.getGyroRotation().getRadians(), desiredRotation.getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
