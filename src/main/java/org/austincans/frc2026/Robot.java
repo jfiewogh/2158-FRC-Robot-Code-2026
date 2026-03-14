@@ -19,7 +19,6 @@ import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
@@ -110,8 +109,8 @@ public class Robot extends LoggedRobot {
     lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
 
-    CameraServer.startAutomaticCapture(0);
-    CameraServer.startAutomaticCapture(1);
+    // CameraServer.startAutomaticCapture(0);
+    // CameraServer.startAutomaticCapture(1);
 
     Threads.setCurrentThreadPriority(true, 10);
   }

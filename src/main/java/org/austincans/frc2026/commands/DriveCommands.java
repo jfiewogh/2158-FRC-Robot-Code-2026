@@ -34,7 +34,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
 
@@ -118,15 +117,11 @@ public class DriveCommands {
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
 
-          boolean isFlipped =
-              DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+          // boolean isFlipped =
+          //     DriverStation.getAlliance().isPresent()
+          //         && DriverStation.getAlliance().get() == Alliance.Red;
+          drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getGyroRotation()));
+          Timer.delay(0.01);
         },
         drive);
   }
@@ -219,15 +214,33 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,
       DoubleSupplier omegaYSupplier) {
-    return Commands.defer(
+
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.run(
         () -> {
           if (turnMode == TurnMode.TWO_AXIS) {
-            return joystickDriveAtAngle(
-                drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+
+          } else {
+
           }
-          return joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
-        },
-        Set.of(drive));
+        });
+
+    // return Commands.defer(
+    //     () -> {
+    //       if (turnMode == TurnMode.TWO_AXIS) {
+    //         return joystickDriveAtAngle(
+    //             drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+    //       }
+    //       return joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+    //     },
+    //     Set.of(drive));
   }
 
   public static Command setTurnMode(Drive drive) {
