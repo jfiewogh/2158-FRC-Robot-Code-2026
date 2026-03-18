@@ -23,35 +23,37 @@ public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfi
     }
 
     @Override
-    public void updateInputs(MotorIOInputs inputs) {
-        inputs.connected = true; // TODO: make this based on some property of the motor
-        inputs.positionRad = Units.rotationsToRadians(encoder.getPosition());
-        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
-        inputs.appliedVolts = motor.getBusVoltage();
-        inputs.statorCurrentAmps = motor.getOutputCurrent();
-        inputs.temperatureCelsius = motor.getMotorTemperature();
+    public void updateRecords(MotorIORecords records) {
+        records.connected = true; // TODO: make this based on some property of the motor
+        records.positionRad = Units.rotationsToRadians(encoder.getPosition());
+        records.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        records.appliedVolts = motor.getBusVoltage();
+        records.statorCurrentAmps = motor.getOutputCurrent();
+        records.temperatureCelsius = motor.getMotorTemperature();
     }
 
     @Override
-    public void setVoltage(double voltage) {
+    public void applyRequests(MotorIORequests requests) {
+        switch (requests.requestMode) {
+            case VOLTAGE -> setVoltage(requests.voltage);
+            case VELOCITY -> setVelocity(requests.velocityRadPerSec);
+            case POSITION -> setPosition(requests.positionRad);
+        }
+    }
+
+    private void setVoltage(double voltage) {
         controller.setSetpoint(voltage, ControlType.kVoltage);
     }
 
-    @Override
-    public void setVelocity(double velocityRadPerSec) {
+    private void setVelocity(double velocityRadPerSec) {
         controller.setSetpoint(
             Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), 
             ControlType.kMAXMotionVelocityControl);
     }
 
-    @Override
-    public void setPosition(double positionRad) {
+    private void setPosition(double positionRad) {
         controller.setSetpoint(
             Units.radiansToRotations(positionRad), ControlType.kMAXMotionVelocityControl);
-    }
-
-    public void stop() {
-        motor.stopMotor();
     }
 
     public void setEncoderPosition(double positionRotations) {

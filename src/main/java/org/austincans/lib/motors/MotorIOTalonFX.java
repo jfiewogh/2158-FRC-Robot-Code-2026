@@ -24,30 +24,36 @@ public class MotorIOTalonFX extends MotorIOReal {
     }
 
     @Override
-    public void updateInputs(MotorIOInputs inputs) {
-        inputs.connected = motor.isConnected();
-        inputs.positionRad = motor.getPosition().getValue().in(Radians);
-        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
-        inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
-        inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
-        inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
-        inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
-        inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+    public void updateRecords(MotorIORecords records) {
+        records.connected = motor.isConnected();
+        records.positionRad = motor.getPosition().getValue().in(Radians);
+        records.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
+        records.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        records.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
+        records.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
+        records.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
+        records.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
     }
 
     @Override
-    public void setVoltage(double voltage) {
+    public void applyRequests(MotorIORequests requests) {
+        switch (requests.requestMode) {
+            case VOLTAGE -> setVoltage(requests.voltage);
+            case VELOCITY -> setVelocity(requests.velocityRadPerSec);
+            case POSITION -> setPosition(requests.positionRad);
+        }
+    }
+
+    private void setVoltage(double voltage) {
         motor.setVoltage(voltage);
     }
 
-    @Override
-    public void setVelocity(double velocityRadPerSec) {
+    private void setVelocity(double velocityRadPerSec) {
         motor.setControl(velocityVoltage.withVelocity(
             AngularVelocity.ofBaseUnits(velocityRadPerSec, RadiansPerSecond))); 
     }
 
-    @Override
-    public void setPosition(double positionRad) {
+    private void setPosition(double positionRad) {
         motor.setControl(positionVoltage.withPosition(
             Units.radiansToRotations(positionRad)));
     }

@@ -20,8 +20,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.Constants;
-import org.austincans.lib.subsystems.elevator.ElevatorIOInputsAutoLogged;
 import org.austincans.lib.subsystems.elevator.ElevatorConfig.ElevatorState;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;

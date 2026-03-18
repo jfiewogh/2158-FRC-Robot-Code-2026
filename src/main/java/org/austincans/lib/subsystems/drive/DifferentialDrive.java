@@ -4,7 +4,7 @@ import java.util.function.DoubleSupplier;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPLTVController;
 
-public class DifferentialDrive extends Drive {
+public class DifferentialDrive {
     protected DifferentialDrive(DriveIO io, PPLTVController pathFollowerController, RobotConfig robotConfig) {
         super(io, pathFollowerController, robotConfig);
     }
