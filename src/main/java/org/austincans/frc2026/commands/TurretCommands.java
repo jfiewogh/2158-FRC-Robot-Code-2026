@@ -20,12 +20,14 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.Constants;
@@ -39,6 +41,14 @@ import org.austincans.frc2026.util.ShooterMath;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretCommands {
+  public static double flywheelExitVelocityConstant = 1;
+  public static InterpolatingDoubleTreeMap distancesAnglesFromHub = InterpolatingDoubleTreeMap.ofEntries(
+    Map.entry(0.0, 0.0),
+    Map.entry(1.0, 1.0));
+  public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint = InterpolatingDoubleTreeMap.ofEntries(
+    Map.entry(5.0, 5.0),
+    Map.entry(10.0, 10.0));
+
   public enum TrackingTargets {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
     blueHub(new Translation3d(4.5974, 4.034536, 1.5748)),
@@ -79,11 +89,30 @@ public class TurretCommands {
   /**
    * Only setter methods used for flywheel, turret, and hood. Only getter methods used for drive.
    */
+
+  public static double getHoodAngleFromDistance(double distance, InterpolatingDoubleTreeMap points){
+    return points.get(distance);
+  }
+
+  public static double getRobotDistanceFromHub(Drive drive, Alliance alliance){
+    if (alliance == Alliance.Blue){
+      return drive.getPose3d().getTranslation().getDistance(TrackingTargets.blueHub.getTranslation3d());
+    }
+    else{
+      return drive.getPose3d().getTranslation().getDistance(TrackingTargets.redHub.getTranslation3d());
+    }
+  }
+
+  public static double getDistanceFromShuttlingPoint(Drive drive, TrackingTargets target){
+    return drive.getPose3d().getTranslation().getDistance(target.getTranslation3d());
+  }
+
   public static void shootToTarget(
-      Flywheel flywheel, Turret turret, Hood hood, Drive drive, TrackingTargets target) {
+      Flywheel flywheel, Turret turret, Hood hood, Drive drive, TrackingTargets target, double distanceFromHub) {
     Pose2d robotPose = drive.getPose();
     ChassisSpeeds robotSpeeds = drive.getChassisSpeeds();
     Drive.driveSpeedMultiplier = 0.5;
+    Translation3d speeds = new Translation3d(robotSpeeds.vxMetersPerSecond,robotSpeeds.vyMetersPerSecond, 0);
 
     double targetHeight = target.getTranslation3d().getZ();
 
@@ -102,16 +131,17 @@ public class TurretCommands {
         futureRobotTranslation.plus(TURRET_OFFSET.rotateBy(futureRobotRotation));
 
     flywheel.setRelativeVelocity(0);
+    double hoodAngleRad = getHoodAngleFromDistance(distanceFromHub, distancesAnglesFromHub);
 
     // TOTAL VALUES
-    double totalVelocityMetersPerSec = getActualExitVelocityMetersPerSec(FLYWHEEL_SHOOT_SPEED);
+    double totalVelocityMetersPerSec = getActualExitVelocityMetersPerSec(FLYWHEEL_SHOOT_SPEED) * flywheelExitVelocityConstant;
     double totalXYDistanceMeters =
         turretTranslation.getDistance(target.getTranslation3d().toTranslation2d());
-    double totalPitchRad =
-        ShooterMath.calculateProjectileAngle(
-            TURRET_HEIGHT, totalVelocityMetersPerSec, totalXYDistanceMeters, targetHeight);
+    // double totalPitchRad =
+        // ShooterMath.calculateProjectileAngle(
+        //     TURRET_HEIGHT, totalVelocityMetersPerSec, totalXYDistanceMeters, targetHeight);
 
-    if (Double.isNaN(totalPitchRad)) {
+    if (Double.isNaN(hoodAngleRad)) {
       System.out.println("Cannot shoot into hub (1)");
     } else {
       Rotation2d totalYaw =
@@ -119,22 +149,24 @@ public class TurretCommands {
               Math.atan2(
                   target.getTranslation3d().getY() - turretTranslation.getY(),
                   target.getTranslation3d().getX() - turretTranslation.getX()));
-      double totalXYVelocity = totalVelocityMetersPerSec * Math.cos(totalPitchRad);
-      double totalXVelocity = totalXYVelocity * totalYaw.getCos();
-      double totalYVelocity = totalXYVelocity * totalYaw.getSin();
+      double totalXYVelocity = totalVelocityMetersPerSec * Math.cos(hoodAngleRad);
+
+      Translation3d velocityVector = new Translation3d(
+        totalXYVelocity * totalYaw.getCos(),
+        totalXYVelocity * totalYaw.getSin(),
+        totalVelocityMetersPerSec * Math.sin(hoodAngleRad)
+      );
 
       // CALCULATE EFFECTIVE YAW (TURRET ANGLE)
-      double effectiveSpeedX = totalXVelocity - robotSpeeds.vxMetersPerSecond;
-      double effectiveSpeedY = totalYVelocity - robotSpeeds.vyMetersPerSecond;
-      double effectiveSpeed = Math.hypot(effectiveSpeedX, effectiveSpeedY);
-      Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedY, effectiveSpeedX));
+      Translation3d effectiveSpeedVector = speeds.minus(velocityVector);
+      double effectiveSpeed = Math.hypot(effectiveSpeedVector.getX(), effectiveSpeedVector.getY());
+      Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan2(effectiveSpeedVector.getY(), effectiveSpeedVector.getY()));
 
       // CALCULATE EFFECTIVE PITCH (HOOD ANGLE)
       double totalTime = totalXYDistanceMeters / totalXYVelocity;
 
-      double hoodAngleRad =
-          ShooterMath.calculateProjectileAngle(
-              TURRET_HEIGHT, totalVelocityMetersPerSec, effectiveSpeed * totalTime, targetHeight);
+          // ShooterMath.calculateProjectileAngle(
+          //     TURRET_HEIGHT, totalVelocityMetersPerSec, effectiveSpeed * totalTime, targetHeight);
 
       if (Double.isNaN(hoodAngleRad)) {
         System.out.println("Cannot shoot into hub (2)");
@@ -181,7 +213,8 @@ public class TurretCommands {
 
   private static void shuttle(
       Flywheel flywheel, Turret turret, Hood hood, Drive drive, Alliance alliance) {
-    shootToTarget(flywheel, turret, hood, drive, getShuttleTarget(drive, alliance));
+    TrackingTargets target = getShuttleTarget(drive, alliance);
+    shootToTarget(flywheel, turret, hood, drive, target, getDistanceFromShuttlingPoint(drive, target));
   }
 
   // TODO: Maybe make it so that robot does not shoot over hub
@@ -206,13 +239,14 @@ public class TurretCommands {
   }
 
   private static void shootToHub(
-      Flywheel flywheel, Turret turret, Hood hood, Drive drive, Alliance alliance) {
+      Flywheel flywheel, Turret turret, Hood hood, Drive drive, Alliance alliance, double distanceFromHub) {
     shootToTarget(
         flywheel,
         turret,
         hood,
         drive,
-        alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub);
+        alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub,
+        getHoodAngleFromDistance(distanceFromHub, distancesAnglesFromHub));
   }
 
   public static Command shootToHubCommand(
@@ -223,7 +257,7 @@ public class TurretCommands {
               if (allianceOptional.isPresent()) {
                 Alliance alliance = allianceOptional.get();
                 if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-                  shootToHub(flywheel, turret, hood, drive, alliance);
+                  shootToHub(flywheel, turret, hood, drive, alliance, getRobotDistanceFromHub(drive, alliance));
                 }
               }
             },
@@ -249,7 +283,7 @@ public class TurretCommands {
               if (allianceOptional.isPresent()) {
                 Alliance alliance = allianceOptional.get();
                 if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-                  shootToHub(flywheel, turret, hood, drive, alliance);
+                  shootToHub(flywheel, turret, hood, drive, alliance,getRobotDistanceFromHub(drive, alliance));
                 } else {
                   shuttle(flywheel, turret, hood, drive, alliance);
                 }
