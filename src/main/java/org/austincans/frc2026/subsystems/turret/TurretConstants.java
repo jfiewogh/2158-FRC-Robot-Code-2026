@@ -17,53 +17,43 @@ package org.austincans.frc2026.subsystems.turret;
 
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.util.Units;
-import org.austincans.frc2026.util.ConfigUtil;
+import java.util.function.DoubleSupplier;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class TurretConstants {
   // values used by SparkFlex and TalonFX
-  public static final double kP = ConfigUtil.getConfigDouble("TURRET_P", 0);
-  public static final double kI = ConfigUtil.getConfigDouble("TURRET_I", 0);
-  public static final double kD = ConfigUtil.getConfigDouble("TURRET_D", 0);
-  public static final double kV = ConfigUtil.getConfigDouble("TURRET_V", 0);
-  public static final double kS = ConfigUtil.getConfigDouble("TURRET_S", 0);
-  public static final double kA = ConfigUtil.getConfigDouble("TURRET_A", 0);
+  public static final DoubleSupplier kP = new LoggedTunableNumber("Turret/kP", 0.0);
+  public static final DoubleSupplier kI = new LoggedTunableNumber("Turret/kI", 0.0);
+  public static final DoubleSupplier kD = new LoggedTunableNumber("Turret/kD", 0.0);
+  public static final DoubleSupplier kV = new LoggedTunableNumber("Turret/kV", 0.0);
+  public static final DoubleSupplier kS = new LoggedTunableNumber("Turret/kS", 0.0);
+  public static final DoubleSupplier kA = new LoggedTunableNumber("Turret/kA", 0.0);
 
-  public static final int turretMotorId = ConfigUtil.getConfigInt("TURRET_MOTOR_ID", 24);
-  public static final int turretEncoderId = ConfigUtil.getConfigInt("TURRET_ENCODER_ID", 0);
+  public static final int turretMotorId = 24;
+  public static final int turretEncoderId = 0;
 
-  public static final double gearing = ConfigUtil.getConfigDouble("TURRET_GEARING", 1);
-  public static final double turretHeightMeters =
-      ConfigUtil.getConfigDouble("TURRET_HEIGHT", Units.inchesToMeters(20));
+  public static final double gearing = 1;
+  public static final double turretHeightMeters = Units.inchesToMeters(20);
 
   public static final double maxVelocityRotationsPerSec = 0.2;
   public static final double maxAccelerationRotationsPerSecSq = 1;
 
-  public static final boolean forwardSoftLimitEnabled =
-      ConfigUtil.getConfigBoolean("TURRET_FORWARD_SOFT_LIMIT_ENABLED", true);
-  public static final boolean reverseSoftLimitEnabled =
-      ConfigUtil.getConfigBoolean("TURRET_REVERSE_SOFT_LIMIT_ENABLED", true);
-  public static final double forwardSoftLimit =
-      ConfigUtil.getConfigDouble("TURRET_FORWARD_SOFT_LIMIT", 0);
-  public static final double reverseSoftLimit =
-      ConfigUtil.getConfigDouble("TURRET_REVERSE_SOFT_LIMIT", 0);
-  public static final boolean isBrakeMode =
-      ConfigUtil.getConfigBoolean("TURRET_IS_BRAKE_MODE", false);
+  public static final boolean forwardSoftLimitEnabled = true;
+  public static final boolean reverseSoftLimitEnabled = true;
+  public static final double forwardSoftLimit = 3.6 - 0.453;
+  public static final double reverseSoftLimit = -3.6 - 0.453;
+  public static final boolean isBrakeMode = false;
 
   // values only used by TalonFX
-  public static final CANBus turretCANBus = new CANBus(ConfigUtil.getConfigString("*", "2158_CAN"));
+  public static final CANBus turretCANBus = new CANBus("2158_CAN");
 
   // values only used by SparkFlex
-  public static final boolean isBrushlessMotor =
-      ConfigUtil.getConfigBoolean("TURRET_IS_BRUSHLESS_MOTOR", true);
-  public static final int smartCurrentLimit =
-      ConfigUtil.getConfigInt("TURRET_SMART_CURRENT_LIMIT", 80);
+  public static final boolean isBrushlessMotor = true;
+  public static final int smartCurrentLimit = 80;
 
   // values (possibly only) used in sim
-  public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
+  public static final double rotationalInertiaMetersSq = 0.01;
 
-  public static final double turretMinimumRotation =
-      ConfigUtil.getConfigDouble("TURRET_MIN_ROT", -2.8 - 0.453);
-  public static final double turretMaxRotation =
-      ConfigUtil.getConfigDouble("TURRET_MAX_ROT", 3.6 - 0.453);
+  public static final double turretMinimumRotation = -2.8 - 0.453;
+  public static final double turretMaxRotation = 3.6 - 0.453;
 }

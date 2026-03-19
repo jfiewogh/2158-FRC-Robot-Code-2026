@@ -80,7 +80,6 @@ import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
 import org.austincans.frc2026.util.LoggedTunableNumber;
-import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -382,9 +381,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     }
 
     // Update current setpoint if not in velocity mode
-    if (!velocityMode) {
-      driveIO.updateSetpoint(new SwerveSetpoint(getChassisSpeeds(), getModuleStates()));
-    }
 
     // Update gyro alert
     gyroDisconnectedAlert.set(

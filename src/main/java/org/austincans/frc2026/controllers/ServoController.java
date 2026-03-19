@@ -16,7 +16,6 @@
 package org.austincans.frc2026.controllers;
 
 import edu.wpi.first.wpilibj.Servo;
-import org.austincans.frc2026.util.ConfigUtil;
 
 // This class is used to control the servo that is used to rotate the color pie
 // The servo is mounted on the robot and is used to rotate the color pie
@@ -40,7 +39,7 @@ public class ServoController {
   public static void servoInit() {
     // Initialize the servo here
     try {
-      m_colorServo = new Servo(ConfigUtil.getConfigInt("COLOR_SERVO_PORT", 9));
+      m_colorServo = new Servo(9);
     } catch (edu.wpi.first.hal.util.AllocationException ae) {
       // Let's do nothing
     }

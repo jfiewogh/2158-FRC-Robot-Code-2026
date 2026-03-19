@@ -15,10 +15,8 @@
 
 package org.austincans.frc2026.subsystems.intake;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.controllers.LaserCAN;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIO;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -28,10 +26,6 @@ public class Intake extends AdvancedSubsystem {
   private final IntakeIO intakeIO;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final DeployIO deployIO;
-
-  private final LaserCAN laserCAN = new LaserCAN(IntakeConstants.laserCANID);
-  private final DigitalInput magLimitSwitch =
-      new DigitalInput(IntakeConstants.magLimitSwitchChannel);
 
   @AutoLogOutput public static boolean deployed = false;
 
@@ -65,10 +59,6 @@ public class Intake extends AdvancedSubsystem {
       System.out.println("Null Hardware deploy");
     }
     this.registerCheckCommand(systemCheckCommand());
-  }
-
-  public boolean intakeDeployed() {
-    return magLimitSwitch.get();
   }
 
   public void setRelativeVelocity(double velocity) {
@@ -131,7 +121,6 @@ public class Intake extends AdvancedSubsystem {
     } catch (NullPointerException e) {
       System.out.println("Null pointer deploy");
     }
-    inputs.isDeployed = intakeDeployed();
 
     Logger.processInputs("Intake", inputs);
   }

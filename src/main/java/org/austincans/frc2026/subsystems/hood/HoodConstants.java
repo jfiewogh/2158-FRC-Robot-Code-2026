@@ -15,19 +15,19 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
-import org.austincans.frc2026.util.ConfigUtil;
+import java.util.function.DoubleSupplier;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class HoodConstants {
-  static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);
-  static int talonMotorID = ConfigUtil.getConfigInt("HOOD_TALON_ID", 0);
-  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACTUATOR_ID", 20);
-  static double kP = ConfigUtil.getConfigDouble("HOOD_P", 0);
-  static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
-  static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
-  static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
-  public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("HOOD_ROTATIONAL_INERTIAL_METERS_SQ", 5);
-  public static final double gearing = ConfigUtil.getConfigDouble("HOOD_GEARING", 5);
+  static int flexMotorID = 0;
+  static int talonMotorID = 0;
+  static int linearActuatorID = 20;
+  static DoubleSupplier kP = new LoggedTunableNumber("Hood/kP", 0);
+  static DoubleSupplier kI = new LoggedTunableNumber("Hood/kI", 0);
+  static DoubleSupplier kD = new LoggedTunableNumber("Hood/kD", 0);
+  static DoubleSupplier kV = new LoggedTunableNumber("Hood/kV", 0);
+  public static final double rotationalInertiaMetersSq = 0.01;
+  public static final double gearing = 5;
 
   // public static final double maxAngle = ConfigUtil.getConfigDouble("Max Hood Angle", 45);
 }

@@ -15,14 +15,10 @@
 
 package org.austincans.frc2026;
 
-import static org.austincans.frc2026.subsystems.vision.VisionConstants.*;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,36 +38,26 @@ import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.simulation.RobotSimulation3D;
-import org.austincans.frc2026.subsystems.battery.BatterySubsystem;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
-import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSim3D;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.hood.HoodIOServoLinear;
-import org.austincans.frc2026.subsystems.hood.HoodIOSparkFlex;
-import org.austincans.frc2026.subsystems.hood.HoodIOTest;
 import org.austincans.frc2026.subsystems.intake.Intake;
-import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
-import org.austincans.frc2026.subsystems.intake.deploy.DeployIOFake;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIOSparkFlex;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.turret.Turret;
-import org.austincans.frc2026.subsystems.turret.TurretIOSim;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
 import org.austincans.lib.util.KeyboardHID;
 import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.MeshSimulation3D;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
-import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
 import org.littletonrobotics.junction.Logger;
 
@@ -89,7 +75,6 @@ public class RobotContainer {
   private Vision vision;
 
   private ObjectDetection objectDetection;
-  private BatterySubsystem batterySubsystem;
   private Turret turret;
   private Hood hood;
   private Intake intake;
@@ -145,7 +130,6 @@ public class RobotContainer {
       case REAL -> {
         // Logger.end();
         // Real robot, instantiate hardware IO implementations
-        batterySubsystem = new BatterySubsystem();
         if (driveEnabled) {
           if (turretEnabled) {
             turret = new Turret(new TurretIOSparkFlex());
@@ -223,136 +207,6 @@ public class RobotContainer {
           led = new Led(new LedIOBlinkin());
         }
       }
-      case TEST -> {
-        // Real robot, instantiate hardware IO implementations
-        Drive.driveTestMultiplier = 0.2;
-        if (driveEnabled) {
-          drive =
-              new Drive(
-                  new DriveIOReal(),
-                  new GyroIOPigeon2(),
-                  new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                  new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                  new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                  new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                  (pose) -> {},
-                  () -> Rotation2d.kZero);
-        }
-        if (visionEnabled) {
-          vision =
-              new Vision(
-                  drive,
-                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-        }
-        if (turretEnabled) {
-          turret = new Turret(new TurretIOSparkFlex());
-        }
-        if (hoodEnabled) {
-          hood = new Hood(new HoodIOSparkFlex());
-        }
-        if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOSparkFlex());
-        }
-        if (flywheelEnabled) {
-          flywheel = new Flywheel(new FlywheelIOSparkFlex());
-        }
-        if (objectDetectionEnabled) {
-          // TODO: add actual limelight name
-          objectDetection =
-              new ObjectDetection(
-                  new ODIOReal(
-                      "limelight",
-                      ObjectDetection.GamePieceType.FUEL,
-                      LimelightConfig.LIMELIGHT_3G));
-        }
-        if (ledEnabled && flywheelEnabled && driveEnabled && intakeEnabled) {
-          led = new Led(new LedIOBlinkin());
-        }
-      }
-      case SIM -> {
-        // TODO: Add option to choose between 2d and 3d sim
-        // Sim robot, instantiate physics sim IO implementations
-
-        // Initialize Rebuilt arena
-        if (isThreaded) {
-          new Arena2026Rebuilt3D(PhysicsThreadConfig.enabled(100));
-        } else {
-          new Arena2026Rebuilt3D();
-        }
-
-        // Initialize robot simulation
-        // TODO: Reduce drive simulation drifting
-        RobotSimulation3D robotSimulation =
-            new RobotSimulation3D(
-                new SwerveDriveSimulation3D(Drive.getMapleSimConfig(), Pose2d.kZero),
-                new Pose2d(14, 3, Rotation2d.kZero));
-        driveSimulation = (SwerveDriveSimulation3D) robotSimulation.getDriveSimulation();
-        robotSimulation.addIntakeSimulation(
-            "Fuel", 0.1, Constants.RobotConstants.kBumperWidthMeters, 0.1, 35);
-        intakeSimulation = robotSimulation.getIntakeSimulation();
-
-        if (simulateShooterBase) {
-          robotSimulation.addShooterBase(new MeshSimulation3D("model_0.obj", 0.1));
-          if (simulateTurret) {
-            robotSimulation.addTurret(new MeshSimulation3D("model_1.obj", 0.1));
-            if (simulateHood) {
-              robotSimulation.addHood(new MeshSimulation3D("model_2.obj", 0.1));
-            }
-          }
-        }
-
-        drive =
-            new Drive(
-                new DriveIOSim3D(driveSimulation),
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(TunerConstants.FrontRight, driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(TunerConstants.BackLeft, driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(TunerConstants.BackRight, driveSimulation.getModules()[3]),
-                // TODO: ModuleIOSim does not work
-                // new ModuleIOSim(driveSimulation.getModules()[0]),
-                // new ModuleIOSim(driveSimulation.getModules()[1]),
-                // new ModuleIOSim(driveSimulation.getModules()[2]),
-                // new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose,
-                () -> Rotation2d.kZero);
-
-        vision =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    camera0Name, () -> robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                new VisionIOPhotonVisionSim(
-                    camera1Name,
-                    () -> robotToCamera1,
-                    driveSimulation::getSimulatedDriveTrainPose));
-
-        hood = new Hood(new HoodIOTest(robotSimulation));
-
-        turret = new Turret(new TurretIOSim(hood::getAngle, drive, robotSimulation));
-
-        objectDetection =
-            new ObjectDetection(
-                new ODIOSimInView(
-                    "Fuel",
-                    LimelightConfig.LIMELIGHT_3G,
-                    4,
-                    driveSimulation::getSimulatedDriveTrainPose3dGroundRelative,
-                    () -> new Pose3d(Translation3d.kZero, new Rotation3d())));
-
-        intake = new Intake(new IntakeIOSim3D(intakeSimulation), new DeployIOFake());
-
-        flywheel =
-            new Flywheel(
-                new FlywheelIOSim3D(
-                    driveSimulation,
-                    intakeSimulation,
-                    hood::getAngle,
-                    () -> Rotation2d.fromRadians(turret.getTurretAngle()),
-                    robotSimulation));
-      }
-
       default -> {
         // Replayed robot, disable IO implementations
         drive =

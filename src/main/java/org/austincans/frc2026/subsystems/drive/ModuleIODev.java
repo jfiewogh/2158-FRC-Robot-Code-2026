@@ -40,7 +40,7 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
-import org.austincans.frc2026.util.ConfigUtil;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.austincans.frc2026.util.PhoenixUtil;
 
 public class ModuleIODev implements ModuleIO {
@@ -91,14 +91,14 @@ public class ModuleIODev implements ModuleIO {
     turnTalon = new TalonFX(config.turnMotorId(), DriveConstants.moduleCANBus);
     encoder = new AnalogInput(config.encoderChannel());
     encoderOffset = config.encoderOffset();
+    double kP = new LoggedTunableNumber("Drive/KP", 0.0).getAsDouble();
+    double kD = new LoggedTunableNumber("Drive/KD", 0.0).getAsDouble();
+    double turnKP = new LoggedTunableNumber("Drive/TurnKP", 0.0).getAsDouble();
+    double turnKD = new LoggedTunableNumber("Drive/TurnKD", 0.0).getAsDouble();
 
     // Configure drive motor
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    driveConfig.Slot0 =
-        new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("DRIVE_P", 0.0))
-            .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("DRIVE_D", 0.0));
+    driveConfig.Slot0 = new Slot0Configs().withKP(kP).withKI(0).withKD(kD);
     driveConfig.Feedback.SensorToMechanismRatio = driveReduction;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveCurrentLimitAmps;
     driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -driveCurrentLimitAmps;
@@ -110,11 +110,7 @@ public class ModuleIODev implements ModuleIO {
 
     // Configure turn motor
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    turnConfig.Slot0 =
-        new Slot0Configs()
-            .withKP(ConfigUtil.getConfigDouble("TURN_P", 0.0))
-            .withKI(0)
-            .withKD(ConfigUtil.getConfigDouble("TURN_D", 0.0));
+    turnConfig.Slot0 = new Slot0Configs().withKP(turnKP).withKI(0).withKD(turnKD);
     turnConfig.Feedback.SensorToMechanismRatio = turnReduction;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = turnCurrentLimitAmps;

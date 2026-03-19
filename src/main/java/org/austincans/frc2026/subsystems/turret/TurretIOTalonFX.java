@@ -22,9 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
@@ -39,15 +37,6 @@ public class TurretIOTalonFX extends TurretIOReal {
   private TalonFX turretMotor;
   private SelfCheckingTalonFXS selfCheckingTalonFXS;
 
-  // Feedforward
-  private final ArmFeedforward feedforward =
-      new ArmFeedforward(
-          TurretConstants.kS, // kS
-          0, // kG - Pivot doesn't need gravity compensation
-          TurretConstants.kV, // kV
-          TurretConstants.kA // kA
-          );
-
   private final PositionVoltage positionRequest;
   private final VelocityVoltage velocityRequest;
   private TurretIOInputs inputs;
@@ -60,12 +49,12 @@ public class TurretIOTalonFX extends TurretIOReal {
     velocityRequest = new VelocityVoltage(0).withSlot(0);
 
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
-    motorConfig.Slot0.kP = TurretConstants.kP;
-    motorConfig.Slot0.kI = TurretConstants.kI;
-    motorConfig.Slot0.kD = TurretConstants.kD;
-    motorConfig.Slot0.kV = TurretConstants.kV;
-    motorConfig.Slot0.kS = TurretConstants.kS;
-    motorConfig.Slot0.kA = TurretConstants.kA;
+    motorConfig.Slot0.kP = TurretConstants.kP.getAsDouble();
+    motorConfig.Slot0.kI = TurretConstants.kI.getAsDouble();
+    motorConfig.Slot0.kD = TurretConstants.kD.getAsDouble();
+    motorConfig.Slot0.kV = TurretConstants.kV.getAsDouble();
+    motorConfig.Slot0.kS = TurretConstants.kS.getAsDouble();
+    motorConfig.Slot0.kA = TurretConstants.kA.getAsDouble();
     motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable =
         TurretConstants.forwardSoftLimitEnabled;
     motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = TurretConstants.forwardSoftLimit;
@@ -87,16 +76,12 @@ public class TurretIOTalonFX extends TurretIOReal {
   public void setDesiredAngle(Rotation2d angle, double accelerationRadPerSecSq) {
     double positionRad = angle.getRadians();
     double positionRotations = Units.radiansToRotations(positionRad);
-    positionRotations = MathUtil.inputModulus(angle.getRotations(), TurretConstants.turretMinimumRotation, TurretConstants.turretMaxRotation);
-    // positionRotations = MathUtil.clamp(positionRotations, TurretConstants.turretMinimumRotation, TurretConstants.turretMaxRotation);
-    if (feedforwardEnabled) {
-      // TODO: feedforward seems to take in parameters of positionRad and velocityRadPerSec
-      double ffVolts = feedforward.calculate(inputs.velocityRadPerSec, accelerationRadPerSecSq);
-      turretMotor.setControl(
-          positionRequest.withPosition(positionRotations).withFeedForward(ffVolts));
-    } else {
-      turretMotor.setControl(positionRequest.withPosition(positionRotations));
-    }
+    positionRotations =
+        MathUtil.inputModulus(
+            angle.getRotations(),
+            TurretConstants.turretMinimumRotation,
+            TurretConstants.turretMaxRotation);
+    turretMotor.setControl(positionRequest.withPosition(positionRotations));
   }
 
   @Override
@@ -112,16 +97,7 @@ public class TurretIOTalonFX extends TurretIOReal {
    */
   public void setVelocity(double velocityRadPerSec, double acceleration) {
     double velocityRotationsPerSec = Units.rotationsToRadians(velocityRadPerSec);
-
-    if (feedforwardEnabled) {
-      // TODO: feedforward seems to take in parameters of positionRad and velocityRadPerSec
-      // Also, should we use the velocityRadPerSec from the parameter or inputs?
-      double ffVolts = feedforward.calculate(inputs.velocityRadPerSec, acceleration);
-      turretMotor.setControl(
-          velocityRequest.withVelocity(velocityRotationsPerSec).withFeedForward(ffVolts));
-    } else {
-      turretMotor.setControl(velocityRequest.withVelocity(velocityRotationsPerSec));
-    }
+    turretMotor.setControl(velocityRequest.withVelocity(velocityRotationsPerSec));
   }
 
   @Override

@@ -23,7 +23,6 @@ import lombok.Builder;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Constants.RobotType;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.util.ConfigUtil;
 import org.austincans.frc2026.util.swerve.ModuleLimits;
 
 // TODO Review with CAD Team
@@ -147,9 +146,9 @@ public class DriveConstants {
         .build()
   };
 
-  public static final double robotMassKG = ConfigUtil.getConfigDouble("ROBOT_MASS_KG", 74.088);
-  public static final double robotMOI = ConfigUtil.getConfigDouble("ROBOT_MOI", 6.883);
-  public static final double wheelCOF = ConfigUtil.getConfigDouble("WHEEL_COF", 1.2);
+  public static final double robotMassKG = 74.088;
+  public static final double robotMOI = 6.883;
+  public static final double wheelCOF = 1.2;
 
   public static class PigeonConstants {
     public static final int id = Constants.getRobot() == RobotType.DEVBOT ? 3 : 30;

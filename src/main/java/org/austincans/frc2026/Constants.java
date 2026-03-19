@@ -19,7 +19,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,7 +34,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
-import org.austincans.frc2026.util.ConfigUtil;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -125,19 +123,15 @@ public final class Constants {
   }
 
   public static class OperatorConstants {
-    public static final int kDriverControllerPort =
-        ConfigUtil.getConfigInt("DRIVER_CONTROLLER_PORT", 0);
+    public static final int kDriverControllerPort = 0;
   }
 
   public static class RobotConstants {
-    public static double kBumperWidthMeters =
-        Units.inchesToMeters(ConfigUtil.getConfigDouble("ROBOT_BUMPER_FRONT_INCHES", 28));
-    public static double kBumperLengthMeters =
-        Units.inchesToMeters(ConfigUtil.getConfigDouble("ROBOT_BUMPER_RIGHT_INCHES", 28));
+    public static double kBumperWidthMeters = Units.inchesToMeters(31);
+    public static double kBumperLengthMeters = Units.inchesToMeters(31);
   }
 
-  public static final double kWheelRadius =
-      Units.inchesToMeters(ConfigUtil.getConfigDouble("ROBOT_WHEEL_RADIUS_INCHES", 2.0));
+  public static final double kWheelRadius = Units.inchesToMeters(4);
 
   public enum ControllerType {
     KEYBOARD,
@@ -145,13 +139,6 @@ public final class Constants {
   }
 
   public static final ControllerType kControllerType = ControllerType.XBOX;
-
-  public static class PIDConstants {
-    // 1 means at the farthest possible point, it is at max speed
-    // be careful with D
-
-    public static final PIDController kElevatorController = new PIDController(10, 0, 0);
-  }
 
   public static enum Mechanism {
     kDrive(1.0 / 5.0),

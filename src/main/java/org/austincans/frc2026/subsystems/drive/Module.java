@@ -32,24 +32,27 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2026.util.ConfigUtil;
 import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Module extends AdvancedSubsystem {
   private static final LoggedTunableNumber drivekS =
-      new LoggedTunableNumber("Drive/Module/DrivekS");
+      new LoggedTunableNumber("Drive/Module/DrivekS", 0);
   private static final LoggedTunableNumber drivekV =
-      new LoggedTunableNumber("Drive/Module/DrivekV");
+      new LoggedTunableNumber("Drive/Module/DrivekV", 0);
   private static final LoggedTunableNumber drivekT =
-      new LoggedTunableNumber("Drive/Module/DrivekT");
+      new LoggedTunableNumber("Drive/Module/DrivekT", 0);
   private static final LoggedTunableNumber drivekP =
-      new LoggedTunableNumber("Drive/Module/DrivekP");
+      new LoggedTunableNumber("Drive/Module/DrivekP", 0);
   private static final LoggedTunableNumber drivekD =
-      new LoggedTunableNumber("Drive/Module/DrivekD");
-  private static final LoggedTunableNumber turnkP = new LoggedTunableNumber("Drive/Module/TurnkP");
-  private static final LoggedTunableNumber turnkD = new LoggedTunableNumber("Drive/Module/TurnkD");
+      new LoggedTunableNumber("Drive/Module/DrivekD", 0);
+  private static final LoggedTunableNumber turnkP =
+      new LoggedTunableNumber("Drive/Module/TurnkP", 0);
+  private static final LoggedTunableNumber turnkD =
+      new LoggedTunableNumber("Drive/Module/TurnkD", 0);
+  private static final LoggedTunableNumber speedConstant =
+      new LoggedTunableNumber("Drive/Module/SPEED_CONSTANT", 1.0);
 
   static {
     switch (Constants.getRobot()) {
@@ -58,10 +61,10 @@ public class Module extends AdvancedSubsystem {
         drivekV.initDefault(0);
         // Multiplied by desired wheelTorqueNm
         drivekT.initDefault(DriveConstants.driveReduction / DCMotor.getKrakenX60Foc(1).KtNMPerAmp);
-        drivekP.initDefault(ConfigUtil.getConfigDouble("DRIVE_P", 0.0));
-        drivekD.initDefault(ConfigUtil.getConfigDouble("DRIVE_D", 0.0));
-        turnkP.initDefault(ConfigUtil.getConfigDouble("TURN_P", 0.0));
-        turnkD.initDefault(ConfigUtil.getConfigDouble("TURN_D", 0.0));
+        drivekP.initDefault(drivekP.getAsDouble());
+        drivekD.initDefault(drivekD.getAsDouble());
+        turnkP.initDefault(turnkP.getAsDouble());
+        turnkD.initDefault(turnkD.getAsDouble());
       }
       default -> {
         drivekS.initDefault(0.014);
@@ -160,7 +163,7 @@ public class Module extends AdvancedSubsystem {
 
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
-    io.setDriveVelocity(speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0));
+    io.setDriveVelocity(speedRadPerSec * speedConstant.get());
     io.setTurnPosition(state.angle);
   }
 
@@ -176,7 +179,7 @@ public class Module extends AdvancedSubsystem {
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
     io.setDriveVelocity(
-        speedRadPerSec * ConfigUtil.getConfigDouble("SPEED_CONSTANT", 1.0),
+        speedRadPerSec * speedConstant.get(),
         ffModel.calculate(speedRadPerSec) + wheelTorqueNm * drivekT.get());
     io.setTurnPosition(state.angle);
   }

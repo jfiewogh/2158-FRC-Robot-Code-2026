@@ -22,7 +22,6 @@ import java.util.List;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2026.util.ConfigUtil;
 
 /** Add your docs here. */
 public class IntakeIOSparkFlex implements IntakeIO {
@@ -31,8 +30,7 @@ public class IntakeIOSparkFlex implements IntakeIO {
 
   public IntakeIOSparkFlex() {
     // Initialize motor controllers
-    intakeMotor =
-        new SparkFlex(ConfigUtil.getConfigInt("INTAKE_MOTOR_ID", 28), MotorType.kBrushless);
+    intakeMotor = new SparkFlex(28, MotorType.kBrushless);
     // FIX ME: SparkFlex keeps initializing as default int
 
     intakeMotorSelfCheck = new SelfCheckingSparkFlex("Intake Motor", intakeMotor);
