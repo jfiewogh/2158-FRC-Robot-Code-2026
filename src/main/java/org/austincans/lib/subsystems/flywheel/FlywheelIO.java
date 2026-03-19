@@ -17,7 +17,7 @@ package org.austincans.lib.subsystems.flywheel;
 
 import java.util.List;
 
-import org.austincans.lib.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.motors.MotorIO.MotorIORecords;;
 import org.austincans.lib.sensors.SensorIO.SensorIOInputs;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
@@ -26,9 +26,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelIO {
   @AutoLog
   public class FlywheelIOInputs {
-    MotorIOInputs motorInputs;
-    double velocityRPM;
-    double appliedVolts;
+    public MotorIORecords motorRecords;
+    public double velocityRPM;
+    public double appliedVolts;
   }
 
   public default void updateInputs(FlywheelIOInputs inputs) {}
@@ -43,17 +43,5 @@ public interface FlywheelIO {
 
   public default List<SelfChecking> getHardware() {
     return List.of();
-  }
-
-  public default boolean readyToShoot() {
-    return false;
-  }
-
-  public default boolean isShooting() {
-    return false;
-  }
-
-  public default boolean noGamePiecesToShoot() {
-    return false;
   }
 }

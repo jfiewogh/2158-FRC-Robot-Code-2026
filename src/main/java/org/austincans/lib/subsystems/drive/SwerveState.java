@@ -28,7 +28,7 @@ import lombok.Setter;
  * Currently, deals with Pose2d.
  * TODO: Maybe update to include Pose3d.
  */
-public class SwerveDriveState {
+public class SwerveState {
     // Constants
     protected static final double poseBufferSizeSec = 2.0;
     protected static final Matrix<N3, N1> odometryStateStdDevs = new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.002));
@@ -56,7 +56,7 @@ public class SwerveDriveState {
     @Getter @Setter private ChassisSpeeds robotSetpointVelocities = new ChassisSpeeds();
 
     // Initialization
-    public SwerveDriveState(SwerveDriveKinematics kinematics) {
+    public SwerveState(SwerveDriveKinematics kinematics) {
         this.kinematics = kinematics;
         for (int i = 0; i < 3; i++) {
             qStdDevs.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));

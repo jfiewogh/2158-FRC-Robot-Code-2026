@@ -1,10 +1,15 @@
 package org.austincans.lib.subsystems.drive;
 
+import java.io.IOException;
+
 import org.austincans.lib.ConfigManager;
 import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.configs.DriveConfigDifferential;
 import org.austincans.lib.configs.DriveConfigSwerve;
-import org.austincans.lib.configs.ModuleConfig;
+import org.austincans.lib.configs.GyroConfig;
+import org.austincans.lib.configs.GyroConfigPigeon2;
+import org.austincans.lib.configs.SwerveModuleConfig;
+import org.austincans.lib.configs.SwerveConfig;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkMax;
 import org.austincans.lib.motors.MotorIOTalonFX;
@@ -13,23 +18,25 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
-    public static SwerveDrive createSwerveTalonFXPigeon2FromPathPlanner(DriveConfigSwerve swerveConfig) {
-        RobotConfig robotConfig = RobotConfig.fromGUISettings();
-        ModuleConfig moduleConfig = swerveConfig.moduleConfig;
-        DriveIOSwerve swerveIO = new DriveIOSwerve(
-            swerveConfig,
-            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
-            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
-            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
-            new Module(ModuleFactory.createTalonFXCANCoder(moduleConfig)),
-            new Gyro(GyroFactory.createPigeon2(gyroConfig)));
-        return new SwerveDrive(swerveConfig, swerveIO);
+    public static Swerve<GyroConfigPigeon2> buildSwerveTalonFXPigeon2Swerve(SwerveConfig<GyroConfigPigeon2> swerveConfig) {
+        SwerveModuleConfig moduleConfig = swerveConfig.moduleConfig;
+        GyroConfigPigeon2 gyroConfig = swerveConfig.gyroConfig;
+        return new Swerve<>(
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            ModuleFactory.createTalonFXCANCoder(moduleConfig),
+            GyroFactory.createPigeon2(gyroConfig),
+            swerveConfig);
     }
 
-    public static void createSwerveTalonFXPigeon2FromYAML(String pathName) {
+    public static Swerve buildSwerveTalonFXPigeon2SwerveFromYAML(String pathName) {
         // TODO: maybe pass ConfigManager into subsystem as optional so values can be updated while deployed.
-        ConfigManager<DriveConfigSwerve> configManager = new ConfigManager<DriveConfigSwerve>(pathName, null);
+        ConfigManager<SwerveConfig<GyroConfigPigeon2>> configManager = new ConfigManager<>(pathName, null);
 
+    }
+
+    public static Swerve buildSwerveTalonFXPigeon2SwerveFromTunerConstants() {
     }
 
     public static void createDifferentialSparkMax(DriveConfigDifferential driveConfig) {

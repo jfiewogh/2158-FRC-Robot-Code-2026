@@ -50,7 +50,7 @@ public class Module extends AdvancedSubsystem {
             AlertType.kError);
     }
 
-    @Override // override to get rid of periodic 
+    @Override
     public void periodic() {
         io.updateRecords(records);
         Logger.processInputs("Module/Records", records);

@@ -1,9 +1,10 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.configs.ModuleConfig;
+import org.austincans.lib.configs.MotorConfigTalon;
+import org.austincans.lib.configs.SwerveModuleConfig;
 
 public class ModuleFactory {
-    public static ModuleIOTalonFXCANcoder createTalonFXCANCoder(ModuleConfig moduleConfig) {
+    public static ModuleIOTalonFXCANcoder createTalonFXCANCoder(SwerveModuleConfig<MotorConfigTalon, MotorConfigTalon> moduleConfig) {
         return new ModuleIOTalonFXCANcoder(moduleConfig);
     }
 }

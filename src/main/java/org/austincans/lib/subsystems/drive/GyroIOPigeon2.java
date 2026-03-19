@@ -53,8 +53,6 @@ public class GyroIOPigeon2 implements GyroIO {
     pigeon.getConfigurator().apply(config);
     pigeon.getConfigurator().setYaw(0.0);
 
-    pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
-
     yaw = pigeon.getYaw();
     pitch = pigeon.getPitch();
     roll = pigeon.getRoll();
@@ -75,26 +73,31 @@ public class GyroIOPigeon2 implements GyroIO {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected =
+  public void updateRecords(GyroIORecords records) {
+    records.connected =
         BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
 
-    inputs.yawPosition = Rotation2d.fromRadians(yaw.getValue().in(Radians));
-    inputs.yawVelocityRadPerSec = yawVelocity.getValue().in(RadiansPerSecond);
-    inputs.pitchPosition = Rotation2d.fromRadians(pitch.getValue().in(Radians));
-    inputs.pitchVelocityRadPerSec = pitchVelocity.getValue().in(RadiansPerSecond);
-    inputs.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
-    inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
+    records.yawPosition = Rotation2d.fromRadians(yaw.getValue().in(Radians));
+    records.yawVelocityRadPerSec = yawVelocity.getValue().in(RadiansPerSecond);
+    records.pitchPosition = Rotation2d.fromRadians(pitch.getValue().in(Radians));
+    records.pitchVelocityRadPerSec = pitchVelocity.getValue().in(RadiansPerSecond);
+    records.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
+    records.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
 
-    inputs.odometryYawTimestamps =
+    records.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
+    records.odometryYawPositions =
         yawPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromDegrees(value))
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
 
-    inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
+    records.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
+  }
+
+  @Override
+  public void registerSelfCheckHardware() {
+
   }
 }

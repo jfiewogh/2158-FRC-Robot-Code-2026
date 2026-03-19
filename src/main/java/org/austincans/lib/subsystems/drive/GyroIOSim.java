@@ -28,16 +28,16 @@ public class GyroIOSim implements GyroIO {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = true;
-    inputs.yawPosition = gyroSimulation.getGyroReading();
-    inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
-    inputs.pitchPosition = Rotation2d.kZero;
-    inputs.pitchVelocityRadPerSec = 0.0;
-    inputs.rollPosition = Rotation2d.kZero;
-    inputs.rollVelocityRadPerSec = 0.0;
+  public void updateRecords(GyroIORecords records) {
+    records.connected = true;
+    records.yawPosition = gyroSimulation.getGyroReading();
+    records.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
+    records.pitchPosition = Rotation2d.kZero;
+    records.pitchVelocityRadPerSec = 0.0;
+    records.rollPosition = Rotation2d.kZero;
+    records.rollVelocityRadPerSec = 0.0;
 
-    inputs.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
-    inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
+    records.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
+    records.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
   }
 }

@@ -178,7 +178,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       ModuleIO brModuleIO,
       PathFollowingController pathFollowingController,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
-    this.driveIO = driveIO;
     this.gyroIO = gyroIO;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);

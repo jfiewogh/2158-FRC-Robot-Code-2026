@@ -39,25 +39,25 @@ public class GyroIONavX implements GyroIO {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = navX.isConnected();
+  public void updateRecords(GyroIORecords records) {
+    records.connected = navX.isConnected();
 
     // values are flipped because navX axes are opposite direction of those used by WPILib
-    inputs.yawPosition = Rotation2d.fromDegrees(-navX.getYaw());
-    inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
-    inputs.pitchPosition = Rotation2d.fromDegrees(-navX.getPitch());
-    inputs.pitchVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroX());
-    inputs.rollPosition = Rotation2d.fromDegrees(-navX.getRoll());
-    inputs.rollVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroY());
+    records.yawPosition = Rotation2d.fromDegrees(-navX.getYaw());
+    records.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
+    records.pitchPosition = Rotation2d.fromDegrees(-navX.getPitch());
+    records.pitchVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroX());
+    records.rollPosition = Rotation2d.fromDegrees(-navX.getRoll());
+    records.rollVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroY());
 
-    inputs.odometryYawTimestamps =
+    records.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
+    records.odometryYawPositions =
         yawPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromDegrees(-value))
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
-    inputs.imuRate = navX.getRate();
+    records.imuRate = navX.getRate();
   }
 }

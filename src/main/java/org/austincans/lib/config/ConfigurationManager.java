@@ -39,7 +39,7 @@ public final class ConfigurationManager<T extends Enum<T> & ConfigurationDescrip
 
   private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-  private final Map<@NotNull T, org.austincans.frc2026.config.Configuration> configurations;
+  private final Map<@NotNull T, Configuration> configurations;
   private final File directory;
   private final Class<T> clazz;
 

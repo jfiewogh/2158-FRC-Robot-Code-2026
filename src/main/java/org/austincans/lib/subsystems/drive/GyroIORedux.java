@@ -45,18 +45,18 @@ public class GyroIORedux implements GyroIO {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = gyro.isConnected();
-    inputs.yawPosition = Rotation2d.fromRotations(gyro.getYaw());
-    inputs.yawVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityYaw());
-    inputs.pitchPosition = Rotation2d.fromRotations(gyro.getPitch());
-    inputs.pitchVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityPitch());
-    inputs.rollPosition = Rotation2d.fromRotations(gyro.getRoll());
-    inputs.rollVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityRoll());
+  public void updateRecords(GyroIORecords records) {
+    records.connected = gyro.isConnected();
+    records.yawPosition = Rotation2d.fromRotations(gyro.getYaw());
+    records.yawVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityYaw());
+    records.pitchPosition = Rotation2d.fromRotations(gyro.getPitch());
+    records.pitchVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityPitch());
+    records.rollPosition = Rotation2d.fromRotations(gyro.getRoll());
+    records.rollVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityRoll());
 
-    inputs.odometryYawTimestamps =
+    records.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
+    records.odometryYawPositions =
         yawPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
 
     yawTimestampQueue.clear();
