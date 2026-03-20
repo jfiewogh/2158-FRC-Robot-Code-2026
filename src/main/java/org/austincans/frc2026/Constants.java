@@ -127,8 +127,8 @@ public final class Constants {
   }
 
   public static class RobotConstants {
-    public static double kBumperWidthMeters = Units.inchesToMeters(31);
-    public static double kBumperLengthMeters = Units.inchesToMeters(31);
+    public static double kBumperWidthMeters = Units.inchesToMeters(34.5);
+    public static double kBumperLengthMeters = Units.inchesToMeters(34.5);
   }
 
   public static final double kWheelRadius = Units.inchesToMeters(4);

@@ -17,6 +17,10 @@ package org.austincans.frc2026.generated;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleSupplier;
+
+import org.austincans.frc2026.util.LoggedTunableNumber;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.*;
@@ -36,6 +40,19 @@ public class TunerConstants {
   // The steer motor uses any SwerveModule.SteerRequestType control request with
   // the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
+  private static final DoubleSupplier steerGainsKP = new LoggedTunableNumber("SteerGains/KP",2.6000000476837158);
+  private static final DoubleSupplier steerGainsKI = new LoggedTunableNumber("SteerGains/KI",0);
+  private static final DoubleSupplier steerGainsKD = new LoggedTunableNumber("SteerGains/KD",0);
+  private static final DoubleSupplier steerGainsKS = new LoggedTunableNumber("SteerGains/KS",0.00625);
+  private static final DoubleSupplier steerGainsKV = new LoggedTunableNumber("SteerGains/KV", 0);
+  private static final DoubleSupplier steerGainskA = new LoggedTunableNumber("SteerGains/KA",0);
+
+  private static final DoubleSupplier driveGainskP = new LoggedTunableNumber("DriveGains/KP",0.0015);
+  private static final DoubleSupplier driveGainskI = new LoggedTunableNumber("DriveGains/KI",0);
+  private static final DoubleSupplier driveGainskD = new LoggedTunableNumber("DriveGains/KD",0);
+  private static final DoubleSupplier driveGainskS = new LoggedTunableNumber("DriveGains/KS",0.12);
+  private static final DoubleSupplier driveGainskV = new LoggedTunableNumber("DriveGains/KV",0.4);
+
   private static final Slot0Configs steerGains =
       new Slot0Configs()
           .withKP(2.6000000476837158)
@@ -48,7 +65,12 @@ public class TunerConstants {
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(0.0015).withKI(0).withKD(0).withKS(0.12).withKV(0.4);
+      new Slot0Configs()
+        .withKP(0.0015)
+        .withKI(0)
+        .withKD(0)
+        .withKS(0.12)
+        .withKV(0.4);
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
