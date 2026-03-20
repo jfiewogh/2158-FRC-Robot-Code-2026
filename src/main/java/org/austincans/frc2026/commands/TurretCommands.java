@@ -43,6 +43,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class TurretCommands {
   public static double flywheelExitVelocityConstant = 1;
+  public static double robotShootTime = 2;
   public static InterpolatingDoubleTreeMap distancesAnglesFromHub =
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(0.0, 0.0), Map.entry(1.0, 1.0));
   public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint =
@@ -93,10 +94,8 @@ public class TurretCommands {
     return points.get(distance);
   }
 
-  public static Translation3d getFuturePose(double time, Translation3d velocities, Translation3d robotTranslation, Rotation3d rotation){
-    Translation3d TranslationAtShot = robotTranslation.plus(velocities.times(time));
-    double distance = (robotTranslation.minus(TranslationAtShot)).getNorm();
-    return new Translation3d(Math.cos(rotation.getAngle()),Math.sin(rotation.getAngle()),0).times(distance);
+  public static Translation2d getFutureTranslation(Translation2d currentTranslation, double time, Translation2d speeds){
+    return currentTranslation.plus(speeds.times(time));
   }
 
   public static double getRobotDistanceFromHub(Drive drive, Alliance alliance) {
@@ -113,7 +112,7 @@ public class TurretCommands {
     }
   }
 
-  public static double getDistance(Translation3d translation1, Translation3d translation2){
+  public static double getDistance(Translation2d translation1, Translation2d translation2){
     return translation1.getDistance(translation2);
   }
 
@@ -340,12 +339,57 @@ public class TurretCommands {
   // }
 
   public static void shootToTarget(Drive drive, Turret turret, Hood hood, Flywheel flywheel, TrackingTargets target, InterpolatingDoubleTreeMap data){
-    Translation3d distanceFromTargetTranslation = drive.getPose3d().getTranslation().minus(target.getTranslation3d());
-    double distance = drive.getPose3d().getTranslation().getDistance(target.getTranslation3d());
-    Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan(distanceFromTargetTranslation.getY()/distanceFromTargetTranslation.getX()));
-    flywheel.setRelativeVelocity(FLYWHEEL_SHOOT_SPEED);
+    Translation2d speeds = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond);
+    Translation2d futureTranslation = getFutureTranslation(drive.getPose().getTranslation(), robotShootTime, speeds);
+    double distancefromTarget = futureTranslation.getDistance(target.getTranslation3d().toTranslation2d());
+    Translation2d tranlationFromTarget = futureTranslation.minus(target.getTranslation3d().toTranslation2d());
+    Rotation2d turretAngle = Rotation2d.fromRadians(Math.atan(tranlationFromTarget.getY()/tranlationFromTarget.getX()));
+    flywheel.setRelativeVelocity(getDistance(futureTranslation, target.getTranslation3d().toTranslation2d())/robotShootTime);
     turret.setDesiredAngleRobotRelative(turretAngle);
-    hood.setAngle(Rotation2d.fromRadians(getHoodAngleFromDistance(distance, data)));
+    hood.setAngle(Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
+  }
+
+  private static void shootToHub(
+      Flywheel flywheel,
+      Turret turret,
+      Hood hood,
+      Drive drive,
+      Alliance alliance
+      ) {
+    shootToTarget(drive, turret, hood, flywheel, alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub, distancesAnglesFromHub);
+  }
+
+  public static Command shootToHubCommand(
+      Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
+    return Commands.run(
+            () -> {
+              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+              if (allianceOptional.isPresent()) {
+                Alliance alliance = allianceOptional.get();
+                if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
+                  shootToHub(
+                      flywheel,
+                      turret,
+                      hood,
+                      drive,
+                      alliance
+                      );
+                }
+              }
+            },
+            flywheel,
+            turret,
+            hood)
+        .until(
+            () -> {
+              return flywheel.noGamePiecesToShoot();
+            })
+        .finallyDo(
+            () -> {
+              System.out.println("no game pieces to shoot");
+              flywheel.setRelativeVelocity(0);
+              Drive.driveSpeedMultiplier = 1;
+            });
   }
 
   // TODO: fix
