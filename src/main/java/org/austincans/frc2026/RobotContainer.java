@@ -21,8 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
@@ -55,12 +53,6 @@ import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
 import org.austincans.lib.util.KeyboardHID;
-import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.SimulatedArena3D;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
-import org.littletonrobotics.junction.Logger;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -91,15 +83,7 @@ public class RobotContainer {
   private static final boolean flywheelEnabled = false;
   private static final boolean ledEnabled = false;
 
-  /* Sim Booleans */
-  private static final boolean isThreaded = false;
-  // Set whether models should exist in physics engine
-  private static final boolean simulateShooterBase = true;
-  private static final boolean simulateTurret = true;
-  private static final boolean simulateHood = true;
-
-  private SwerveDriveSimulation3D driveSimulation;
-
+  
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -108,8 +92,6 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final SendableChooser<Command> autoChooser;
-
-  private IntakeSimulation3D intakeSimulation;
 
   private DoubleSupplier leftY, leftX, rightY, rightX;
 
@@ -452,14 +434,7 @@ public class RobotContainer {
           // Reset gyro / odometry
 
           final Runnable resetGyro =
-              Constants.currentMode == Constants.Mode.SIM
-                  ? () ->
-                      drive.setPose(
-                          driveSimulation
-                              .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
-                  // during simulation
-                  : () ->
-                      drive.setPose(
+                      () -> drive.setPose(
                           new Pose2d(
                               drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
           driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
@@ -498,12 +473,7 @@ public class RobotContainer {
             .onTrue(
                 Commands.runOnce(
                     () -> {
-                      Arena2026Rebuilt3D rebuiltArena =
-                          (Arena2026Rebuilt3D) SimulatedArena3D.getInstance();
-                      Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-                      if (allianceOptional.isPresent()) {
-                        rebuiltArena.outpostDump(allianceOptional.get() == Alliance.Blue);
-                      }
+
                     }));
       }
       default -> {}
@@ -522,31 +492,4 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
-  public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-
-    driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
-    SimulatedArena3D.getInstance().resetFieldForAuto();
-  }
-
-  public void preloadSimulation() {
-    if (intakeSimulation != null) {
-      intakeSimulation.addGamePiecesToIntake(8);
-    }
-  }
-
-  public void updateSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-
-    SimulatedArena3D.getInstance().simulationPeriodic();
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition",
-        driveSimulation.getSimulatedDriveTrainPose3dGroundRelative());
-    Logger.recordOutput(
-        "FieldSimulation/Fuel",
-        SimulatedArena3D.getInstance().getGamePiecePosesArrayByType("Fuel"));
-    // Logger.recordOutput(
-    // "FieldSimulation/Fuel2D",
-    // SimulatedArena.getInstance().getGamePiecePosesArrayByType("Fuel"));
-  }
 }
