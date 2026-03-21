@@ -6,7 +6,7 @@ import org.austincans.lib.motors.MotorIO.MotorIORequests;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public abstract interface ModuleIO {
+public interface ModuleIO {
     @AutoLog
     public class ModuleIORecords {
         public MotorIORecords driveMotorRecords;

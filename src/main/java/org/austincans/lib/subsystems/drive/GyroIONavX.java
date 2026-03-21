@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import java.util.Queue;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 /** IO implementation for NavX. */
 public class GyroIONavX implements GyroIO {
@@ -60,4 +61,8 @@ public class GyroIONavX implements GyroIO {
     yawPositionQueue.clear();
     records.imuRate = navX.getRate();
   }
+
+  // TODO: add self checking
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

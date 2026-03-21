@@ -23,7 +23,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class MotorFactory {
   /* REV */
 
-  private static <T extends SparkBaseConfig> T applyMotorConfigToSparkConfig(T config, MotorConfigSpark motorConfig) {
+  private static <Cnfg extends SparkBaseConfig> Cnfg applyMotorConfigToSparkConfig(Cnfg config, MotorConfigSpark motorConfig) {
     config.encoder.positionConversionFactor(motorConfig.gearRatio);
     PIDConfig pidConfig = motorConfig.pidConfig;
     config.closedLoop.p(pidConfig.kP());

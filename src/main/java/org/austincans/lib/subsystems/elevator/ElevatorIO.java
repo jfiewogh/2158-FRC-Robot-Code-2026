@@ -17,7 +17,8 @@ package org.austincans.lib.subsystems.elevator;
 
 import java.util.List;
 
-import org.austincans.lib.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.motors.MotorIO.MotorIORecords;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -25,7 +26,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public class ElevatorIOInputs {
-    public MotorIOInputs motorInputs;
+    public MotorIORecords motorRecords;
     public double heightMeters = 0.0;
     public double velocityMetersPerSec = 0.0;
   }
@@ -33,6 +34,8 @@ public interface ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs);
 
   public default void runVoltage(double volts) {}
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 
   public default List<HardwareFault> checkForFaults() {
     return List.of();

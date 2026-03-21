@@ -2,7 +2,6 @@ package org.austincans.lib.encoders;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -31,11 +30,6 @@ public class CANcoderIO implements AbsoluteEncoderIO {
         inputs.absolutePositionRad = absolutePosition.getValue().in(Radians);
         inputs.positionRad = position.getValue().in(Radians);
         inputs.velocityRadPerSec = velocity.getValue().in(RadiansPerSecond);
-    }
-
-    @Override
-    public double getAbsolutePositionRotations() {
-        return absolutePosition.getValue().in(Rotations);
     }
 
     public int getDeviceId() {

@@ -9,12 +9,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import edu.wpi.first.math.util.Units;
 
-public abstract class MotorIOSpark<T extends SparkBase, U extends SparkBaseConfig> extends MotorIOReal {
-    protected final T motor;
+public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBaseConfig> extends MotorIOReal {
+    protected final Mtr motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    protected MotorIOSpark(T motor, U config) {
+    protected MotorIOSpark(Mtr motor, Cnfg config) {
         super(motor.getDeviceId());
         this.motor = motor;
         encoder = motor.getEncoder();

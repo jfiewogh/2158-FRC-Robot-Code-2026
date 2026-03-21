@@ -4,7 +4,7 @@ import org.austincans.lib.motors.MotorIO.MotorIORecords;
 import org.austincans.lib.motors.MotorIO.MotorIORequests;
 import org.littletonrobotics.junction.AutoLog;
 
-public class DifferentialDriveIO {
+public interface DifferentialDriveIO {
     @AutoLog
     public class DifferentialDriveIORecords {
         public MotorIORecords frontLeftMotorRecords = new MotorIORecords();
@@ -20,4 +20,8 @@ public class DifferentialDriveIO {
         public MotorIORequests backLeftMotorRequests = new MotorIORequests();
         public MotorIORequests backRightMotorRequests = new MotorIORequests();
     }
+
+    public void updateRecords(DifferentialDriveIORecords records);
+
+    public void applyRequests(DifferentialDriveIORequests requests);
 }

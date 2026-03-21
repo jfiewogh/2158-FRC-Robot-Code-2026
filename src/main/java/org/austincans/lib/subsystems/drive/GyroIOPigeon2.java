@@ -18,7 +18,6 @@ package org.austincans.lib.subsystems.drive;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
@@ -32,12 +31,11 @@ import java.util.Queue;
 import org.austincans.lib.util.PhoenixUtil;
 import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingPigeon2;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon;
-  private SelfCheckingPigeon2 pigeonSelfChecker; // TODO: this is unused
 
   private final StatusSignal<Angle> yaw;
   private final StatusSignal<Angle> pitch;
@@ -97,7 +95,7 @@ public class GyroIOPigeon2 implements GyroIO {
   }
 
   @Override
-  public void registerSelfCheckHardware() {
-
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Gyro", pigeon);
   }
 }

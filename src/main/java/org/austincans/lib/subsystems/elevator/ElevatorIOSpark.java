@@ -24,13 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class ElevatorIOSpark implements ElevatorIO {
-  // TODO: move constants to config
-
   private final boolean brakeMode = true;
 
   private final MotorIOSparkFlex motorIO;
@@ -70,6 +69,11 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.heightMeters = encoder.getPosition();
     inputs.velocityMetersPerSec = encoder.getVelocity();
     motorIO.updateInputs(inputs.motorInputs);
+  }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+
   }
 
   @Override

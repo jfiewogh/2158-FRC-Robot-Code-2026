@@ -17,6 +17,8 @@ package org.austincans.lib.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.math.geometry.Rotation2d;
+
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.util.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
@@ -40,4 +42,7 @@ public class GyroIOSim implements GyroIO {
     records.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
     records.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
   }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }
