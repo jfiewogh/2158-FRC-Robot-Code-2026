@@ -1,5 +1,6 @@
 package org.austincans.lib.configs;
 
-public abstract class ModuleConfig {
-    
+public class ModuleConfig {
+    public double wheelRadiusMeters;
+    public double wheelCoefficientOfFriction;
 }
