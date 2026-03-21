@@ -7,8 +7,12 @@ public abstract class MotorConfig {
     public boolean isInverted;
     public PIDConfig pidConfig;
     public FFConfig ffConfig;
-    public SoftLimitConfig softLimitConfig; // before gearing
-    public double gearRatio; // input over output // ex. 50 motor rotations / 1 mechanism rotation = 50
-    public double maxSpeedRotationsPerSec; // after gearing
-    public double maxAccelerationRotationsPerSecSq; // after gearing
+    /** Values after gearing */
+    public SoftLimitConfig softLimitConfig;
+    /** Motor over mechanism. For example, 50 motor rotations over 2 mechanism rotation = 25. */
+    public double gearRatio;
+    /** Value after gearing */
+    public double maxSpeedRotationsPerSec;
+    /** Value after gearing */
+    public double maxAccelerationRotationsPerSecSq;
 }

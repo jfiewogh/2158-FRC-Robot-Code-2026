@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-
-import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.lib.Constants;
 import org.austincans.lib.configs.SwerveConfig;
 import org.austincans.lib.configs.SwerveModuleConfig;
@@ -154,7 +152,7 @@ public class Swerve<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends Motor
 
     // Send odometry updates to robot state
     swerveState.addOdometryObservation(
-        new OdometryObservation(
+        new SwerveState.OdometryObservation(
             Timer.getTimestamp(),
             getModulePositions(),
             Optional.ofNullable(gyroRecords.connected ? gyroRecords.rollPosition : null),
@@ -203,7 +201,7 @@ public class Swerve<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends Motor
         moduleLimitsFree,
         currentSetpoint,
         discreteVelocities,
-        Constants.loopPeriodSec);
+        Constants.loopPeriodSecs);
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
 
     // Log unoptimized setpoints and setpoint speeds

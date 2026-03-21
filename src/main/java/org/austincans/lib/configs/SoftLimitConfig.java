@@ -2,11 +2,10 @@ package org.austincans.lib.configs;
 
 /**
  * Values as recorded in REV client or Phoenix Tuner X. 
- * Soft limit values are in rotations.
- * They are not affected by gear ratio or position conversion factor.
+ * Soft limit values are in rotations and after gearing.
  */
 public record SoftLimitConfig(
     boolean forwardSoftLimitEnabled,
-    double forwardSoftLimit,
+    double forwardSoftLimitRotations,
     boolean reverseSoftLimitEnabled,
-    double reverseSoftLimit) {}
+    double reverseSoftLimitRotations) {}

@@ -10,9 +10,9 @@ import org.austincans.lib.motors.MotorIOTalonFX;
 public class ModuleIOTalonFXCANcoder extends ModuleIOBase<MotorIOTalonFX, MotorIOTalonFX, CANcoderIO> {
     public ModuleIOTalonFXCANcoder(SwerveModuleConfig<MotorConfigTalon, MotorConfigTalon> moduleConfig) {
         super(
-            MotorFactory.createTalonFX(moduleConfig.driveMotorConfig()),
-            MotorFactory.createTalonFX(moduleConfig.steerMotorConfig()),
-            AbsoluteEncoderFactory.createCANcoder(moduleConfig.absoluteEncoderConfig())
+            MotorFactory.createTalonFX(moduleConfig.driveMotorConfig),
+            MotorFactory.createTalonFX(moduleConfig.steerMotorConfig),
+            AbsoluteEncoderFactory.createCANcoder(moduleConfig.absoluteEncoderConfig)
         );
     }
 }

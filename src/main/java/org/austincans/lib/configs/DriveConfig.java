@@ -1,11 +1,14 @@
 package org.austincans.lib.configs;
 
-// TODO: use all values
 public class DriveConfig {
     public double robotMassKg;
     public double robotMomentOfInertiaKgMetersSq;
     public double maxDriveSpeedMetersPerSec;
     public double maxOmegaSpeedRadPerSec;
-    public double trackWidthMeters; // distance between left and right motors
-    public double wheelbaseMeters; // distance between front and back motors
+    /** The distance between the left and right motors in meters */
+    public double trackWidthMeters;
+    /** The distance between the front and back motors in meters */
+    public double wheelbaseMeters;
+    /** This assumes all wheels are identical. If not, you can make multiple wheelConfigs. */
+    public WheelConfig wheelConfig;
 }

@@ -79,7 +79,7 @@ public class SwerveDriveCommands {
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(
-      SwerveDrive drive,
+      Swerve drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,

@@ -24,7 +24,9 @@ public class MotorFactory {
   /* REV */
 
   private static <Cnfg extends SparkBaseConfig> Cnfg applyMotorConfigToSparkConfig(Cnfg config, MotorConfigSpark motorConfig) {
-    config.encoder.positionConversionFactor(motorConfig.gearRatio);
+    double conversionFactor = motorConfig.gearRatio;
+    config.encoder.positionConversionFactor(conversionFactor);
+    config.encoder.velocityConversionFactor(conversionFactor);
     PIDConfig pidConfig = motorConfig.pidConfig;
     config.closedLoop.p(pidConfig.kP());
     config.closedLoop.i(pidConfig.kI());
@@ -39,9 +41,9 @@ public class MotorFactory {
     config.closedLoop.allowedClosedLoopError(motorConfig.allowedClosedLoopErrorRad, ClosedLoopSlot.kSlot0);
     SoftLimitConfig softLimitConfig = motorConfig.softLimitConfig;
     config.softLimit.forwardSoftLimitEnabled(softLimitConfig.forwardSoftLimitEnabled());
-    config.softLimit.forwardSoftLimit(softLimitConfig.forwardSoftLimit());
+    config.softLimit.forwardSoftLimit(softLimitConfig.forwardSoftLimitRotations());
     config.softLimit.reverseSoftLimitEnabled(softLimitConfig.reverseSoftLimitEnabled());
-    config.softLimit.reverseSoftLimit(softLimitConfig.reverseSoftLimit());
+    config.softLimit.reverseSoftLimit(softLimitConfig.reverseSoftLimitRotations());
     config.idleMode(motorConfig.brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
     config.inverted(motorConfig.isInverted);
     config.smartCurrentLimit(motorConfig.smartCurrentStallLimitAmps);
@@ -98,9 +100,9 @@ public class MotorFactory {
     config.Slot0.kA = ffConfig.kA();
     SoftLimitConfig softLimitConfig = motorConfig.softLimitConfig;
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled();
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit();
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimitRotations();
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled();
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit();
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimitRotations();
     config.MotorOutput.NeutralMode = motorConfig.brakeModeEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     config.MotorOutput.Inverted = motorConfig.isInverted ? InvertedValue.Clockwise_Positive
         : InvertedValue.CounterClockwise_Positive;
@@ -138,9 +140,9 @@ public class MotorFactory {
     config.Slot0.kA = ffConfig.kA();
     SoftLimitConfig softLimitConfig = motorConfig.softLimitConfig;
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled();
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit();
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimitRotations();
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled();
-    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit();
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimitRotations();
     config.MotorOutput.NeutralMode = motorConfig.brakeModeEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     config.MotorOutput.Inverted = motorConfig.isInverted ? InvertedValue.Clockwise_Positive
         : InvertedValue.CounterClockwise_Positive;

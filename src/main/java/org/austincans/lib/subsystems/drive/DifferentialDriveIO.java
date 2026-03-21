@@ -7,18 +7,24 @@ import org.littletonrobotics.junction.AutoLog;
 public interface DifferentialDriveIO {
     @AutoLog
     public class DifferentialDriveIORecords {
-        public MotorIORecords frontLeftMotorRecords = new MotorIORecords();
-        public MotorIORecords frontRightMotorRecords = new MotorIORecords();
-        public MotorIORecords backLeftMotorRecords = new MotorIORecords();
-        public MotorIORecords backRightMotorRecords = new MotorIORecords();
+        public MotorIORecords leftLeaderMotorRecords = new MotorIORecords();
+        public MotorIORecords leftFollowerMotorRecords = new MotorIORecords();
+        public MotorIORecords rightLeaderMotorRecords = new MotorIORecords();
+        public MotorIORecords rightFollowerMotorRecords = new MotorIORecords();
     }
 
     @AutoLog
     public class DifferentialDriveIORequests {
-        public MotorIORequests frontLeftMotorRequests = new MotorIORequests();
-        public MotorIORequests frontRightMotorRequests = new MotorIORequests();
-        public MotorIORequests backLeftMotorRequests = new MotorIORequests();
-        public MotorIORequests backRightMotorRequests = new MotorIORequests();
+        public MotorIORequests leftLeaderMotorRequests = new MotorIORequests();
+        public MotorIORequests rightLeaderMotorRequests = new MotorIORequests();
+
+        public void setVelocities(double leftRadPerSec, double rightRadPerSec, double leftFFVolts, double rightFFVolts) {
+            leftLeaderMotorRequests.
+        }
+        public void setVoltages(double leftVolts, double rightVolts) {
+            leftLeaderMotorRequests.setVoltage(leftVolts);
+            rightLeaderMotorRequests.setVoltage(rightVolts);
+        }
     }
 
     public void updateRecords(DifferentialDriveIORecords records);

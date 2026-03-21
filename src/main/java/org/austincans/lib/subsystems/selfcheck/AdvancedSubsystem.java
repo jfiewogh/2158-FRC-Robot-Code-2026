@@ -30,6 +30,14 @@ import java.util.List;
 import org.austincans.lib.controllers.REVDigitController;
 import org.littletonrobotics.junction.Logger;
 
+/*
+ * Links to complete selfchecking
+ * https://github.com/3015RangerRobotics/2024Public/tree/main/RobotCode2024/src/main/java/frc/lib/subsystem
+ * https://github.com/3015RangerRobotics/2024Public/tree/main/RobotCode2024/src/main/java/frc/robot/subsystems
+ * https://github.com/3015RangerRobotics/2024Public/blob/main/RobotCode2024/src/main/java/frc/robot/subsystems/swerve/Swerve.java
+ * https://github.com/3015RangerRobotics/2024Public/blob/main/RobotCode2024/src/main/java/frc/robot/subsystems/swerve/SwerveIOPhoenix.java
+ */
+
 public abstract class AdvancedSubsystem extends SubsystemBase {
   public enum SystemStatus {
     OK,

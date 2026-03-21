@@ -9,6 +9,10 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import edu.wpi.first.math.util.Units;
 
+/*
+ * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
+ * so that you can configure only specific values while keeping existing ones.
+ */
 public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBaseConfig> extends MotorIOReal {
     protected final Mtr motor;
     protected final RelativeEncoder encoder;
@@ -19,7 +23,7 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
-        motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        motor.configureAsync(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override

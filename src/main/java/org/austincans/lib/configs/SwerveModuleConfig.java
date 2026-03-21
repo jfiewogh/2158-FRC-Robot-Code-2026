@@ -6,8 +6,7 @@ public class SwerveModuleConfig<DriveMotorCfg extends MotorConfig, SteerMotorCfg
     public DriveMotorCfg driveMotorConfig;
     public SteerMotorCfg steerMotorConfig;
     public AbsoluteEncoderConfig absoluteEncoderConfig;
-    public double wheelRadiusMeters;
-    public double wheelCoefficientOfFriction;
+    /** The drive speed multiplier on initialization */
     public double driveSpeedMultiplier;
 
     public ModuleLimits getModuleLimitsFree() {
