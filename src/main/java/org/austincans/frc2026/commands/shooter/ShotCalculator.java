@@ -28,7 +28,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * </ul>
  */
 public class ShotCalculator {
-    private static final int iterations = 20;
+    private static final int iterations = 10;
 
     private final double phaseDelaySecs;
     /** Pitch relative to the shooter */
@@ -137,7 +137,7 @@ public class ShotCalculator {
         Rotation2d hoodAngle = pitchMap.get(lookaheadShotToTargetDistance2d);
 
         /* Turret angle */
-        Rotation2d turretAngle = lookaheadShotPose2d.getTranslation().minus(shotFieldRelPose2d.getTranslation()).getAngle();
+        Rotation2d turretAngle = targetFieldRelPosition2d.minus(lookaheadShotPose2d.getTranslation()).getAngle();
 
         /* Flywheel speed */
         double flywheelSpeedRPM = flywheelSpeedMap.get(lookaheadShotToTargetDistance2d);
