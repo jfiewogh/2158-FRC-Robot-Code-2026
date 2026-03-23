@@ -16,103 +16,92 @@
 package org.austincans.frc2026.subsystems.hood;
 
 import com.revrobotics.servohub.ServoChannel.ChannelId;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import java.util.List;
 import org.austincans.frc2026.controllers.ServoHubController;
-import org.austincans.frc2026.math.Angle;
+import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
+import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 
 public class HoodIOServoLinear implements HoodIO {
-  ServoHubController servoHub = new ServoHubController();
-  // LinearActuatorController linearActuator;
-  InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
-  Angle currentAngle = Angle.fromDegrees(0);
+  private final ServoHubController servoHub = new ServoHubController();
+  private final ChannelId id = ChannelId.kChannelId0;
 
-  public HoodIOServoLinear() {
-    // this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
-    // angles.put(0.0, 1000.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
-    // angles.put(90.0, 2000.0);
+  // TODO: find actual min and maxvalues
+  private final double minPulseWidth = 1000;
+  private final double maxPulseWidth = 1500;
+  private final double minActuatorLengthMeters = 0;
+  private final double maxActuatorLengthMeters = 0.2;
 
-    // if (HoodConstants.potentiometer == true);
-  }
+  private final double pivotToActuatorMountMeters = 0.2;
+  private final double pivotToActuatorEndMeters = 0.2;
+  private final double pivotToActuatorMountSq = Math.pow(pivotToActuatorMountMeters, 2);
+  private final double pivotToActuatorEndSq = Math.pow(pivotToActuatorEndMeters, 2);
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = currentAngle.getRotation2d().getDegrees();
+    inputs.pulseWidth = servoHub.getPulseWidth(id);
+    inputs.hoodAngle = getAngleFromPulseWidth(inputs.pulseWidth);
+    inputs.shotPitchAngle = Rotation2d.fromDegrees(90).minus(inputs.hoodAngle);
   }
 
   @Override
-  public Angle getAngle() {
-    return currentAngle;
+  public void setPulse(int pulseWidth) {
+    servoHub.setPulse(id, pulseWidth);
   }
 
   @Override
-  public void setAngle(Angle setpoint) {
-    servoHub.setPulse(ChannelId.kChannelId0, (int) setpoint.getRotation2d().getDegrees());
-    // currentAngle = Angle.fromDegrees(setPoint.toDegrees());
-  }
-
-  @Override
-  public void set(int pulseWidth) {
-    servoHub.setPulse(ChannelId.kChannelId0, pulseWidth);
-  }
-
-  @Override
-  public void setAngleRotation2d(Rotation2d angle) {
-    servoHub.setPulse(ChannelId.kChannelId0, (angles.get(angle.getDegrees()).intValue()));
-    currentAngle = Angle.fromDegrees(angle.getDegrees());
+  public void setHoodAngle(Rotation2d angle) {
+    setPulse(getPulseWidthFromAngle(angle));
   }
 
   /**
-   * Calculate hood angle from linear actuator length
-   * Uses law of cosines
+   * Calculate hood angle from actuator length using law of cosines
    */
-  private final double a = 0.2;
-  private final double c = 0.2;
-  private final double aSq = Math.pow(a, 2);
-  private final double cSq = Math.pow(c, 2);
-  public Rotation2d getAngleFromLength(double b) {
-    double angleRad = Math.acos((aSq + Math.pow(b, 2) - cSq) / (2 * a * b));
+  private Rotation2d getAngleFromLength(double lengthMeters) {
+    double angleRad = Math.acos((pivotToActuatorMountSq + pivotToActuatorEndSq - Math.pow(lengthMeters, 2))
+        / (2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters));
     return Rotation2d.fromRadians(angleRad);
   }
 
   private static double map(double value, double iMin, double iMax, double oMin, double oMax) {
+    value = MathUtil.clamp(value, iMin, iMax);
     return oMin + (oMax - oMin) * ((value - iMin) / (iMax - iMin));
   }
 
-  // TODO: find actual min and maxvalues
-  private final double minPulseWidth = 1000;
-  private final double maxPulseWidth = 2000;
-  private final double minLength = 0;
-  private final double maxLength = 0.2;
-  public double getLengthFromPulseWidth(double pulseWidth) {
-    return map(pulseWidth, minPulseWidth, maxPulseWidth, minLength, maxLength);
+  private double getLengthFromPulseWidth(int pulseWidth) {
+    return map(pulseWidth, minPulseWidth, maxPulseWidth, minActuatorLengthMeters, maxActuatorLengthMeters);
   }
 
-  public Rotation2d getAngleFromPulseWidth(double pulseWidth) {
+  private Rotation2d getAngleFromPulseWidth(int pulseWidth) {
     return getAngleFromLength(getLengthFromPulseWidth(pulseWidth));
   }
 
-  public double getPulseWidthFromLength(double length) {
-    return map(length, minLength, maxLength, minPulseWidth, maxPulseWidth);
+  private int getPulseWidthFromLength(double length) {
+    return (int) map(length, minActuatorLengthMeters, maxActuatorLengthMeters, minPulseWidth, maxPulseWidth);
   }
 
-  public double getLengthFromAngle(Rotation2d angle) {
-    // c^2 = b^2 + a^2 - 2ab * cosC. solve for b
-    // b^2 - (2a * cosC)b + (a^2 - c^2) = 0
-    // b = acosC + sqrt(c^2 - a^2 * (sinC)^2);
-    return a * angle.getCos() + Math.sqrt(cSq - aSq * Math.pow(angle.getSin(), 2));
+  private double getLengthFromAngle(Rotation2d angle) {
+    // c^2 = a^2 + b^2 - 2ab * cosC. We are solving for c.
+    // c = sqrt(b^2 + a^2 - 2ab * cosC)
+    return Math.sqrt(pivotToActuatorMountSq + pivotToActuatorEndSq
+        - 2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters * angle.getCos());
+  }
+
+  private int getPulseWidthFromAngle(Rotation2d angle) {
+    return getPulseWidthFromLength(getLengthFromAngle(angle));
+  }
+  
+  @Override
+  public List<HardwareFault> checkForFaults() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'checkForFaults'");
   }
 
   @Override
-  public Rotation2d getAngleRotation2d() {
-    return Rotation2d.fromDegrees(currentAngle.toDegrees());
+  public List<SelfChecking> getHardware() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getHardware'");
   }
-
-  @Override
-  public boolean atAngle(Angle setpoint) {
-    return currentAngle.toDegrees() == setpoint.toDegrees();
-  }
-
-  @Override
-  public void setVoltage(double voltage) {}
 }

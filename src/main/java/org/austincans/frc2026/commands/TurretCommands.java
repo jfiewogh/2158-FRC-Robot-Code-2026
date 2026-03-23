@@ -384,7 +384,7 @@ public class TurretCommands {
         //     FlywheelConstants.radiusMeters)
         1500);
     turret.setDesiredAngleFieldRelative(turretAngle, drive.getRotation());
-    hood.setAngle(Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
+    hood.setShotPitchAngle(Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
     Logger.recordOutput(
         "current pos", new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
     Logger.recordOutput("future Pos", new Pose2d(futureTranslation, Rotation2d.kZero));

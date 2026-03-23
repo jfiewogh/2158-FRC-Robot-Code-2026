@@ -78,7 +78,7 @@ public class RobotContainer {
   private static final boolean visionEnabled = false;
   private static final boolean objectDetectionEnabled = false;
   private static final boolean turretEnabled = false;
-  private static final boolean hoodEnabled = false;
+  private static final boolean hoodEnabled = true;
   private static final boolean intakeEnabled = false;
   private static final boolean flywheelEnabled = false;
   private static final boolean ledEnabled = false;
@@ -392,7 +392,7 @@ public class RobotContainer {
                 .rightTrigger()
                 .whileTrue(
                     Commands.runEnd(
-                        () -> {
+                     () -> {
                           intake.retract();
                         },
                         intake::stopDeploy,
@@ -402,10 +402,17 @@ public class RobotContainer {
             // operatorController.b().onTrue(intake.retractCommand());
           }
           if (hoodEnabled) {
-            operatorController.x().onTrue(Commands.runOnce(() -> hood.incrementHood(50), hood));
-            operatorController.b().onTrue(Commands.runOnce(() -> hood.decrementHood(50), hood));
+            // TESTING
+            operatorController.x().onTrue(hood.addToPulseCommand(50));
+            operatorController.b().onTrue(hood.addToPulseCommand(-50));
+
+            operatorController.leftBumper().onTrue(hood.setPulseCommand(1000));
+            operatorController.rightBumper().onTrue(hood.setPulseCommand(1500));
+
+            operatorController.a().onTrue(Commands.runOnce(() -> System.out.println(hood.getPulse())));
+            
             NamedCommands.registerCommand(
-                "turretAngleFar", Commands.runOnce(() -> hood.setHood(1150), hood));
+                "turretAngleFar", Commands.runOnce(() -> hood.setPulse(1150), hood));
           } else {
             NamedCommands.registerCommand("turretAngleFar", Commands.none());
           }
@@ -441,7 +448,7 @@ public class RobotContainer {
         }
       }
       case KEYBOARD -> {
-        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()), hood));
+        // hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()), hood));
 
         turret.setDefaultCommand(
             Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
