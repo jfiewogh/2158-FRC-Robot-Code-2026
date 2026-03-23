@@ -62,6 +62,28 @@ public class HoodIOServoLinear implements HoodIO {
     currentAngle = Angle.fromDegrees(angle.getDegrees());
   }
 
+  /**
+   * Calculate hood angle from linear actuator length
+   * Uses law of cosines
+   */
+  private final double a = 0.2;
+  private final double b = 0.2;
+  private final double aSq = Math.pow(a, 2);
+  private final double bSq = Math.pow(b, 2);
+  public Rotation2d getAngleFromLength(double c) {
+    double angleRad = Math.acos((aSq + bSq - Math.pow(c, 2)) / (2 * a * b)));
+    return Rotation2d.fromRadians(angleRad);
+  }
+
+  // TODO: find actual min and maxvalues
+  private final minPulseWidth = 1000;
+  private final maxPulseWidth = 2000;
+  private final minLength = 0;
+  private final maxLength = 0.2;
+  public void getLengthFromPulseWidth(double pulseWidth) {
+    return minLength + (maxLength - minLength) * ((pulseWidth - minPulseWidth) / (max - maxPulseWidth));
+  }
+
   @Override
   public Rotation2d getAngleRotation2d() {
     return Rotation2d.fromDegrees(currentAngle.toDegrees());
