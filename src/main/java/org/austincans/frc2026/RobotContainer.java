@@ -454,8 +454,8 @@ public class RobotContainer {
             .x()
             .whileTrue(
                 Commands.runEnd(
-                    () -> flywheel.setRelativeVelocity(FlywheelConstants.maxRPM),
-                    () -> flywheel.setRelativeVelocity(0)));
+                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
+                    () -> flywheel.setVelocity(0)));
 
         keyboardHID.c().whileTrue(shootToHubCommand);
 

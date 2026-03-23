@@ -1,17 +1,9 @@
-// Copyright (c) 2026 the ausTIN CANs
-// https://github.com/AusTINCANsProgrammingTeam
+// Copyright (c) 2025-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
 //
-// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
-// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
-//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
-//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
-//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
-//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
-// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package org.austincans.frc2026.util;
 
@@ -126,6 +118,17 @@ public class GeomUtil {
   }
 
   /**
+   * Converts a Transform3d to a Transform2d
+   *
+   * @param transform The original transform
+   * @return The resulting transform
+   */
+  public static Transform2d toTransform2d(Transform3d transform) {
+    return new Transform2d(
+        transform.getTranslation().toTranslation2d(), transform.getRotation().toRotation2d());
+  }
+
+  /**
    * Converts a Transform3d to a Pose3d to be used as a position or as the start of a kinematic
    * chain
    *
@@ -167,5 +170,27 @@ public class GeomUtil {
    */
   public static Pose2d withRotation(Pose2d pose, Rotation2d rotation) {
     return new Pose2d(pose.getTranslation(), rotation);
+  }
+
+  /**
+   * Transforms a velocity along a translation.
+   *
+   * @param velocity The original velocity
+   * @param transform The transform to the new position
+   * @param currentRotation The current rotation of the robot
+   * @return The new velocity
+   */
+  public static ChassisSpeeds transformVelocity(
+      ChassisSpeeds velocity, Translation2d transform, Rotation2d currentRotation) {
+    return new ChassisSpeeds(
+        velocity.vxMetersPerSecond
+            - velocity.omegaRadiansPerSecond
+                * (transform.getX() * currentRotation.getSin()
+                    + transform.getY() * currentRotation.getCos()),
+        velocity.vyMetersPerSecond
+            + velocity.omegaRadiansPerSecond
+                * (transform.getX() * currentRotation.getCos()
+                    - transform.getY() * currentRotation.getSin()),
+        velocity.omegaRadiansPerSecond);
   }
 }

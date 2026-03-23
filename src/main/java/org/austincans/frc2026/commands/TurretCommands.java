@@ -41,6 +41,7 @@ import org.littletonrobotics.junction.Logger;
 public class TurretCommands {
   public static double flywheelExitVelocityConstant = 1;
   public static double robotShootTime = 1;
+
   public static InterpolatingDoubleTreeMap distancesAnglesFromHub =
       InterpolatingDoubleTreeMap.ofEntries(
           Map.entry(FieldConstants.fieldLength / 6, 7 * Math.PI / 18),
@@ -48,6 +49,8 @@ public class TurretCommands {
           Map.entry(FieldConstants.fieldLength / 3, Math.PI / 4));
   public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint =
       InterpolatingDoubleTreeMap.ofEntries(Map.entry(5.0, 5.0), Map.entry(10.0, 10.0));
+
+  // TODO: Add areas where you cannot shoot from (ex. in front of hub in neutral zone, behind tower)
 
   public enum TrackingTargets {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
