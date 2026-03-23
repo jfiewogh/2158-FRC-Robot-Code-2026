@@ -67,21 +67,39 @@ public class HoodIOServoLinear implements HoodIO {
    * Uses law of cosines
    */
   private final double a = 0.2;
-  private final double b = 0.2;
+  private final double c = 0.2;
   private final double aSq = Math.pow(a, 2);
-  private final double bSq = Math.pow(b, 2);
-  public Rotation2d getAngleFromLength(double c) {
-    double angleRad = Math.acos((aSq + bSq - Math.pow(c, 2)) / (2 * a * b)));
+  private final double cSq = Math.pow(c, 2);
+  public Rotation2d getAngleFromLength(double b) {
+    double angleRad = Math.acos((aSq + Math.pow(b, 2) - cSq) / (2 * a * b));
     return Rotation2d.fromRadians(angleRad);
   }
 
+  private static double map(double value, double iMin, double iMax, double oMin, double oMax) {
+    return oMin + (oMax - oMin) * ((value - iMin) / (iMax - iMin));
+  }
+
   // TODO: find actual min and maxvalues
-  private final minPulseWidth = 1000;
-  private final maxPulseWidth = 2000;
-  private final minLength = 0;
-  private final maxLength = 0.2;
-  public void getLengthFromPulseWidth(double pulseWidth) {
-    return minLength + (maxLength - minLength) * ((pulseWidth - minPulseWidth) / (max - maxPulseWidth));
+  private final double minPulseWidth = 1000;
+  private final double maxPulseWidth = 2000;
+  private final double minLength = 0;
+  private final double maxLength = 0.2;
+  public double getLengthFromPulseWidth(double pulseWidth) {
+    return map(pulseWidth, minPulseWidth, maxPulseWidth, minLength, maxLength);
+  }
+
+  public Rotation2d getAngleFromPulseWidth(double pulseWidth) {
+    return getAngleFromLength(getLengthFromPulseWidth(pulseWidth));
+  }
+
+  public double getPulseWidthFromLength(double length) {
+    return map(length, minLength, maxLength, minPulseWidth, maxPulseWidth);
+  }
+
+  public double getLengthFromAngle(Rotation2d angle) {
+    // TODO: finish
+    // c^2 = b^2 + a^2 - 2ab * cosC
+    // return Math.sqrt(cSq + aSq - 2 * a * c * angle.getCos());
   }
 
   @Override
