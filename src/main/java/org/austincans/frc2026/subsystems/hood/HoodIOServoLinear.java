@@ -97,9 +97,10 @@ public class HoodIOServoLinear implements HoodIO {
   }
 
   public double getLengthFromAngle(Rotation2d angle) {
-    // TODO: finish
-    // c^2 = b^2 + a^2 - 2ab * cosC
-    // return Math.sqrt(cSq + aSq - 2 * a * c * angle.getCos());
+    // c^2 = b^2 + a^2 - 2ab * cosC. solve for b
+    // b^2 - (2a * cosC)b + (a^2 - c^2) = 0
+    // b = acosC + sqrt(c^2 - a^2 * (sinC)^2);
+    return a * angle.getCos() + Math.sqrt(cSq - aSq * Math.pow(angle.getSin(), 2));
   }
 
   @Override
