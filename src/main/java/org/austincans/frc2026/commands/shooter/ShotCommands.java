@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Optional;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.commands.TurretCommands;
@@ -112,7 +111,9 @@ public class ShotCommands {
                 shuttle(drive, flywheel, hood, turret);
               }
             },
-            flywheel, turret, hood)
+            flywheel,
+            turret,
+            hood)
         .finallyDo(
             () -> {
               flywheel.setVelocity(0);

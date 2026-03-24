@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import org.austincans.frc2026.Constants;
 
 /** This is specifically for the 2026 robot */
 public class ShotConstants {
@@ -44,42 +45,82 @@ public class ShotConstants {
    * key: distance from target in meters
    */
   static {
-    scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
-    scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
-    scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
-    scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
-    scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
-    scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
-    scoringFlywheelSpeedMap.put(0.0, 1000.0);
-    scoringFlywheelSpeedMap.put(1.0, 1100.0);
-    scoringFlywheelSpeedMap.put(2.0, 1210.0);
-    scoringFlywheelSpeedMap.put(3.0, 1310.0);
-    scoringFlywheelSpeedMap.put(4.0, 1410.0);
-    scoringFlywheelSpeedMap.put(5.0, 1550.0);
-    scoringTimeOfFlightMap.put(0.0, 0.9);
-    scoringTimeOfFlightMap.put(1.0, 0.9);
-    scoringTimeOfFlightMap.put(2.0, 0.9);
-    scoringTimeOfFlightMap.put(3.0, 0.9);
-    scoringTimeOfFlightMap.put(4.0, 0.9);
-    scoringTimeOfFlightMap.put(5.0, 0.9);
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
+      scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
+      scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
+      scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
+      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
+      scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
+      scoringFlywheelSpeedMap.put(0.0, 1000.0);
+      scoringFlywheelSpeedMap.put(1.0, 1110.0);
+      scoringFlywheelSpeedMap.put(2.0, 1220.0);
+      scoringFlywheelSpeedMap.put(3.0, 1330.0);
+      scoringFlywheelSpeedMap.put(4.0, 1430.0);
+      scoringFlywheelSpeedMap.put(5.0, 1600.0);
+      scoringTimeOfFlightMap.put(0.0, 0.9);
+      scoringTimeOfFlightMap.put(1.0, 0.9);
+      scoringTimeOfFlightMap.put(2.0, 0.9);
+      scoringTimeOfFlightMap.put(3.0, 0.9);
+      scoringTimeOfFlightMap.put(4.0, 0.9);
+      scoringTimeOfFlightMap.put(5.0, 0.9);
 
-    passingHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
-    passingHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
-    passingHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
-    passingHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
-    passingHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
-    passingHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
-    passingFlywheelSpeedMap.put(0.0, 1000.0);
-    passingFlywheelSpeedMap.put(1.0, 1100.0);
-    passingFlywheelSpeedMap.put(2.0, 1210.0);
-    passingFlywheelSpeedMap.put(3.0, 1310.0);
-    passingFlywheelSpeedMap.put(4.0, 1410.0);
-    passingFlywheelSpeedMap.put(5.0, 1550.0);
-    passingTimeOfFlightMap.put(0.0, 0.9);
-    passingTimeOfFlightMap.put(1.0, 0.9);
-    passingTimeOfFlightMap.put(2.0, 0.9);
-    passingTimeOfFlightMap.put(3.0, 0.9);
-    passingTimeOfFlightMap.put(4.0, 0.9);
-    passingTimeOfFlightMap.put(5.0, 0.9);
+      passingHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
+      passingHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
+      passingHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
+      passingHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
+      passingHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
+      passingHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
+      passingFlywheelSpeedMap.put(0.0, 900.0);
+      passingFlywheelSpeedMap.put(1.0, 1000.0);
+      passingFlywheelSpeedMap.put(2.0, 1110.0);
+      passingFlywheelSpeedMap.put(3.0, 1210.0);
+      passingFlywheelSpeedMap.put(4.0, 1310.0);
+      passingFlywheelSpeedMap.put(5.0, 1450.0);
+      passingTimeOfFlightMap.put(0.0, 0.9);
+      passingTimeOfFlightMap.put(1.0, 0.9);
+      passingTimeOfFlightMap.put(2.0, 0.9);
+      passingTimeOfFlightMap.put(3.0, 0.9);
+      passingTimeOfFlightMap.put(4.0, 0.9);
+      passingTimeOfFlightMap.put(5.0, 0.9);
+    } else {
+      scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
+      scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
+      scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
+      scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
+      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
+      scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
+      scoringFlywheelSpeedMap.put(0.0, 1000.0);
+      scoringFlywheelSpeedMap.put(1.0, 1100.0);
+      scoringFlywheelSpeedMap.put(2.0, 1210.0);
+      scoringFlywheelSpeedMap.put(3.0, 1310.0);
+      scoringFlywheelSpeedMap.put(4.0, 1410.0);
+      scoringFlywheelSpeedMap.put(5.0, 1550.0);
+      scoringTimeOfFlightMap.put(0.0, 0.9);
+      scoringTimeOfFlightMap.put(1.0, 0.9);
+      scoringTimeOfFlightMap.put(2.0, 0.9);
+      scoringTimeOfFlightMap.put(3.0, 0.9);
+      scoringTimeOfFlightMap.put(4.0, 0.9);
+      scoringTimeOfFlightMap.put(5.0, 0.9);
+
+      passingHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
+      passingHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
+      passingHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
+      passingHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
+      passingHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
+      passingHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
+      passingFlywheelSpeedMap.put(0.0, 900.0);
+      passingFlywheelSpeedMap.put(1.0, 1000.0);
+      passingFlywheelSpeedMap.put(2.0, 1110.0);
+      passingFlywheelSpeedMap.put(3.0, 1210.0);
+      passingFlywheelSpeedMap.put(4.0, 1310.0);
+      passingFlywheelSpeedMap.put(5.0, 1450.0);
+      passingTimeOfFlightMap.put(0.0, 0.9);
+      passingTimeOfFlightMap.put(1.0, 0.9);
+      passingTimeOfFlightMap.put(2.0, 0.9);
+      passingTimeOfFlightMap.put(3.0, 0.9);
+      passingTimeOfFlightMap.put(4.0, 0.9);
+      passingTimeOfFlightMap.put(5.0, 0.9);
+    }
   }
 }
