@@ -42,7 +42,7 @@ import org.austincans.frc2026.util.GeomUtil;
  * </ul>
  */
 public class ShotCalculator {
-  private static final int iterations = 10;
+  private static final int iterations = 20;
 
   private final double phaseDelaySecs;
 
