@@ -39,6 +39,7 @@ import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
+import org.austincans.frc2026.commands.shooter.ShotCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.frc2026.subsystems.drive.*;
@@ -349,7 +350,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
+      shootCommand = ShotCommands.shootCommand(flywheel, turret, hood, drive);
       shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
       shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
       NamedCommands.registerCommand("shoot", shootToHubCommand);

@@ -41,7 +41,8 @@ public class DriveIOSim implements DriveIO {
   @Override
   public void updateInputs(DriveIOInputs inputs) {
     inputs.pose = new Pose3d(simulation.getSimulatedDriveTrainPose());
-    inputs.chassisSpeeds = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+    inputs.robotRelVelocities = simulation.getDriveTrainSimulatedChassisSpeedsRobotRelative();
+    inputs.robotRelVelocities = simulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
   }
 
   @Override

@@ -76,7 +76,7 @@ public class ShooterSim {
       new RebuiltFuelOnFly(
               drive.getPose3d().getTranslation().toTranslation2d(),
               new Translation2d(),
-              drive.getChassisSpeeds(),
+              drive.getRobotRelVelocities(),
               turretAngle.get(),
               initialHeight,
               launchingSpeed,
