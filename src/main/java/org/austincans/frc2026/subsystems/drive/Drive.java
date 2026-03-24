@@ -80,6 +80,7 @@ import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
 import org.austincans.frc2026.util.LoggedTunableNumber;
+import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -182,7 +183,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     AutoBuilder.configure(
         this::getPose,
         this::setPose,
-        this::getChassisSpeeds,
+        this::getRobotRelVelocities,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
             new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
@@ -324,7 +325,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                     gyroInputs.rollPosition.getRadians(),
                     0.0,
                     0.0)));
-    RobotState.getInstance().setRobotVelocity(getChassisSpeeds());
+    RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
     // Update brake mode
     // Reset movement timer if velocity above threshold
     if (Arrays.stream(modules)
@@ -355,6 +356,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     }
 
     // Update current setpoint if not in velocity mode
+    if (!velocityMode) {
+      driveIO.updateSetpoint(new SwerveSetpoint(getRobotRelVelocities(), getModuleStates()));
+    }
 
     // Update gyro alert
     gyroDisconnectedAlert.set(
@@ -471,8 +475,12 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  public ChassisSpeeds getChassisSpeeds() {
-    return driveInputs.chassisSpeeds;
+  public ChassisSpeeds getRobotRelVelocities() {
+    return driveInputs.robotRelVelocities;
+  }
+
+  public ChassisSpeeds getFieldRelVelocities() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelVelocities(), getGyroRotation());
   }
 
   /** Returns the position of each module in radians. */

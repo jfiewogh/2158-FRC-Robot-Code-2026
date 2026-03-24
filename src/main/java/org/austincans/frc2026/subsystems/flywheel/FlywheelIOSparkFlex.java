@@ -69,7 +69,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   }
 
   @Override
-  public void runRelativeVelocity(double velocityRPM) {
+  public void runVelocity(double velocityRPM) {
     controller.setSetpoint(velocityRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     if (velocityRPM == 0) {
       controller.setSetpoint(0, ControlType.kDutyCycle);

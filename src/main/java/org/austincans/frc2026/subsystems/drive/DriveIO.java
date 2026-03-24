@@ -31,7 +31,7 @@ public interface DriveIO {
   @AutoLog
   public class DriveIOInputs {
     public Pose3d pose = Pose3d.kZero;
-    public ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
+    public ChassisSpeeds robotRelVelocities = new ChassisSpeeds();
   }
 
   public static final SwerveDriveKinematics kinematics =

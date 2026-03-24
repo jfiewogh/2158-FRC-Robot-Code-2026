@@ -275,7 +275,7 @@ public class AutonCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              flywheel.setRelativeVelocity(0);
+              flywheel.setVelocity(0);
               System.out.println("end drive score command");
             });
   }

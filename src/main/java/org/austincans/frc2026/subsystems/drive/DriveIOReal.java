@@ -45,7 +45,9 @@ public class DriveIOReal implements DriveIO {
     currentSetpoint =
         swerveSetpointGenerator.generateSetpoint(
             DriveConstants.moduleLimitsFree,
-            currentSetpoint,
+            currentSetpoint != null
+                ? currentSetpoint
+                : new SwerveSetpoint(new ChassisSpeeds(), getModuleStates()),
             discreteSpeeds,
             Constants.loopPeriodSecs);
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
@@ -64,7 +66,7 @@ public class DriveIOReal implements DriveIO {
   @Override
   public void updateInputs(DriveIOInputs inputs) {
     inputs.pose = new Pose3d(RobotState.getInstance().getEstimatedPose());
-    inputs.chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+    inputs.robotRelVelocities = kinematics.toChassisSpeeds(getModuleStates());
   }
 
   @Override
