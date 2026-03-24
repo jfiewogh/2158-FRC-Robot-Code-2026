@@ -116,10 +116,9 @@ public class Turret extends AdvancedSubsystem {
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(
-      Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
+  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
     io.setDesiredAngle(
-        fieldRelativeAngle.minus(robotRotation).unaryMinus().plus(Rotation2d.k180deg));
+        fieldRelativeAngle.minus(driveFieldRelRotation).unaryMinus().plus(Rotation2d.k180deg));
   }
 
   /**

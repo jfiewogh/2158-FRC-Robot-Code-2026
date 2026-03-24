@@ -231,7 +231,7 @@ public class TurretCommands {
     return closestTarget;
   }
 
-  private static TrackingTargets getShuttleTarget(Drive drive, Alliance alliance) {
+  public static TrackingTargets getShuttleTarget(Drive drive, Alliance alliance) {
     Pose3d robotPose = new Pose3d(drive.getPose());
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
@@ -367,7 +367,8 @@ public class TurretCommands {
       InterpolatingDoubleTreeMap data) {
     Translation2d speeds =
         new Translation2d(
-            drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond);
+            drive.getRobotRelVelocities().vxMetersPerSecond,
+            drive.getRobotRelVelocities().vyMetersPerSecond);
     Translation2d futureTranslation =
         getFutureTranslation(drive.getPose().getTranslation(), robotShootTime, speeds);
     double distancefromTarget =
