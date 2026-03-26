@@ -408,10 +408,8 @@ public class RobotContainer {
                 TurretCommands.joystickTurretAngleCommand(
                     turret,
                     drive,
-                    operatorController::getRightY,
-                    () ->
-                        operatorController
-                            .getRightX())); // axis values not flipped b/c turret is 180 off robot 0
+                    () -> -operatorController.getRightY(),
+                    () -> -operatorController.getRightX())); 
             NamedCommands.registerCommand("point to hub", pointToHubCommand);
             // operatorController
             // .rightTrigger()
