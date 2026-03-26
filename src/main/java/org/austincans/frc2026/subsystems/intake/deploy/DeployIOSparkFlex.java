@@ -49,22 +49,26 @@ public class DeployIOSparkFlex implements DeployIO {
         new SelfCheckingSparkFlex("Intake Deploy Motor 2", rightDeployMotor);
 
     // SparkFlexConfig rightConfig = new SparkFlexConfig();
-    // rightConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    // rightConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake :
+    // IdleMode.kCoast);
     // rightConfig.softLimit.forwardSoftLimit(7.8);
     // rightConfig.softLimit.reverseSoftLimit(0);
     // rightConfig.closedLoop.pid(0, 0, 0);
     // rightConfig.inverted(true);
     // rightDeployMotor.configureAsync(
-    //     rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    // rightConfig, ResetMode.kNoResetSafeParameters,
+    // PersistMode.kNoPersistParameters);
 
     // SparkFlexConfig leftConfig = new SparkFlexConfig();
-    // leftConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    // leftConfig.idleMode(IntakeConstants.deployBrakeEnabled ? IdleMode.kBrake :
+    // IdleMode.kCoast);
     // leftConfig.softLimit.forwardSoftLimit(7.8);
     // leftConfig.softLimit.reverseSoftLimit(0);
     // leftConfig.closedLoop.pid(0, 0, 0);
     // leftConfig.follow(rightDeployMotor);
     // leftDeployMotor.configureAsync(
-    //     leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    // leftConfig, ResetMode.kNoResetSafeParameters,
+    // PersistMode.kNoPersistParameters);
     leftDeployEncoder = leftDeployMotor.getEncoder();
 
     rightDeployController = rightDeployMotor.getClosedLoopController();
@@ -75,7 +79,8 @@ public class DeployIOSparkFlex implements DeployIO {
   public void setVelocity(double velocityRotationsPerSec) {
     rightDeployMotor.set(velocityRotationsPerSec);
     leftDeployMotor.set(velocityRotationsPerSec);
-    // rightDeployController.setSetpoint(velocityRotationsPerSec, ControlType.kVelocity);
+    // rightDeployController.setSetpoint(velocityRotationsPerSec,
+    // ControlType.kVelocity);
   }
 
   @Override
@@ -90,8 +95,10 @@ public class DeployIOSparkFlex implements DeployIO {
   @Override
   public void retract() {
     System.out.println("Retract");
-    leftDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
-    rightDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    if (leftDeployEncoder.getPosition() > 2) {
+      leftDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+      rightDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    }
   }
 
   @Override

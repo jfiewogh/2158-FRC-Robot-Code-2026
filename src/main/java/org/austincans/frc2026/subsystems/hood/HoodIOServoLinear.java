@@ -16,7 +16,6 @@
 package org.austincans.frc2026.subsystems.hood;
 
 import com.revrobotics.servohub.ServoChannel.ChannelId;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
@@ -53,15 +52,15 @@ public class HoodIOServoLinear implements HoodIO {
 
   @Override
   public void setHoodAngle(Rotation2d angle) {
-    setPulse(getPulseWidthFromAngle(angle));
+    setPulse(HoodConstants.angleToPWM.get(angle.getDegrees()).intValue());
   }
 
-  /**
-   * Calculate hood angle from actuator length using law of cosines
-   */
+  /** Calculate hood angle from actuator length using law of cosines */
   private Rotation2d getAngleFromLength(double lengthMeters) {
-    double angleRad = Math.acos((pivotToActuatorMountSq + pivotToActuatorEndSq - Math.pow(lengthMeters, 2))
-        / (2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters));
+    double angleRad =
+        Math.acos(
+            (pivotToActuatorMountSq + pivotToActuatorEndSq - Math.pow(lengthMeters, 2))
+                / (2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters));
     return Rotation2d.fromRadians(angleRad);
   }
 
@@ -71,7 +70,8 @@ public class HoodIOServoLinear implements HoodIO {
   }
 
   private double getLengthFromPulseWidth(int pulseWidth) {
-    return map(pulseWidth, minPulseWidth, maxPulseWidth, minActuatorLengthMeters, maxActuatorLengthMeters);
+    return map(
+        pulseWidth, minPulseWidth, maxPulseWidth, minActuatorLengthMeters, maxActuatorLengthMeters);
   }
 
   private Rotation2d getAngleFromPulseWidth(int pulseWidth) {
@@ -79,29 +79,30 @@ public class HoodIOServoLinear implements HoodIO {
   }
 
   private int getPulseWidthFromLength(double length) {
-    return (int) map(length, minActuatorLengthMeters, maxActuatorLengthMeters, minPulseWidth, maxPulseWidth);
+    return (int)
+        map(length, minActuatorLengthMeters, maxActuatorLengthMeters, minPulseWidth, maxPulseWidth);
   }
 
   private double getLengthFromAngle(Rotation2d angle) {
     // c^2 = a^2 + b^2 - 2ab * cosC. We are solving for c.
     // c = sqrt(b^2 + a^2 - 2ab * cosC)
-    return Math.sqrt(pivotToActuatorMountSq + pivotToActuatorEndSq
-        - 2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters * angle.getCos());
+    return Math.sqrt(
+        pivotToActuatorMountSq
+            + pivotToActuatorEndSq
+            - 2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters * angle.getCos());
   }
 
   private int getPulseWidthFromAngle(Rotation2d angle) {
     return getPulseWidthFromLength(getLengthFromAngle(angle));
   }
-  
+
   @Override
   public List<HardwareFault> checkForFaults() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'checkForFaults'");
+    return List.of();
   }
 
   @Override
   public List<SelfChecking> getHardware() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getHardware'");
+    return List.of();
   }
 }

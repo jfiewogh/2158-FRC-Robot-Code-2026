@@ -47,7 +47,7 @@ public class Hood extends AdvancedSubsystem {
   }
 
   public void setShotPitchAngle(Rotation2d angle) {
-    io.setHoodAngle(Rotation2d.fromDegrees(90).minus(angle));
+    setHoodAngle(Rotation2d.fromDegrees(90).minus(angle));
   }
 
   public int getPulse() {
@@ -72,6 +72,7 @@ public class Hood extends AdvancedSubsystem {
   public Command setPulseCommand(int pulseWidth) {
     return Commands.runOnce(() -> setPulse(pulseWidth), this);
   }
+
   public Command addToPulseCommand(int addend) {
     return Commands.runOnce(() -> addToPulse(addend), this);
   }
@@ -81,7 +82,7 @@ public class Hood extends AdvancedSubsystem {
         // () -> {
         //   io.setHoodAngle(Rotation2d.fromDegrees(0));
         // });
-    );
+        );
   }
 
   public Command systemCheckCommand() {

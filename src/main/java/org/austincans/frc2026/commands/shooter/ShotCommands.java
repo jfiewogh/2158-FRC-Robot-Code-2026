@@ -54,7 +54,7 @@ public class ShotCommands {
     ShotParameters parameters = hubShotCalculator.calculate(inputs);
 
     flywheel.setVelocity(parameters.flywheelSpeedRPM());
-    hood.setAngle(parameters.hoodAngle());
+    hood.setHoodAngle(parameters.hoodAngle());
     turret.setDesiredAngleFieldRelative(
         parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
@@ -88,7 +88,7 @@ public class ShotCommands {
     ShotParameters parameters = shuttleShotCalculator.calculate(inputs);
 
     flywheel.setVelocity(parameters.flywheelSpeedRPM());
-    hood.setAngle(parameters.hoodAngle());
+    hood.setHoodAngle(parameters.hoodAngle());
     turret.setDesiredAngleFieldRelative(
         parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }

@@ -26,7 +26,12 @@ public class LinearActuatorController extends SubsystemBase {
   // L16-100-35-6-R
   public LinearActuatorController(int linearActuatorDeviceID) {
     linearActuator = new Servo(linearActuatorDeviceID);
-    linearActuator.setBoundsMicroseconds(ControllerConstants.linearActuatorMax, 1550, ControllerConstants.linearActuatorMid, 1450, ControllerConstants.linearActuatorMin);
+    linearActuator.setBoundsMicroseconds(
+        ControllerConstants.linearActuatorMax,
+        1550,
+        ControllerConstants.linearActuatorMid,
+        1450,
+        ControllerConstants.linearActuatorMin);
   }
 
   public void setSpeed(double speed) {
@@ -38,6 +43,5 @@ public class LinearActuatorController extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }

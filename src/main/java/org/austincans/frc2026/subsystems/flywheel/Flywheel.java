@@ -66,7 +66,11 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public void runSpindexer() {
-    spindexer.set(0.35);
+    spindexer.set(0.1);
+  }
+
+  public void stopSpindexer() {
+    spindexer.set(0);
   }
 
   @Override

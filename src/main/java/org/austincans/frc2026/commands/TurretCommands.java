@@ -385,7 +385,8 @@ public class TurretCommands {
         //     FlywheelConstants.radiusMeters)
         1500);
     turret.setDesiredAngleFieldRelative(turretAngle, drive.getRotation());
-    hood.setShotPitchAngle(Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
+    hood.setShotPitchAngle(
+        Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
     Logger.recordOutput(
         "current pos", new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
     Logger.recordOutput("future Pos", new Pose2d(futureTranslation, Rotation2d.kZero));
@@ -491,13 +492,12 @@ public class TurretCommands {
                       : TrackingTargets.redHub;
               Translation3d targetTrans = target.getTranslation3d();
               Translation3d robotTrans = drive.getPose3d().getTranslation();
-              double angRad =
-                  Math.atan2(
-                      targetTrans.getY() - robotTrans.getY(),
-                      targetTrans.getX() - robotTrans.getX());
-              Logger.recordOutput("turret angle deg", Units.radiansToDegrees(angRad));
-              turret.setDesiredAngleFieldRelative(
-                  Rotation2d.fromRadians(angRad), drive.getPose().getRotation());
+              Rotation2d fieldRelAngle =
+                  targetTrans.toTranslation2d().minus(robotTrans.toTranslation2d()).getAngle();
+
+              Logger.recordOutput("turret angle deg", fieldRelAngle.getDegrees());
+
+              turret.setDesiredAngleFieldRelative(fieldRelAngle, drive.getRotation());
             },
             turret)
         .withTimeout(5);

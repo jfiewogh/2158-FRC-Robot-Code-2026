@@ -56,10 +56,6 @@ public final class PhoenixUtil {
     }
   }
 
-  
-
-  
-
   /**
    *
    *

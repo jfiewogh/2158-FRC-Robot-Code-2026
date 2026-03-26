@@ -27,7 +27,9 @@ public abstract interface HoodIO {
   public class HoodIOInputs {
     public int pulseWidth;
     public Rotation2d hoodAngle; // angle created at pivot point
-    public Rotation2d shotPitchAngle; // angle that the game piece is shot (relative to turret) (0 is straight forward, 90 is straight up)
+    public Rotation2d
+        shotPitchAngle; // angle that the game piece is shot (relative to turret) (0 is straight
+    // forward, 90 is straight up)
     public double temperatureCelsius;
     public double motorPositionRad;
     public double velocityRadPerSec;

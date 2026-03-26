@@ -15,6 +15,7 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 
@@ -30,4 +31,24 @@ public class HoodConstants {
   public static final double gearing = 5;
 
   // public static final double maxAngle = ConfigUtil.getConfigDouble("Max Hood Angle", 45);
+
+  public static final InterpolatingDoubleTreeMap angleToPWM = new InterpolatingDoubleTreeMap();
+
+  static {
+    angleToPWM.put(10.9, 1000.0);
+    angleToPWM.put(12.4, 1050.0);
+    angleToPWM.put(14.2, 1100.0);
+    angleToPWM.put(16.0, 1150.0);
+    angleToPWM.put(17.7, 1200.0);
+    angleToPWM.put(19.5, 1250.0);
+    angleToPWM.put(21.3, 1300.0);
+    angleToPWM.put(23.1, 1350.0);
+    angleToPWM.put(25.0, 1400.0);
+    angleToPWM.put(26.9, 1450.0);
+    angleToPWM.put(28.7, 1500.0);
+    angleToPWM.put(30.6, 1550.0);
+    angleToPWM.put(32.4, 1600.0);
+    angleToPWM.put(34.3, 1650.0);
+    angleToPWM.put(36.15, 1700.0);
+  }
 }

@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.04;
@@ -87,15 +88,19 @@ public class DriveCommands {
     }
   }
 
+  // TODO: fix other joystick drive commands. check if omegaY and omegaX are correct. change
+  // rotation to estimated pose rotation. flip joystick based on red or blue alliance
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public static Command joystickDrive(
       Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaXSupplier,
-      DoubleSupplier omegaYSupplier) {
+      DoubleSupplier xSupplier, // forward/backward
+      DoubleSupplier ySupplier, // left/right
+      DoubleSupplier omegaXSupplier, // forward/backward
+      DoubleSupplier omegaYSupplier // left/right
+      ) {
     return Commands.run(
         () -> {
           updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
@@ -105,10 +110,15 @@ public class DriveCommands {
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaXSupplier.getAsDouble(), DEADBAND);
+          double omega = MathUtil.applyDeadband(omegaYSupplier.getAsDouble(), DEADBAND);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
+
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+          Logger.recordOutput("flipped", isFlipped);
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
@@ -117,10 +127,10 @@ public class DriveCommands {
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
 
-          // boolean isFlipped =
-          //     DriverStation.getAlliance().isPresent()
-          //         && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getGyroRotation()));
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped ? drive.getRotation().plus(Rotation2d.k180deg) : drive.getRotation()));
           Timer.delay(0.01);
         },
         drive);
