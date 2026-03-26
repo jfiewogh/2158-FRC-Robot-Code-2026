@@ -30,15 +30,29 @@ import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.turret.Turret;
+import org.austincans.frc2026.subsystems.turret.TurretConstants;
 
 public class ShotCommands {
-  private static final ShotCalculator hubShotCalculator =
-      new ShotCalculator(
-          Constants.loopPeriodSecs,
-          ShotConstants.scoringHoodAngleMap,
-          ShotConstants.scoringFlywheelSpeedMap,
-          ShotConstants.scoringTimeOfFlightMap,
-          Transform3d.kZero);
+  private static ShotCalculator hubShotCalculator;
+  private static final ShotCalculator shuttleShotCalculator;
+
+  static {
+    hubShotCalculator =
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.scoringHoodAngleMap,
+            ShotConstants.scoringFlywheelSpeedMap,
+            ShotConstants.scoringTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
+
+    shuttleShotCalculator = 
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.passingHoodAngleMap,
+            ShotConstants.passingFlywheelSpeedMap,
+            ShotConstants.passingTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
+  }
 
   public static void shootToHub(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
@@ -67,14 +81,6 @@ public class ShotCommands {
               flywheel.setVelocity(0);
             });
   }
-
-  private static final ShotCalculator shuttleShotCalculator =
-      new ShotCalculator(
-          Constants.loopPeriodSecs,
-          ShotConstants.passingHoodAngleMap,
-          ShotConstants.passingFlywheelSpeedMap,
-          ShotConstants.passingTimeOfFlightMap,
-          Transform3d.kZero);
 
   public static void shuttle(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);

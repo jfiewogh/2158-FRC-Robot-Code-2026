@@ -15,10 +15,16 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
-import com.ctre.phoenix6.CANBus;
-import edu.wpi.first.math.util.Units;
 import java.util.function.DoubleSupplier;
+
 import org.austincans.frc2026.util.LoggedTunableNumber;
+
+import com.ctre.phoenix6.CANBus;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class TurretConstants {
   // values used by SparkFlex and TalonFX
@@ -56,4 +62,16 @@ public class TurretConstants {
 
   public static final double turretMinimumRotation = -2.8 - 0.453;
   public static final double turretMaxRotation = 3.6 - 0.453;
+
+  public static final Transform3d robotRelTurretTransform =
+    new Transform3d(
+      Units.inchesToMeters(8.140 - (6.875 / 2)),
+      0,
+      Units.inchesToMeters(18.375 + 5.5), // camera height 
+        // TODO: maybe change to turret height or shooter exit height
+      new Rotation3d(Rotation2d.k180deg));
+  
+  /** The difference between the robot's zero position and the turret's zero position */
+  public static final Rotation2d robotRelTurretRotationOffset = 
+    TurretConstants.robotRelTurretTransform.getRotation().toRotation2d();
 }

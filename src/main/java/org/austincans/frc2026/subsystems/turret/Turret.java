@@ -107,7 +107,7 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
-    io.setDesiredAngle(robotRelativeAngle.unaryMinus());
+    io.setDesiredAngle(robotRelativeAngle.plus(TurretConstants.robotRelTurretRotationOffset).unaryMinus());
   }
 
   /**
@@ -122,7 +122,8 @@ public class Turret extends AdvancedSubsystem {
 
     Logger.recordOutput("Turret angle", desiredAngle);
 
-    io.setDesiredAngle(desiredAngle.plus(Rotation2d.k180deg).unaryMinus());
+    // unary minus because turret angle is clockwise positive, while robot rotation is counterclockwise positive
+    io.setDesiredAngle(desiredAngle.plus(TurretConstants.robotRelTurretRotationOffset).unaryMinus()); 
   }
 
   /**
