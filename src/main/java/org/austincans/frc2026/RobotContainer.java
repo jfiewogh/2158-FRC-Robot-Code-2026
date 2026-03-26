@@ -477,9 +477,12 @@ public class RobotContainer {
 
         keyboardHID.v().whileTrue(runIntakeCommand);
 
-        keyboardHID.m().onTrue(driveAndIntakeCommand);
+        keyboardHID.m().whileTrue(TurretCommands.pointToHub(turret, drive));
+        keyboardHID.comma().whileTrue(shootCommand);
 
-        keyboardHID.comma().whileTrue(driveAndScoreCommand);
+        // keyboardHID.m().onTrue(driveAndIntakeCommand);
+
+        // keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
         keyboardHID.period().whileTrue(shuttleCommand);
 

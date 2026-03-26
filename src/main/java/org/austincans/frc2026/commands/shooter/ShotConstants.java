@@ -16,9 +16,12 @@
 package org.austincans.frc2026.commands.shooter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.math.util.Units;
 import org.austincans.frc2026.Constants;
 
 /** This is specifically for the 2026 robot */
@@ -38,6 +41,13 @@ public class ShotConstants {
       new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap passingTimeOfFlightMap =
       new InterpolatingDoubleTreeMap();
+
+  public static final Transform3d robotRelTurretTransform =
+      new Transform3d(
+          Units.inchesToMeters(8.140 - (6.875 / 2)),
+          0,
+          Units.inchesToMeters(18.375 + 5.5),
+          new Rotation3d(Rotation2d.k180deg));
 
   // TODO: make version for sim and for real
 

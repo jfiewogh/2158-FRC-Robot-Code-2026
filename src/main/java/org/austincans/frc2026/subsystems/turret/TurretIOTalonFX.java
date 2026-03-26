@@ -22,7 +22,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -87,8 +86,9 @@ public class TurretIOTalonFX extends TurretIOReal {
   public void setDesiredAngle(Rotation2d angle, double accelerationRadPerSecSq) {
     double positionRad = angle.getRadians();
     double positionRotations = Units.radiansToRotations(positionRad);
-    positionRotations = MathUtil.inputModulus(angle.getRotations(), TurretConstants.turretMinimumRotation, TurretConstants.turretMaxRotation);
-    // positionRotations = MathUtil.clamp(positionRotations, TurretConstants.turretMinimumRotation, TurretConstants.turretMaxRotation);
+    positionRotations = MathUtil.inputModulus(angle.getRotations(), -0.5, 0.5);
+    // positionRotations = MathUtil.clamp(positionRotations, TurretConstants.turretMinimumRotation,
+    // TurretConstants.turretMaxRotation);
     if (feedforwardEnabled) {
       // TODO: feedforward seems to take in parameters of positionRad and velocityRadPerSec
       double ffVolts = feedforward.calculate(inputs.velocityRadPerSec, accelerationRadPerSecSq);

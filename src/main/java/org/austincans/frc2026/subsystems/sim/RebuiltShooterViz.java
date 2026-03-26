@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.function.Supplier;
+import org.austincans.frc2026.commands.shooter.ShotConstants;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
@@ -36,13 +37,8 @@ public class RebuiltShooterViz {
 
   public static final Translation3d hoodOffset = new Translation3d(0.127981, 0, 0.106538);
 
-  // TODO: move to constants
-  private final Translation3d[] modelTranslations =
-      new Translation3d[] {
-        new Translation3d(0, 0, TurretConstants.turretHeightMeters),
-        new Translation3d(0, 0, TurretConstants.turretHeightMeters),
-        new Translation3d(0.127981, 0, 0.106538 + TurretConstants.turretHeightMeters)
-      };
+  private final Translation3d shooterBaseTranslation;
+  private final Translation3d[] modelTranslations;
 
   private final Pose3d[] models = new Pose3d[] {Pose3d.kZero, Pose3d.kZero, Pose3d.kZero};
 
@@ -52,20 +48,35 @@ public class RebuiltShooterViz {
     this.key = key;
     this.hoodAngle = hoodAngle;
 
+    shooterBaseTranslation =
+        new Translation3d(
+                ShotConstants.robotRelTurretTransform
+                    .getTranslation()
+                    .toTranslation2d()
+                    .rotateBy(ShotConstants.robotRelTurretTransform.getRotation().toRotation2d()))
+            .plus(new Translation3d(0, 0, TurretConstants.turretHeightMeters));
+    modelTranslations =
+        new Translation3d[] {
+          shooterBaseTranslation, shooterBaseTranslation, shooterBaseTranslation.plus(hoodOffset)
+        };
+
     models[0] = new Pose3d(modelTranslations[0], Rotation3d.kZero);
   }
 
   public void update(Rotation2d turretAngle) {
-    double yawRad = turretAngle.getRadians();
-
-    models[1] = new Pose3d(modelTranslations[1], new Rotation3d(0, 0, yawRad));
+    models[1] =
+        new Pose3d(
+            modelTranslations[1],
+            new Rotation3d(
+                turretAngle.plus(
+                    ShotConstants.robotRelTurretTransform.getRotation().toRotation2d())));
 
     models[2] =
         new Pose3d(
-            new Translation3d(modelTranslations[2].getX(), modelTranslations[2].getY(), 0)
-                .rotateBy(new Rotation3d(0, 0, yawRad))
-                .plus(new Translation3d(0, 0, modelTranslations[2].getZ())),
-            new Rotation3d(0, getPitchRad(hoodAngle.get().getRadians()), yawRad));
+            new Translation3d(hoodOffset.getX(), hoodOffset.getY(), 0)
+                .rotateBy(new Rotation3d(turretAngle))
+                .plus(shooterBaseTranslation.plus(new Translation3d(0, 0, hoodOffset.getZ()))),
+            new Rotation3d(0, getPitchRad(hoodAngle.get().getRadians()), turretAngle.getRadians()));
 
     for (int i = 0; i < models.length; i++) {
       Logger.recordOutput(key + "/Turret" + i, models[i]);

@@ -96,7 +96,6 @@ public class DeployIOSparkFlex implements DeployIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.isDeployed = deployed;
     inputs.deployMotorVoltage = rightDeployMotor.getBusVoltage();
     inputs.deployPositionRad = Units.rotationsToRadians(rightDeployEncoder.getPosition());
     inputs.deployTemperatureC = rightDeployMotor.getMotorTemperature();

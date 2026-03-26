@@ -15,7 +15,6 @@
 
 package org.austincans.frc2026.commands.shooter;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +37,7 @@ public class ShotCommands {
           ShotConstants.scoringHoodAngleMap,
           ShotConstants.scoringFlywheelSpeedMap,
           ShotConstants.scoringTimeOfFlightMap,
-          Transform3d.kZero);
+          ShotConstants.robotRelTurretTransform);
 
   public static void shootToHub(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
@@ -74,7 +73,7 @@ public class ShotCommands {
           ShotConstants.passingHoodAngleMap,
           ShotConstants.passingFlywheelSpeedMap,
           ShotConstants.passingTimeOfFlightMap,
-          Transform3d.kZero);
+          ShotConstants.robotRelTurretTransform);
 
   public static void shuttle(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);

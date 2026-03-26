@@ -21,15 +21,14 @@ import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.function.Supplier;
+import org.austincans.frc2026.commands.shooter.ShotConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
-import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.ironmaple.simulation.IntakeSimulation3D;
 import org.ironmaple.simulation.MeshSimulation3D;
 import org.ironmaple.simulation.ShooterSimulation3D;
@@ -63,11 +62,11 @@ public class ShooterSim3D {
     this.hoodAngleSupplier = hoodAngleSupplier;
     this.robotSimulation = robotSimulation;
 
-    Supplier<Pose3d> shooterPose =
+    Supplier<Pose3d> shooterPose = // robot relative
         () ->
-            new Pose3d(
-                new Translation3d(0, 0, TurretConstants.turretHeightMeters),
-                new Rotation3d(turretAngleSupplier.get()));
+            Pose3d.kZero
+                .plus(ShotConstants.robotRelTurretTransform)
+                .rotateBy(new Rotation3d(turretAngleSupplier.get()));
     shooterSim =
         ShooterSimulation3D.create(FuelBall.createInfo(SimulatedArena3D.getInstance()))
             .onRobot(driveSimulation, shooterPose)

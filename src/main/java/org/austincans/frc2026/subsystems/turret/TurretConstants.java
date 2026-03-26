@@ -16,6 +16,7 @@
 package org.austincans.frc2026.subsystems.turret;
 
 import com.ctre.phoenix6.CANBus;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import org.austincans.frc2026.util.ConfigUtil;
 
@@ -59,7 +60,11 @@ public class TurretConstants {
   public static final double rotationalInertiaMetersSq =
       ConfigUtil.getConfigDouble("TURRET_ROTATIONAL_INERTIA_METER_SQ", 0.01);
 
-  public static final double turretMinimumRotation =
-      ConfigUtil.getConfigDouble("TURRET_MIN_ROT", 0);
-  public static final double turretMaxRotation = ConfigUtil.getConfigDouble("TURRET_MAX_ROT", 0);
+  public static final Rotation2d turretMinRotation = Rotation2d.fromRadians(-Math.PI / 2);
+  public static final Rotation2d turretMaxRotation = Rotation2d.fromRadians(Math.PI / 2);
+
+  //   public static final double turretMinimumRotation =
+  //       ConfigUtil.getConfigDouble("TURRET_MIN_ROT", 0);
+  //   public static final double turretMaxRotation = ConfigUtil.getConfigDouble("TURRET_MAX_ROT",
+  // 180);
 }
