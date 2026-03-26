@@ -126,6 +126,17 @@ public class GeomUtil {
   }
 
   /**
+   * Converts a Transform3d to a Transform2d
+   *
+   * @param transform The original transform
+   * @return The resulting transform
+   */
+  public static Transform2d toTransform2d(Transform3d transform) {
+    return new Transform2d(
+        transform.getTranslation().toTranslation2d(), transform.getRotation().toRotation2d());
+  }
+
+  /**
    * Converts a Transform3d to a Pose3d to be used as a position or as the start of a kinematic
    * chain
    *
@@ -167,5 +178,27 @@ public class GeomUtil {
    */
   public static Pose2d withRotation(Pose2d pose, Rotation2d rotation) {
     return new Pose2d(pose.getTranslation(), rotation);
+  }
+
+  /**
+   * Transforms a velocity along a translation.
+   *
+   * @param velocity The original velocity
+   * @param transform The transform to the new position
+   * @param currentRotation The current rotation of the robot
+   * @return The new velocity
+   */
+  public static ChassisSpeeds transformVelocity(
+      ChassisSpeeds velocity, Translation2d transform, Rotation2d currentRotation) {
+    return new ChassisSpeeds(
+        velocity.vxMetersPerSecond
+            - velocity.omegaRadiansPerSecond
+                * (transform.getX() * currentRotation.getSin()
+                    + transform.getY() * currentRotation.getCos()),
+        velocity.vyMetersPerSecond
+            + velocity.omegaRadiansPerSecond
+                * (transform.getX() * currentRotation.getCos()
+                    - transform.getY() * currentRotation.getSin()),
+        velocity.omegaRadiansPerSecond);
   }
 }

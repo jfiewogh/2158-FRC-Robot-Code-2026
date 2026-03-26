@@ -63,10 +63,6 @@ public class GyroIOPigeon2 implements GyroIO {
     PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(0.0, 0.25));
   }
 
-  public void resetGyro() {
-    pigeon.reset();
-  }
-
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected =

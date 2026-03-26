@@ -17,15 +17,19 @@ package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface HoodIO {
+/* This is specifically for the linear actuator */
+public abstract interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
-    public double hoodAngleDeg;
+    public int pulseWidth;
+    public Rotation2d hoodAngle; // angle created at pivot point
+    public Rotation2d
+        shotPitchAngle; // angle that the game piece is shot (relative to turret) (0 is straight
+    // forward, 90 is straight up)
     public double temperatureCelsius;
     public double motorPositionRad;
     public double velocityRadPerSec;
@@ -33,27 +37,11 @@ public interface HoodIO {
 
   public void updateInputs(HoodIOInputs inputs);
 
-  public default void setVelocity(double velocityRadPerSec) {}
+  public void setHoodAngle(Rotation2d angle);
 
-  public void setAngle(Angle angle);
+  public void setPulse(int pulseWidth);
 
-  public void setAngleRotation2d(Rotation2d angle);
+  public List<HardwareFault> checkForFaults();
 
-  public Angle getAngle();
-
-  public Rotation2d getAngleRotation2d();
-
-  public boolean atAngle(Angle setpoint);
-
-  public void setVoltage(double voltage);
-
-  public void set(int value);
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
+  public List<SelfChecking> getHardware();
 }

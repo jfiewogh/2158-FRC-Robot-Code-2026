@@ -19,14 +19,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import org.austincans.frc2026.math.Angle;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends AdvancedSubsystem {
+  public final boolean tuningModeEnabled = false;
+
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
-  private int value = 1000;
 
   public Hood(HoodIO io) {
     this.io = io;
@@ -34,51 +34,55 @@ public class Hood extends AdvancedSubsystem {
     registerCheckCommand(systemCheckCommand());
   }
 
-  public Command runHoodMotorCommand(Rotation2d angle) {
-    return Commands.run((() -> io.setAngleRotation2d(angle)));
+  public void setPulse(int pulseWidth) {
+    io.setPulse(pulseWidth);
   }
 
-  public void setHood(int value) {
-    this.value = value;
+  public void addToPulse(int addend) {
+    io.setPulse(inputs.pulseWidth + addend);
   }
 
-  public void incrementHood(int value) {
-    this.value += value;
+  public void setHoodAngle(Rotation2d hoodAngle) {
+    io.setHoodAngle(hoodAngle);
   }
 
-  public void decrementHood(int value) {
-    this.value -= value;
+  public void setShotPitchAngle(Rotation2d angle) {
+    setHoodAngle(Rotation2d.fromDegrees(90).minus(angle));
   }
 
-  // TODO: Only IO with setVelocity implementation is HoodIOTest
-  public void setVelocity(double velocityRadPerSec) {
-    io.setVelocity(velocityRadPerSec);
+  public int getPulse() {
+    return inputs.pulseWidth;
   }
 
-  public void setAngle(Rotation2d angle) {
-    io.setAngleRotation2d(angle);
+  public Rotation2d getHoodAngle() {
+    return inputs.hoodAngle;
   }
 
-  public Rotation2d getAngle() {
-    return io.getAngleRotation2d();
-  }
-
-  public boolean atAngle(Angle setpoint) {
-    return io.atAngle(setpoint);
+  public Rotation2d getShotPitchAngle() {
+    return Rotation2d.fromDegrees(90).minus(inputs.hoodAngle);
   }
 
   @Override
   public void periodic() {
-    io.set(value);
-    Logger.processInputs("Hood/Inputs", inputs);
     io.updateInputs(inputs);
+    Logger.processInputs("Hood/Inputs", inputs);
+  }
+
+  /** This should only be used for testing */
+  public Command setPulseCommand(int pulseWidth) {
+    return Commands.runOnce(() -> setPulse(pulseWidth), this);
+  }
+
+  public Command addToPulseCommand(int addend) {
+    return Commands.runOnce(() -> addToPulse(addend), this);
   }
 
   public Command stopCommand() {
     return new InstantCommand(
-        () -> {
-          io.setAngle(Angle.fromDegrees(0));
-        });
+        // () -> {
+        //   io.setHoodAngle(Rotation2d.fromDegrees(0));
+        // });
+        );
   }
 
   public Command systemCheckCommand() {
@@ -86,7 +90,7 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   clearFaults();
-                  io.setAngle(Angle.fromDegrees(10));
+                  io.setHoodAngle(Rotation2d.fromDegrees(10));
                 },
                 this),
             Commands.waitSeconds(0.1),
@@ -100,13 +104,13 @@ public class Hood extends AdvancedSubsystem {
                 this),
             Commands.run(
                     () -> {
-                      io.setAngle(Angle.fromDegrees(20));
+                      io.setHoodAngle(Rotation2d.fromDegrees(20));
                     },
                     this)
                 .withTimeout(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
+                  if (inputs.hoodAngle.getDegrees() < 22 || inputs.hoodAngle.getDegrees() > 18) {
                     addSubsystemFault(
                         "HOOD", "[System Check] Hood did not reach target position", false);
                   }

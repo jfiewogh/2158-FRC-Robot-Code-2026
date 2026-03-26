@@ -32,7 +32,7 @@ public interface FlywheelIO {
 
   public default void runVoltage(double volts) {}
 
-  public default void runRelativeVelocity(double velocityRPM) {}
+  public default void runVelocity(double velocityRPM) {}
 
   public default List<HardwareFault> checkForFaults() {
     return List.of();

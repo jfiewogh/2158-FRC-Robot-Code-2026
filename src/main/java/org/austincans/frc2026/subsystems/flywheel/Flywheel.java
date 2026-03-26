@@ -66,7 +66,11 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public void runSpindexer() {
-    spindexer.set(0.35);
+    spindexer.set(0.1);
+  }
+
+  public void stopSpindexer() {
+    spindexer.set(0);
   }
 
   @Override
@@ -77,8 +81,8 @@ public class Flywheel extends AdvancedSubsystem {
     isReadyToShoot = io.readyToShoot();
   }
 
-  public void setRelativeVelocity(double velocityRPM) {
-    io.runRelativeVelocity(velocityRPM);
+  public void setVelocity(double velocityRPM) {
+    io.runVelocity(velocityRPM);
   }
 
   public double getRPM() {
@@ -95,13 +99,13 @@ public class Flywheel extends AdvancedSubsystem {
 
   public void runShooter() {
     indexer.set(-1);
-    io.runRelativeVelocity(1);
+    io.runVelocity(1);
     // if (Math.abs(inputs.velocityRPM - indexer.get))
   }
 
   public void stopShooter() {
     indexer.set(0);
-    io.runRelativeVelocity(0);
+    io.runVelocity(0);
   }
 
   public boolean noGamePiecesToShoot() {
@@ -111,7 +115,7 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> io.runRelativeVelocity(1)),
+        Commands.runOnce(() -> io.runVelocity(1)),
         Commands.waitSeconds(0.3),
         Commands.runOnce(
             () -> {
@@ -124,21 +128,21 @@ public class Flywheel extends AdvancedSubsystem {
 
   public void stopMotors() {
     indexer.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
-    setRelativeVelocity(0);
+    setVelocity(0);
     spindexer.set(0);
   }
 
   public void testing() {
     controller.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    io.runRelativeVelocity(10000);
+    io.runVelocity(10000);
     // spindexer.stopMotor();
     // indexer.stopMotor();
   }
 
-  public void runIndexerAndFlywheel(double velocity) {
-    io.runRelativeVelocity(velocity);
+  public void runIndexerAndFlywheel(double velocityRPM) {
+    io.runVelocity(velocityRPM);
     controller.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocityRPM) > (velocity * 0.9)
+    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.9)
         && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
       runSpindexer();
     }

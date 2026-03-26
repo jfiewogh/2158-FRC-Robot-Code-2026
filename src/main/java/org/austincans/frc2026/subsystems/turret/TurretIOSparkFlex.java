@@ -77,8 +77,8 @@ public class TurretIOSparkFlex extends TurretIOReal {
     double rotations =
         MathUtil.inputModulus(
             angle.getRotations(),
-            TurretConstants.turretMaxRotation,
-            TurretConstants.turretMinimumRotation);
+            TurretConstants.turretMinimumRotation,
+            TurretConstants.turretMaxRotation);
     controller.setSetpoint(rotations * 10, ControlType.kPosition); // 10:1 motor to turret rotations
   }
 
