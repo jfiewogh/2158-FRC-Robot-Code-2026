@@ -34,7 +34,6 @@ import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
-import org.austincans.frc2026.commands.shooter.ShotCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
@@ -52,6 +51,7 @@ import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.austincans.lib.util.KeyboardHID;
 
 /**
@@ -96,7 +96,7 @@ public class RobotContainer {
   private DoubleSupplier leftY, leftX, rightY, rightX;
 
   // Commands
-  private Command runIntakeCommand;
+  private Command toggleIntakeCommand;
   private Command driveAndIntakeCommand;
   private Command driveAndScoreCommand;
   private Command shootCommand;
@@ -104,6 +104,8 @@ public class RobotContainer {
   // auton only
   private Command shuttleCommand;
   private Command shootToHubCommand;
+
+  LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   @SuppressWarnings("unused")
@@ -223,10 +225,13 @@ public class RobotContainer {
       }
     }
 
-    // Initialize commands
+    /* Initialize commands */
+
     // TODO: runIntakeCommand should deploy intake before it can run it
     if (intakeEnabled) {
-      runIntakeCommand =
+      toggleIntakeCommand = intake.toggleIntakeCommand();
+
+      Command runIntakeCommand =
           Commands.runEnd(
               () -> intake.setRelativeVelocity(0.5), () -> intake.setRelativeVelocity(0));
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
@@ -234,9 +239,22 @@ public class RobotContainer {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand = ShotCommands.shootCommand(flywheel, turret, hood, drive);
+      // shootCommand = ShotCommands.shootCommand(flywheel, turret, hood, drive);
+      shootCommand =
+          Commands.run(
+                  () -> {
+                    flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
+                  },
+                  flywheel)
+              .finallyDo(
+                  () -> {
+                    flywheel.stopMotors();
+                  })
+              .withTimeout(5);
+
       // shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
       // shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
+      NamedCommands.registerCommand("shoot", shootCommand);
       NamedCommands.registerCommand("shuttle", shuttleCommand);
     } else {
       NamedCommands.registerCommand("shoot", Commands.none());
@@ -259,7 +277,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
     if (driveEnabled) {
-      setTurnMode = DriveCommands.setTurnMode(drive);
+      setTurnMode = DriveCommands.setTurnMode();
     }
 
     // Set up auto routines
@@ -297,7 +315,7 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     if (driveEnabled) {
-      drive.setDefaultCommand(DriveCommands.joystickDrive(drive, leftY, leftX, rightY, rightX));
+      drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightY, rightX));
     }
 
     // Configure the button bindings
@@ -330,29 +348,18 @@ public class RobotContainer {
     switch (Constants.controlMode) {
       case JOYSTICK -> {
         if (driveEnabled) {
-          // driverController.leftBumper().whileTrue(runIntakeCommand);
+          driverController.leftBumper().onTrue(toggleIntakeCommand);
           // Switch to X pattern when X button is pressed
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
           if (flywheelEnabled) {
-            shootCommand =
-                Commands.run(
-                        () -> {
-                          flywheel.runIndexerAndFlywheel(7500);
-                          System.out.println("RAN FLYWHEEL");
-                        },
-                        flywheel)
-                    .finallyDo(
-                        () -> {
-                          flywheel.stopMotors();
-                        })
-                    .withTimeout(5);
             driverController.rightBumper().whileTrue(shootCommand);
+
             operatorController
                 .rightBumper()
                 .whileTrue(
                     Commands.run(() -> flywheel.runSpindexer(), flywheel)
                         .finallyDo(() -> flywheel.stopSpindexer()));
-            NamedCommands.registerCommand("shoot", shootCommand);
           }
           if (setTurnMode != null) {
             driverController.b().onTrue(setTurnMode);
@@ -361,24 +368,14 @@ public class RobotContainer {
           if (intakeEnabled) {
             driverController
                 .leftTrigger()
-                .whileTrue(
-                    Commands.runEnd(
-                        () -> {
-                          System.out.println("deploy");
-                          intake.deploy();
-                        },
-                        intake::stopDeploy, // intake.runDeployVelocity(0)
-                        intake));
+                .onTrue(intake.deployCommand())
+                // .onTrue(intake.toggleDeployCommand())
+                .onFalse(intake.stopDeployCommand());
+
             driverController
                 .rightTrigger()
-                .whileTrue(
-                    Commands.runEnd(
-                        () -> {
-                          System.out.println("retract direction");
-                          intake.retract();
-                        },
-                        intake::stopDeploy, // intake.runDeployVelocity(0)
-                        intake));
+                .onTrue(intake.retractCommand())
+                .onFalse(intake.endRetractCommand());
 
             // operatorController.x().onTrue(intake.deployCommand());
             // operatorController.b().onTrue(intake.retractCommand());
@@ -402,14 +399,14 @@ public class RobotContainer {
           }
           if (turretEnabled) {
             pointToHubCommand = TurretCommands.pointToHub(turret, drive);
-            operatorController.leftTrigger().whileTrue(pointToHubCommand);
+            driverController.rightBumper().whileTrue(pointToHubCommand);
 
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(
                     turret,
                     drive,
                     () -> -operatorController.getRightY(),
-                    () -> -operatorController.getRightX())); 
+                    () -> -operatorController.getRightX()));
             NamedCommands.registerCommand("point to hub", pointToHubCommand);
             // operatorController
             // .rightTrigger()
@@ -424,15 +421,14 @@ public class RobotContainer {
           // Reset gyro / odometry
 
           final Runnable resetGyro =
-              () -> 
+              () ->
                   drive.setPose(
                       new Pose2d(
-                        drive.getPose().getTranslation(), 
-                        DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red 
-                          ? Rotation2d.k180deg
-                          : Rotation2d.kZero
-                        )); // zero gyro
-          driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+                          drive.getPose().getTranslation(),
+                          DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
+                              ? Rotation2d.k180deg
+                              : Rotation2d.kZero)); // zero gyro
+          driverController.back().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         }
       }
       case KEYBOARD -> {
@@ -455,7 +451,7 @@ public class RobotContainer {
 
         keyboardHID.c().whileTrue(shootToHubCommand);
 
-        keyboardHID.v().whileTrue(runIntakeCommand);
+        keyboardHID.v().onTrue(toggleIntakeCommand);
 
         keyboardHID.m().onTrue(driveAndIntakeCommand);
 

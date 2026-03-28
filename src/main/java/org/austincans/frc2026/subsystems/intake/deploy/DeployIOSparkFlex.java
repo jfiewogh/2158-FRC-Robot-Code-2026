@@ -95,10 +95,10 @@ public class DeployIOSparkFlex implements DeployIO {
   @Override
   public void retract() {
     System.out.println("Retract");
-    if (leftDeployEncoder.getPosition() > 2) {
-      leftDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
-      rightDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
-    }
+    // if (leftDeployEncoder.getPosition() > 2) {
+    leftDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    rightDeployController.setSetpoint(-0.15, ControlType.kDutyCycle, ClosedLoopSlot.kSlot0);
+    // }
   }
 
   @Override

@@ -84,22 +84,25 @@ public class ShotConstants {
       passingTimeOfFlightMap.put(4.0, 0.9);
       passingTimeOfFlightMap.put(5.0, 0.9);
     } else {
-      scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
-      scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
-      scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
-      scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
-      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
-      scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
+      scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(79.1));
+
+      scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(79.1));
+      
       scoringFlywheelSpeedMap.put(0.0, 1000.0);
       scoringFlywheelSpeedMap.put(1.0, 1100.0);
-      scoringFlywheelSpeedMap.put(2.0, 1210.0);
-      scoringFlywheelSpeedMap.put(3.0, 1310.0);
+      scoringFlywheelSpeedMap.put(3.0, 7000.0);
+      scoringFlywheelSpeedMap.put(3.3, 7500.0);
       scoringFlywheelSpeedMap.put(4.0, 1410.0);
       scoringFlywheelSpeedMap.put(5.0, 1550.0);
+
       scoringTimeOfFlightMap.put(0.0, 0.9);
       scoringTimeOfFlightMap.put(1.0, 0.9);
-      scoringTimeOfFlightMap.put(2.0, 0.9);
-      scoringTimeOfFlightMap.put(3.0, 0.9);
+      scoringTimeOfFlightMap.put(3.0, 1.05);
+      scoringTimeOfFlightMap.put(3.3, 1.31);
       scoringTimeOfFlightMap.put(4.0, 0.9);
       scoringTimeOfFlightMap.put(5.0, 0.9);
 

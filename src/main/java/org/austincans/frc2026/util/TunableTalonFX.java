@@ -1,3 +1,18 @@
+// Copyright (c) 2026 the ausTIN CANs
+// https://github.com/AusTINCANsProgrammingTeam
+//
+// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
+// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
+//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
+//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
+//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
+//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
+// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
+//
+// Use of this source code is governed by a BSD
+// license that can be found in the LICENSE file
+// at the root directory of this project.
+
 package org.austincans.frc2026.util;
 
 // Copyright 2021-2024 FRC 6328
@@ -21,7 +36,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
- * A TalonFX with tunable PID gains via NetworkTables. Extends TalonFX so you can use it as a drop-in replacement.
+ * A TalonFX with tunable PID gains via NetworkTables. Extends TalonFX so you can use it as a
+ * drop-in replacement.
  *
  * <p>Usage examples:
  *
@@ -38,233 +54,238 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
  * }</pre>
  */
 public class TunableTalonFX extends TalonFX {
-    private final String tunableName;
+  private final String tunableName;
 
-    private final boolean TUNING_ENABLED = false;
+  private final boolean TUNING_ENABLED = false;
 
-    // Tunable PID gains
-    private final LoggedNetworkNumber tunableKP;
-    private final LoggedNetworkNumber tunableKI;
-    private final LoggedNetworkNumber tunableKD;
-    private final LoggedNetworkNumber tunableKV;
-    private final LoggedNetworkNumber tunableKS;
-    private final LoggedNetworkNumber tunableKA;
-    private final LoggedNetworkNumber tunableKG;
+  // Tunable PID gains
+  private final LoggedNetworkNumber tunableKP;
+  private final LoggedNetworkNumber tunableKI;
+  private final LoggedNetworkNumber tunableKD;
+  private final LoggedNetworkNumber tunableKV;
+  private final LoggedNetworkNumber tunableKS;
+  private final LoggedNetworkNumber tunableKA;
+  private final LoggedNetworkNumber tunableKG;
 
-    // Cache previous values to detect changes
-    private double lastKP;
-    private double lastKI;
-    private double lastKD;
-    private double lastKV;
-    private double lastKS;
-    private double lastKA;
-    private double lastKG;
+  // Cache previous values to detect changes
+  private double lastKP;
+  private double lastKI;
+  private double lastKD;
+  private double lastKV;
+  private double lastKS;
+  private double lastKA;
+  private double lastKG;
 
-    /**
-     * Creates a TunableTalonFX on a specific CAN bus from a Slot0Configs object.
-     *
-     * @param deviceId The CAN ID of the device
-     * @param canbus The name of the CAN bus (e.g., "rio", "canivore")
-     * @param tunableName The name prefix for NetworkTables entries
-     * @param initialGains The initial Slot0Configs to use for gains
-     */
-    public TunableTalonFX(int deviceId, String canbus, String tunableName, Slot0Configs initialGains) {
-        super(deviceId, new CANBus(canbus));
-        this.tunableName = tunableName;
+  /**
+   * Creates a TunableTalonFX on a specific CAN bus from a Slot0Configs object.
+   *
+   * @param deviceId The CAN ID of the device
+   * @param canbus The name of the CAN bus (e.g., "rio", "canivore")
+   * @param tunableName The name prefix for NetworkTables entries
+   * @param initialGains The initial Slot0Configs to use for gains
+   */
+  public TunableTalonFX(
+      int deviceId, String canbus, String tunableName, Slot0Configs initialGains) {
+    super(deviceId, new CANBus(canbus));
+    this.tunableName = tunableName;
 
-        // Create tunable values from Slot0Configs
-        this.tunableKP = new LoggedNetworkNumber(tunableName + "/kP", initialGains.kP);
-        this.tunableKI = new LoggedNetworkNumber(tunableName + "/kI", initialGains.kI);
-        this.tunableKD = new LoggedNetworkNumber(tunableName + "/kD", initialGains.kD);
-        this.tunableKV = new LoggedNetworkNumber(tunableName + "/kV", initialGains.kV);
-        this.tunableKS = new LoggedNetworkNumber(tunableName + "/kS", initialGains.kS);
-        this.tunableKA = new LoggedNetworkNumber(tunableName + "/kA", initialGains.kA);
-        this.tunableKG = new LoggedNetworkNumber(tunableName + "/kG", initialGains.kG);
-        // Initialize cache
-        this.lastKP = initialGains.kP;
-        this.lastKI = initialGains.kI;
-        this.lastKD = initialGains.kD;
-        this.lastKV = initialGains.kV;
-        this.lastKS = initialGains.kS;
-        this.lastKA = initialGains.kA;
-        this.lastKG = initialGains.kG;
+    // Create tunable values from Slot0Configs
+    this.tunableKP = new LoggedNetworkNumber(tunableName + "/kP", initialGains.kP);
+    this.tunableKI = new LoggedNetworkNumber(tunableName + "/kI", initialGains.kI);
+    this.tunableKD = new LoggedNetworkNumber(tunableName + "/kD", initialGains.kD);
+    this.tunableKV = new LoggedNetworkNumber(tunableName + "/kV", initialGains.kV);
+    this.tunableKS = new LoggedNetworkNumber(tunableName + "/kS", initialGains.kS);
+    this.tunableKA = new LoggedNetworkNumber(tunableName + "/kA", initialGains.kA);
+    this.tunableKG = new LoggedNetworkNumber(tunableName + "/kG", initialGains.kG);
+    // Initialize cache
+    this.lastKP = initialGains.kP;
+    this.lastKI = initialGains.kI;
+    this.lastKD = initialGains.kD;
+    this.lastKV = initialGains.kV;
+    this.lastKS = initialGains.kS;
+    this.lastKA = initialGains.kA;
+    this.lastKG = initialGains.kG;
 
-        // Apply initial configuration
-        applyTunableGains();
+    // Apply initial configuration
+    applyTunableGains();
+  }
+
+  public TunableTalonFX(int deviceId, String canbus, String tunableName) {
+    this(deviceId, canbus, tunableName, new Slot0Configs());
+  }
+
+  /**
+   * Call this method periodically (e.g., in your subsystem's periodic()) to check for and apply any
+   * PID gain changes from the dashboard.
+   *
+   * @return true if gains were updated, false otherwise
+   */
+  public boolean updateTunableGains() {
+
+    if (!TUNING_ENABLED) return false;
+    // Check if any values changed
+    double currentKP = tunableKP.get();
+    double currentKI = tunableKI.get();
+    double currentKD = tunableKD.get();
+    double currentKV = tunableKV.get();
+    double currentKS = tunableKS.get();
+    double currentKA = tunableKA.get();
+    double currentKG = tunableKG.get();
+
+    boolean changed =
+        currentKP != lastKP
+            || currentKI != lastKI
+            || currentKD != lastKD
+            || currentKV != lastKV
+            || currentKS != lastKS
+            || currentKA != lastKA
+            || currentKG != lastKG;
+
+    if (changed) {
+      // Update cache
+      lastKP = currentKP;
+      lastKI = currentKI;
+      lastKD = currentKD;
+      lastKV = currentKV;
+      lastKS = currentKS;
+      lastKA = currentKA;
+      lastKG = currentKG;
+
+      // Apply new gains
+      applyTunableGains();
     }
 
-    public TunableTalonFX(int deviceId, String canbus, String tunableName) {
-        this(deviceId, canbus, tunableName, new Slot0Configs());
-    }
-    /**
-     * Call this method periodically (e.g., in your subsystem's periodic()) to check for and apply any PID gain changes
-     * from the dashboard.
-     *
-     * @return true if gains were updated, false otherwise
-     */
-    public boolean updateTunableGains() {
+    return changed;
+  }
 
-        if (!TUNING_ENABLED) return false;
-        // Check if any values changed
-        double currentKP = tunableKP.get();
-        double currentKI = tunableKI.get();
-        double currentKD = tunableKD.get();
-        double currentKV = tunableKV.get();
-        double currentKS = tunableKS.get();
-        double currentKA = tunableKA.get();
-        double currentKG = tunableKG.get();
+  /** Applies the current gain values to the motor. */
+  private void applyTunableGains() {
+    var gains =
+        new Slot0Configs()
+            .withKP(lastKP)
+            .withKI(lastKI)
+            .withKD(lastKD)
+            .withKV(lastKV)
+            .withKS(lastKS)
+            .withKA(lastKA)
+            .withKG(lastKG);
 
-        boolean changed = currentKP != lastKP
-                || currentKI != lastKI
-                || currentKD != lastKD
-                || currentKV != lastKV
-                || currentKS != lastKS
-                || currentKA != lastKA
-                || currentKG != lastKG;
+    getConfigurator().apply(gains);
+  }
 
-        if (changed) {
-            // Update cache
-            lastKP = currentKP;
-            lastKI = currentKI;
-            lastKD = currentKD;
-            lastKV = currentKV;
-            lastKS = currentKS;
-            lastKA = currentKA;
-            lastKG = currentKG;
+  /** Force applies the current dashboard values to the motor. */
+  public void forceApplyTunableGains() {
+    lastKP = tunableKP.get();
+    lastKI = tunableKI.get();
+    lastKD = tunableKD.get();
+    lastKV = tunableKV.get();
+    lastKS = tunableKS.get();
+    lastKA = tunableKA.get();
+    lastKG = tunableKG.get();
+    applyTunableGains();
+  }
 
-            // Apply new gains
-            applyTunableGains();
-        }
+  /**
+   * Gets a Slot0Configs object with the current tunable values.
+   *
+   * @return A new Slot0Configs with the current dashboard values
+   */
+  public Slot0Configs getTunableSlot0Configs() {
+    return new Slot0Configs()
+        .withKP(tunableKP.get())
+        .withKI(tunableKI.get())
+        .withKD(tunableKD.get())
+        .withKV(tunableKV.get())
+        .withKS(tunableKS.get())
+        .withKA(tunableKA.get())
+        .withKG(tunableKG.get());
+  }
 
-        return changed;
-    }
+  // Getters for current tunable values
+  public double getTunableKP() {
+    return tunableKP.get();
+  }
 
-    /** Applies the current gain values to the motor. */
-    private void applyTunableGains() {
-        var gains = new Slot0Configs()
-                .withKP(lastKP)
-                .withKI(lastKI)
-                .withKD(lastKD)
-                .withKV(lastKV)
-                .withKS(lastKS)
-                .withKA(lastKA)
-                .withKG(lastKG);
+  public double getTunableKI() {
+    return TUNING_ENABLED ? tunableKI.get() : 0.0;
+  }
 
-        getConfigurator().apply(gains);
-    }
+  public double getTunableKD() {
+    return TUNING_ENABLED ? tunableKD.get() : 0.0;
+  }
 
-    /** Force applies the current dashboard values to the motor. */
-    public void forceApplyTunableGains() {
-        lastKP = tunableKP.get();
-        lastKI = tunableKI.get();
-        lastKD = tunableKD.get();
-        lastKV = tunableKV.get();
-        lastKS = tunableKS.get();
-        lastKA = tunableKA.get();
-        lastKG = tunableKG.get();
-        applyTunableGains();
-    }
+  public double getTunableKV() {
+    return TUNING_ENABLED ? tunableKV.get() : 0.0;
+  }
 
-    /**
-     * Gets a Slot0Configs object with the current tunable values.
-     *
-     * @return A new Slot0Configs with the current dashboard values
-     */
-    public Slot0Configs getTunableSlot0Configs() {
-        return new Slot0Configs()
-                .withKP(tunableKP.get())
-                .withKI(tunableKI.get())
-                .withKD(tunableKD.get())
-                .withKV(tunableKV.get())
-                .withKS(tunableKS.get())
-                .withKA(tunableKA.get())
-                .withKG(tunableKG.get());
-    }
+  public double getTunableKS() {
+    return TUNING_ENABLED ? tunableKS.get() : 0.0;
+  }
 
-    // Getters for current tunable values
-    public double getTunableKP() {
-        return tunableKP.get();
-    }
+  public double getTunableKA() {
+    return TUNING_ENABLED ? tunableKA.get() : 0.0;
+  }
 
-    public double getTunableKI() {
-        return TUNING_ENABLED ? tunableKI.get() : 0.0;
-    }
+  public double getTunableKG() {
+    return TUNING_ENABLED ? tunableKG.get() : 0.0;
+  }
 
-    public double getTunableKD() {
-        return TUNING_ENABLED ? tunableKD.get() : 0.0;
-    }
+  public String getTunableName() {
+    return tunableName;
+  }
 
-    public double getTunableKV() {
-        return TUNING_ENABLED ? tunableKV.get() : 0.0;
-    }
+  /**
+   * Applies a TalonFXConfiguration to the motor and updates the tunable NetworkTables values from
+   * its Slot0 gains.
+   *
+   * @param configuration The TalonFXConfiguration to apply
+   * @return The StatusCode from applying the configuration
+   */
+  public StatusCode applyConfiguration(TalonFXConfiguration configuration) {
+    Slot0Configs pidConfigs = configuration.Slot0;
 
-    public double getTunableKS() {
-        return TUNING_ENABLED ? tunableKS.get() : 0.0;
-    }
+    // Update the tunable NetworkTables values
+    tunableKP.set(pidConfigs.kP);
+    tunableKI.set(pidConfigs.kI);
+    tunableKD.set(pidConfigs.kD);
+    tunableKV.set(pidConfigs.kV);
+    tunableKS.set(pidConfigs.kS);
+    tunableKA.set(pidConfigs.kA);
+    tunableKG.set(pidConfigs.kG);
 
-    public double getTunableKA() {
-        return TUNING_ENABLED ? tunableKA.get() : 0.0;
-    }
+    // Update the cache
+    lastKP = pidConfigs.kP;
+    lastKI = pidConfigs.kI;
+    lastKD = pidConfigs.kD;
+    lastKV = pidConfigs.kV;
+    lastKS = pidConfigs.kS;
+    lastKA = pidConfigs.kA;
+    lastKG = pidConfigs.kG;
 
-    public double getTunableKG() {
-        return TUNING_ENABLED ? tunableKG.get() : 0.0;
-    }
+    return super.getConfigurator().apply(configuration);
+  }
 
-    public String getTunableName() {
-        return tunableName;
-    }
+  public StatusCode applyConfiguration(TalonFXConfiguration configuration, double timeoutSeconds) {
+    Slot0Configs pidConfigs = configuration.Slot0;
 
-    /**
-     * Applies a TalonFXConfiguration to the motor and updates the tunable NetworkTables values from its Slot0 gains.
-     *
-     * @param configuration The TalonFXConfiguration to apply
-     * @return The StatusCode from applying the configuration
-     */
-    public StatusCode applyConfiguration(TalonFXConfiguration configuration) {
-        Slot0Configs pidConfigs = configuration.Slot0;
+    // Update the tunable NetworkTables values
+    tunableKP.set(pidConfigs.kP);
+    tunableKI.set(pidConfigs.kI);
+    tunableKD.set(pidConfigs.kD);
+    tunableKV.set(pidConfigs.kV);
+    tunableKS.set(pidConfigs.kS);
+    tunableKA.set(pidConfigs.kA);
+    tunableKG.set(pidConfigs.kG);
 
-        // Update the tunable NetworkTables values
-        tunableKP.set(pidConfigs.kP);
-        tunableKI.set(pidConfigs.kI);
-        tunableKD.set(pidConfigs.kD);
-        tunableKV.set(pidConfigs.kV);
-        tunableKS.set(pidConfigs.kS);
-        tunableKA.set(pidConfigs.kA);
-        tunableKG.set(pidConfigs.kG);
+    // Update the cache
+    lastKP = pidConfigs.kP;
+    lastKI = pidConfigs.kI;
+    lastKD = pidConfigs.kD;
+    lastKV = pidConfigs.kV;
+    lastKS = pidConfigs.kS;
+    lastKA = pidConfigs.kA;
+    lastKG = pidConfigs.kG;
 
-        // Update the cache
-        lastKP = pidConfigs.kP;
-        lastKI = pidConfigs.kI;
-        lastKD = pidConfigs.kD;
-        lastKV = pidConfigs.kV;
-        lastKS = pidConfigs.kS;
-        lastKA = pidConfigs.kA;
-        lastKG = pidConfigs.kG;
-
-        return super.getConfigurator().apply(configuration);
-    }
-
-    public StatusCode applyConfiguration(TalonFXConfiguration configuration, double timeoutSeconds) {
-        Slot0Configs pidConfigs = configuration.Slot0;
-
-        // Update the tunable NetworkTables values
-        tunableKP.set(pidConfigs.kP);
-        tunableKI.set(pidConfigs.kI);
-        tunableKD.set(pidConfigs.kD);
-        tunableKV.set(pidConfigs.kV);
-        tunableKS.set(pidConfigs.kS);
-        tunableKA.set(pidConfigs.kA);
-        tunableKG.set(pidConfigs.kG);
-
-        // Update the cache
-        lastKP = pidConfigs.kP;
-        lastKI = pidConfigs.kI;
-        lastKD = pidConfigs.kD;
-        lastKV = pidConfigs.kV;
-        lastKS = pidConfigs.kS;
-        lastKA = pidConfigs.kA;
-        lastKG = pidConfigs.kG;
-
-        return super.getConfigurator().apply(configuration, timeoutSeconds);
-    }
+    return super.getConfigurator().apply(configuration, timeoutSeconds);
+  }
 }

@@ -18,6 +18,7 @@ package org.austincans.frc2026.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -42,15 +43,15 @@ public class TurretCommands {
   public static double flywheelExitVelocityConstant = 1;
   public static double robotShootTime = 1;
 
-  public static InterpolatingDoubleTreeMap distancesAnglesFromHub =
-      InterpolatingDoubleTreeMap.ofEntries(
-          Map.entry(FieldConstants.fieldLength / 6, 7 * Math.PI / 18),
-          Map.entry(0.0, Math.PI / 2),
-          Map.entry(FieldConstants.fieldLength / 3, Math.PI / 4));
-  public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint =
-      InterpolatingDoubleTreeMap.ofEntries(Map.entry(5.0, 5.0), Map.entry(10.0, 10.0));
+  public static InterpolatingDoubleTreeMap distancesAnglesFromHub = InterpolatingDoubleTreeMap.ofEntries(
+      Map.entry(FieldConstants.fieldLength / 6, 7 * Math.PI / 18),
+      Map.entry(0.0, Math.PI / 2),
+      Map.entry(FieldConstants.fieldLength / 3, Math.PI / 4));
+  public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint = InterpolatingDoubleTreeMap
+      .ofEntries(Map.entry(5.0, 5.0), Map.entry(10.0, 10.0));
 
-  // TODO: Add areas where you cannot shoot from (ex. in front of hub in neutral zone, behind tower)
+  // TODO: Add areas where you cannot shoot from (ex. in front of hub in neutral
+  // zone, behind tower)
 
   public enum TrackingTargets {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
@@ -90,7 +91,8 @@ public class TurretCommands {
   }
 
   /**
-   * Only setter methods used for flywheel, turret, and hood. Only getter methods used for drive.
+   * Only setter methods used for flywheel, turret, and hood. Only getter methods
+   * used for drive.
    */
   public static double getHoodAngleFromDistance(
       double distance, InterpolatingDoubleTreeMap points) {
@@ -235,11 +237,9 @@ public class TurretCommands {
     Pose3d robotPose = new Pose3d(drive.getPose());
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
-      possibleTargets =
-          new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
+      possibleTargets = new TrackingTargets[] { TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight };
     } else {
-      possibleTargets =
-          new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
+      possibleTargets = new TrackingTargets[] { TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight };
     }
     return getClosestTarget(robotPose, possibleTargets);
   }
@@ -365,24 +365,21 @@ public class TurretCommands {
       Flywheel flywheel,
       TrackingTargets target,
       InterpolatingDoubleTreeMap data) {
-    Translation2d speeds =
-        new Translation2d(
-            drive.getRobotRelVelocities().vxMetersPerSecond,
-            drive.getRobotRelVelocities().vyMetersPerSecond);
-    Translation2d futureTranslation =
-        getFutureTranslation(drive.getPose().getTranslation(), robotShootTime, speeds);
-    double distancefromTarget =
-        drive.getPose().getTranslation().getDistance(target.getTranslation3d().toTranslation2d());
-    Translation2d tranlationFromTarget =
-        target.getTranslation3d().toTranslation2d().minus(drive.getPose().getTranslation());
-    Rotation2d turretAngle =
-        Rotation2d.fromRadians(
-            Math.atan2(tranlationFromTarget.getY(), tranlationFromTarget.getX()));
+    Translation2d speeds = new Translation2d(
+        drive.getRobotRelVelocities().vxMetersPerSecond,
+        drive.getRobotRelVelocities().vyMetersPerSecond);
+    Translation2d futureTranslation = getFutureTranslation(drive.getPose().getTranslation(), robotShootTime, speeds);
+    double distancefromTarget = drive.getPose().getTranslation()
+        .getDistance(target.getTranslation3d().toTranslation2d());
+    Translation2d tranlationFromTarget = target.getTranslation3d().toTranslation2d()
+        .minus(drive.getPose().getTranslation());
+    Rotation2d turretAngle = Rotation2d.fromRadians(
+        Math.atan2(tranlationFromTarget.getY(), tranlationFromTarget.getX()));
     flywheel.setVelocity(
         // metersPerSecToRPM(
-        //     getDistance(futureTranslation, target.getTranslation3d().toTranslation2d())
-        //         / robotShootTime,
-        //     FlywheelConstants.radiusMeters)
+        // getDistance(futureTranslation, target.getTranslation3d().toTranslation2d())
+        // / robotShootTime,
+        // FlywheelConstants.radiusMeters)
         1500);
     turret.setDesiredAngleFieldRelative(turretAngle, drive.getRotation());
     hood.setShotPitchAngle(
@@ -412,18 +409,18 @@ public class TurretCommands {
   public static Command shootToHubCommand(
       Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
     return Commands.run(
-            () -> {
-              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-              if (allianceOptional.isPresent()) {
-                Alliance alliance = allianceOptional.get();
-                if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-                  shootToHub(flywheel, turret, hood, drive, alliance);
-                }
-              }
-            },
-            flywheel,
-            turret,
-            hood)
+        () -> {
+          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+          if (allianceOptional.isPresent()) {
+            Alliance alliance = allianceOptional.get();
+            if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
+              shootToHub(flywheel, turret, hood, drive, alliance);
+            }
+          }
+        },
+        flywheel,
+        turret,
+        hood)
         .until(
             () -> {
               return flywheel.noGamePiecesToShoot();
@@ -439,15 +436,15 @@ public class TurretCommands {
   // TODO: Maybe make it so that robot does not shoot over hub
   public static Command shuttleCommand(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
     return Commands.run(
-            () -> {
-              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-              if (allianceOptional.isPresent()) {
-                shuttle(flywheel, turret, hood, drive, allianceOptional.get());
-              }
-            },
-            flywheel,
-            turret,
-            hood)
+        () -> {
+          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+          if (allianceOptional.isPresent()) {
+            shuttle(flywheel, turret, hood, drive, allianceOptional.get());
+          }
+        },
+        flywheel,
+        turret,
+        hood)
         .until(flywheel::noGamePiecesToShoot)
         .finallyDo(
             () -> {
@@ -459,20 +456,20 @@ public class TurretCommands {
 
   public static Command shootCommand(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
     return Commands.run(
-            () -> {
-              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-              if (allianceOptional.isPresent()) {
-                Alliance alliance = allianceOptional.get();
-                if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-                  shootToHub(flywheel, turret, hood, drive, alliance);
-                } else {
-                  shuttle(flywheel, turret, hood, drive, alliance);
-                }
-              }
-            },
-            flywheel,
-            turret,
-            hood)
+        () -> {
+          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+          if (allianceOptional.isPresent()) {
+            Alliance alliance = allianceOptional.get();
+            if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
+              shootToHub(flywheel, turret, hood, drive, alliance);
+            } else {
+              shuttle(flywheel, turret, hood, drive, alliance);
+            }
+          }
+        },
+        flywheel,
+        turret,
+        hood)
         .finallyDo(
             () -> {
               flywheel.setVelocity(0);
@@ -481,30 +478,38 @@ public class TurretCommands {
             });
   }
 
-  // TODO: fix
   public static Command pointToHub(Turret turret, Drive drive) {
     return Commands.run(
-            () -> {
-              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-              TrackingTargets target =
-                  allianceOptional.get() == Alliance.Blue
-                      ? TrackingTargets.blueHub
-                      : TrackingTargets.redHub;
-              Translation3d targetTrans = target.getTranslation3d();
-              Translation3d robotTrans = drive.getPose3d().getTranslation();
-              Rotation2d fieldRelAngle =
-                  targetTrans.toTranslation2d().minus(robotTrans.toTranslation2d()).getAngle();
+        () -> {
+          Optional<Alliance> allianceOptional = DriverStation.getAlliance();
+          TrackingTargets target = allianceOptional.get() == Alliance.Blue
+              ? TrackingTargets.blueHub
+              : TrackingTargets.redHub;
+          Translation3d targetTrans = target.getTranslation3d();
+          Pose3d drivePose = drive.getPose3d();
+          
+          // Transform3d applies Translation3d first, then Rotation3d
+          Pose3d turretPose = drivePose.plus(TurretConstants.robotRelTurretTransform);
+          Translation3d turretTranslation = turretPose.getTranslation();
+          Logger.recordOutput("turret pose", turretPose);
 
-              Logger.recordOutput("turret angle deg", fieldRelAngle.getDegrees());
+          Rotation2d fieldRelAngle = targetTrans
+              .toTranslation2d()
+              .minus(turretTranslation.toTranslation2d())
+              .getAngle();
 
-              turret.setDesiredAngleFieldRelative(fieldRelAngle, drive.getRotation());
-            },
-            turret)
+          // We need this for calculating
+          Logger.recordOutput(
+              "turret distance from hub",
+              turretTranslation.toTranslation2d().getDistance(targetTrans.toTranslation2d()));
+
+          turret.setDesiredAngleFieldRelative(fieldRelAngle, drive.getRotation());
+        },
+        turret)
         .withTimeout(5);
   }
 
-  private static Rotation2d setpointJoystickTurretAngle =
-      Rotation2d.kZero; // should be zero on start
+  private static Rotation2d setpointJoystickTurretAngle = Rotation2d.kZero; // should be zero on start
 
   public static Command joystickTurretAngleCommand(
       Turret turret, Drive drive, DoubleSupplier vertSupplier, DoubleSupplier horizSupplier) {
@@ -512,13 +517,29 @@ public class TurretCommands {
         () -> {
           if (Math.abs(vertSupplier.getAsDouble()) > 0.1
               && Math.abs(horizSupplier.getAsDouble()) > 0.1) {
-            setpointJoystickTurretAngle =
-                Rotation2d.fromRadians(
-                    Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
+            setpointJoystickTurretAngle = Rotation2d.fromRadians(
+                Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
             turret.setDesiredAngleRobotRelative(
                 setpointJoystickTurretAngle); // , drive.getPose().getRotation());
           }
         },
         turret);
   }
+
+  public enum TurretMode {
+    STATIC,
+    MOVING
+  }
+
+  private TurretMode turretMode = TurretMode.STATIC;
+
+  // public Command setTurretMode() {
+  // return Commands.runOnce(() -> {
+  // if (TurretMode.STATIC) {
+
+  // } else {
+
+  // }
+  // });
+  // }
 }

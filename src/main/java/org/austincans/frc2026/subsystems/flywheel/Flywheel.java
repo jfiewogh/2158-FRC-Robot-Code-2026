@@ -142,9 +142,11 @@ public class Flywheel extends AdvancedSubsystem {
   public void runIndexerAndFlywheel(double velocityRPM) {
     io.runVelocity(velocityRPM);
     controller.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.9)
+    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.95)
         && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
-      runSpindexer();
+      spindexer.set(0.2);
+    } else {
+      spindexer.set(0);
     }
   }
 }

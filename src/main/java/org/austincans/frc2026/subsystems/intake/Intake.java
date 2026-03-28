@@ -28,6 +28,7 @@ public class Intake extends AdvancedSubsystem {
   private final DeployIO deployIO;
 
   @AutoLogOutput public static boolean deployed = false;
+  @AutoLogOutput public boolean intakeIsRunning = false;
 
   public Intake(IntakeIO intakeIO, DeployIO deployIO) {
     this.intakeIO = intakeIO;
@@ -142,6 +143,49 @@ public class Intake extends AdvancedSubsystem {
         () -> {
           intakeIO.setRelativeVelocity(0);
           deployIO.retract();
+        },
+        this);
+  }
+
+  public Command stopDeployCommand() {
+    return Commands.runOnce(() -> stopDeploy(), this);
+  }
+
+  public void toggleIntake() {
+    if (intakeIsRunning) {
+      intakeIsRunning = false;
+      intakeIO.setRelativeVelocity(0);
+    } else {
+      intakeIsRunning = true;
+      intakeIO.setRelativeVelocity(0.45);
+    }
+  }
+
+  public Command toggleIntakeCommand() {
+    return Commands.runOnce(this::toggleIntake, this);
+  }
+
+  public Command toggleDeployCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (deployed) {
+            deployed = false;
+            retract();
+          } else {
+            deployed = true;
+            deploy();
+          }
+        },
+        this);
+  }
+
+  public Command endRetractCommand() {
+    return Commands.runOnce(
+        () -> {
+          stopDeploy();
+          if (intakeIsRunning) {
+            toggleIntake();
+          }
         },
         this);
   }
