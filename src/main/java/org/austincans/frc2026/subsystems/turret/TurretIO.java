@@ -41,6 +41,8 @@ public interface TurretIO {
 
   public void updateInputs(TurretIOInputs inputs);
 
+  public void resetAngle(Rotation2d pose);
+
   public default List<HardwareFault> checkForFaults() {
     return List.of();
   }

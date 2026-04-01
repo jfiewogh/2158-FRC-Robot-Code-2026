@@ -27,6 +27,7 @@ import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.function.Function;
 import org.austincans.frc2026.util.GeomUtil;
+import org.littletonrobotics.junction.Logger;
 
 // TODO: Move into lib
 // TODO: Maybe make it work for z's between floor and hub height (ex. robot on bump)
@@ -168,9 +169,13 @@ public class ShotCalculator {
           targetFieldRelPosition2d.getDistance(lookaheadShotPose2d.getTranslation());
     }
 
+    Logger.recordOutput("turret pose", shotFieldRelPose2d);
+    Logger.recordOutput("shot pose", lookaheadShotPose2d);
+    Logger.recordOutput("target pose", targetFieldRelPosition2d);
+
     // Account for shot position being off center
     // Pose2d lookaheadDrivePose2d =
-    // lookaheadShotPose2d.transformBy(GeomUtil.toTransform2d(robotRelTurretOffset).inverse());
+    //     lookaheadShotPose2d.transformBy(GeomUtil.toTransform2d(robotRelTurretOffset).inverse());
 
     /* Hood angle */
     Rotation2d hoodAngle = pitchMap.get(lookaheadShotToTargetDistance2d);

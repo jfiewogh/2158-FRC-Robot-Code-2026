@@ -113,4 +113,9 @@ public class TurretIOSparkFlex extends TurretIOReal {
   public List<SelfChecking> getHardware() {
     return List.of(selfCheckingMotor);
   }
+
+  @Override
+  public void resetAngle(Rotation2d angle) {
+    relativeEncoder.setPosition(angle.getRotations() * 10);
+  }
 }

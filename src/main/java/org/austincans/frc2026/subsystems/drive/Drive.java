@@ -44,6 +44,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -79,6 +80,7 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
   public static double driveTestMultiplier = 0.6; // For when in testing mode
+  public static double turningMultiplier = 0.85;
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -211,7 +213,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     ALWAYS_COAST
   }
 
-  private SwerveModulePosition[] getModulePositions() {
+  public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
       states[i] = modules[i].getPosition();
@@ -492,6 +494,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /** Returns the raw gyro rotation read by the IMU */
   public Rotation2d getGyroRotation() {
     return gyroInputs.yawPosition;
+  }
+
+  public double getGyroRateDegPerSec() {
+    return Units.radiansToDegrees(gyroInputs.yawVelocityRadPerSec);
   }
 
   public Pose3d getPose3d() {

@@ -44,6 +44,7 @@ public class HoodIOServoLinear implements HoodIO {
   public void updateInputs(HoodIOInputs inputs) {
     inputs.pulseWidth = servoHub.getPulseWidth(id);
     inputs.hoodAngle = getAngleFromPulseWidth(inputs.pulseWidth);
+    inputs.hoodAngleDeg = inputs.hoodAngle.getDegrees();
   }
 
   @Override

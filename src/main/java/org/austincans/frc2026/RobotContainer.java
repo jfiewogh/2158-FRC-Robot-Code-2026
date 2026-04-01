@@ -34,6 +34,7 @@ import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
+import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
@@ -117,6 +118,7 @@ public class RobotContainer {
         if (driveEnabled) {
           if (turretEnabled) {
             turret = new Turret(new TurretIOSparkFlex());
+            // new VisionIOLimelightTurret("limelight-turret", drive::getRotation, drive));
             drive =
                 new Drive(
                     new DriveIOReal(),
@@ -149,10 +151,11 @@ public class RobotContainer {
           // right is positive
           // up is positive z
           // Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
-          //     new Translation3d(
-          //         Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 +
+          // new Translation3d(
+          // Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 +
           // 5.5));
-          // double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 /
+          // double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 +
+          // (6.875 /
           // 2));
           vision =
               new Vision(
@@ -214,7 +217,9 @@ public class RobotContainer {
       case JOYSTICK -> {
         leftX = () -> -driverController.getLeftX() * Drive.driveTestMultiplier;
         leftY = () -> -driverController.getLeftY() * Drive.driveTestMultiplier;
-        rightX = () -> -driverController.getRightX() * Drive.driveTestMultiplier;
+        rightX =
+            () ->
+                -driverController.getRightX() * Drive.driveTestMultiplier * Drive.turningMultiplier;
         rightY = () -> -driverController.getRightY() * Drive.driveTestMultiplier;
       }
       case KEYBOARD -> {
@@ -233,17 +238,30 @@ public class RobotContainer {
 
       Command runIntakeCommand =
           Commands.runEnd(
-              () -> intake.setRelativeVelocity(0.5), () -> intake.setRelativeVelocity(0));
+              () -> intake.setRelativeVelocity(0.3), () -> intake.setRelativeVelocity(0));
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
     } else {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      // shootCommand = ShotCommands.shootCommand(flywheel, turret, hood, drive);
-      shootCommand =
+      shootCommand = ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret);
+      // shootCommand =
+      //     Commands.run(
+      //             () -> {
+      //               flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
+      //             },
+      //             flywheel)
+      //         .finallyDo(
+      //             () -> {
+      //               flywheel.stopMotors();
+      //             })
+      //         .withTimeout(5);
+
+      // this is temporary
+      Command otherShootCommand =
           Commands.run(
                   () -> {
-                    flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
+                    flywheel.runIndexerAndFlywheel(7500);
                   },
                   flywheel)
               .finallyDo(
@@ -252,8 +270,9 @@ public class RobotContainer {
                   })
               .withTimeout(5);
 
-      // shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
-      // shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
+      // shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood,
+      // drive);
+      shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
       NamedCommands.registerCommand("shoot", shootCommand);
       NamedCommands.registerCommand("shuttle", shuttleCommand);
     } else {
@@ -300,7 +319,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Angular)",
+        "Drive SysId (Dynam ic Angular)",
         drive.sysIdDynamicAngular(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
@@ -308,6 +327,10 @@ public class RobotContainer {
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
     autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
+
+    autoChooser.addOption("Blue Just Shoot Top", AutoBuilder.buildAuto("blueTopJustShoot"));
+    autoChooser.addOption("Blue Just Shoot Mid", AutoBuilder.buildAuto("blueMidJustShoot"));
+    autoChooser.addOption("Blue Just Shoot Bot", AutoBuilder.buildAuto("blueBottomJustShoot"));
 
     autoChooser.addOption("Auto1", AutoBuilder.buildAuto("Auto1"));
     autoChooser.addOption("Auto2", AutoBuilder.buildAuto("Auto2"));
@@ -353,6 +376,9 @@ public class RobotContainer {
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
           if (flywheelEnabled) {
+            // TODO: add flywheel tracking command (indexer at zero speed, flywheel at desired
+            // speed)
+
             driverController.rightBumper().whileTrue(shootCommand);
 
             operatorController
@@ -399,14 +425,16 @@ public class RobotContainer {
           }
           if (turretEnabled) {
             pointToHubCommand = TurretCommands.pointToHub(turret, drive);
+
             driverController.rightBumper().whileTrue(pointToHubCommand);
 
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(
                     turret,
                     drive,
-                    () -> -operatorController.getRightY(),
-                    () -> -operatorController.getRightX()));
+                    () -> operatorController.getRightY(),
+                    () -> operatorController.getRightX()));
+            operatorController.y().onTrue(turret.resetAngle());
             NamedCommands.registerCommand("point to hub", pointToHubCommand);
             // operatorController
             // .rightTrigger()
@@ -416,6 +444,12 @@ public class RobotContainer {
             // .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(-90)));
           } else {
             NamedCommands.registerCommand("point to hub", Commands.none());
+          }
+
+          // turret and hood
+          // UNTESTED
+          if (turretEnabled && hoodEnabled) {
+            // operatorController.a().whileTrue(ShooterCommands.trackCommand(turret, hood, drive));
           }
 
           // Reset gyro / odometry
@@ -432,7 +466,8 @@ public class RobotContainer {
         }
       }
       case KEYBOARD -> {
-        // hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()),
+        // hood.setDefaultCommand(Commands.run(() ->
+        // hood.setVelocity(keyboardHID.middleY()),
         // hood));
 
         turret.setDefaultCommand(

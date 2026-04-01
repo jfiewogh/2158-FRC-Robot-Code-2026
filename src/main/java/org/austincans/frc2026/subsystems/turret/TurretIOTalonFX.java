@@ -133,4 +133,10 @@ public class TurretIOTalonFX extends TurretIOReal {
   public List<SelfChecking> getHardware() {
     return List.of(selfCheckingTalonFXS);
   }
+
+  @Override
+  public void resetAngle(Rotation2d pose) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'resetAngle'");
+  }
 }

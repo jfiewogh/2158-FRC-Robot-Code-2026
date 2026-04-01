@@ -61,63 +61,6 @@ public class VisionIOLimelight implements VisionIO {
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
   }
 
-  //   public void updateOdometry() {
-  //   boolean useMegaTag2 = true; //set to false to use MegaTag1
-  //   boolean doRejectUpdate = false;
-  //   if(useMegaTag2 == false)
-  //   {
-  //     LimelightHelpers.PoseEstimate mt1 =
-  // LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-
-  //     if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
-  //     {
-  //       if(mt1.rawFiducials[0].ambiguity > .7)
-  //       {
-  //         doRejectUpdate = true;
-  //       }
-  //       if(mt1.rawFiducials[0].distToCamera > 3)
-  //       {
-  //         doRejectUpdate = true;
-  //       }
-  //     }
-  //     if(mt1.tagCount == 0)
-  //     {
-  //       doRejectUpdate = true;
-  //     }
-
-  //     if(!doRejectUpdate)
-  //     {
-  //       RobotState.getInstance().addVisionObservation(new VisionObservation(mt1.timestampSeconds,
-  // new Pose3d(mt1.pose), VecBuilder.fill(.5,.5,9999999)));
-  //       // m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5,.5,9999999));
-  //       // m_poseEstimator.addVisionMeasurement(
-  //       //     mt1.pose,
-  //       //     mt1.timestampSeconds);
-  //     }
-  //   }
-  //   else if (useMegaTag2 == true)
-  //   {
-  //     LimelightHelpers.SetRobotOrientation("limelight",
-  // RobotState.getInstance().getEstimatedPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-  //     LimelightHelpers.PoseEstimate mt2 =
-  // LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-  //     // if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720
-  // degrees per second, ignore vision updates
-  //     // {
-  //     //   doRejectUpdate = true;
-  //     // }
-  //     if(mt2.tagCount == 0)
-  //     {
-  //       doRejectUpdate = true;
-  //     }
-  //     if(!doRejectUpdate)
-  //     {
-  //       RobotState.getInstance().addVisionObservation(new VisionObservation(mt2.timestampSeconds,
-  // new Pose3d(mt2.pose), VecBuilder.fill(.7,.7,9999999)));
-  //     }
-  //   }
-  // }
-
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -125,7 +68,7 @@ public class VisionIOLimelight implements VisionIO {
     double targetOffsetAngle_Vertical = ty.getDouble(0.0);
 
     // how many degrees back is your limelight rotated from perfectly vertical?
-    double limelightMountAngleDegrees = 25.0;
+    double limelightMountAngleDegrees = 15.0;
 
     // distance from the center of the Limelight lens to the floor
     double limelightLensHeightInches = 20.0;

@@ -41,6 +41,7 @@ public class ShotConstants {
 
   // TODO: make version for sim and for real
 
+
   /* Add empirical data
    * key: distance from target in meters
    */
@@ -84,46 +85,22 @@ public class ShotConstants {
       passingTimeOfFlightMap.put(4.0, 0.9);
       passingTimeOfFlightMap.put(5.0, 0.9);
     } else {
-      scoringHoodAngleMap.put(0.0, Rotation2d.fromDegrees(79.1));
-      scoringHoodAngleMap.put(1.0, Rotation2d.fromDegrees(79.1));
-      scoringHoodAngleMap.put(2.0, Rotation2d.fromDegrees(79.1));
-      scoringHoodAngleMap.put(3.0, Rotation2d.fromDegrees(79.1));
-      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(79.1));
-
-      scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(79.1));
-      
-      scoringFlywheelSpeedMap.put(0.0, 1000.0);
-      scoringFlywheelSpeedMap.put(1.0, 1100.0);
-      scoringFlywheelSpeedMap.put(3.0, 7000.0);
+      scoringHoodAngleMap.put(1.5, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(3.3, Rotation2d.fromDegrees(79.1));
+      scoringHoodAngleMap.put(3.5, Rotation2d.fromDegrees(77.6));
+      scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(75.8));
+      scoringHoodAngleMap.put(4.25, Rotation2d.fromDegrees(74));
+      scoringHoodAngleMap.put(4.4, Rotation2d.fromDegrees(72.3));
+      scoringHoodAngleMap.put(4.625, Rotation2d.fromDegrees(70.5));
+      scoringFlywheelSpeedMap.put(1.5, 2000.0);
+      scoringFlywheelSpeedMap.put(2.0, 2800.0);
+      scoringFlywheelSpeedMap.put(2.25, 3000.0);
+      scoringFlywheelSpeedMap.put(2.527, 3500.0);
+      scoringFlywheelSpeedMap.put(3.0, 4000.0);
       scoringFlywheelSpeedMap.put(3.3, 7500.0);
-      scoringFlywheelSpeedMap.put(4.0, 1410.0);
-      scoringFlywheelSpeedMap.put(5.0, 1550.0);
-
-      scoringTimeOfFlightMap.put(0.0, 0.9);
-      scoringTimeOfFlightMap.put(1.0, 0.9);
-      scoringTimeOfFlightMap.put(3.0, 1.05);
-      scoringTimeOfFlightMap.put(3.3, 1.31);
-      scoringTimeOfFlightMap.put(4.0, 0.9);
-      scoringTimeOfFlightMap.put(5.0, 0.9);
-
-      passingHoodAngleMap.put(0.0, Rotation2d.fromDegrees(90));
-      passingHoodAngleMap.put(1.0, Rotation2d.fromDegrees(80));
-      passingHoodAngleMap.put(2.0, Rotation2d.fromDegrees(70));
-      passingHoodAngleMap.put(3.0, Rotation2d.fromDegrees(60));
-      passingHoodAngleMap.put(4.0, Rotation2d.fromDegrees(50));
-      passingHoodAngleMap.put(5.0, Rotation2d.fromDegrees(45));
-      passingFlywheelSpeedMap.put(0.0, 900.0);
-      passingFlywheelSpeedMap.put(1.0, 1000.0);
-      passingFlywheelSpeedMap.put(2.0, 1110.0);
-      passingFlywheelSpeedMap.put(3.0, 1210.0);
-      passingFlywheelSpeedMap.put(4.0, 1310.0);
-      passingFlywheelSpeedMap.put(5.0, 1450.0);
-      passingTimeOfFlightMap.put(0.0, 0.9);
-      passingTimeOfFlightMap.put(1.0, 0.9);
-      passingTimeOfFlightMap.put(2.0, 0.9);
-      passingTimeOfFlightMap.put(3.0, 0.9);
-      passingTimeOfFlightMap.put(4.0, 0.9);
-      passingTimeOfFlightMap.put(5.0, 0.9);
+      scoringFlywheelSpeedMap.put(5.0, 7500.0);
+      scoringTimeOfFlightMap.put(1.5, 1.25);
+      scoringTimeOfFlightMap.put(5.0, 1.25);
     }
   }
 }

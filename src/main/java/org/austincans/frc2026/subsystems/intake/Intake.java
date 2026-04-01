@@ -141,7 +141,7 @@ public class Intake extends AdvancedSubsystem {
   public Command retractCommand() {
     return Commands.runOnce(
         () -> {
-          intakeIO.setRelativeVelocity(0);
+          // intakeIO.setRelativeVelocity(0);
           deployIO.retract();
         },
         this);
@@ -157,7 +157,7 @@ public class Intake extends AdvancedSubsystem {
       intakeIO.setRelativeVelocity(0);
     } else {
       intakeIsRunning = true;
-      intakeIO.setRelativeVelocity(0.45);
+      intakeIO.setRelativeVelocity(0.35);
     }
   }
 
@@ -183,9 +183,9 @@ public class Intake extends AdvancedSubsystem {
     return Commands.runOnce(
         () -> {
           stopDeploy();
-          if (intakeIsRunning) {
-            toggleIntake();
-          }
+          // if (intakeIsRunning) {
+          //   toggleIntake();
+          // }
         },
         this);
   }

@@ -15,31 +15,55 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
 
-public class Turret extends AdvancedSubsystem {
+public class Turret extends AdvancedSubsystem implements VisionConsumer {
   private final TurretIO io;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-  public Turret(TurretIO io) {
+  // private final VisionIO vision;
+  // private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
+  DigitalInput magneticLimit = new DigitalInput(0);
+  Boolean previousValue = false;
+
+  public Turret(TurretIO io) { // , VisionIO turretViz) {
     this.io = io;
     io.getHardware().forEach(e -> registerHardware(e));
     registerCheckCommand(systemCheckCommand());
     io.setDesiredAngle(Rotation2d.fromDegrees(0));
+    // this.vision = turretViz;
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    // vision.updateInputs(visionInputs);
     Logger.processInputs("Turret", inputs);
+    // if (inputs.velocityRadPerSec < 0){
+    //   if (magneticLimit.get() == true && magneticLimit.get() != previousValue){
+    //     io.resetAngle(Rotation2d.kZero);
+    //     previousValue = magneticLimit.get();
+    //   }
+    // }
+    // Logger.processInputs("TurretVision", visionInputs);
+
+    // Pose2d pose = LimelightHelpers.getBotPose2d("limelight-turret");
+    // Logger.recordOutput("Turret field rel pose", pose);
+    // io.resetAngle(pose.getRotation().plus(TurretConstants.robotRelTurretRotationOffset));
   }
 
   @Override
@@ -154,6 +178,14 @@ public class Turret extends AdvancedSubsystem {
         this);
   }
 
+  public Command resetAngle() {
+    return Commands.runOnce(
+        () -> {
+          io.resetAngle(Rotation2d.kZero);
+        },
+        this);
+  }
+
   public Command runTurret(double velocityRadPerSec) {
     return Commands.run(() -> setTurretVelocity(velocityRadPerSec));
   }
@@ -208,5 +240,14 @@ public class Turret extends AdvancedSubsystem {
         //       }
         //     }))
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
+  }
+
+  @Override
+  public void accept(
+      Pose3d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'accept'");
   }
 }

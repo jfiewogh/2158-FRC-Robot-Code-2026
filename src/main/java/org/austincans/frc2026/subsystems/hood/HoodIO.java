@@ -27,6 +27,7 @@ public abstract interface HoodIO {
   public class HoodIOInputs {
     public int pulseWidth;
     public Rotation2d hoodAngle;
+    public double hoodAngleDeg;
     public double temperatureCelsius;
     public double motorPositionRad;
     public double velocityRadPerSec;
