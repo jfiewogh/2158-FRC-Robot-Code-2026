@@ -102,13 +102,19 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   LoggedTunableNumber steer_kP = new LoggedTunableNumber("Tuning/Steer_KP", 2.6);
   LoggedTunableNumber steer_kI = new LoggedTunableNumber("Tuning/Steer_KI", 0);
   LoggedTunableNumber steer_kD = new LoggedTunableNumber("Tuning/Steer_KD", 0);
-  LoggedTunableNumber steer_kS = new LoggedTunableNumber("Tuning/Steer_KS", 0.0125);
+  LoggedTunableNumber steer_kS = new LoggedTunableNumber("Tuning/Steer_KS", 0);
   LoggedTunableNumber steer_KV = new LoggedTunableNumber("Tuning/Steer_KV", 0);
+
+  LoggedTunableNumber drive_kP = new LoggedTunableNumber("Tuning/Drive_KP", 2.6);
+  LoggedTunableNumber drive_kI = new LoggedTunableNumber("Tuning/Drive_KI", 0);
+  LoggedTunableNumber drive_kD = new LoggedTunableNumber("Tuning/Drive_KD", 0);
+  LoggedTunableNumber drive_kS = new LoggedTunableNumber("Tuning/Drive_KS", 0);
+  LoggedTunableNumber drive_KV = new LoggedTunableNumber("Tuning/Drive_KV", 0);
 
   protected ModuleIOTalonFX(
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
-    SmartDashboard.putData("Tuning", Commands.runOnce(() -> updateTurnConfigs()));
+    SmartDashboard.putData("Tuning", Commands.runOnce(() -> updateDriveConfigs()));
     this.constants = constants;
 
     driveTalon = new TalonFX(constants.DriveMotorId, DriveConstants.moduleCANBus);
@@ -255,7 +261,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     inputs.turnTorqueCurrentAmps = turnTorqueCurrent.getValueAsDouble();
   }
 
-  public void updateTurnConfigs() {
+  public void updateDriveConfigs() {
     var turnConfig = new TalonFXConfiguration();
     turnConfig.Slot0 =
         new Slot0Configs()
@@ -265,6 +271,16 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
             .withKS(steer_kS.get())
             .withKV(steer_KV.get());
     turnTalon.getConfigurator().apply(turnConfig);
+
+    var driveConfig = new TalonFXConfiguration();
+    driveConfig.Slot0 =
+        new Slot0Configs()
+            .withKP(drive_kP.get())
+            .withKI(drive_kI.get())
+            .withKD(drive_kD.get())
+            .withKS(drive_kS.get())
+            .withKV(drive_KV.get());
+    driveTalon.getConfigurator().apply(driveConfig);
   }
 
   @Override

@@ -79,8 +79,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public static double driveSpeedMultiplier = 1;
-  public static double driveTestMultiplier = 0.6; // For when in testing mode
-  public static double turningMultiplier = 0.85;
+  public static double driveTestMultiplier = 0.7; // For when in testing mode
+  public static double turningMultiplier = 0.95;
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -180,7 +180,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         this::getRobotRelVelocities,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
-            new PIDConstants(3, 0.0, 0.0), new PIDConstants(3, 0.0, 0.0)),
+            new PIDConstants(7.5, 0.0, 2), new PIDConstants(7.5, 0.0, 2)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);

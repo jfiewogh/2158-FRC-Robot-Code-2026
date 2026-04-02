@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
 
@@ -37,7 +38,7 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
 
   // private final VisionIO vision;
   // private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
-  DigitalInput magneticLimit = new DigitalInput(0);
+  DigitalInput magneticLimit = new DigitalInput(0); // id is zero
   Boolean previousValue = false;
 
   public Turret(TurretIO io) { // , VisionIO turretViz) {
@@ -53,12 +54,33 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     io.updateInputs(inputs);
     // vision.updateInputs(visionInputs);
     Logger.processInputs("Turret", inputs);
-    // if (inputs.velocityRadPerSec < 0){
-    //   if (magneticLimit.get() == true && magneticLimit.get() != previousValue){
+    Logger.recordOutput("Turret/Magnetic Limit Switch", magneticLimit.get());
+    // if (inputs.motorVelocityRotationsPerSec < 0) {
+    //   if (magneticLimit.get() == true && magneticLimit.get() != previousValue) {
     //     io.resetAngle(Rotation2d.kZero);
     //     previousValue = magneticLimit.get();
+    //     System.out.println("Zero'd turret");
     //   }
     // }
+
+    // previousValue = magneticLimit.get();
+
+    double gearToCamera = 0.2665;
+    double forward =
+        -0.123
+            + gearToCamera
+                * Math.sin(
+                    Math.toRadians(90) - inputs.positionRad); // meters, forward from robot center
+    double side =
+        gearToCamera
+            * Math.cos(Math.toRadians(90) - inputs.positionRad); // meters, left of robot center
+    double up = 0.331; // meters, up from robot center
+    double roll = 0.0; // degrees
+    double pitch = 15.0; // degrees (e.g. camera tilted down as arm moves)
+    double yaw = 180.0; // degrees
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        "limelight-turret", forward, side, up, roll, pitch, yaw);
     // Logger.processInputs("TurretVision", visionInputs);
 
     // Pose2d pose = LimelightHelpers.getBotPose2d("limelight-turret");
@@ -82,8 +104,12 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
    *
    * @return Absolute turret angle in radians
    */
-  public double getTurretAngle() {
+  public double getTurretRads() {
     return inputs.positionRad;
+  }
+
+  public Rotation2d getTurretRotation2d() {
+    return Rotation2d.fromRadians(inputs.positionRad);
   }
 
   /**
@@ -174,7 +200,7 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     return Commands.run(
         () ->
             io.setDesiredAngle(
-                Rotation2d.fromRadians(getTurretAngle() + angleControl.getAsDouble() * 1)),
+                Rotation2d.fromRadians(getTurretRads() + angleControl.getAsDouble() * 1)),
         this);
   }
 
@@ -209,8 +235,8 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (getTurretAngle() < Units.degreesToRadians(-25)
-                      || getTurretAngle() > Units.degreesToRadians(-15)) {
+                  if (getTurretRads() < Units.degreesToRadians(-25)
+                      || getTurretRads() > Units.degreesToRadians(-15)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
@@ -220,7 +246,7 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Math.abs(getTurretAngle()) > Units.degreesToRadians(5)) {
+                  if (Math.abs(getTurretRads()) > Units.degreesToRadians(5)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }

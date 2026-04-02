@@ -36,12 +36,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.04;
-  private static final double ANGLE_KP = 0.5;
-  private static final double ANGLE_KD = 0.0;
+  private static final LoggedTunableNumber ANGLE_KP =
+      new LoggedTunableNumber("driveAtAngle_kP", 0.5);
+  private static final LoggedTunableNumber ANGLE_KD =
+      new LoggedTunableNumber("driveAtAngle_kD", 0.0);
+  ;
   private static final double ANGLE_MAX_VELOCITY = Math.PI;
   private static final double ANGLE_MAX_ACCELERATION = Math.PI * 2;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -157,9 +161,9 @@ public class DriveCommands {
   // Create PID controller
   public static final ProfiledPIDController angleController =
       new ProfiledPIDController(
-          ANGLE_KP,
+          ANGLE_KP.getAsDouble(),
           0.0,
-          ANGLE_KD,
+          ANGLE_KD.getAsDouble(),
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
   static {
@@ -197,6 +201,11 @@ public class DriveCommands {
     } else {
       desiredRotation = lastFieldRelRotation;
     }
+
+    LoggedTunableNumber.ifChanged(
+        ANGLE_KD.hashCode(), () -> angleController.setD(ANGLE_KD.getAsDouble()), ANGLE_KD);
+    LoggedTunableNumber.ifChanged(
+        ANGLE_KP.hashCode(), () -> angleController.setP(ANGLE_KP.getAsDouble()), ANGLE_KP);
 
     double omega =
         angleController.calculate(drive.getRotation().getRadians(), desiredRotation.getRadians());
@@ -247,14 +256,6 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,
       DoubleSupplier omegaYSupplier) {
-
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     return Commands.run(
         () -> {
@@ -342,13 +343,7 @@ public class DriveCommands {
   }
 
   public static Command robotPointToPose(Drive drive, Pose2d pose) {
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
+    // angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     return Commands.run(
         () -> {

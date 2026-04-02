@@ -129,7 +129,7 @@ public class RobotContainer {
                     new ModuleIOTalonFXReal(TunerConstants.BackRight),
                     (pose) -> {},
                     () -> {
-                      return Rotation2d.fromRadians(turret.getTurretAngle());
+                      return Rotation2d.fromRadians(turret.getTurretRads());
                     });
           } else {
             drive =
@@ -159,7 +159,9 @@ public class RobotContainer {
           // 2));
           vision =
               new Vision(
-                  drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation)
+                  drive,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, turret::getTurretRotation2d)
                   // new VisionIOPhotonVision(
                   // VisionConstants.camera1Name,
                   // () -> {
@@ -244,7 +246,9 @@ public class RobotContainer {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand = ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret);
+      shootCommand =
+          ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret)
+              .finallyDo(() -> turret.setDesiredAngleRobotRelative(Rotation2d.kZero));
       // shootCommand =
       //     Commands.run(
       //             () -> {
@@ -336,6 +340,8 @@ public class RobotContainer {
     autoChooser.addOption("Auto2", AutoBuilder.buildAuto("Auto2"));
     autoChooser.addOption("Auto3", AutoBuilder.buildAuto("Auto3"));
 
+    autoChooser.addOption("Do nothing", AutoBuilder.buildAuto("Do Nothing"));
+    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("justShoot"));
     // Default command, normal field-relative drive
     if (driveEnabled) {
       drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightY, rightX));
@@ -372,6 +378,10 @@ public class RobotContainer {
       case JOYSTICK -> {
         if (driveEnabled) {
           driverController.leftBumper().onTrue(toggleIntakeCommand);
+          operatorController
+              .leftBumper()
+              .onTrue(Commands.runOnce(() -> intake.setRelativeVelocity(-0.35), intake));
+
           // Switch to X pattern when X button is pressed
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 

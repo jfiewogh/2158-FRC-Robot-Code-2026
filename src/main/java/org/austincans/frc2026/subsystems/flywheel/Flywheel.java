@@ -115,15 +115,16 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> io.runVelocity(1)),
-        Commands.waitSeconds(0.3),
+        Commands.run(() -> io.runVelocity(100)).withTimeout(5),
+        Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
               if (getRPM() < 0) {
                 addSubsystemFault(
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
-            }));
+            }),
+        Commands.runOnce(() -> io.runVelocity(0)));
   }
 
   public void stopMotors() {
@@ -142,7 +143,7 @@ public class Flywheel extends AdvancedSubsystem {
   public void runIndexerAndFlywheel(double velocityRPM) {
     io.runVelocity(velocityRPM);
     controller.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.95)
+    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.9)
         && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
       spindexer.set(0.2);
     } else {

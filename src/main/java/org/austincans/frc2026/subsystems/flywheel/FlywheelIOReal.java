@@ -30,7 +30,6 @@ public abstract class FlywheelIOReal implements FlywheelIO {
   //   return laserCan2.getMeasurement().distance_mm < FlywheelConstants.maxDistFromLasarCan2;
   // }
 
-  // // TODO: complete
   // @Override
   // public boolean noGamePiecesToShoot() {
   //   return false;

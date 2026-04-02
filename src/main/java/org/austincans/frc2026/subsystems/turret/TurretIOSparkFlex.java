@@ -15,6 +15,8 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -33,8 +35,9 @@ import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
 
-public class TurretIOSparkFlex extends TurretIOReal {
+public class TurretIOSparkFlex implements TurretIO {
   private final SparkFlex motor;
+  private final CANcoder encoder;
   private final RelativeEncoder relativeEncoder;
   private final SparkClosedLoopController controller;
   private final SelfCheckingSparkFlex selfCheckingMotor;
@@ -59,6 +62,13 @@ public class TurretIOSparkFlex extends TurretIOReal {
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
     motor.configure(
         motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    encoder = new CANcoder(25, new CANBus("rio"));
+
+    // CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
+    // encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    // encoderConfig.MagnetSensor.MagnetOffset = 0.4140625;
+    // encoder.getConfigurator().apply(encoderConfig);
 
     relativeEncoder = motor.getEncoder();
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
@@ -91,12 +101,14 @@ public class TurretIOSparkFlex extends TurretIOReal {
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     // super.updateInputs(inputs);
+    inputs.encoderPosition = encoder.getPosition().getValueAsDouble();
     inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / 10);
     inputs.motorPositionRotations = relativeEncoder.getPosition();
     inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
     inputs.voltage = motor.getBusVoltage();
     inputs.temperatureCelsius = motor.getMotorTemperature();
+    relativeEncoder.setPosition(encoder.getPosition().getValueAsDouble());
   }
 
   @Override

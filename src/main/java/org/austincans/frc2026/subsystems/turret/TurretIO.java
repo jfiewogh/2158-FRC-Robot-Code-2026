@@ -27,10 +27,11 @@ public interface TurretIO {
     public double positionRad = 0.0; // robot relative
     public double velocityRadPerSec = 0.0; // robot relative
     public double motorPositionRotations = 0.0;
-    public double motorVelocityRotationsPerSec;
+    public double motorVelocityRotationsPerSec = 0.0;
     public double voltage = 0.0;
     public double currentAmps = 0.0;
     public double temperatureCelsius = 0.0;
+    public double encoderPosition = 0.0;
   }
 
   public void setVoltage(double voltage);

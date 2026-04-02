@@ -145,10 +145,7 @@ public class ShooterCommands {
               } else {
                 shuttle(drive, flywheel, hood, turret);
               }
-            },
-            flywheel,
-            turret,
-            hood)
+            })
         .finallyDo(
             () -> {
               flywheel.stopMotors();

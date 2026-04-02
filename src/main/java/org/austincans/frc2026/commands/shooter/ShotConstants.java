@@ -41,7 +41,6 @@ public class ShotConstants {
 
   // TODO: make version for sim and for real
 
-
   /* Add empirical data
    * key: distance from target in meters
    */
