@@ -470,7 +470,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   }
 
   public ChassisSpeeds getFieldRelVelocities() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelVelocities(), getGyroRotation());
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelVelocities(), getRotation());
   }
 
   /** Returns the position of each module in radians. */

@@ -98,7 +98,7 @@ public class ShotConstants {
       scoringFlywheelSpeedMap.put(3.0, 4000.0);
       scoringFlywheelSpeedMap.put(3.3, 7500.0);
       scoringFlywheelSpeedMap.put(5.0, 7500.0);
-      scoringTimeOfFlightMap.put(1.5, 1.25);
+      scoringTimeOfFlightMap.put(1.5, 1.0);
       scoringTimeOfFlightMap.put(5.0, 1.25);
     }
   }

@@ -247,7 +247,8 @@ public class RobotContainer {
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
       shootCommand =
-          ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret)
+          ShooterCommands.shootCommand(flywheel, turret, hood, drive)
+              // ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret)
               .finallyDo(() -> turret.setDesiredAngleRobotRelative(Rotation2d.kZero));
       // shootCommand =
       //     Commands.run(
@@ -436,7 +437,7 @@ public class RobotContainer {
           if (turretEnabled) {
             pointToHubCommand = TurretCommands.pointToHub(turret, drive);
 
-            driverController.rightBumper().whileTrue(pointToHubCommand);
+            // driverController.rightBumper().whileTrue(pointToHubCommand);
 
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(

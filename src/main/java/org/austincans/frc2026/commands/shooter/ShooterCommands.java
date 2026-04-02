@@ -122,8 +122,8 @@ public class ShooterCommands {
     // ShotParameters parameters = getShuttleShotParameters(drive);
 
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    flywheel.runIndexerAndFlywheel(7500);
-    hood.setHoodAngle(Rotation2d.fromDegrees(45));
+    flywheel.runIndexerAndFlywheel(6000);
+    hood.setHoodAngle(Rotation2d.fromDegrees(60));
     turret.setDesiredAngleFieldRelative(
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
   }
