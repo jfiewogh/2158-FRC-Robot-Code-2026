@@ -25,7 +25,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -36,7 +35,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -185,15 +183,15 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
-    PathPlannerLogging.setLogActivePathCallback(
-        (activePath) -> {
-          Logger.recordOutput(
-              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-        });
-    PathPlannerLogging.setLogTargetPoseCallback(
-        (targetPose) -> {
-          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-        });
+    // PathPlannerLogging.setLogActivePathCallback(
+    //     (activePath) -> {
+    //       Logger.recordOutput(
+    //           "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+    //     });
+    // PathPlannerLogging.setLogTargetPoseCallback(
+    //     (targetPose) -> {
+    //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+    //     });
 
     // Configure SysId
     sysId =
@@ -297,28 +295,27 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
     // Log 3D robot pose
     Logger.recordOutput(
-        "RobotState/EstimatedPose3d",
-        new Pose3d(RobotState.getInstance().getEstimatedPose())
-            .exp(
-                new Twist3d(
-                    0.0,
-                    0.0,
-                    Math.abs(gyroInputs.pitchPosition.getRadians())
-                        * DriveConstants.trackWidthX
-                        / 2.0,
-                    0.0,
-                    gyroInputs.pitchPosition.getRadians(),
-                    0.0))
-            .exp(
-                new Twist3d(
-                    0.0,
-                    0.0,
-                    Math.abs(gyroInputs.rollPosition.getRadians())
-                        * DriveConstants.trackWidthY
-                        / 2.0,
-                    gyroInputs.rollPosition.getRadians(),
-                    0.0,
-                    0.0)));
+        "RobotState/EstimatedPose3d", new Pose3d(RobotState.getInstance().getEstimatedPose()));
+    // .exp(
+    //     new Twist3d(
+    //         0.0,
+    //         0.0,
+    //         Math.abs(gyroInputs.pitchPosition.getRadians())
+    //             * DriveConstants.trackWidthX
+    //             / 2.0,
+    //         0.0,
+    //         gyroInputs.pitchPosition.getRadians(),
+    //         0.0))
+    // .exp(
+    //     new Twist3d(
+    //         0.0,
+    //         0.0,
+    //         Math.abs(gyroInputs.rollPosition.getRadians())
+    //             * DriveConstants.trackWidthY
+    //             / 2.0,
+    //         gyroInputs.rollPosition.getRadians(),
+    //         0.0,
+    //         0.0)));
     RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
     // Update brake mode
     // Reset movement timer if velocity above threshold

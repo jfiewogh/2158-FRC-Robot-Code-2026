@@ -15,7 +15,6 @@
 
 package org.austincans.frc2026.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -53,6 +52,8 @@ public class TurretCommands {
   // TODO: Add areas where you cannot shoot from (ex. in front of hub in neutral
   // zone, behind tower)
 
+  static double yOff = Units.inchesToMeters(158.32 - 25.62);
+
   public enum TrackingTargets {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
     blueHub(new Translation3d(4.5974, 4.034536, 1.5748)),
@@ -61,11 +62,12 @@ public class TurretCommands {
     redDepotTrench(new Translation3d(11.915394, 0.632968, 0)),
     redLeftTrench(new Translation3d(11.915394, 7.436358, 0)),
 
-    redShuttleLeft(new Translation3d(RebuiltFieldUtils.fieldLength - 1, 3, 0)),
+    redShuttleLeft(new Translation3d(RebuiltFieldUtils.fieldLength - 1, yOff, 0)),
     redShuttleRight(
-        new Translation3d(RebuiltFieldUtils.fieldLength - 1, RebuiltFieldUtils.fieldWidth - 3, 0)),
-    blueShuttleRight(new Translation3d(1, 3, 0)),
-    blueShuttleLeft(new Translation3d(1, RebuiltFieldUtils.fieldWidth - 3, 0));
+        new Translation3d(
+            RebuiltFieldUtils.fieldLength - 1, RebuiltFieldUtils.fieldWidth - yOff, 0)),
+    blueShuttleRight(new Translation3d(1, yOff, 0)),
+    blueShuttleLeft(new Translation3d(1, RebuiltFieldUtils.fieldWidth - yOff, 0));
 
     private final Translation3d targetTranslation3d;
 
@@ -388,9 +390,6 @@ public class TurretCommands {
     turret.setDesiredAngleFieldRelative(turretAngle, drive.getRotation());
     hood.setShotPitchAngle(
         Rotation2d.fromRadians(getHoodAngleFromDistance(distancefromTarget, data)));
-    Logger.recordOutput(
-        "current pos", new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
-    Logger.recordOutput("future Pos", new Pose2d(futureTranslation, Rotation2d.kZero));
   }
 
   private static void shuttle(

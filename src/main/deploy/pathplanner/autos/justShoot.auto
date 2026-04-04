@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "still"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 5.0

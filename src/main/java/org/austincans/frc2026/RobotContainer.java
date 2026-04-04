@@ -105,6 +105,7 @@ public class RobotContainer {
   // auton only
   private Command shuttleCommand;
   private Command shootToHubCommand;
+  private Command otherShootCommand;
 
   LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
@@ -161,7 +162,7 @@ public class RobotContainer {
               new Vision(
                   drive,
                   new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                  new VisionIOLimelight(VisionConstants.camera1Name, turret::getTurretRotation2d)
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation)
                   // new VisionIOPhotonVision(
                   // VisionConstants.camera1Name,
                   // () -> {
@@ -249,7 +250,7 @@ public class RobotContainer {
       shootCommand =
           ShooterCommands.shootCommand(flywheel, turret, hood, drive)
               // ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret)
-              .finallyDo(() -> turret.setDesiredAngleRobotRelative(Rotation2d.kZero));
+              .finallyDo(() -> turret.setDesiredAngleTurretRelative(Rotation2d.kZero));
       // shootCommand =
       //     Commands.run(
       //             () -> {
@@ -263,22 +264,21 @@ public class RobotContainer {
       //         .withTimeout(5);
 
       // this is temporary
-      Command otherShootCommand =
+      otherShootCommand =
           Commands.run(
                   () -> {
-                    flywheel.runIndexerAndFlywheel(7500);
+                    flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
                   },
                   flywheel)
               .finallyDo(
                   () -> {
                     flywheel.stopMotors();
-                  })
-              .withTimeout(5);
-
+                  });
       // shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood,
       // drive);
-      shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
-      NamedCommands.registerCommand("shoot", shootCommand);
+      shuttleCommand = ShooterCommands.shuttleCommand(drive, flywheel, hood, turret);
+      NamedCommands.registerCommand(
+          "shoot", ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret));
       NamedCommands.registerCommand("shuttle", shuttleCommand);
     } else {
       NamedCommands.registerCommand("shoot", Commands.none());
@@ -382,6 +382,13 @@ public class RobotContainer {
           operatorController
               .leftBumper()
               .onTrue(Commands.runOnce(() -> intake.setRelativeVelocity(-0.35), intake));
+          operatorController
+              .rightBumper()
+              .onTrue(
+                  Commands.runOnce(
+                      () -> {
+                        ShooterCommands.staticShooter = !ShooterCommands.staticShooter;
+                      }));
 
           // Switch to X pattern when X button is pressed
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -389,14 +396,8 @@ public class RobotContainer {
           if (flywheelEnabled) {
             // TODO: add flywheel tracking command (indexer at zero speed, flywheel at desired
             // speed)
-
+            operatorController.povDown().whileTrue(otherShootCommand);
             driverController.rightBumper().whileTrue(shootCommand);
-
-            operatorController
-                .rightBumper()
-                .whileTrue(
-                    Commands.run(() -> flywheel.runSpindexer(), flywheel)
-                        .finallyDo(() -> flywheel.stopSpindexer()));
           }
           if (setTurnMode != null) {
             driverController.b().onTrue(setTurnMode);
@@ -419,15 +420,12 @@ public class RobotContainer {
           }
           if (hoodEnabled) {
             // TESTING
-            operatorController.x().onTrue(hood.addToPulseCommand(50));
-            operatorController.b().onTrue(hood.addToPulseCommand(-50));
+            // operatorController.x().onTrue(hood.addToPulseCommand(50));
+            operatorController.x().onTrue(Commands.runOnce(() -> hood.setPulse(1000)));
+            // operatorController.b().onTrue(hood.addToPulseCommand(-50));
 
             // operatorController.leftBumper().onTrue(hood.setPulseCommand(1000));
             // operatorController.rightBumper().onTrue(hood.setPulseCommand(1500));
-
-            operatorController
-                .a()
-                .onTrue(Commands.runOnce(() -> System.out.println(hood.getPulse())));
 
             NamedCommands.registerCommand(
                 "turretAngleFar", Commands.runOnce(() -> hood.setPulse(1150), hood));
@@ -437,14 +435,19 @@ public class RobotContainer {
           if (turretEnabled) {
             pointToHubCommand = TurretCommands.pointToHub(turret, drive);
 
-            // driverController.rightBumper().whileTrue(pointToHubCommand);
+            operatorController.povDown().whileTrue(pointToHubCommand);
+            operatorController
+                .povUp()
+                .whileTrue(
+                    Commands.run(() -> flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble())))
+                .onFalse(Commands.runOnce(() -> flywheel.stopMotors()));
 
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(
                     turret,
                     drive,
-                    () -> operatorController.getRightY(),
-                    () -> operatorController.getRightX()));
+                    () -> -operatorController.getRightY(),
+                    () -> -operatorController.getRightX()));
             operatorController.y().onTrue(turret.resetAngle());
             NamedCommands.registerCommand("point to hub", pointToHubCommand);
             // operatorController

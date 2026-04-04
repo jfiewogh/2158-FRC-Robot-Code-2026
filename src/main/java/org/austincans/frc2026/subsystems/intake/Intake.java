@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIO;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Intake extends AdvancedSubsystem {
   private final IntakeIO intakeIO;
@@ -123,7 +122,7 @@ public class Intake extends AdvancedSubsystem {
       System.out.println("Null pointer deploy");
     }
 
-    Logger.processInputs("Intake", inputs);
+    // Logger.processInputs("Intake", inputs);
   }
 
   public Command systemCheckCommand() {

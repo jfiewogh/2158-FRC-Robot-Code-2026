@@ -52,9 +52,9 @@ public class TurretIOSparkFlex implements TurretIO {
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
-    motorConfig.softLimit.forwardSoftLimit(3.2);
+    motorConfig.softLimit.forwardSoftLimit(3);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);
-    motorConfig.softLimit.reverseSoftLimit(-3.2);
+    motorConfig.softLimit.reverseSoftLimit(-3);
     motorConfig.closedLoop.maxMotion.cruiseVelocity(TurretConstants.maxVelocityRotationsPerSec);
     motorConfig.closedLoop.maxMotion.maxAcceleration(
         TurretConstants.maxAccelerationRotationsPerSecSq);

@@ -19,6 +19,7 @@ import au.grapplerobotics.CanBridge;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
@@ -51,26 +52,26 @@ public class Robot extends LoggedRobot {
 
   public Robot() {
     // Record metadata
-    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    // Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    // Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    // Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    // Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    // Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     SignalLogger.enableAutoLogging(false);
     RobotController.setBrownoutVoltage(6);
     SignalLogger.stop();
     CanBridge.runTCP();
-    switch (BuildConstants.DIRTY) {
-      case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
-        break;
-      case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        break;
-      default:
-        Logger.recordMetadata("GitDirty", "Unknown");
-        break;
-    }
+    // switch (BuildConstants.DIRTY) {
+    //   case 0:
+    //     Logger.recordMetadata("GitDirty", "All changes committed");
+    //     break;
+    //   case 1:
+    //     Logger.recordMetadata("GitDirty", "Uncomitted changes");
+    //     break;
+    //   default:
+    //     Logger.recordMetadata("GitDirty", "Unknown");
+    //     break;
+    // }
 
     // Set up data receivers & replay source
     switch (Constants.currentMode) {
@@ -97,6 +98,16 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+
+    PortForwarder.add(5801, "172.29.1.1", 5801);
+    PortForwarder.add(5802, "172.29.1.1", 5802);
+    PortForwarder.add(5803, "172.29.1.1", 5803);
+    PortForwarder.add(5804, "172.29.1.1", 5804);
+    PortForwarder.add(5805, "172.29.1.1", 5805);
+    PortForwarder.add(5806, "172.29.1.1", 5806);
+    PortForwarder.add(5807, "172.29.1.1", 5807);
+    PortForwarder.add(5808, "172.29.1.1", 5808);
+    PortForwarder.add(5809, "172.29.1.1", 5809);
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.

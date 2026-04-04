@@ -34,7 +34,8 @@ import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 
 /** Commands dealing with turret, hood, and flywheel */
-// TODO: maybe make a ShooterSuperstructure class to handle all. this is low priority
+// TODO: maybe make a ShooterSuperstructure class to handle all. this is low
+// priority
 public class ShooterCommands {
   private static ShotCalculator hubShotCalculator;
   private static final ShotCalculator shuttleShotCalculator;
@@ -92,12 +93,18 @@ public class ShooterCommands {
         parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
 
+  public static boolean staticShooter = false;
+
   public static void shootToHub(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     ShotParameters parameters = getHubShotParameters(drive);
     flywheel.runIndexerAndFlywheel(parameters.flywheelSpeedRPM());
     hood.setHoodAngle(parameters.hoodAngle());
-    turret.setDesiredAngleFieldRelative(
-        parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
+    if (staticShooter) {
+      turret.setDesiredAngleTurretRelative(Rotation2d.kZero);
+    } else {
+      turret.setDesiredAngleFieldRelative(
+          parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
+    }
   }
 
   public static Command shootToHubCommand(
@@ -110,12 +117,14 @@ public class ShooterCommands {
   }
 
   public static void trackShuttle(Drive drive, Hood hood, Turret turret) {
-    // ShotParameters parameters = getShuttleShotParameters(drive);
-    // flywheel.setVelocity(7500);
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    hood.setHoodAngle(Rotation2d.fromDegrees(45));
+    hood.setHoodAngle(Rotation2d.fromDegrees(50));
     turret.setDesiredAngleFieldRelative(
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
+  }
+
+  public static Command shuttleTrackingCommand(Drive drive, Hood hood, Turret turret) {
+    return Commands.run(() -> trackShuttle(drive, hood, turret));
   }
 
   public static void shuttle(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
@@ -149,7 +158,6 @@ public class ShooterCommands {
         .finallyDo(
             () -> {
               flywheel.stopMotors();
-              Drive.driveSpeedMultiplier = 1;
             });
   }
 

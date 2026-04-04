@@ -37,7 +37,8 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
   // private final VisionIO vision;
-  // private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
+  // private final VisionIOInputsAutoLogged visionInputs = new
+  // VisionIOInputsAutoLogged();
   DigitalInput magneticLimit = new DigitalInput(0); // id is zero
   Boolean previousValue = false;
 
@@ -56,31 +57,39 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     Logger.processInputs("Turret", inputs);
     Logger.recordOutput("Turret/Magnetic Limit Switch", magneticLimit.get());
     // if (inputs.motorVelocityRotationsPerSec < 0) {
-    //   if (magneticLimit.get() == true && magneticLimit.get() != previousValue) {
-    //     io.resetAngle(Rotation2d.kZero);
-    //     previousValue = magneticLimit.get();
-    //     System.out.println("Zero'd turret");
-    //   }
+    // if (magneticLimit.get() == true && magneticLimit.get() != previousValue) {
+    // io.resetAngle(Rotation2d.kZero);
+    // previousValue = magneticLimit.get();
+    // System.out.println("Zero'd turret");
+    // }
     // }
 
     // previousValue = magneticLimit.get();
+    Rotation2d ccwPositiveRobotRelYaw =
+        Rotation2d.fromRadians(inputs.positionRad)
+            .unaryMinus()
+            .plus(TurretConstants.robotRelTurretRotationOffset);
 
-    double gearToCamera = 0.2665;
-    double forward =
+    double gearToCameraMeters = 0.2665;
+    double forwardMeters =
         -0.123
-            + gearToCamera
-                * Math.sin(
-                    Math.toRadians(90) - inputs.positionRad); // meters, forward from robot center
-    double side =
-        gearToCamera
-            * Math.cos(Math.toRadians(90) - inputs.positionRad); // meters, left of robot center
-    double up = 0.331; // meters, up from robot center
-    double roll = 0.0; // degrees
-    double pitch = 15.0; // degrees (e.g. camera tilted down as arm moves)
-    double yaw = 180.0; // degrees
+            + gearToCameraMeters
+                * ccwPositiveRobotRelYaw.getCos(); // meters, forward from robot center
+    // right positive
+    // negative because sin of ccw positive is left positive
+    double sideMeters =
+        -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin(); // meters, left of robot center
 
+    double upMeters = 0.331; // meters, up from robot center
+    double rollDeg = 0.0; // degrees
+    double pitchDeg = 15.0; // degrees (e.g. camera tilted down as arm moves)
+    double yawDeg = ccwPositiveRobotRelYaw.getDegrees();
+
+    /*
+     *
+     */
     LimelightHelpers.setCameraPose_RobotSpace(
-        "limelight-turret", forward, side, up, roll, pitch, yaw);
+        "limelight-turret", forwardMeters, sideMeters, upMeters, rollDeg, pitchDeg, yawDeg);
     // Logger.processInputs("TurretVision", visionInputs);
 
     // Pose2d pose = LimelightHelpers.getBotPose2d("limelight-turret");
@@ -156,8 +165,15 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     // .until(() -> magLimitSwitch.get());
   }
 
+  /** relative to turret's zero */
+  public void setDesiredAngleTurretRelative(Rotation2d turretRelAngle) {
+    io.setDesiredAngle(turretRelAngle.unaryMinus());
+  }
+
+  /** relative to robot's zero */
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
-    io.setDesiredAngle(robotRelativeAngle.unaryMinus());
+    io.setDesiredAngle(
+        robotRelativeAngle.unaryMinus().plus(TurretConstants.robotRelTurretRotationOffset));
   }
 
   /**
@@ -172,7 +188,8 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
 
     Logger.recordOutput("Turret angle", desiredAngle);
 
-    // unary minus because turret angle is clockwise positive, while robot rotation is
+    // unary minus because turret angle is clockwise positive, while robot rotation
+    // is
     // counterclockwise positive
     io.setDesiredAngle(
         desiredAngle.unaryMinus().plus(TurretConstants.robotRelTurretRotationOffset));
@@ -259,12 +276,12 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
                 this),
             Commands.waitSeconds(2))
         // Commands.runOnce(
-        //     () -> {
-        //       if (magLimitSwitch.get() != true) {
-        //         addSubsystemFault(
-        //             "TRRT", "[System Check] Turret did not reach it's zero position");
-        //       }
-        //     }))
+        // () -> {
+        // if (magLimitSwitch.get() != true) {
+        // addSubsystemFault(
+        // "TRRT", "[System Check] Turret did not reach it's zero position");
+        // }
+        // }))
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
   }
 

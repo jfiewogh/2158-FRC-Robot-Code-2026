@@ -22,7 +22,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.util.swerve.SwerveSetpoint;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveIOReal implements DriveIO {
   private Module[] modules;
@@ -53,9 +52,9 @@ public class DriveIOReal implements DriveIO {
     SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
 
     // Log unoptimized setpoints and setpoint speeds
-    Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized);
-    Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisSpeeds());
+    // Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized);
+    // Logger.recordOutput("Drive/SwerveStates/Setpoints", setpointStates);
+    // Logger.recordOutput("Drive/SwerveChassisSpeeds/Setpoints", currentSetpoint.chassisSpeeds());
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {

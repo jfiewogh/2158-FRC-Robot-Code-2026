@@ -34,7 +34,6 @@ import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
 
 public class Module extends AdvancedSubsystem {
   private static final LoggedTunableNumber drivekS =
@@ -130,7 +129,7 @@ public class Module extends AdvancedSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     io.checkForFaults().forEach(this::addHardwareFault);
-    Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+    // Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Update tunable numbers
     if (drivekS.hasChanged(hashCode()) || drivekV.hasChanged(hashCode())) {

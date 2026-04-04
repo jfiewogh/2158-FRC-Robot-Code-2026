@@ -63,7 +63,7 @@ public class TurretConstants {
 
   public static final Transform3d robotRelTurretTransform = // relative to robot zero
       new Transform3d(
-          -Units.inchesToMeters(8.140 - (6.875 / 2)), // negative because turret is toward the back
+          -0.123, // negative because turret is toward the back
           0,
           Units.inchesToMeters(18.375 + 5.5), // camera height
           new Rotation3d(Rotation2d.k180deg));
