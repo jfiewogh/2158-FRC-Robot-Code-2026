@@ -20,7 +20,6 @@ import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class FlywheelConstants {
-  // TODO: get from config
   public static final DoubleSupplier kS = new LoggedTunableNumber("Flywheel/kS", 0);
   public static final DoubleSupplier kV = new LoggedTunableNumber("Flywheel/KV", 0);
   public static final DoubleSupplier kA = new LoggedTunableNumber("Flywheel/KA", 0);

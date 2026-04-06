@@ -36,6 +36,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
+
+import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
@@ -251,7 +253,7 @@ public class AutonCommands {
                                       < pathfindEndDistance)
                       .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
               return Commands.deadline(
-                  TurretCommands.shootToHubCommand(flywheel, turret, hood, drive),
+                  ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret),
                   pathfindCommand,
                   updateJoystickHasInputCommand(suppliers));
             },

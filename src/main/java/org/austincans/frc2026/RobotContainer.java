@@ -62,19 +62,6 @@ import org.austincans.lib.util.KeyboardHID;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private Drive drive;
-
-  @SuppressWarnings("unused")
-  private Vision vision;
-
-  private ObjectDetection objectDetection;
-  private Turret turret;
-  private Hood hood;
-  private Intake intake;
-  private Flywheel flywheel;
-  private Led led;
-
   // Subsystem Enabled // only matters for real robot
   private static final boolean driveEnabled = true;
   private static final boolean visionEnabled = true;
@@ -84,6 +71,18 @@ public class RobotContainer {
   private static final boolean intakeEnabled = true;
   private static final boolean flywheelEnabled = true;
   private static final boolean ledEnabled = false;
+
+  // Subsystems
+  private Drive drive;
+  @SuppressWarnings("unused")
+  private Vision vision;
+  private ObjectDetection objectDetection;
+  private Turret turret;
+  private Hood hood;
+  private Intake intake;
+  private Flywheel flywheel;
+  @SuppressWarnings("unused")
+  private Led led;
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -507,9 +506,6 @@ public class RobotContainer {
         keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
         keyboardHID.period().whileTrue(shuttleCommand);
-
-        // Outpost dump
-        keyboardHID.slash().onTrue(Commands.runOnce(() -> {}));
       }
       default -> {}
     }

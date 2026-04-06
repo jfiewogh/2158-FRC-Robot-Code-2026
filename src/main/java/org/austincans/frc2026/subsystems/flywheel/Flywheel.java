@@ -29,7 +29,6 @@ import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
-// NOTE: Sometimes flywheel run velocity does not work
 /*
  * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
  * is an algorithm that uses a series of measurements observed over time, including statistical
@@ -40,19 +39,18 @@ import org.littletonrobotics.junction.Logger;
  * the filter is also provided showing how the filter relates to maximum likelihood statistics.
  * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
  */
-
+/** Flywheel, spindexer, indexer */
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   public static boolean isShooting = false;
   public static boolean isReadyToShoot = false;
-  private final SparkFlex indexer =
-      new SparkFlex((IntakeConstants.indexerID), MotorType.kBrushless);
+  private final SparkFlex indexer = new SparkFlex(IntakeConstants.indexerID, MotorType.kBrushless);
   private final SparkFlex spindexer =
-      new SparkFlex((IntakeConstants.spindexerID), MotorType.kBrushless);
+      new SparkFlex(IntakeConstants.spindexerID, MotorType.kBrushless);
   private final SparkFlexConfig config = new SparkFlexConfig();
 
-  private final SparkClosedLoopController controller = indexer.getClosedLoopController();
+  private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -134,7 +132,7 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public void testing() {
-    controller.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    indexerController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     io.runVelocity(10000);
     // spindexer.stopMotor();
     // indexer.stopMotor();
@@ -142,12 +140,12 @@ public class Flywheel extends AdvancedSubsystem {
 
   public void runIndexerAndFlywheel(double velocityRPM) {
     io.runVelocity(velocityRPM);
-    controller.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.9)
         && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
-      spindexer.set(0.2);
+      spindexer.setVoltage(0.2 * 12);
     } else {
-      spindexer.set(0);
+      spindexer.setVoltage(0);
     }
   }
 }
