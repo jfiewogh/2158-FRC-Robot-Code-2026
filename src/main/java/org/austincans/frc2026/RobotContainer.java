@@ -127,10 +127,7 @@ public class RobotContainer {
                     new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                     new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                     new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                    (pose) -> {},
-                    () -> {
-                      return Rotation2d.fromRadians(turret.getTurretRads());
-                    });
+                    (pose) -> {});
           } else {
             drive =
                 new Drive(
@@ -140,10 +137,7 @@ public class RobotContainer {
                     new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                     new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                     new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                    (pose) -> {},
-                    () -> {
-                      return Rotation2d.kZero;
-                    });
+                    (pose) -> {});
           }
         }
         if (visionEnabled) {
@@ -208,8 +202,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                (pose) -> {},
-                () -> Rotation2d.kZero);
+                (pose) -> {});
         vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
       }
     }

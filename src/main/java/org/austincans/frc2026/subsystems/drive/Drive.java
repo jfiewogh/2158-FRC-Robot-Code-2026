@@ -132,7 +132,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   private final Timer lastMovementTimer = new Timer();
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
-  private Supplier<Rotation2d> turretAngleSupplier;
 
   public static boolean joystickHasInput = false;
 
@@ -149,12 +148,10 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      Consumer<Pose2d> resetSimulationPoseCallBack,
-      Supplier<Rotation2d> turretAngleSupplier) {
+      Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.driveIO = driveIO;
     this.gyroIO = gyroIO;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
-    this.turretAngleSupplier = turretAngleSupplier;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
