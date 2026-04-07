@@ -33,7 +33,20 @@ public abstract interface HoodIO {
     public double velocityRadPerSec;
   }
 
+  public class HoodIOOutputs {
+    public Rotation2d angle = new Rotation2d();
+    public int pulseWidth = 0;
+    public HoodIOOutputsMode mode = HoodIOOutputsMode.ANGLE;
+  }
+
+  public static enum HoodIOOutputsMode {
+    ANGLE,
+    PULSE
+  }
+
   public void updateInputs(HoodIOInputs inputs);
+
+  public void applyOutputs(HoodIOOutputs outputs);
 
   public void setHoodAngle(Rotation2d angle);
 

@@ -130,4 +130,19 @@ public class TurretIOSparkFlex implements TurretIO {
   public void resetAngle(Rotation2d angle) {
     relativeEncoder.setPosition(angle.getRotations() * 10);
   }
+
+  @Override
+  public void applyOutputs(TurretIOOutputs outputs){
+    switch (outputs.mode){
+      case VELOCITY:
+        setVelocity(outputs.velocity);
+        break;
+      case VOLTAGE:
+        setVoltage(outputs.voltage);
+        break;
+      case ANGLE:
+        setDesiredAngle(outputs.angle);
+        break;
+    }
+  }
 }

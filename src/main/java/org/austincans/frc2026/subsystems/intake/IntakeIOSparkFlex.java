@@ -71,4 +71,16 @@ public class IntakeIOSparkFlex implements IntakeIO {
       return faults;
     }
   }
+
+  @Override
+  public void applyOutputs(IntakeIOOutputs outputs) {
+    switch (outputs.mode) {
+      case VELOCITY:
+        setRelativeVelocity(outputs.velocity);
+        break;
+      case VOLTAGE:
+        setVoltage(outputs.voltage);
+        break;
+    }
+  }
 }

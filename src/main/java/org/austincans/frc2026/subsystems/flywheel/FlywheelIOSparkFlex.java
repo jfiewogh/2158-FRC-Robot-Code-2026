@@ -95,4 +95,17 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   public List<SelfChecking> getHardware() {
     return List.of(selfCheckMotor1, selfCheckMotor2);
   }
+
+  @Override
+  public void applyOutputs(FlywheelIOOutputs outputs) {
+    switch (outputs.mode){
+      case VELOCITY:
+        runVelocity(outputs.velocityRPM);
+        break;
+      case VOLTAGE:
+        runVoltage(outputs.voltage);
+        break;
+    }
+  }
+
 }
