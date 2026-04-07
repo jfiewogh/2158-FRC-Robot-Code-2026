@@ -139,4 +139,19 @@ public class TurretIOTalonFX extends TurretIOReal {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'resetAngle'");
   }
+
+  @Override
+  public void applyOutputs(TurretIOOutputs outputs){
+    switch (outputs.mode){
+      case VELOCITY:
+        setVelocity(outputs.velocity);
+        break;
+      case VOLTAGE:
+        setVoltage(outputs.voltage);
+        break;
+      case ANGLE:
+        setDesiredAngle(outputs.angle);
+        break;
+    }
+  }
 }

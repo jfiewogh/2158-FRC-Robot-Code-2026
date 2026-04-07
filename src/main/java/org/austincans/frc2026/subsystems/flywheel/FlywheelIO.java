@@ -28,7 +28,19 @@ public interface FlywheelIO {
     public double temperatureC = 0;
   }
 
+  public class FlywheelIOOutputs {
+    public FlywheelIOOutputsMode mode = FlywheelIOOutputsMode.VELOCITY;
+    public double voltage = 5;
+    public double velocityRPM = 5;
+  }
+
+  public static enum FlywheelIOOutputsMode {
+    VELOCITY,
+    VOLTAGE
+  }
   public default void updateInputs(FlywheelIOInputs inputs) {}
+
+  public default void applyOutputs(FlywheelIOOutputs outputs) {}
 
   public default void runVoltage(double volts) {}
 
@@ -53,4 +65,6 @@ public interface FlywheelIO {
   public default boolean noGamePiecesToShoot() {
     return false;
   }
+
+  
 }

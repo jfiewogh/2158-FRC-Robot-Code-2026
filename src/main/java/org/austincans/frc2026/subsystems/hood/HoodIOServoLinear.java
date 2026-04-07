@@ -61,49 +61,6 @@ public class HoodIOServoLinear implements HoodIO {
     return Rotation2d.fromDegrees(HoodConstants.pwmToAngle.get((double) pulseWidth));
   }
 
-  /** Calculate hood angle from actuator length using law of cosines */
-  // private Rotation2d getAngleFromLength(double lengthMeters) {
-  //   double angleRad =
-  //       Math.acos(
-  //           (pivotToActuatorMountSq + pivotToActuatorEndSq - Math.pow(lengthMeters, 2))
-  //               / (2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters));
-  //   return Rotation2d.fromRadians(angleRad);
-  // }
-
-  // private static double map(double value, double iMin, double iMax, double oMin, double oMax) {
-  //   value = MathUtil.clamp(value, iMin, iMax);
-  //   return oMin + (oMax - oMin) * ((value - iMin) / (iMax - iMin));
-  // }
-
-  // private double getLengthFromPulseWidth(int pulseWidth) {
-  //   return map(
-  //       pulseWidth, minPulseWidth, maxPulseWidth, minActuatorLengthMeters,
-  // maxActuatorLengthMeters);
-  // }
-
-  // private Rotation2d getAngleFromPulseWidth(int pulseWidth) {
-  //   return getAngleFromLength(getLengthFromPulseWidth(pulseWidth));
-  // }
-
-  // private int getPulseWidthFromLength(double length) {
-  //   return (int)
-  //       map(length, minActuatorLengthMeters, maxActuatorLengthMeters, minPulseWidth,
-  // maxPulseWidth);
-  // }
-
-  // private double getLengthFromAngle(Rotation2d angle) {
-  //   // c^2 = a^2 + b^2 - 2ab * cosC. We are solving for c.
-  //   // c = sqrt(b^2 + a^2 - 2ab * cosC)
-  //   return Math.sqrt(
-  //       pivotToActuatorMountSq
-  //           + pivotToActuatorEndSq
-  //           - 2 * pivotToActuatorMountMeters * pivotToActuatorEndMeters * angle.getCos());
-  // }
-
-  // private int getPulseWidthFromAngle(Rotation2d angle) {
-  //   return getPulseWidthFromLength(getLengthFromAngle(angle));
-  // }
-
   @Override
   public List<HardwareFault> checkForFaults() {
     return List.of();
@@ -112,5 +69,17 @@ public class HoodIOServoLinear implements HoodIO {
   @Override
   public List<SelfChecking> getHardware() {
     return List.of();
+  }
+
+  @Override
+  public void applyOutputs(HoodIOOutputs outputs) {
+    switch (outputs.mode){
+      case PULSE:
+        setPulse(outputs.pulseWidth);
+        break;
+      case ANGLE:
+        setHoodAngle(outputs.angle);
+        break;
+    }
   }
 }

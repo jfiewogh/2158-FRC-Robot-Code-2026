@@ -33,7 +33,20 @@ public interface IntakeIO {
     public double intakeTemperatureC = 0;
   }
 
+  public class IntakeIOOutputs {
+    public double velocity = 0;
+    public double voltage = 0;
+    public IntakeIOOutputsMode mode = IntakeIOOutputsMode.VELOCITY;
+  }
+
+  public static enum IntakeIOOutputsMode{
+    VELOCITY,
+    VOLTAGE
+  }
+
   public void updateInputs(IntakeIOInputs inputs);
+
+  public void applyOutputs(IntakeIOOutputs outputs);
 
   // rpm
   public void setRelativeVelocity(double velocity);

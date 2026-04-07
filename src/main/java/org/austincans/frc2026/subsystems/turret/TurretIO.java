@@ -34,6 +34,19 @@ public interface TurretIO {
     public double encoderPosition = 0.0;
   }
 
+  public static enum TurretIOOutputsMode {
+    VOLTAGE,
+    ANGLE,
+    VELOCITY
+  }
+
+  public class TurretIOOutputs{
+    public double voltage = 0;
+    public Rotation2d angle = new Rotation2d();
+    public double velocity = 0;
+    public TurretIOOutputsMode mode = TurretIOOutputsMode.ANGLE;
+  }
+
   public void setVoltage(double voltage);
 
   public void setDesiredAngle(Rotation2d angle);
@@ -41,6 +54,8 @@ public interface TurretIO {
   public void setVelocity(double velocityRadPerSec);
 
   public void updateInputs(TurretIOInputs inputs);
+
+  public void applyOutputs(TurretIOOutputs outputs);
 
   public void resetAngle(Rotation2d pose);
 
