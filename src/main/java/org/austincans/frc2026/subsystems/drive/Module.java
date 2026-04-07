@@ -15,9 +15,18 @@
 
 package org.austincans.frc2026.subsystems.drive;
 
+import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.Robot;
+import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputMode;
+import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputs;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.LoggedTracer;
+import org.austincans.frc2026.util.LoggedTunableNumber;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,11 +38,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.Robot;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2026.util.LoggedTracer;
-import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class Module extends AdvancedSubsystem {
   private static final LoggedTunableNumber drivekS =
@@ -79,6 +83,7 @@ public class Module extends AdvancedSubsystem {
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+  private final ModuleIOOutputs outputs = new ModuleIOOutputs();
   private final int index;
   private final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
@@ -154,6 +159,11 @@ public class Module extends AdvancedSubsystem {
     LoggedTracer.record("Drive/Module" + index);
   }
 
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+    LoggedTracer.record("Drive/Module" + index + "/AfterScheduler");
+  }
+
   /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
   public void runSetpoint(SwerveModuleState state) {
     // Optimize velocity setpoint
@@ -162,8 +172,11 @@ public class Module extends AdvancedSubsystem {
 
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
-    io.setDriveVelocity(speedRadPerSec * speedConstant.get());
-    io.setTurnPosition(state.angle);
+    outputs.mode = ModuleIOOutputMode.DRIVE;
+    outputs.driveVelocityRadPerSec = speedRadPerSec * speedConstant.get();
+    outputs.driveFeedforward = ffModel.calculate(speedRadPerSec);
+    outputs.turnRotation = state.angle;
+    outputs.turnNeutral = Math.abs(state.angle.minus(getAngle()).getDegrees()) < DriveConstants.turnDeadbandDeg;
   }
 
   /**
@@ -177,20 +190,23 @@ public class Module extends AdvancedSubsystem {
 
     // Apply setpoints
     double speedRadPerSec = state.speedMetersPerSecond / DriveConstants.wheelRadius;
-    io.setDriveVelocity(
-        speedRadPerSec * speedConstant.get(),
-        ffModel.calculate(speedRadPerSec) + wheelTorqueNm * drivekT.get());
-    io.setTurnPosition(state.angle);
+    outputs.mode = ModuleIOOutputMode.DRIVE;
+    outputs.driveVelocityRadPerSec = speedRadPerSec * speedConstant.get();
+    outputs.driveFeedforward = ffModel.calculate(speedRadPerSec) + wheelTorqueNm * drivekT.get();
+    outputs.turnRotation = state.angle;
+    outputs.turnNeutral = Math.abs(state.angle.minus(getAngle()).getDegrees()) < DriveConstants.turnDeadbandDeg;
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
   public void runCharacterization(double output) {
-    io.setDriveOpenLoop(output);
-    io.setTurnPosition(Rotation2d.kZero);
+    outputs.mode = ModuleIOOutputMode.CHARACTERIZE;
+    outputs.driveCharacterizationOutput = output;
+    outputs.turnRotation = Rotation2d.kZero;
   }
 
   /** Runs the module with the specified output toward Angular Motions */
   public void runAngularCharacterization(double output) {
+    outputs.mode = ModuleIOOutputMode.CHARACTERIZE;
     io.setDriveOpenLoop(output);
     io.setTurnPosition(
         new Rotation2d(constants.LocationX, constants.LocationY).plus(Rotation2d.kCCW_Pi_2));
@@ -237,9 +253,14 @@ public class Module extends AdvancedSubsystem {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
   }
 
-  /* Sets brake mode to {@code enabled} */
-  public void setBrakeMode(boolean enabled) {
-    io.setBrakeMode(enabled);
+  /** Disables all motor outputs in brake mode */
+  public void brake() {
+    outputs.mode = ModuleIOOutputMode.BRAKE;
+  }
+
+  /** Disables all motor outputs in coast mode */
+  public void coast() {
+    outputs.mode = ModuleIOOutputMode.COAST;
   }
 
   @Override

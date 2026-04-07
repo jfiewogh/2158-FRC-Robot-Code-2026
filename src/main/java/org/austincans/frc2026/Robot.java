@@ -28,6 +28,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.austincans.frc2026.controllers.REVDigitController;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.FullSubsystem;
+import org.austincans.frc2026.util.LoggedTracer;
+import org.austincans.frc2026.util.VirtualSubsystem;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -111,12 +114,18 @@ public class Robot extends LoggedRobot {
     // Switch thread to high priority to improve loop timing
     Threads.setCurrentThreadPriority(true, 99);
 
+    // Reset logged tracer
+    LoggedTracer.reset();
+
+    VirtualSubsystem.runAllPeriodic();
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    VirtualSubsystem.runAllPeriodicAfterScheduler();
+    FullSubsystem.runAllPeriodicAfterScheduler();
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);

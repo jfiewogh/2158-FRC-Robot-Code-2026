@@ -43,8 +43,26 @@ public interface ModuleIO {
     public double turnTorqueCurrentAmps = 0.0;
   }
 
+  public static enum ModuleIOOutputMode {
+    COAST,
+    BRAKE,
+    DRIVE,
+    CHARACTERIZE
+  }
+
+  public static class ModuleIOOutputs {
+    public ModuleIOOutputMode mode = ModuleIOOutputMode.COAST;
+    public double driveVelocityRadPerSec = 0.0;
+    public double driveFeedforward = 0.0;
+    public double driveCharacterizationOutput = 0.0;
+    public Rotation2d turnRotation = Rotation2d.kZero;
+    public boolean turnNeutral = false;
+  }
+
   /** Updates the set of loggable inputs. */
-  default void updateInputs(ModuleIOInputs inputs) {}
+  public default void updateInputs(ModuleIOInputs inputs) {}
+
+  public default void applyOutputs(ModuleIOOutputs outputs) {}
 
   /** Run the drive motor at the specified open loop value. */
   default void setDriveOpenLoop(double output) {}

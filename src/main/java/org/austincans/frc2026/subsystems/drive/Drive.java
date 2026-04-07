@@ -58,7 +58,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import lombok.Setter;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Constants.Mode;
@@ -70,6 +69,7 @@ import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
+import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -293,10 +293,18 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     isDriving = isDriving();
   }
 
+  @Override
+  public void periodicAfterScheduler() {
+    for (Module module : modules) {
+      module.periodicAfterScheduler();
+    }
+    LoggedTracer.record("Drive/PeriodicAfterScheduler");
+  }
+
   /** Set brake mode to {@code enabled} doesn't change brake mode if already set. */
   private void setBrakeMode(boolean enabled) {
     if (brakeModeEnabled != enabled) {
-      Arrays.stream(modules).forEach(module -> module.setBrakeMode(enabled));
+      Arrays.stream(modules).forEach(module -> enabled ? module.brake() : module.coast());
     }
     brakeModeEnabled = enabled;
   }
