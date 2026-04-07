@@ -113,12 +113,10 @@ public class RobotContainer {
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL -> {
-        // Logger.end();
         // Real robot, instantiate hardware IO implementations
         if (driveEnabled) {
           if (turretEnabled) {
             turret = new Turret(new TurretIOSparkFlex());
-            // new VisionIOLimelightTurret("limelight-turret", drive::getRotation, drive));
             drive =
                 new Drive(
                     new DriveIOReal(),
@@ -141,33 +139,11 @@ public class RobotContainer {
           }
         }
         if (visionEnabled) {
-          // toward back of robot is positive x
-          // right is positive
-          // up is positive z
-          // Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
-          // new Translation3d(
-          // Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 +
-          // 5.5));
-          // double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 +
-          // (6.875 /
-          // 2));
           vision =
               new Vision(
                   drive,
                   new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                   new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation)
-                  // new VisionIOPhotonVision(
-                  // VisionConstants.camera1Name,
-                  // () -> {
-                  // Transform3d robotToTurret =
-                  // new Transform3d(
-                  // robotCenterToTurretCenterWithCameraHeightMeters,
-                  // Rotation3d.kZero);
-                  // Transform3d turretCenterToCamera =
-                  // new Transform3d(
-                  // new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
-                  // new Rotation3d(0, 0, turret.getTurretAngle()));
-                  // return robotToTurret.plus(turretCenterToCamera);
                   );
         }
         if (hoodEnabled) {
@@ -241,21 +217,7 @@ public class RobotContainer {
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
       shootCommand =
           ShooterCommands.shootCommand(flywheel, turret, hood, drive)
-              // ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret)
               .finallyDo(() -> turret.setDesiredAngleTurretRelative(Rotation2d.kZero));
-      // shootCommand =
-      //     Commands.run(
-      //             () -> {
-      //               flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
-      //             },
-      //             flywheel)
-      //         .finallyDo(
-      //             () -> {
-      //               flywheel.stopMotors();
-      //             })
-      //         .withTimeout(5);
-
-      // this is temporary
       otherShootCommand =
           Commands.run(
                   () -> {
@@ -266,8 +228,6 @@ public class RobotContainer {
                   () -> {
                     flywheel.stopMotors();
                   });
-      // shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood,
-      // drive);
       shuttleCommand = ShooterCommands.shuttleCommand(drive, flywheel, hood, turret);
       NamedCommands.registerCommand(
           "shoot", ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret));
@@ -355,15 +315,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Lock to 0° when A button is held
-    // controller
-    // .a()
-    // .whileTrue(
-    // DriveCommands.joystickDriveAtAngle(
-    // drive,
-    // () -> -controller.getLeftY(),
-    // () -> -controller.getLeftX(),
-    // () -> new Rotation2d()));
 
     Command pointToHubCommand;
 
@@ -406,9 +357,6 @@ public class RobotContainer {
                 .rightTrigger()
                 .onTrue(intake.retractCommand())
                 .onFalse(intake.endRetractCommand());
-
-            // operatorController.x().onTrue(intake.deployCommand());
-            // operatorController.b().onTrue(intake.retractCommand());
           }
           if (hoodEnabled) {
             // TESTING
@@ -442,12 +390,6 @@ public class RobotContainer {
                     () -> -operatorController.getRightX()));
             operatorController.y().onTrue(turret.resetAngle());
             NamedCommands.registerCommand("point to hub", pointToHubCommand);
-            // operatorController
-            // .rightTrigger()
-            // .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(90)));
-            // operatorController
-            // .start()
-            // .onTrue(turret.setTurretAngleCommand(Rotation2d.fromDegrees(-90)));
           } else {
             NamedCommands.registerCommand("point to hub", Commands.none());
           }
@@ -471,35 +413,32 @@ public class RobotContainer {
           driverController.back().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         }
       }
-      case KEYBOARD -> {
-        // hood.setDefaultCommand(Commands.run(() ->
-        // hood.setVelocity(keyboardHID.middleY()),
-        // hood));
+      // case KEYBOARD -> {
 
-        turret.setDefaultCommand(
-            Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
+      //   turret.setDefaultCommand(
+      //       Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
 
-        keyboardHID
-            .z()
-            .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+      //   keyboardHID
+      //       .z()
+      //       .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
 
-        keyboardHID
-            .x()
-            .whileTrue(
-                Commands.runEnd(
-                    () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
-                    () -> flywheel.setVelocity(0)));
+      //   keyboardHID
+      //       .x()
+      //       .whileTrue(
+      //           Commands.runEnd(
+      //               () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
+      //               () -> flywheel.setVelocity(0)));
 
-        keyboardHID.c().whileTrue(shootToHubCommand);
+      //   keyboardHID.c().whileTrue(shootToHubCommand);
 
-        keyboardHID.v().onTrue(toggleIntakeCommand);
+      //   keyboardHID.v().onTrue(toggleIntakeCommand);
 
-        keyboardHID.m().onTrue(driveAndIntakeCommand);
+      //   keyboardHID.m().onTrue(driveAndIntakeCommand);
 
-        keyboardHID.comma().whileTrue(driveAndScoreCommand);
+      //   keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
-        keyboardHID.period().whileTrue(shuttleCommand);
-      }
+      //   keyboardHID.period().whileTrue(shuttleCommand);
+      // }
       default -> {}
     }
 

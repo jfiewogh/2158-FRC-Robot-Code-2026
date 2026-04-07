@@ -30,9 +30,7 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.FieldConstants;
 import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
-import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
@@ -206,20 +204,5 @@ public class TurretCommands {
         turret);
   }
 
-  public enum TurretMode {
-    STATIC,
-    MOVING
-  }
-
-  private TurretMode turretMode = TurretMode.STATIC;
-
-  // public Command setTurretMode() {
-  // return Commands.runOnce(() -> {
-  // if (TurretMode.STATIC) {
-
-  // } else {
-
-  // }
-  // });
-  // }
+  
 }

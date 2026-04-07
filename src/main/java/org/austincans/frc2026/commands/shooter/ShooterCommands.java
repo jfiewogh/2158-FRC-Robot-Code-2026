@@ -175,7 +175,6 @@ public class ShooterCommands {
             hood)
         .finallyDo(
             () -> {
-              // flywheel.runIndexerAndFlywheel(0);
               Drive.driveSpeedMultiplier = 1;
             });
   }

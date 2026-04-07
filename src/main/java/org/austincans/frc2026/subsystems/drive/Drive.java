@@ -180,15 +180,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
-    // PathPlannerLogging.setLogActivePathCallback(
-    //     (activePath) -> {
-    //       Logger.recordOutput(
-    //           "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-    //     });
-    // PathPlannerLogging.setLogTargetPoseCallback(
-    //     (targetPose) -> {
-    //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-    //     });
 
     // Configure SysId
     sysId =
@@ -222,41 +213,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public void periodic() {
     driveIO.updateInputs(driveInputs);
     Logger.processInputs("Drive/Inputs", driveInputs);
-
-    // Transform3d robotCenterToTurretCenterWithCameraHeightMeters =
-    //     new Transform3d(
-    //         Units.inchesToMeters(8.140 - (6.875 / 2)),
-    //         0,
-    //         Units.inchesToMeters(18.375 + 5.5),
-    //         new Rotation3d(Rotation2d.k180deg));
-    // // Translation3d robotCenterToTurretCenterWithCameraHeightMeters =
-    // // new Translation3d(
-    // //     -Units.inchesToMeters(8.140 - (6.875 / 2)), 0, Units.inchesToMeters(18.375 + 5.5));
-    // double turretHorizontalDistanceToCameraMeters = Units.inchesToMeters(4.84 + (6.875 / 2));
-    // Transform3d turretCenterToCamera =
-    //     new Transform3d(
-    //         new Translation3d(turretHorizontalDistanceToCameraMeters, 0, 0),
-    //         new Rotation3d(0, 0, turretAngleSupplier.get().unaryMinus().getRadians()));
-    // Transform3d robotToCamera =
-    //     robotCenterToTurretCenterWithCameraHeightMeters.plus(turretCenterToCamera);
-    // Pose3d robotRelativeCameraPose = Pose3d.kZero.transformBy(robotToCamera);
-
-    // LimelightHelpers.setCameraPose_RobotSpace(
-    //     "limelight",
-    //     robotRelativeCameraPose.getX(),
-    //     -robotRelativeCameraPose.getY(),
-    //     robotRelativeCameraPose.getZ(),
-    //     0,
-    //     0,
-    //     robotRelativeCameraPose.getRotation().toRotation2d().getRadians() + Math.PI);
-    // Units.radiansToDegrees(
-    //     RobotState.getInstance()
-    //         .getRotation()
-    //         // .minus(Rotation2d.k180deg)
-    //         .plus(turretAngleSupplier.get())
-    //         // .minus(Rotation2d.fromDegrees(90))
-    //         .getRadians()));
-    // turretAngleSupplier.get().plus(Rotation2d.fromDegrees(90)).getRadians());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -293,26 +249,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     // Log 3D robot pose
     Logger.recordOutput(
         "RobotState/EstimatedPose3d", new Pose3d(RobotState.getInstance().getEstimatedPose()));
-    // .exp(
-    //     new Twist3d(
-    //         0.0,
-    //         0.0,
-    //         Math.abs(gyroInputs.pitchPosition.getRadians())
-    //             * DriveConstants.trackWidthX
-    //             / 2.0,
-    //         0.0,
-    //         gyroInputs.pitchPosition.getRadians(),
-    //         0.0))
-    // .exp(
-    //     new Twist3d(
-    //         0.0,
-    //         0.0,
-    //         Math.abs(gyroInputs.rollPosition.getRadians())
-    //             * DriveConstants.trackWidthY
-    //             / 2.0,
-    //         gyroInputs.rollPosition.getRadians(),
-    //         0.0,
-    //         0.0)));
+    
     RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
     // Update brake mode
     // Reset movement timer if velocity above threshold

@@ -51,27 +51,10 @@ public class Robot extends LoggedRobot {
   private AdvancedSubsystem advancedSubsystem;
 
   public Robot() {
-    // Record metadata
-    // Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    // Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    // Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    // Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    // Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
     SignalLogger.enableAutoLogging(false);
     RobotController.setBrownoutVoltage(6);
     SignalLogger.stop();
     CanBridge.runTCP();
-    // switch (BuildConstants.DIRTY) {
-    //   case 0:
-    //     Logger.recordMetadata("GitDirty", "All changes committed");
-    //     break;
-    //   case 1:
-    //     Logger.recordMetadata("GitDirty", "Uncomitted changes");
-    //     break;
-    //   default:
-    //     Logger.recordMetadata("GitDirty", "Unknown");
-    //     break;
-    // }
 
     // Set up data receivers & replay source
     switch (Constants.currentMode) {
@@ -118,9 +101,6 @@ public class Robot extends LoggedRobot {
     lebron.addInstrument(motor1);
     lebron.addInstrument(motor2);
     lebron.loadMusic("LeBlondJames.chrp");
-
-    // CameraServer.startAutomaticCapture(0);
-    // CameraServer.startAutomaticCapture(1);
 
     Threads.setCurrentThreadPriority(true, 10);
   }

@@ -122,7 +122,7 @@ public class Intake extends AdvancedSubsystem {
       System.out.println("Null pointer deploy");
     }
 
-    // Logger.processInputs("Intake", inputs);
+
   }
 
   public Command systemCheckCommand() {
