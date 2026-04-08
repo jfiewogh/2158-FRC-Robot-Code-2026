@@ -99,9 +99,9 @@ public class ShooterCommands {
     ShotParameters parameters = getHubShotParameters(drive);
     flywheel.runIndexerAndFlywheel(parameters.flywheelSpeedRPM());
     hood.setAngle(parameters.hoodAngle());
-    
+
     if (staticShooter) {
-      turret.setDesiredAngleTurretRelative(Rotation2d.kZero);
+      turret.setDesiredAngle(Rotation2d.kZero);
     } else {
       turret.setDesiredAngleFieldRelative(
           parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());

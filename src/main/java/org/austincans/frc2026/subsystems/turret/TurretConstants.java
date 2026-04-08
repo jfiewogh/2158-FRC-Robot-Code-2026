@@ -61,6 +61,7 @@ public class TurretConstants {
   public static final double turretMinimumRotation = -2.8 - 0.453;
   public static final double turretMaxRotation = 3.6 - 0.453;
 
+  // REAL
   public static final Transform3d robotRelTurretTransform = // relative to robot zero
       new Transform3d(
           -0.123, // negative because turret is toward the back
@@ -74,4 +75,6 @@ public class TurretConstants {
 
   public static final Translation3d fieldRelTurretTranslationOffset =
       robotRelTurretTransform.getTranslation().rotateBy(robotRelTurretTransform.getRotation());
+
+  public static final double heightMeters = robotRelTurretTransform.getZ();
 }

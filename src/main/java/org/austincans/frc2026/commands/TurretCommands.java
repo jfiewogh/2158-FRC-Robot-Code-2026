@@ -82,7 +82,7 @@ public class TurretCommands {
   private static final Translation2d TURRET_OFFSET = new Translation2d(0, 0); // meters
   private static final double FLYWHEEL_SHOOT_SPEED = FlywheelConstants.maxRPM;
 
-  private static final double TURRET_HEIGHT = TurretConstants.turretHeightMeters; // meters
+  private static final double TURRET_HEIGHT = TurretConstants.heightMeters; // meters
   public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
@@ -203,6 +203,4 @@ public class TurretCommands {
         },
         turret);
   }
-
-  
 }
