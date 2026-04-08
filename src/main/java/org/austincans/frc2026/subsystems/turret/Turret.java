@@ -32,7 +32,7 @@ import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
 
-public class Turret extends AdvancedSubsystem implements VisionConsumer {
+public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
@@ -283,15 +283,6 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
         // }
         // }))
         .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
-  }
-
-  @Override
-  public void accept(
-      Pose3d visionRobotPoseMeters,
-      double timestampSeconds,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'accept'");
   }
 
   @Override
