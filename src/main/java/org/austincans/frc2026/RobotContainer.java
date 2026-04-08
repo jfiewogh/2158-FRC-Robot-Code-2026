@@ -30,21 +30,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
-import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.drive.*;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
-import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.hood.HoodIOServoLinear;
 import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIOSparkFlex;
 import org.austincans.frc2026.subsystems.intake.roller.Roller;
+import org.austincans.frc2026.subsystems.intake.roller.RollerIOSparkFlex;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -108,7 +106,7 @@ public class RobotContainer {
   // auton only
   private Command shuttleCommand;
   private Command shootToHubCommand;
-  private Command otherShootCommand;
+  private Command testShootCommand;
 
   LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
@@ -214,21 +212,18 @@ public class RobotContainer {
     }
 
     /* Initialize commands */
-
-    // TODO: runIntakeCommand should deploy intake before it can run it
     if (intakeEnabled) {
-      toggleIntakeCommand = intake.toggleIntakeCommand();
+      toggleIntakeCommand = roller.toggleCommand();
 
-      Command runIntakeCommand = Commands.runEnd(
-          () -> intake.setRelativeVelocity(0.3), () -> intake.setRelativeVelocity(0));
+      Command runIntakeCommand = Commands.runEnd(roller::intake, roller::outtake, roller);
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
     } else {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
       shootCommand = ShooterCommands.shootCommand(flywheel, turret, hood, drive)
-          .finallyDo(() -> turret.setDesiredAngleTurretRelative(Rotation2d.kZero));
-      otherShootCommand = Commands.run(
+          .finallyDo(() -> turret.setDesiredAngle(Rotation2d.kZero));
+      testShootCommand = Commands.run(
           () -> {
             flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
           },
@@ -244,20 +239,6 @@ public class RobotContainer {
     } else {
       NamedCommands.registerCommand("shoot", Commands.none());
       NamedCommands.registerCommand("shuttle", Commands.none());
-    }
-    if (driveEnabled && objectDetectionEnabled && intakeEnabled) {
-      driveAndIntakeCommand = AutonCommands.driveToAndIntakeGamePieces(
-          drive, objectDetection, intake, leftX, leftY, rightX, rightY);
-      NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
-    } else {
-      NamedCommands.registerCommand("driveAndIntake", Commands.none());
-    }
-    if (driveEnabled && objectDetectionEnabled && turretEnabled && flywheelEnabled && hoodEnabled) {
-      driveAndScoreCommand = AutonCommands.driveToAndShootIntoHub(
-          drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
-      NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
-    } else {
-      NamedCommands.registerCommand("driveAndScore", Commands.none());
     }
     if (driveEnabled) {
       setTurnMode = DriveCommands.setTurnMode();
@@ -331,9 +312,7 @@ public class RobotContainer {
       case JOYSTICK -> {
         if (driveEnabled) {
           driverController.leftBumper().onTrue(toggleIntakeCommand);
-          operatorController
-              .leftBumper()
-              .onTrue(Commands.runOnce(() -> intake.setRelativeVelocity(-0.35), intake));
+          operatorController.leftBumper().onTrue(roller.outtakeCommand());
           operatorController
               .rightBumper()
               .onTrue(
@@ -346,10 +325,7 @@ public class RobotContainer {
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
           if (flywheelEnabled) {
-            // TODO: add flywheel tracking command (indexer at zero speed, flywheel at
-            // desired
-            // speed)
-            operatorController.povDown().whileTrue(otherShootCommand);
+            operatorController.povDown().whileTrue(testShootCommand);
             driverController.rightBumper().whileTrue(shootCommand);
           }
           if (setTurnMode != null) {
@@ -357,16 +333,13 @@ public class RobotContainer {
           }
 
           if (intakeEnabled) {
-            driverController
-                .leftTrigger()
-                .onTrue(intake.deployCommand())
-                // .onTrue(intake.toggleDeployCommand())
-                .onFalse(intake.stopDeployCommand());
-
+            driverController.leftTrigger()
+                .onTrue(deploy.deployCommand())
+                .onFalse(deploy.stopCommand());
             driverController
                 .rightTrigger()
-                .onTrue(intake.retractCommand())
-                .onFalse(intake.endRetractCommand());
+                .onTrue(deploy.retractCommand())
+                .onFalse(deploy.stopCommand());
           }
           if (hoodEnabled) {
             // TESTING

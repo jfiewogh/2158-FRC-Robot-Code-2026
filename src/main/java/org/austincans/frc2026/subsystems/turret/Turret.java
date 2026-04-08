@@ -41,12 +41,12 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
   // private final VisionIO vision;
   // private final VisionIOInputsAutoLogged visionInputs = new
   // VisionIOInputsAutoLogged();
-  DigitalInput magneticLimit = new DigitalInput(0); // id is zero
-  Boolean previousValue = false;
+  private final DigitalInput magneticLimit = new DigitalInput(0); // id is zero
+  private boolean previousValue = false;
 
   public Turret(TurretIO io) { // , VisionIO turretViz) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
     io.setDesiredAngle(Rotation2d.fromDegrees(0));
     // this.vision = turretViz;
@@ -172,34 +172,25 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     // .until(() -> magLimitSwitch.get());
   }
 
-  /** relative to turret's zero */
-  public void setDesiredAngleTurretRelative(Rotation2d turretRelAngle) {
-    io.setDesiredAngle(turretRelAngle.unaryMinus());
+  /** Relative to turret's zero */
+  public void setDesiredAngle(Rotation2d turretRelAngle) {
+    outputs.angle = turretRelAngle.unaryMinus();
   }
 
-  /** relative to robot's zero */
+  /** Relative to robot's zero */
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
-    io.setDesiredAngle(
-        robotRelativeAngle.unaryMinus().plus(TurretConstants.robotRelTurretRotationOffset));
+    setDesiredAngle(robotRelativeAngle.plus(TurretConstants.robotRelTurretRotationOffset));
   }
 
   /**
    * Set the desired angle of the turret to a field relative angle
-   *
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(
-      Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
-    Rotation2d desiredAngle = fieldRelativeAngle.minus(driveFieldRelRotation);
-
-    Logger.recordOutput("Turret angle", desiredAngle);
-
-    // unary minus because turret angle is clockwise positive, while robot rotation
-    // is
-    // counterclockwise positive
-    io.setDesiredAngle(
-        desiredAngle.unaryMinus().plus(TurretConstants.robotRelTurretRotationOffset));
+  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
+    // unary minus because turret angle is clockwise positive, 
+    // while robot rotation is counterclockwise positive
+    setDesiredAngleRobotRelative(fieldRelativeAngle.minus(driveFieldRelRotation));
   }
 
   /**
@@ -299,9 +290,5 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'accept'");
-  }
-
-  @Override
-  public void periodicAfterScheduler() {
   }
 }

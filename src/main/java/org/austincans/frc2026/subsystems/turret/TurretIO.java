@@ -16,16 +16,14 @@
 package org.austincans.frc2026.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
   @AutoLog
   class TurretIOInputs {
-    public double positionRad = 0.0; // robot relative
-    public double velocityRadPerSec = 0.0; // robot relative
+    public double positionRad = 0.0;
+    public double velocityRadPerSec = 0.0;
     public double motorPositionRotations = 0.0;
     public double motorVelocityRotationsPerSec = 0.0;
     public double voltage = 0.0;
@@ -34,36 +32,22 @@ public interface TurretIO {
     public double encoderPosition = 0.0;
   }
 
-  public static enum TurretIOOutputsMode {
+  public static enum TurretIOOutputMode {
     VOLTAGE,
     ANGLE,
     VELOCITY
   }
 
-  public class TurretIOOutputs{
+  public class TurretIOOutputs {
+    public TurretIOOutputMode mode = TurretIOOutputMode.ANGLE;
+    public Rotation2d angle = Rotation2d.kZero;
     public double voltage = 0;
-    public Rotation2d angle = new Rotation2d();
     public double velocity = 0;
-    public TurretIOOutputsMode mode = TurretIOOutputsMode.ANGLE;
   }
-
-  public void setVoltage(double voltage);
-
-  public void setDesiredAngle(Rotation2d angle);
-
-  public void setVelocity(double velocityRadPerSec);
 
   public void updateInputs(TurretIOInputs inputs);
 
   public void applyOutputs(TurretIOOutputs outputs);
 
-  public void resetAngle(Rotation2d pose);
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

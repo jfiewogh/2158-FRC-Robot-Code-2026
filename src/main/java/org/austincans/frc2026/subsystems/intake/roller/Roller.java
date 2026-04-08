@@ -48,12 +48,20 @@ public class Roller extends AdvancedSubsystem {
         outputs.voltage = 0.0;
     }
 
-    public void toggleIntake() {
+    public void toggle() {
         if (running) {
             stop();
         } else {
             intake();
         }
+    }
+
+    public Command outtakeCommand() {
+        return Commands.runOnce(this::outtake, this);
+    }
+
+    public Command toggleCommand() {
+        return Commands.runOnce(this::toggle, this);
     }
 
     @Override
