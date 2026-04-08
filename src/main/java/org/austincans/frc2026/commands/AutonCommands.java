@@ -31,6 +31,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -277,7 +280,7 @@ public class AutonCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              flywheel.setVelocity(0);
+              flywheel.setVelocity(RotationsPerSecond.of(0));
               System.out.println("end drive score command");
             });
   }

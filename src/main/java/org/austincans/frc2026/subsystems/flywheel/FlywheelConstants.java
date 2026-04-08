@@ -16,6 +16,13 @@
 package org.austincans.frc2026.subsystems.flywheel;
 
 import com.ctre.phoenix6.CANBus;
+
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Time;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 
@@ -35,8 +42,13 @@ public class FlywheelConstants {
   public static final int lasarCan2Id = 1;
   public static final CANBus canBus = new CANBus("*");
 
-  public static final double radiusMeters = 0.0508;
+  public static final Current statorCurrentLimit = Amps.of(70);
+  public static final Current supplyCurrentLimit = Amps.of(50);
 
+  public static final Time flywheelClosedLoopRamp = Seconds.of(0.5);
+  public static final Time flywheelOpenLoopRamp = Seconds.of(0.5);
+
+  public static final double radiusMeters = 0.0508;
   public static final double gearing = 0;
 
   /* SIM */
