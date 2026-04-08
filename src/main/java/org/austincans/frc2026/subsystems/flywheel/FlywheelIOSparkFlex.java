@@ -23,6 +23,18 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
+import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Fahrenheit;
+import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
@@ -57,21 +69,22 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.appliedVolts = motor1.getBusVoltage();
-    inputs.velocityRPM = motor1.getEncoder().getVelocity();
+    inputs.appliedVolts = Volts.of(motor1.getBusVoltage());
+    inputs.velocityRPM = RotationsPerSecond.of(motor1.getEncoder().getVelocity());
     // inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
-    inputs.temperatureC = motor1.getMotorTemperature();
+    inputs.temperature = Fahrenheit.of(motor1.getMotorTemperature());
+    inputs.current = Amps.of(motor1.getOutputCurrent());
   }
 
   @Override
-  public void runVoltage(double volts) {
+  public void runVoltage(Voltage volts) {
     motor1.setVoltage(volts);
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
-    controller.setSetpoint(velocityRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (velocityRPM == 0) {
+  public void runVelocity(AngularVelocity velocity) {
+    controller.setSetpoint(velocity.in(RotationsPerSecond), ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (velocity == RotationsPerSecond.of(0)) {
       controller.setSetpoint(0, ControlType.kDutyCycle);
     }
   }
@@ -100,7 +113,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   public void applyOutputs(FlywheelIOOutputs outputs) {
     switch (outputs.mode){
       case VELOCITY:
-        runVelocity(outputs.velocityRPM);
+        runVelocity(outputs.velocity);
         break;
       case VOLTAGE:
         runVoltage(outputs.voltage);

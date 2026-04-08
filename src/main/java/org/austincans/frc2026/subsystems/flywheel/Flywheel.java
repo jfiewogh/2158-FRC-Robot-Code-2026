@@ -23,10 +23,21 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.EqualsUtil;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /*
@@ -42,6 +53,7 @@ import org.littletonrobotics.junction.Logger;
 /** Flywheel, spindexer, indexer */
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
+  private FlywheelIOOutputs outputs = new FlywheelIOOutputs();
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   public static boolean isShooting = false;
   public static boolean isReadyToShoot = false;
@@ -51,6 +63,11 @@ public class Flywheel extends AdvancedSubsystem {
   private final SparkFlexConfig config = new SparkFlexConfig();
 
   private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
+
+  @Getter
+  @Accessors(fluent = true)
+  @AutoLogOutput(key = "Flywheel/AtGoal")
+  private boolean atGoal = false;
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -74,17 +91,18 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    io.applyOutputs(outputs);
     Logger.processInputs("Flywheel", inputs);
     isShooting = io.isShooting();
     isReadyToShoot = io.readyToShoot();
   }
 
-  public void setVelocity(double velocityRPM) {
-    io.runVelocity(velocityRPM);
+  public void setVelocity(AngularVelocity velocity) {
+    io.runVelocity(velocity);
   }
 
   public double getRPM() {
-    return inputs.velocityRPM;
+    return inputs.velocityRPM.in(RotationsPerSecond) * 60;
   }
 
   public boolean readyToShoot() {
@@ -95,15 +113,9 @@ public class Flywheel extends AdvancedSubsystem {
     return io.isShooting();
   }
 
-  public void runShooter() {
-    indexer.set(-1);
-    io.runVelocity(1);
-    // if (Math.abs(inputs.velocityRPM - indexer.get))
-  }
-
   public void stopShooter() {
     indexer.set(0);
-    io.runVelocity(0);
+    io.runVelocity(RotationsPerSecond.of(0));
   }
 
   public boolean noGamePiecesToShoot() {
@@ -113,7 +125,7 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.run(() -> io.runVelocity(100)).withTimeout(5),
+        Commands.run(() -> io.runVelocity(RotationsPerSecond.of(100))).withTimeout(5),
         Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
@@ -122,26 +134,31 @@ public class Flywheel extends AdvancedSubsystem {
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }),
-        Commands.runOnce(() -> io.runVelocity(0)));
+        Commands.runOnce(() -> io.runVelocity(RotationsPerSecond.of(0))));
   }
 
   public void stopMotors() {
     indexer.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
-    setVelocity(0);
+    setVelocity(RotationsPerSecond.of(0));
     spindexer.set(0);
   }
 
-  public void testing() {
-    indexerController.setSetpoint(3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    io.runVelocity(10000);
-    // spindexer.stopMotor();
-    // indexer.stopMotor();
+  /** Run closed loop at the specified velocity. */
+  private void runVelocity(double velocityRadsPerSec) {
+    double setpointRadPerSec = velocityRadsPerSec;
+    atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadsPerSec, 2.0);
+    outputs.mode = FlywheelIO.FlywheelIOOutputsMode.VELOCITY;
+    outputs.velocity = RotationsPerSecond.of(setpointRadPerSec);
+    Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
+    Logger.recordOutput("Flywheel/Goal", velocityRadsPerSec);
+    // Logger.recordOutput("Flywheel/Feedforward", outputs.feedforward);
   }
 
+
   public void runIndexerAndFlywheel(double velocityRPM) {
-    io.runVelocity(velocityRPM);
+    io.runVelocity(RotationsPerSecond.of(velocityRPM));
     indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocityRPM) > (velocityRPM * 0.9)
+    if (Math.abs(inputs.velocityRPM.in(RotationsPerSecond)) > (velocityRPM * 0.9)
         && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
       spindexer.setVoltage(0.2 * 12);
     } else {
