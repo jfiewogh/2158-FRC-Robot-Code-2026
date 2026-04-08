@@ -15,13 +15,11 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIO.DeployIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Deploy extends AdvancedSubsystem {
   private final DeployIO io;
@@ -37,7 +35,7 @@ public class Deploy extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Intake/Deploy", inputs);
+    // Logger.processInputs("Intake/Deploy", inputs);
   }
 
   @Override
@@ -46,7 +44,7 @@ public class Deploy extends AdvancedSubsystem {
   }
 
   public void deploy() {
-    outputs.voltage = 0.15 * Constants.maxVoltage; 
+    outputs.voltage = 0.15 * Constants.maxVoltage;
   }
 
   public void retract() {

@@ -34,18 +34,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.FieldConstants;
 import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.commands.shooter.ShotCalculator;
-import org.austincans.frc2026.commands.shooter.ShotConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
-import org.austincans.frc2026.util.GeomUtil;
 
 public class DriveCommands {
   public static final double deadband = 0.1;
@@ -83,7 +77,7 @@ public class DriveCommands {
         .getTranslation();
   }
 
-    public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
+  public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
     Drive.joystickHasInput = false;
     for (DoubleSupplier supplier : suppliers) {
       if (Math.abs(supplier.getAsDouble()) >= 0.1) {
@@ -122,7 +116,7 @@ public class DriveCommands {
     boolean isFlipped =
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Red;
-    Logger.recordOutput("flipped", isFlipped);
+    // Logger.recordOutput("flipped", isFlipped);
 
     // Convert to field relative speeds & send command
     ChassisSpeeds speeds =
@@ -280,7 +274,7 @@ public class DriveCommands {
           }
         });
   }
-  
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *

@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.subsystems.hood.HoodIO.HoodIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 /** This is specifically for the 2026 robot */
 public class Hood extends AdvancedSubsystem {
@@ -39,7 +38,7 @@ public class Hood extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Hood/Inputs", inputs);
+    // Logger.processInputs("Hood/Inputs", inputs);
   }
 
   @Override

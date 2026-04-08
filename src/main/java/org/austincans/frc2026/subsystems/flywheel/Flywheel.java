@@ -14,6 +14,11 @@
 // at the root directory of this project.
 
 package org.austincans.frc2026.subsystems.flywheel;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -25,14 +30,13 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.austincans.frc2026.util.EqualsUtil;
 import org.austincans.frc2026.util.LoggedTracer;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -44,11 +48,13 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-  private final SparkFlex indexer = new SparkFlex(FlywheelConstants.indexerId, MotorType.kBrushless);
+  private final SparkFlex indexer =
+      new SparkFlex(FlywheelConstants.indexerId, MotorType.kBrushless);
   private final SparkFlexConfig indexerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
 
-  private final SparkFlex spindexer = new SparkFlex(FlywheelConstants.spindexerId, MotorType.kBrushless);
+  private final SparkFlex spindexer =
+      new SparkFlex(FlywheelConstants.spindexerId, MotorType.kBrushless);
 
   @Getter
   @Accessors(fluent = true)
@@ -60,7 +66,7 @@ public class Flywheel extends AdvancedSubsystem {
     this.io = io;
     io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
-    
+
     indexerConfig.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
     indexerConfig.closedLoop.feedForward.kV(0.00017);
     indexer.configureAsync(
@@ -77,8 +83,10 @@ public class Flywheel extends AdvancedSubsystem {
     atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadPerSec, 2.0);
     Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
     Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
-  }
 
+    Robot.batteryLogger.reportCurrentUsage(
+        "Flywheel", false, inputs.current.in(Amps), inputs.current.in(Amps));
+  }
 
   @Override
   public void periodicAfterScheduler() {
@@ -105,7 +113,8 @@ public class Flywheel extends AdvancedSubsystem {
   public void runIndexerAndFlywheel(double velocityRPM) {
     setVelocity(RPM.of(velocityRPM));
     indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocity.in(RPM)) > (velocityRPM * 0.9) && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
+    if (Math.abs(inputs.velocity.in(RPM)) > (velocityRPM * 0.9)
+        && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
       runSpindexer();
     } else {
       stopSpindexer();

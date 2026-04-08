@@ -18,7 +18,6 @@ package org.austincans.frc2026.subsystems.led;
 import org.austincans.frc2026.subsystems.led.LedConstants.LedState;
 import org.austincans.frc2026.subsystems.led.LedIO.LedIOOutputs;
 import org.austincans.frc2026.util.VirtualSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Led extends VirtualSubsystem {
   private final LedIO io;
@@ -32,7 +31,7 @@ public class Led extends VirtualSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Leds", inputs);
+    // Logger.processInputs("Leds", inputs);
   }
 
   @Override
