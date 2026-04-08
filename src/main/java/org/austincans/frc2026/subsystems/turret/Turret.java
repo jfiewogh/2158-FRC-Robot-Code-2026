@@ -15,13 +15,9 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,7 +26,6 @@ import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.turret.TurretIO.TurretIOOutputs;
 import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
-import org.austincans.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends AdvancedSubsystem {
