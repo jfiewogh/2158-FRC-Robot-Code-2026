@@ -33,11 +33,8 @@ public class TurretConstants {
   public static final DoubleSupplier kS = new LoggedTunableNumber("Turret/kS", 0.0);
   public static final DoubleSupplier kA = new LoggedTunableNumber("Turret/kA", 0.0);
 
-  public static final int turretMotorId = 24;
-  public static final int turretEncoderId = 0;
-
-  public static final double gearing = 1;
-  public static final double turretHeightMeters = Units.inchesToMeters(20);
+  public static final int motorId = 24;
+  public static final double gearing = 10; // 10:1 motor to turret rotations
 
   public static final double maxVelocityRotationsPerSec = 0.2;
   public static final double maxAccelerationRotationsPerSecSq = 1;
@@ -48,8 +45,11 @@ public class TurretConstants {
   public static final double reverseSoftLimit = -3.6 - 0.453;
   public static final boolean isBrakeMode = false;
 
+  public static final int encoderId = 25;
+  public static final double magnetOffset = 0.4140625;
+
   // values only used by TalonFX
-  public static final CANBus turretCANBus = new CANBus("2158_CAN");
+  public static final CANBus canBus = new CANBus("2158_CAN");
 
   // values only used by SparkFlex
   public static final boolean isBrushlessMotor = true;

@@ -23,13 +23,15 @@ public interface TurretIO {
   @AutoLog
   class TurretIOInputs {
     public double positionRad = 0.0;
-    public double velocityRadPerSec = 0.0;
+
     public double motorPositionRotations = 0.0;
     public double motorVelocityRotationsPerSec = 0.0;
     public double voltage = 0.0;
     public double currentAmps = 0.0;
     public double temperatureCelsius = 0.0;
-    public double encoderPosition = 0.0;
+
+    public double encoderPositionRad = 0.0;
+    public double encoderVelocityRadPerSec = 0.0;
   }
 
   public static enum TurretIOOutputMode {
@@ -42,7 +44,7 @@ public interface TurretIO {
     public TurretIOOutputMode mode = TurretIOOutputMode.ANGLE;
     public Rotation2d angle = Rotation2d.kZero;
     public double voltage = 0;
-    public double velocity = 0;
+    public double velocityRadPerSec = 0;
   }
 
   public void updateInputs(TurretIOInputs inputs);
@@ -50,4 +52,6 @@ public interface TurretIO {
   public void applyOutputs(TurretIOOutputs outputs);
 
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
+
+  public void resetAngle(Rotation2d newAngle);
 }

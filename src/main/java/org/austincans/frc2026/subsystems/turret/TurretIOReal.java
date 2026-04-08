@@ -17,7 +17,6 @@ package org.austincans.frc2026.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -26,17 +25,17 @@ public abstract class TurretIOReal implements TurretIO {
   protected final CANcoder encoder;
 
   public TurretIOReal() {
-    encoder = new CANcoder(25, TurretConstants.turretCANBus);
+    encoder = new CANcoder(TurretConstants.encoderId, TurretConstants.canBus);
 
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    encoderConfig.MagnetSensor.MagnetOffset = 0.4140625;
+    encoderConfig.MagnetSensor.MagnetOffset = TurretConstants.magnetOffset;
     encoder.getConfigurator().apply(encoderConfig);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-    inputs.encoderPosition = encoder.getPosition().getValue().in(Radians);
-    inputs.velocityRadPerSec = encoder.getVelocity().getValue().in(RadiansPerSecond);
+    inputs.encoderPositionRad = encoder.getPosition().getValue().in(Radians);
+    inputs.encoderVelocityRadPerSec = encoder.getVelocity().getValue().in(RadiansPerSecond);
   }
 }
