@@ -42,9 +42,9 @@ import org.austincans.frc2026.subsystems.flywheel.FlywheelConstants;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOSparkFlex;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.hood.HoodIOServoLinear;
-import org.austincans.frc2026.subsystems.intake.Intake;
-import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
+import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
 import org.austincans.frc2026.subsystems.intake.deploy.DeployIOSparkFlex;
+import org.austincans.frc2026.subsystems.intake.roller.Roller;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -79,7 +79,8 @@ public class RobotContainer {
   private ObjectDetection objectDetection;
   private Turret turret;
   private Hood hood;
-  private Intake intake;
+  private Roller roller;
+  private Deploy deploy;
   private Flywheel flywheel;
   @SuppressWarnings("unused")
   private Led led;
@@ -152,7 +153,8 @@ public class RobotContainer {
           hood = new Hood(new HoodIOServoLinear());
         }
         if (intakeEnabled) {
-          intake = new Intake(new IntakeIOSparkFlex(), new DeployIOSparkFlex());
+          roller = new Roller(new RollerIOSparkFlex());
+          deploy = new Deploy(new DeployIOSparkFlex());
         }
         if (flywheelEnabled) {
           flywheel = new Flywheel(new FlywheelIOSparkFlex());

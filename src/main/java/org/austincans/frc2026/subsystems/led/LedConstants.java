@@ -17,4 +17,19 @@ package org.austincans.frc2026.subsystems.led;
 
 public class LedConstants {
   public static final int blinkinID = 0;
+
+  public enum LedState {
+    READYTOSHOOT,
+    INTAKED,
+    DRIVING,
+    CLIMBING,
+    SHUTTLING,
+    SHOOTING,
+    ALIGNED,
+    NONE,
+    IDLE,
+    ESTOP,
+    BLUE_ALLIANCE,
+    RED_ALLIANCE
+  }
 }

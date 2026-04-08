@@ -16,22 +16,8 @@
 package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class HoodConstants {
-  static int flexMotorID = 0;
-  static int talonMotorID = 0;
-  static int linearActuatorID = 20;
-  static DoubleSupplier kP = new LoggedTunableNumber("Hood/kP", 0);
-  static DoubleSupplier kI = new LoggedTunableNumber("Hood/kI", 0);
-  static DoubleSupplier kD = new LoggedTunableNumber("Hood/kD", 0);
-  static DoubleSupplier kV = new LoggedTunableNumber("Hood/kV", 0);
-  public static final double rotationalInertiaMetersSq = 0.01;
-  public static final double gearing = 5;
-
-  // public static final double maxAngle = ConfigUtil.getConfigDouble("Max Hood Angle", 45);
-
   public static final InterpolatingDoubleTreeMap angleToPWM = new InterpolatingDoubleTreeMap();
   public static final InterpolatingDoubleTreeMap pwmToAngle = new InterpolatingDoubleTreeMap();
 
@@ -39,7 +25,6 @@ public class HoodConstants {
     // angle is measured from being placed on
     // the metal right above the linear actuator
     // subtract all angles from 90 to get shot angle
-
     angleToPWM.put(90 - 10.9, 1000.0);
     angleToPWM.put(90 - 12.4, 1050.0);
     angleToPWM.put(90 - 14.2, 1100.0);

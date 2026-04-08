@@ -16,25 +16,12 @@
 package org.austincans.frc2026.subsystems.hood;
 
 import com.revrobotics.servohub.ServoChannel.ChannelId;
-import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
 import org.austincans.frc2026.controllers.ServoHubController;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOServoLinear implements HoodIO {
   private final ServoHubController servoHub = new ServoHubController();
   private final ChannelId id = ChannelId.kChannelId0;
-
-  // private final double minPulseWidth = 1000;
-  // private final double maxPulseWidth = 1500;
-  // private final double minActuatorLengthMeters = 0;
-  // private final double maxActuatorLengthMeters = 0.2;
-
-  // private final double pivotToActuatorMountMeters = 0.2;
-  // private final double pivotToActuatorEndMeters = 0.2;
-  // private final double pivotToActuatorMountSq = Math.pow(pivotToActuatorMountMeters, 2);
-  // private final double pivotToActuatorEndSq = Math.pow(pivotToActuatorEndMeters, 2);
 
   public HoodIOServoLinear() {
     setPulse(1000);
@@ -43,43 +30,17 @@ public class HoodIOServoLinear implements HoodIO {
   @Override
   public void updateInputs(HoodIOInputs inputs) {
     inputs.pulseWidth = servoHub.getPulseWidth(id);
-    inputs.hoodAngle = getAngleFromPulseWidth(inputs.pulseWidth);
-    inputs.hoodAngleDeg = inputs.hoodAngle.getDegrees();
   }
 
-  @Override
   public void setPulse(int pulseWidth) {
     servoHub.setPulse(id, pulseWidth);
   }
 
   @Override
-  public void setHoodAngle(Rotation2d angle) {
-    setPulse(HoodConstants.angleToPWM.get(angle.getDegrees()).intValue());
-  }
-
-  private Rotation2d getAngleFromPulseWidth(int pulseWidth) {
-    return Rotation2d.fromDegrees(HoodConstants.pwmToAngle.get((double) pulseWidth));
-  }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of();
-  }
-
-  @Override
   public void applyOutputs(HoodIOOutputs outputs) {
-    switch (outputs.mode){
-      case PULSE:
-        setPulse(outputs.pulseWidth);
-        break;
-      case ANGLE:
-        setHoodAngle(outputs.angle);
-        break;
-    }
+    setPulse(outputs.pulseWidth);
   }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }
