@@ -56,9 +56,12 @@ import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.austincans.lib.util.KeyboardHID;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -109,7 +112,9 @@ public class RobotContainer {
 
   LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -120,34 +125,32 @@ public class RobotContainer {
         if (driveEnabled) {
           if (turretEnabled) {
             turret = new Turret(new TurretIOSparkFlex());
-            drive =
-                new Drive(
-                    new DriveIOReal(),
-                    new GyroIOPigeon2(),
-                    new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                    new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                    new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                    new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                    (pose) -> {});
+            drive = new Drive(
+                new DriveIOReal(),
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                (pose) -> {
+                });
           } else {
-            drive =
-                new Drive(
-                    new DriveIOReal(),
-                    new GyroIOPigeon2(),
-                    new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                    new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                    new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                    new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                    (pose) -> {});
+            drive = new Drive(
+                new DriveIOReal(),
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                (pose) -> {
+                });
           }
         }
         if (visionEnabled) {
-          vision =
-              new Vision(
-                  drive,
-                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation)
-                  );
+          vision = new Vision(
+              drive,
+              new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+              new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
         }
         if (hoodEnabled) {
           hood = new Hood(new HoodIOServoLinear());
@@ -161,12 +164,11 @@ public class RobotContainer {
         }
         if (objectDetectionEnabled) {
           // TODO: add actual limelight name
-          objectDetection =
-              new ObjectDetection(
-                  new ODIOReal(
-                      "limelight",
-                      ObjectDetection.GamePieceType.FUEL,
-                      LimelightConfig.LIMELIGHT_3G));
+          objectDetection = new ObjectDetection(
+              new ODIOReal(
+                  "limelight",
+                  ObjectDetection.GamePieceType.FUEL,
+                  LimelightConfig.LIMELIGHT_3G));
         }
         if (ledEnabled && flywheelEnabled && driveEnabled && intakeEnabled) {
           led = new Led(new LedIOBlinkin());
@@ -174,16 +176,24 @@ public class RobotContainer {
       }
       default -> {
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new DriveIO() {},
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                (pose) -> {});
-        vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+        drive = new Drive(
+            new DriveIO() {
+            },
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            (pose) -> {
+            });
+        vision = new Vision(drive, new VisionIO() {
+        }, new VisionIO() {
+        });
       }
     }
 
@@ -192,9 +202,7 @@ public class RobotContainer {
       case JOYSTICK -> {
         leftX = () -> -driverController.getLeftX() * Drive.driveTestMultiplier;
         leftY = () -> -driverController.getLeftY() * Drive.driveTestMultiplier;
-        rightX =
-            () ->
-                -driverController.getRightX() * Drive.driveTestMultiplier * Drive.turningMultiplier;
+        rightX = () -> -driverController.getRightX() * Drive.driveTestMultiplier * Drive.turningMultiplier;
         rightY = () -> -driverController.getRightY() * Drive.driveTestMultiplier;
       }
       case KEYBOARD -> {
@@ -211,27 +219,24 @@ public class RobotContainer {
     if (intakeEnabled) {
       toggleIntakeCommand = intake.toggleIntakeCommand();
 
-      Command runIntakeCommand =
-          Commands.runEnd(
-              () -> intake.setRelativeVelocity(0.3), () -> intake.setRelativeVelocity(0));
+      Command runIntakeCommand = Commands.runEnd(
+          () -> intake.setRelativeVelocity(0.3), () -> intake.setRelativeVelocity(0));
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
     } else {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand =
-          ShooterCommands.shootCommand(flywheel, turret, hood, drive)
-              .finallyDo(() -> turret.setDesiredAngleTurretRelative(Rotation2d.kZero));
-      otherShootCommand =
-          Commands.run(
-                  () -> {
-                    flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
-                  },
-                  flywheel)
-              .finallyDo(
-                  () -> {
-                    flywheel.stopMotors();
-                  });
+      shootCommand = ShooterCommands.shootCommand(flywheel, turret, hood, drive)
+          .finallyDo(() -> turret.setDesiredAngleTurretRelative(Rotation2d.kZero));
+      otherShootCommand = Commands.run(
+          () -> {
+            flywheel.runIndexerAndFlywheel(flywheelSpeed.getAsDouble());
+          },
+          flywheel)
+          .finallyDo(
+              () -> {
+                flywheel.stopMotors();
+              });
       shuttleCommand = ShooterCommands.shuttleCommand(drive, flywheel, hood, turret);
       NamedCommands.registerCommand(
           "shoot", ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret));
@@ -241,17 +246,15 @@ public class RobotContainer {
       NamedCommands.registerCommand("shuttle", Commands.none());
     }
     if (driveEnabled && objectDetectionEnabled && intakeEnabled) {
-      driveAndIntakeCommand =
-          AutonCommands.driveToAndIntakeGamePieces(
-              drive, objectDetection, intake, leftX, leftY, rightX, rightY);
+      driveAndIntakeCommand = AutonCommands.driveToAndIntakeGamePieces(
+          drive, objectDetection, intake, leftX, leftY, rightX, rightY);
       NamedCommands.registerCommand("driveAndIntake", driveAndIntakeCommand);
     } else {
       NamedCommands.registerCommand("driveAndIntake", Commands.none());
     }
     if (driveEnabled && objectDetectionEnabled && turretEnabled && flywheelEnabled && hoodEnabled) {
-      driveAndScoreCommand =
-          AutonCommands.driveToAndShootIntoHub(
-              drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
+      driveAndScoreCommand = AutonCommands.driveToAndShootIntoHub(
+          drive, turret, flywheel, hood, objectDetection, leftX, leftY, rightX, rightY);
       NamedCommands.registerCommand("driveAndScore", driveAndScoreCommand);
     } else {
       NamedCommands.registerCommand("driveAndScore", Commands.none());
@@ -313,9 +316,11 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
@@ -341,7 +346,8 @@ public class RobotContainer {
           driverController.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
           if (flywheelEnabled) {
-            // TODO: add flywheel tracking command (indexer at zero speed, flywheel at desired
+            // TODO: add flywheel tracking command (indexer at zero speed, flywheel at
+            // desired
             // speed)
             operatorController.povDown().whileTrue(otherShootCommand);
             driverController.rightBumper().whileTrue(shootCommand);
@@ -401,49 +407,50 @@ public class RobotContainer {
           // turret and hood
           // UNTESTED
           if (turretEnabled && hoodEnabled) {
-            // operatorController.a().whileTrue(ShooterCommands.trackCommand(turret, hood, drive));
+            // operatorController.a().whileTrue(ShooterCommands.trackCommand(turret, hood,
+            // drive));
           }
 
           // Reset gyro / odometry
 
-          final Runnable resetGyro =
-              () ->
-                  drive.setPose(
-                      new Pose2d(
-                          drive.getPose().getTranslation(),
-                          DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-                              ? Rotation2d.k180deg
-                              : Rotation2d.kZero)); // zero gyro
+          final Runnable resetGyro = () -> drive.setPose(
+              new Pose2d(
+                  drive.getPose().getTranslation(),
+                  DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
+                      ? Rotation2d.k180deg
+                      : Rotation2d.kZero)); // zero gyro
           driverController.back().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         }
       }
       // case KEYBOARD -> {
 
-      //   turret.setDefaultCommand(
-      //       Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
+      // turret.setDefaultCommand(
+      // Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
 
-      //   keyboardHID
-      //       .z()
-      //       .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive, objectDetection));
+      // keyboardHID
+      // .z()
+      // .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive,
+      // objectDetection));
 
-      //   keyboardHID
-      //       .x()
-      //       .whileTrue(
-      //           Commands.runEnd(
-      //               () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
-      //               () -> flywheel.setVelocity(0)));
+      // keyboardHID
+      // .x()
+      // .whileTrue(
+      // Commands.runEnd(
+      // () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
+      // () -> flywheel.setVelocity(0)));
 
-      //   keyboardHID.c().whileTrue(shootToHubCommand);
+      // keyboardHID.c().whileTrue(shootToHubCommand);
 
-      //   keyboardHID.v().onTrue(toggleIntakeCommand);
+      // keyboardHID.v().onTrue(toggleIntakeCommand);
 
-      //   keyboardHID.m().onTrue(driveAndIntakeCommand);
+      // keyboardHID.m().onTrue(driveAndIntakeCommand);
 
-      //   keyboardHID.comma().whileTrue(driveAndScoreCommand);
+      // keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
-      //   keyboardHID.period().whileTrue(shuttleCommand);
+      // keyboardHID.period().whileTrue(shuttleCommand);
       // }
-      default -> {}
+      default -> {
+      }
     }
 
     SmartDashboard.putData("SeqSystemCheck", AdvancedSubsystem.sequentialCheck());
