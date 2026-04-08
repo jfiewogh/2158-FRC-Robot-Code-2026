@@ -40,7 +40,9 @@ public class FlywheelConstants {
   public static final int encoderId = 0;
   public static final int lasarCan1Id = 0;
   public static final int lasarCan2Id = 1;
-  public static final CANBus canBus = new CANBus("*");
+  public static final int indexerId = 21;
+  public static final int spindexerId = 20;
+  public static final CANBus canBus = new CANBus("2158_CAN");
 
   public static final Current statorCurrentLimit = Amps.of(70);
   public static final Current supplyCurrentLimit = Amps.of(50);

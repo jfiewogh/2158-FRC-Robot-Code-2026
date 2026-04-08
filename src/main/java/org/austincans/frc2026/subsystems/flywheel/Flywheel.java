@@ -14,7 +14,6 @@
 // at the root directory of this project.
 
 package org.austincans.frc2026.subsystems.flywheel;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -23,48 +22,33 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMode;
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
-import org.austincans.frc2026.subsystems.intake.IntakeConstants;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.EqualsUtil;
 import org.austincans.frc2026.util.LoggedTracer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-/*
- * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
- * is an algorithm that uses a series of measurements observed over time, including statistical
- * noise and other inaccuracies, to produce estimates of unknown variables that tend to be more
- * accurate than those based on a single measurement, by estimating a joint probability
- * distribution over the variables for each time-step.
- * The filter is constructed as a mean squared error minimiser, but an alternative derivation of
- * the filter is also provided showing how the filter relates to maximum likelihood statistics.
- * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
- */
-/** Flywheel, spindexer, indexer */
+/** Flywheel, Indexer, and Spindexer Subsystem */
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-  public static boolean isShooting = false;
-  public static boolean isReadyToShoot = false;
-  private final SparkFlex indexer = new SparkFlex(IntakeConstants.indexerID, MotorType.kBrushless);
-  private final SparkFlex spindexer =
-      new SparkFlex(IntakeConstants.spindexerID, MotorType.kBrushless);
-  private final SparkFlexConfig config = new SparkFlexConfig();
-
+  private final SparkFlex indexer = new SparkFlex(FlywheelConstants.indexerId, MotorType.kBrushless);
+  private final SparkFlexConfig indexerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
+
+  private final SparkFlex spindexer = new SparkFlex(FlywheelConstants.spindexerId, MotorType.kBrushless);
 
   @Getter
   @Accessors(fluent = true)
@@ -74,30 +58,27 @@ public class Flywheel extends AdvancedSubsystem {
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
-    config.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
-    config.closedLoop.feedForward.kV(0.00017);
+    
+    indexerConfig.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
+    indexerConfig.closedLoop.feedForward.kV(0.00017);
     indexer.configureAsync(
-        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-  }
-
-  public void runSpindexer() {
-    spindexer.set(0.1);
-  }
-
-  public void stopSpindexer() {
-    spindexer.set(0);
+        indexerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    io.applyOutputs(outputs);
     Logger.processInputs("Flywheel", inputs);
-    isShooting = io.isShooting();
-    isReadyToShoot = io.readyToShoot();
+
+    double velocityRadPerSec = inputs.velocity.in(RPM);
+    double setpointRadPerSec = outputs.velocity.in(RPM);
+    atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadPerSec, 2.0);
+    Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
+    Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
   }
+
 
   @Override
   public void periodicAfterScheduler() {
@@ -105,35 +86,48 @@ public class Flywheel extends AdvancedSubsystem {
     LoggedTracer.record("Flywheel/AfterScheduler");
   }
 
+  /** Run closed loop at the specified velocity. */
   public void setVelocity(AngularVelocity velocity) {
-    io.runVelocity(velocity);
-  }
-
-  public double getRPM() {
-    return inputs.velocityRPM.in(RotationsPerSecond) * 60;
-  }
-
-  public boolean readyToShoot() {
-    return io.readyToShoot();
-  }
-
-  public boolean isShooting() {
-    return io.isShooting();
+    outputs.mode = FlywheelIOOutputMode.VELOCITY;
+    outputs.velocity = velocity;
   }
 
   public void stopShooter() {
-    indexer.set(0);
-    io.runVelocity(RotationsPerSecond.of(0));
+    setVelocity(RPM.of(0));
   }
 
-  public boolean noGamePiecesToShoot() {
-    return io.noGamePiecesToShoot();
+  public void stopMotors() {
+    indexerController.setSetpoint(0, ControlType.kVelocity);
+    setVelocity(RotationsPerSecond.of(0));
+    spindexer.set(0);
+  }
+
+  public void runIndexerAndFlywheel(double velocityRPM) {
+    setVelocity(RPM.of(velocityRPM));
+    indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (Math.abs(inputs.velocity.in(RPM)) > (velocityRPM * 0.9) && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
+      runSpindexer();
+    } else {
+      stopSpindexer();
+    }
+  }
+
+  public void runSpindexer() {
+    spindexer.setVoltage(0.2 * Constants.maxVoltage);
+  }
+
+  public void stopSpindexer() {
+    spindexer.setVoltage(0);
+  }
+
+  public double getRPM() {
+    return inputs.velocity.in(RPM);
   }
 
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.run(() -> io.runVelocity(RotationsPerSecond.of(100))).withTimeout(5),
+        Commands.run(() -> setVelocity(RPM.of(100))).withTimeout(5),
         Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
@@ -142,35 +136,6 @@ public class Flywheel extends AdvancedSubsystem {
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
             }),
-        Commands.runOnce(() -> io.runVelocity(RotationsPerSecond.of(0))));
-  }
-
-  public void stopMotors() {
-    indexer.getClosedLoopController().setSetpoint(0, ControlType.kVelocity);
-    setVelocity(RotationsPerSecond.of(0));
-    spindexer.set(0);
-  }
-
-  /** Run closed loop at the specified velocity. */
-  private void runVelocity(double velocityRadsPerSec) {
-    double setpointRadPerSec = velocityRadsPerSec;
-    atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadsPerSec, 2.0);
-    outputs.mode = FlywheelIO.FlywheelIOOutputsMode.VELOCITY;
-    outputs.velocity = RotationsPerSecond.of(setpointRadPerSec);
-    Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
-    Logger.recordOutput("Flywheel/Goal", velocityRadsPerSec);
-    // Logger.recordOutput("Flywheel/Feedforward", outputs.feedforward);
-  }
-
-
-  public void runIndexerAndFlywheel(double velocityRPM) {
-    io.runVelocity(RotationsPerSecond.of(velocityRPM));
-    indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocityRPM.in(RotationsPerSecond)) > (velocityRPM * 0.9)
-        && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
-      spindexer.setVoltage(0.2 * 12);
-    } else {
-      spindexer.setVoltage(0);
-    }
+        Commands.runOnce(() -> setVelocity(RPM.of(0))));
   }
 }

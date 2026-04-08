@@ -19,47 +19,25 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Fahrenheit;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-
 import java.util.ArrayList;
 import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXPro;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingTalonFXS;
-import org.checkerframework.checker.units.qual.A;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOTalonFX extends FlywheelIOReal {
-  private final TalonFX motor1 = new TalonFX(FlywheelConstants.motor1Id, "2158_CAN");
-  private final SelfCheckingTalonFXPro selfCheckMotor1 = new SelfCheckingTalonFXPro("flywheel motor 1", motor1);
-  private final TalonFX motor2 = new TalonFX(FlywheelConstants.motor2Id, "2158_CAN");
-  private final SelfCheckingTalonFXPro selfCheckMotor2 = new SelfCheckingTalonFXPro("flywheel motor 2", motor2);
+  private final TalonFX motor1 = new TalonFX(FlywheelConstants.motor1Id, FlywheelConstants.canBus);
+  private final TalonFX motor2 = new TalonFX(FlywheelConstants.motor2Id, FlywheelConstants.canBus);
 
   private final StatusSignal<AngularVelocity> flywheelVelocity;
   private final StatusSignal<Voltage> flywheelAppliedVolts;
@@ -112,7 +90,6 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-
     List<BaseStatusSignal> signals = new ArrayList<>();
     signals.add(flywheelVelocity);
     signals.add(flywheelAppliedVolts);
@@ -121,52 +98,36 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
     BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
 
-    inputs.velocityRPM = flywheelVelocity.getValue(); // Convert to RPM
+    inputs.velocity = flywheelVelocity.getValue(); // Convert to RPM
     inputs.appliedVolts = flywheelAppliedVolts.getValue();
     inputs.current = flywheelCurrent.getValue();
     inputs.temperature = flywheelTemp.getValue();
   }
 
-  @Override
-  public void runVoltage(Voltage volts) {
+  private void runVoltage(Voltage volts) {
     motor1.setVoltage(volts.in(Volts));
   }
 
-  @Override
-  public void runVelocity(AngularVelocity velocity) {
+  private void runVelocity(AngularVelocity velocity) {
     final MotionMagicVelocityTorqueCurrentFOC m_request = new MotionMagicVelocityTorqueCurrentFOC(0);
     motor1.setControl(m_request);
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> motorFaults = selfCheckMotor1.checkForFaults();
-    motorFaults.addAll(selfCheckMotor2.checkForFaults());
-    if (motorFaults != null) {
-      faults.addAll(motorFaults);
-    }
-    if (faults.isEmpty()) {
-      return null;
-    } else {
-      return faults;
-    }
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckMotor1, selfCheckMotor2);
-  }
-
-  @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     switch (outputs.mode) {
-      case VELOCITY:
+      case VELOCITY -> {
         runVelocity(outputs.velocity);
-        break;
-      case VOLTAGE:
+      }
+      case VOLTAGE -> {
         runVoltage(outputs.voltage);
-        break;
+      }
     }
+  }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Flywheel Motor 1", motor1);
+    subsystem.registerHardware("Flywheel Motor 2", motor2);
   }
 }

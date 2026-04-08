@@ -20,10 +20,7 @@ import com.ctre.phoenix6.CANBus;
 public class IntakeConstants {
   public static final CANBus intakeCANBus = new CANBus("2158_CAN");
 
-  public static final int deployCanID1 = 26;
-  public static final int deployCanID2 = 27;
-  public static final int intakeCanID = 28;
-
-  public static int indexerID = 21;
-  public static int spindexerID = 20;
+  public static final int deployCanId1 = 26;
+  public static final int deployCanId2 = 27;
+  public static final int intakeCanId = 28;
 }
