@@ -130,6 +130,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       new LoggedTunableNumber("Drive/CoastMetersPerSecThreshold", .05);
 
   private final Timer lastMovementTimer = new Timer();
+  private boolean hasStartedCoast = false;
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
@@ -160,7 +161,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     driveIO.setModules(modules);
     registerCheckCommand(systemCheckCommand());
     lastMovementTimer.start();
-    setBrakeMode(true);
+    brake();
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -217,6 +218,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     gyroIO.checkForFaults().forEach(this::addHardwareFault);
+    LoggedTracer.record("Drive/GyroInputs");
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();
@@ -245,12 +247,11 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.rollPosition : null),
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.pitchPosition : null),
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.yawPosition : null)));
+    RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
 
     // Log 3D robot pose
-    Logger.recordOutput(
-        "RobotState/EstimatedPose3d", new Pose3d(RobotState.getInstance().getEstimatedPose()));
+    Logger.recordOutput("RobotState/EstimatedPose3d", new Pose3d(RobotState.getInstance().getEstimatedPose()));
     
-    RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
     // Update brake mode
     // Reset movement timer if velocity above threshold
     if (Arrays.stream(modules)
@@ -267,22 +268,17 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     switch (coastRequest) {
       case AUTOMATIC -> {
         if (DriverStation.isEnabled()) {
-          setBrakeMode(true);
+          brake();
         } else if (lastMovementTimer.hasElapsed(coastWaitTime.get())) {
-          setBrakeMode(false);
+          coast();
         }
       }
       case ALWAYS_BRAKE -> {
-        setBrakeMode(true);
+        brake();
       }
       case ALWAYS_COAST -> {
-        setBrakeMode(false);
+        coast();
       }
-    }
-
-    // Update current setpoint if not in velocity mode
-    if (!velocityMode) {
-      driveIO.updateSetpoint(new SwerveSetpoint(getRobotRelVelocities(), getModuleStates()));
     }
 
     // Update gyro alert
@@ -301,12 +297,18 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     LoggedTracer.record("Drive/PeriodicAfterScheduler");
   }
 
-  /** Set brake mode to {@code enabled} doesn't change brake mode if already set. */
-  private void setBrakeMode(boolean enabled) {
-    if (brakeModeEnabled != enabled) {
-      Arrays.stream(modules).forEach(module -> enabled ? module.brake() : module.coast());
+  private void brake() {
+    for (Module module : modules) {
+      module.brake();
     }
-    brakeModeEnabled = enabled;
+    brakeModeEnabled = true;
+  }
+
+  private void coast() {
+    for (Module module : modules) {
+      module.coast();
+    }
+    brakeModeEnabled = false;
   }
 
   /**
@@ -335,6 +337,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(output);
     }
+    RobotState.getInstance().setRobotSetpointVelocity(new ChassisSpeeds());
   }
 
   /** Runs the drive in a straight line with the specified drive output. */

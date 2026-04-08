@@ -283,7 +283,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     driveTalon.getConfigurator().apply(driveConfig);
   }
 
-  @Override
   public void setDriveOpenLoop(double output) {
     driveTalon.setControl(
         switch (constants.DriveMotorClosedLoopOutput) {
@@ -292,7 +291,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         });
   }
 
-  @Override
   public void setTurnOpenLoop(double output) {
     turnTalon.setControl(
         switch (constants.SteerMotorClosedLoopOutput) {
@@ -301,7 +299,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         });
   }
 
-  @Override
   public void setDriveVelocity(double wheelVelocityRadPerSec) {
     double motorVelocityRotPerSec =
         Units.radiansToRotations(wheelVelocityRadPerSec) * constants.DriveMotorGearRatio;
@@ -313,7 +310,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         });
   }
 
-  @Override
   public void setTurnPosition(Rotation2d rotation) {
     turnTalon.setControl(
         positionRequest.withPosition(rotation.getRotations())
@@ -325,7 +321,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         );
   }
 
-  @Override
   public List<HardwareFault> checkForFaults() {
     List<HardwareFault> faults = new ArrayList<>();
 

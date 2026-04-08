@@ -25,8 +25,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.intake.IntakeConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.LoggedTracer;
 import org.littletonrobotics.junction.Logger;
 
 /*
@@ -43,6 +45,8 @@ import org.littletonrobotics.junction.Logger;
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+  private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
+
   public static boolean isShooting = false;
   public static boolean isReadyToShoot = false;
   private final SparkFlex indexer = new SparkFlex(IntakeConstants.indexerID, MotorType.kBrushless);
@@ -79,6 +83,12 @@ public class Flywheel extends AdvancedSubsystem {
     isReadyToShoot = io.readyToShoot();
   }
 
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+    LoggedTracer.record("Flywheel/AfterScheduler");
+  }
+
   public void setVelocity(double velocityRPM) {
     io.runVelocity(velocityRPM);
   }
@@ -98,7 +108,6 @@ public class Flywheel extends AdvancedSubsystem {
   public void runShooter() {
     indexer.set(-1);
     io.runVelocity(1);
-    // if (Math.abs(inputs.velocityRPM - indexer.get))
   }
 
   public void stopShooter() {

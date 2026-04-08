@@ -16,6 +16,8 @@
 package org.austincans.frc2026.subsystems.flywheel;
 
 import java.util.List;
+
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -38,9 +40,13 @@ public interface FlywheelIO {
     VELOCITY,
     VOLTAGE
   }
-  public default void updateInputs(FlywheelIOInputs inputs) {}
+  public void updateInputs(FlywheelIOInputs inputs);
 
-  public default void applyOutputs(FlywheelIOOutputs outputs) {}
+  public void applyOutputs(FlywheelIOOutputs outputs);
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
+
+
 
   public default void runVoltage(double volts) {}
 

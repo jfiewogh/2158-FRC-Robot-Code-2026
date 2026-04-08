@@ -128,12 +128,12 @@ public class Module extends AdvancedSubsystem {
         new Alert(
             "Disconnected turn encoder on module " + Integer.toString(index) + ".",
             AlertType.kError);
-    io.getHardware().forEach(e -> registerHardware(e));
+
+    io.registerSelfCheckHardware(this);
   }
 
   public void periodic() {
     io.updateInputs(inputs);
-    io.checkForFaults().forEach(this::addHardwareFault);
     // Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Update tunable numbers

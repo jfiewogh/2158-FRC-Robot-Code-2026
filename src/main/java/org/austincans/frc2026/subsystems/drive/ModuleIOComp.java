@@ -42,6 +42,7 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.austincans.frc2026.subsystems.drive.DriveConstants.ModuleConfig;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.PhoenixUtil;
 
 public class ModuleIOComp implements ModuleIO {
@@ -224,16 +225,35 @@ public class ModuleIOComp implements ModuleIO {
   }
 
   @Override
+  public void applyOutputs(ModuleIOOutputs outputs) {
+    switch (outputs.mode) {
+      case COAST, BRAKE -> {
+        
+      }
+      case DRIVE -> {
+        
+      }
+      case CHARACTERIZE -> {
+
+      }
+    }
+  }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Drive Motor", driveTalon);
+    subsystem.registerHardware("Turn Motor", turnTalon);
+    subsystem.registerHardware("Turn Encoder", encoder);
+  }
+
   public void setDriveOpenLoop(double output) {
     driveTalon.setControl(torqueCurrentRequest.withOutput(output));
   }
 
-  @Override
   public void setTurnOpenLoop(double output) {
     turnTalon.setControl(torqueCurrentRequest.withOutput(output));
   }
 
-  @Override
   public void setDriveVelocity(double velocityRadPerSec, double feedforward) {
     driveTalon.setControl(
         velocityTorqueCurrentRequest
@@ -241,12 +261,10 @@ public class ModuleIOComp implements ModuleIO {
             .withFeedForward(feedforward));
   }
 
-  @Override
   public void setTurnPosition(Rotation2d rotation) {
     turnTalon.setControl(positionTorqueCurrentRequest.withPosition(rotation.getRotations()));
   }
 
-  @Override
   public void setDrivePID(double kP, double kI, double kD) {
     driveConfig.Slot0.kP = kP;
     driveConfig.Slot0.kI = kI;
@@ -254,7 +272,6 @@ public class ModuleIOComp implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
   }
 
-  @Override
   public void setTurnPID(double kP, double kI, double kD) {
     turnConfig.Slot0.kP = kP;
     turnConfig.Slot0.kI = kI;
@@ -262,7 +279,6 @@ public class ModuleIOComp implements ModuleIO {
     tryUntilOk(5, () -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
   }
 
-  @Override
   public void setBrakeMode(boolean enabled) {
     brakeModeExecutor.execute(
         () -> {

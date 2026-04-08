@@ -18,38 +18,22 @@ package org.austincans.frc2026.subsystems.drive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.RobotState;
-import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 
 public class DriveIOReal implements DriveIO {
   private Module[] modules;
-
-  private SwerveSetpoint currentSetpoint =
-      new SwerveSetpoint(
-          new ChassisSpeeds(),
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          });
 
   @Override
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.loopPeriodSecs);
-    SwerveModuleState[] setpointStatesUnoptimized = kinematics.toSwerveModuleStates(discreteSpeeds);
-    currentSetpoint =
-        swerveSetpointGenerator.generateSetpoint(
-            DriveConstants.moduleLimitsFree,
-            currentSetpoint != null
-                ? currentSetpoint
-                : new SwerveSetpoint(new ChassisSpeeds(), getModuleStates()),
-            discreteSpeeds,
-            Constants.loopPeriodSecs);
-    SwerveModuleState[] setpointStates = currentSetpoint.moduleStates();
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.maxLinearSpeed);
+
+    RobotState.getInstance().setRobotSetpointVelocity(discreteSpeeds);
 
     // Log unoptimized setpoints and setpoint speeds
     // Logger.recordOutput("Drive/SwerveStates/SetpointsUnoptimized", setpointStatesUnoptimized);
@@ -71,11 +55,6 @@ public class DriveIOReal implements DriveIO {
   @Override
   public void setModules(Module[] modules) {
     this.modules = modules;
-  }
-
-  @Override
-  public void updateSetpoint(SwerveSetpoint setpoint) {
-    this.currentSetpoint = setpoint;
   }
 
   @Override

@@ -35,10 +35,7 @@ public interface DriveIO {
   }
 
   public static final SwerveDriveKinematics kinematics =
-      new SwerveDriveKinematics(DriveConstants.moduleTranslations);
-
-  public static final SwerveSetpointGenerator swerveSetpointGenerator =
-      new SwerveSetpointGenerator(kinematics, DriveConstants.moduleTranslations);
+    new SwerveDriveKinematics(DriveConstants.moduleTranslations);
 
   public default void updateInputs(DriveIOInputs inputs) {}
 

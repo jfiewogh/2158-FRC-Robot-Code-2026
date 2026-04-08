@@ -17,6 +17,8 @@ package org.austincans.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
+
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
 import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
@@ -52,7 +54,5 @@ public abstract interface HoodIO {
 
   public void setPulse(int pulseWidth);
 
-  public List<HardwareFault> checkForFaults();
-
-  public List<SelfChecking> getHardware();
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }
