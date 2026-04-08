@@ -75,20 +75,7 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
     inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
 
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
-
-    inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
-  }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    return pigeonSelfChecker.checkForFaults();
   }
 }

@@ -344,4 +344,10 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   public List<SelfChecking> getHardware() {
     return List.of(driveTalonSelfCheck, turnTalonSelfCheck);
   }
+
+  @Override
+  public void applyOutputs(ModuleIOOutputs outputs) {
+    setDriveVelocity(outputs.driveVelocityRadPerSec);
+    setTurnPosition(outputs.turnRotation);
+  }
 }

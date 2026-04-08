@@ -20,6 +20,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import java.util.Queue;
 
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
  * CANcoder. Configured using a set of module constants from Phoenix.
@@ -51,5 +53,9 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
     timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
+  }
+
+  @Override
+  public void applyOutputs(ModuleIOOutputs outputs) {
   }
 }

@@ -293,4 +293,8 @@ public class Turret extends AdvancedSubsystem implements VisionConsumer {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'accept'");
   }
+
+  @Override
+  public void periodicAfterScheduler() {
+  }
 }

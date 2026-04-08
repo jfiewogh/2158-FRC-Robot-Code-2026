@@ -58,10 +58,9 @@ public interface ModuleIO {
     public boolean turnNeutral = false;
   }
 
-  /** Updates the set of loggable inputs. */
   public default void updateInputs(ModuleIOInputs inputs) {}
 
   public default void applyOutputs(ModuleIOOutputs outputs) {}
 
-  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
+  public default void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

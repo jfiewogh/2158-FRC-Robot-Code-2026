@@ -66,8 +66,8 @@ public class ShooterCommands {
     ShotInputs inputs =
         new ShotInputs(
             drive.getPose3d(),
-            drive.getRobotRelVelocities(),
-            drive.getFieldRelVelocities(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
             alliance == Alliance.Red
                 ? TrackingTargets.redHub.getTranslation3d()
                 : TrackingTargets.blueHub.getTranslation3d());
@@ -79,8 +79,8 @@ public class ShooterCommands {
     ShotInputs inputs =
         new ShotInputs(
             drive.getPose3d(),
-            drive.getRobotRelVelocities(),
-            drive.getFieldRelVelocities(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
             TurretCommands.getShuttleTarget(drive, alliance).getTranslation3d());
     return shuttleShotCalculator.calculate(inputs);
   }
