@@ -88,7 +88,7 @@ public class ShooterCommands {
   public static void trackHub(Drive drive, Hood hood, Turret turret) {
     ShotParameters parameters = getHubShotParameters(drive);
     // flywheel.setVelocity(parameters.flywheelSpeedRPM());
-    hood.setHoodAngle(parameters.hoodAngle());
+    hood.setAngle(parameters.hoodAngle());
     turret.setDesiredAngleFieldRelative(
         parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
@@ -98,7 +98,8 @@ public class ShooterCommands {
   public static void shootToHub(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     ShotParameters parameters = getHubShotParameters(drive);
     flywheel.runIndexerAndFlywheel(parameters.flywheelSpeedRPM());
-    hood.setHoodAngle(parameters.hoodAngle());
+    hood.setAngle(parameters.hoodAngle());
+    
     if (staticShooter) {
       turret.setDesiredAngleTurretRelative(Rotation2d.kZero);
     } else {
@@ -118,7 +119,7 @@ public class ShooterCommands {
 
   public static void trackShuttle(Drive drive, Hood hood, Turret turret) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    hood.setHoodAngle(Rotation2d.fromDegrees(50));
+    hood.setAngle(Rotation2d.fromDegrees(50));
     turret.setDesiredAngleFieldRelative(
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
   }
@@ -132,7 +133,7 @@ public class ShooterCommands {
 
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
     flywheel.runIndexerAndFlywheel(6000);
-    hood.setHoodAngle(Rotation2d.fromDegrees(60));
+    hood.setAngle(Rotation2d.fromDegrees(60));
     turret.setDesiredAngleFieldRelative(
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
   }

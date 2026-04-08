@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.turret.TurretIO.TurretIOOutputs;
 import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.austincans.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.littletonrobotics.junction.Logger;
@@ -35,6 +36,7 @@ import org.littletonrobotics.junction.Logger;
 public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+  private final TurretIOOutputs outputs = new TurretIOOutputs();
 
   // private final VisionIO vision;
   // private final VisionIOInputsAutoLogged visionInputs = new
@@ -95,6 +97,11 @@ public class Turret extends AdvancedSubsystem {
     // Pose2d pose = LimelightHelpers.getBotPose2d("limelight-turret");
     // Logger.recordOutput("Turret field rel pose", pose);
     // io.resetAngle(pose.getRotation().plus(TurretConstants.robotRelTurretRotationOffset));
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
   }
 
   @Override

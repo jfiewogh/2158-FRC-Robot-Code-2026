@@ -45,7 +45,7 @@ import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
-import org.austincans.frc2026.subsystems.intake.Intake;
+import org.austincans.frc2026.subsystems.intake.roller.Roller;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 
@@ -93,7 +93,7 @@ public class AutonCommands {
   // and the robot continues to drive with its last velocity
 
   public static Command driveToAndIntakeGamePieces(
-      Drive drive, ObjectDetection detection, Intake intake, DoubleSupplier... suppliers) {
+      Drive drive, ObjectDetection detection, Roller roller, DoubleSupplier... suppliers) {
     return Commands.defer(
             () ->
                 // Pathfind (used to navigate quickly to nearest game piece)
@@ -137,14 +137,14 @@ public class AutonCommands {
                                           detection.getNearestGamePiecePose().toPose2d(),
                                           drive.getPose())
                                       < intakeDistanceMeters) {
-                                if (intake.getVelocityRadPerSec() == 0) {
+                                if (!roller.running) {
                                   intakeStartTime = Timer.getFPGATimestamp();
                                 }
-                                intake.setRelativeVelocity(0.5);
+                                roller.intake();
                               }
                             }))
                     .alongWith(Commands.run(() -> updateJoystickHasInputCommand(suppliers))),
-            Set.of(drive, detection, intake))
+            Set.of(drive, detection, roller))
         .beforeStarting(
             () -> {
               System.out.println("start drive intake command");
@@ -171,14 +171,13 @@ public class AutonCommands {
         .onlyWhile(() -> detection.getNearestGamePiecePose() != null)
         .until(
             () ->
-                intake.getVelocityRadPerSec() != 0
-                        && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
+                roller.running && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
                     || Drive.joystickHasInput)
         .finallyDo(
             () -> {
               System.out.println("end drive intake command");
               drive.stop();
-              intake.setRelativeVelocity(0);
+              roller.stop();
               Pathfinding.setDynamicObstacles(List.of(), drive.getPose().getTranslation());
             });
   }

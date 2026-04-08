@@ -15,41 +15,32 @@
 
 package org.austincans.frc2026.subsystems.led;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.austincans.frc2026.commands.TurretCommands;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.flywheel.Flywheel;
-import org.austincans.frc2026.subsystems.intake.Intake;
-import org.austincans.frc2026.subsystems.led.LedIO.LedState;
+import org.austincans.frc2026.subsystems.led.LedConstants.LedState;
+import org.austincans.frc2026.subsystems.led.LedIO.LedIOOutputs;
+import org.austincans.frc2026.util.VirtualSubsystem;
+import org.littletonrobotics.junction.Logger;
 
-public class Led extends SubsystemBase {
+public class Led extends VirtualSubsystem {
   private final LedIO io;
   private final LedIOInputsAutoLogged inputs = new LedIOInputsAutoLogged();
+  private final LedIOOutputs outputs = new LedIOOutputs();
 
   public Led(LedIO io) {
     this.io = io;
   }
 
-  public void updateState() {
-    if (Flywheel.isReadyToShoot) {
-      io.setPattern(LedState.READYTOSHOOT);
-    } else if (Flywheel.isShooting) {
-      io.setPattern(LedState.SHOOTING);
-    } else if (Drive.isDriving) {
-      io.setPattern(LedState.DRIVING);
-    } else if (Intake.deployed) {
-      io.setPattern(LedState.INTAKED);
-    } else if (TurretCommands.isShuttling) {
-      io.setPattern(LedState.SHUTTLING);
-      TurretCommands.isShuttling = false;
-    } else {
-      io.setPattern(LedState.IDLE);
-    }
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Leds", inputs);
   }
 
   @Override
-  public void periodic() {
-    updateState();
-    io.updateInputs(inputs);
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+  }
+
+  public void setState(LedState state) {
+    outputs.state = state;
   }
 }
