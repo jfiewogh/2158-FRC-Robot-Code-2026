@@ -1,36 +1,46 @@
-// Copyright (c) 2026 the ausTIN CANs
-// https://github.com/AusTINCANsProgrammingTeam
+// Copyright (c) 2025-2026 Littleton Robotics
+// http://github.com/Mechanical-Advantage
 //
-// oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
-// `888'     `8 `888   `Y88.  d8P'  `Y8b       `888   `Y88.           "888                   .o8   
-//  888          888   .d88' 888                888   .d88'  .ooooo.   888oooo.   .ooooo.  .o888oo 
-//  888oooo8     888ooo88P'  888                888ooo88P'  d88' `88b  d88' `88b d88' `88b   888   
-//  888    "     888`88b.    888                888`88b.    888   888  888   888 888   888   888   
-//  888          888  `88b.  `88b    ooo        888  `88b.  888   888  888   888 888   888   888 . 
-// o888o        o888o  o888o  `Y8bood8P'       o888o  o888o `Y8bod8P'  `Y8bod8P' `Y8bod8P'   "888" 
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package org.austincans.frc2026;
 
-import au.grapplerobotics.CanBridge;
-import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.math.MathShared;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.austincans.frc2026.controllers.REVDigitController;
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.Constants.Mode;
+import org.austincans.frc2026.Constants.RobotType;
 import org.austincans.frc2026.util.FullSubsystem;
+import org.austincans.frc2026.util.HubShiftUtil;
 import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.VirtualSubsystem;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -38,111 +48,199 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-/**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
- */
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
+  private double autoStart;
+  private boolean autoMessagePrinted;
   private RobotContainer robotContainer;
-  private TalonFX motor1;
-  private TalonFX motor2;
-  private Orchestra lebron;
 
-  private AdvancedSubsystem advancedSubsystem;
+  private final Timer fuelLoggingTimer = new Timer();
+  private static final Timer disabledTimer = new Timer();
 
   public Robot() {
-    SignalLogger.enableAutoLogging(false);
-    RobotController.setBrownoutVoltage(6);
-    SignalLogger.stop();
-    CanBridge.runTCP();
+    super(Constants.loopPeriodSecs);
+
+    // Record metadata
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    Logger.recordMetadata(
+        "GitDirty",
+        switch (BuildConstants.DIRTY) {
+          case 0 -> "All changes committed";
+          case 1 -> "Uncommitted changes";
+          default -> "Unknown";
+        });
+    try {
+      Logger.recordMetadata(
+          "Hostname", InetAddress.getLocalHost().getHostName().replaceAll("\\.local$", ""));
+    } catch (UnknownHostException e) {
+      Logger.recordMetadata("Hostname", "Unknown");
+    }
+    Logger.recordMetadata(
+        "Platform",
+        "%s %s (%s)"
+            .formatted(
+                System.getProperty("os.name").replace(" ", ""),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch")));
 
     // Set up data receivers & replay source
-    switch (Constants.currentMode) {
+    switch (Constants.getMode()) {
       case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda2"));
+        Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
-        Logger.addDataReceiver(new WPILOGWriter());
         break;
 
       case REPLAY:
         // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        String inPath = LogFileUtil.findReplayLog();
+        String outPath = LogFileUtil.addPathSuffix(inPath, "_sim");
+        Logger.setReplaySource(new WPILOGReader(inPath));
+        Logger.addDataReceiver(new WPILOGWriter(outPath));
         break;
     }
+
+    // Set timing mode
+    setUseTiming(Constants.getMode() != Mode.REPLAY);
 
     // Start AdvantageKit logger
     Logger.start();
 
-    PortForwarder.add(5801, "172.29.1.1", 5801);
-    PortForwarder.add(5802, "172.29.1.1", 5802);
-    PortForwarder.add(5803, "172.29.1.1", 5803);
-    PortForwarder.add(5804, "172.29.1.1", 5804);
-    PortForwarder.add(5805, "172.29.1.1", 5805);
-    PortForwarder.add(5806, "172.29.1.1", 5806);
-    PortForwarder.add(5807, "172.29.1.1", 5807);
-    PortForwarder.add(5808, "172.29.1.1", 5808);
-    PortForwarder.add(5809, "172.29.1.1", 5809);
+    // Adjust loop overrun warning timeout
+    try {
+      Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
+      watchdogField.setAccessible(true);
+      Watchdog watchdog = (Watchdog) watchdogField.get(this);
+      watchdog.setTimeout(Constants.loopPeriodWatchdogSecs);
+    } catch (Exception e) {
+      DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
+    }
+    CommandScheduler.getInstance().setPeriod(Constants.loopPeriodWatchdogSecs);
 
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our autonomous chooser on the dashboard.
+    // Silence joystick alerts
+    DriverStation.silenceJoystickConnectionWarning(true);
+
+    // Silence Rotation2d warnings
+    var mathShared = MathSharedStore.getMathShared();
+    MathSharedStore.setMathShared(
+        new MathShared() {
+          @Override
+          public void reportError(String error, StackTraceElement[] stackTrace) {
+            if (error.startsWith("x and y components of Rotation2d are zero")) {
+              return;
+            }
+            mathShared.reportError(error, stackTrace);
+          }
+
+          @Override
+          public void reportUsage(MathUsageId id, int count) {
+            mathShared.reportUsage(id, count);
+          }
+
+          @Override
+          public double getTimestamp() {
+            return mathShared.getTimestamp();
+          }
+        });
+
+    // Log active commands
+    Map<String, Integer> commandCounts = new HashMap<>();
+    BiConsumer<Command, Boolean> logCommandFunction =
+        (Command command, Boolean active) -> {
+          String name = command.getName();
+          int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+          commandCounts.put(name, count);
+          Logger.recordOutput(
+              "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+          Logger.recordOutput("CommandsAll/" + name, count > 0);
+        };
+    CommandScheduler.getInstance()
+        .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
+    CommandScheduler.getInstance()
+        .onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
+
+    // Configure Driver Station for sim
+    RoboRioSim.setTeamNumber(6328);
+    if (Constants.getRobot() == RobotType.SIMBOT) {
+      DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+      DriverStationSim.notifyNewData();
+    }
+
+    // Reset disabled timer
+    disabledTimer.restart();
+
+    // Set up auto logging for RobotState
+    AutoLogOutputManager.addObject(RobotState.getInstance());
+
+    // Instantiate RobotContainer
     robotContainer = new RobotContainer();
-    lebron = new Orchestra();
-    motor1 = new TalonFX(31);
-    motor2 = new TalonFX(32);
-    lebron.addInstrument(motor1);
-    lebron.addInstrument(motor2);
-    lebron.loadMusic("LeBlondJames.chrp");
-
-    Threads.setCurrentThreadPriority(true, 10);
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    // Switch thread to high priority to improve loop timing
-    Threads.setCurrentThreadPriority(true, 99);
 
     // Reset logged tracer
     LoggedTracer.reset();
 
+    // Main periodic functions
     VirtualSubsystem.runAllPeriodic();
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled commands, running already-scheduled commands, removing
-    // finished or interrupted commands, and running subsystem periodic() methods.
-    // This must be called from the robot's periodic block in order for anything in
-    // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    VirtualSubsystem.runAllPeriodicAfterScheduler();
-    FullSubsystem.runAllPeriodicAfterScheduler();
+    LoggedTracer.record("Robot/Commands");
+    AdvancedSubsystem.runAllPeriodicAfterScheduler();
+    LoggedTracer.record("Robot/AfterScheduler");
 
-    // Return to normal thread priority
-    Threads.setCurrentThreadPriority(false, 10);
+    // Reset disabled timer
+    if (DriverStation.isEnabled()) {
+      disabledTimer.restart();
+    }
+
+    // Process throttle state
+    Logger.recordOutput("Throttled", shouldThrottle());
+
+    // Print auto duration
+    if (autonomousCommand != null) {
+      if (!autonomousCommand.isScheduled() && !autoMessagePrinted) {
+        if (DriverStation.isAutonomousEnabled()) {
+          System.out.printf(
+              "*** Auto finished in %.2f secs ***%n", Timer.getTimestamp() - autoStart);
+        } else {
+          System.out.printf(
+              "*** Auto cancelled in %.2f secs ***%n", Timer.getTimestamp() - autoStart);
+        }
+        autoMessagePrinted = true;
+      }
+    }
+
+    // Update RobotContainer dashboard outputs
+    robotContainer.updateDashboardOutputs();
+
+    // Log hub state
+    Logger.recordOutput("HubShift/Official", HubShiftUtil.getOfficialShiftInfo());
+    Logger.recordOutput("HubShift/Shifted", HubShiftUtil.getShiftedShiftInfo());
+
+    // Record cycle time
+    LoggedTracer.record("Robot/Periodic");
   }
 
-  /** Returns whether we should wait to enable because JIT optimizations are in progress. */
-  public static boolean isJITing() {
-    return Timer.getTimestamp() < 45.0;
+  /** Returns whether performance should be throttled to conserve power. */
+  public static boolean shouldThrottle() {
+    return disabledTimer.hasElapsed(5.0);
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {
-    lebron.play();
-    // robotContainer.resetSimulationField();
-    REVDigitController.getInstance().writeDigits("2158");
-  }
+  public void disabledInit() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -151,9 +249,10 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    autoStart = Timer.getTimestamp();
+    autoMessagePrinted = false;
     autonomousCommand = robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
@@ -161,17 +260,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    if (RobotBase.isSimulation()) {}
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
@@ -179,18 +272,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    if (REVDigitController.getInstance().getA() && REVDigitController.getInstance().getB()) {
-      AdvancedSubsystem.sequentialCheck();
-    }
-  }
+  public void teleopPeriodic() {}
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+  public void testInit() {}
 
   /** This function is called periodically during test mode. */
   @Override

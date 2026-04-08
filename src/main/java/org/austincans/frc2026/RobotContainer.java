@@ -19,6 +19,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -30,6 +32,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
+
+import org.austincans.frc2026.FieldConstants.AprilTagLayoutType;
+import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.commands.shooter.ShooterCommands;
@@ -50,6 +55,7 @@ import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
 import org.austincans.frc2026.subsystems.vision.*;
 import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
+import org.austincans.frc2026.util.HubShiftUtil;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.austincans.lib.util.KeyboardHID;
 
@@ -85,6 +91,11 @@ public class RobotContainer {
   private Flywheel flywheel;
   @SuppressWarnings("unused")
   private Led led;
+
+  // Alerts
+  private final Alert primaryDisconnected = new Alert("Primary controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert secondaryDisconnected = new Alert("Secondary controller disconnected (port 1).",
+      AlertType.kWarning);
 
   // Controller
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -437,5 +448,26 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // return AutoBuilder.buildAuto("shoot");
     return autoChooser.getSelected();
+  }
+
+  /** Update dashboard outputs. */
+  public void updateDashboardOutputs() {
+    // Publish match time
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+    // Update from HubShiftUtil
+    SmartDashboard.putString(
+        "Shifts/Remaining Shift Time",
+        String.format("%.1f", Math.max(HubShiftUtil.getShiftedShiftInfo().remainingTime(), 0.0)));
+    SmartDashboard.putBoolean("Shifts/Shift Active", HubShiftUtil.getShiftedShiftInfo().active());
+    SmartDashboard.putString(
+        "Shifts/Game State", HubShiftUtil.getShiftedShiftInfo().currentShift().toString());
+    SmartDashboard.putBoolean(
+        "Shifts/Active First?",
+        DriverStation.getAlliance().orElse(Alliance.Blue) == HubShiftUtil.getFirstActiveAlliance());
+
+    // Controller disconnected alerts
+    primaryDisconnected.set(!DriverStation.isJoystickConnected(driverController.getHID().getPort()));
+    secondaryDisconnected.set(!DriverStation.isJoystickConnected(operatorController.getHID().getPort()));
   }
 }
