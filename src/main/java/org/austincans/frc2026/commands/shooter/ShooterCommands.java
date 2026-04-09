@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
+import java.util.Optional;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.commands.TurretCommands;
@@ -109,12 +111,22 @@ public class ShooterCommands {
   }
 
   public static Command shootToHubCommand(
-      Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
-    return Commands.run(() -> shootToHub(drive, flywheel, hood, turret))
-        .finallyDo(
-            () -> {
-              flywheel.stopMotors();
-            });
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    return flywheel
+        .flatMap(
+            (f) ->
+                hood.flatMap(
+                    (h) ->
+                        turret.flatMap(
+                            (t) ->
+                                drive.map(
+                                    (d) ->
+                                        Commands.run(() -> shootToHub(d, f, h, t), d, f, h, t)
+                                            .finallyDo(f::stopMotors)))))
+        .orElse((WrapperCommand) Commands.none());
   }
 
   public static void trackShuttle(Drive drive, Hood hood, Turret turret) {
@@ -138,28 +150,57 @@ public class ShooterCommands {
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
   }
 
-  public static Command shuttleCommand(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
-    return Commands.run(() -> shuttle(drive, flywheel, hood, turret))
-        .finallyDo(
-            () -> {
-              flywheel.stopMotors();
-            });
+  public static Command shuttleCommand(
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    return flywheel
+        .flatMap(
+            (f) ->
+                hood.flatMap(
+                    (h) ->
+                        turret.flatMap(
+                            (t) ->
+                                drive.map(
+                                    (d) ->
+                                        Commands.run(() -> shuttle(d, f, h, t), d, f, h, t)
+                                            .finallyDo(f::stopMotors)))))
+        .orElse((WrapperCommand) Commands.none());
   }
 
-  public static Command shootCommand(Flywheel flywheel, Turret turret, Hood hood, Drive drive) {
-    return Commands.run(
-            () -> {
-              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-              if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-                shootToHub(drive, flywheel, hood, turret);
-              } else {
-                shuttle(drive, flywheel, hood, turret);
-              }
-            })
-        .finallyDo(
-            () -> {
-              flywheel.stopMotors();
-            });
+  public static Command shootCommand(
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    return flywheel
+        .flatMap(
+            (f) ->
+                hood.flatMap(
+                    (h) ->
+                        turret.flatMap(
+                            (t) ->
+                                drive.map(
+                                    (d) ->
+                                        Commands.run(
+                                                () -> {
+                                                  Alliance alliance =
+                                                      DriverStation.getAlliance()
+                                                          .orElse(Alliance.Red);
+                                                  if (RebuiltFieldUtils.isInAllianceZone(
+                                                      alliance, d.getPose())) {
+                                                    shootToHub(d, f, h, t);
+                                                  } else {
+                                                    shuttle(d, f, h, t);
+                                                  }
+                                                },
+                                                d,
+                                                f,
+                                                h,
+                                                t)
+                                            .finallyDo(f::stopMotors)))))
+        .orElse((WrapperCommand) Commands.none());
   }
 
   public static Command trackCommand(Turret turret, Hood hood, Drive drive) {
@@ -178,5 +219,9 @@ public class ShooterCommands {
             () -> {
               Drive.driveSpeedMultiplier = 1;
             });
+  }
+
+  public static Command staticShooterToggleCommand() {
+    return Commands.runOnce(() -> staticShooter = !staticShooter);
   }
 }

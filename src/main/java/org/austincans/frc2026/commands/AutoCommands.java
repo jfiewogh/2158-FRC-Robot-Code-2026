@@ -15,6 +15,8 @@
 
 package org.austincans.frc2026.commands;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
@@ -31,25 +33,23 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
-
 import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
 import org.austincans.frc2026.subsystems.intake.roller.Roller;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 
-public class AutonCommands {
+public class AutoCommands {
   private static PIDController drivePIDX = new PIDController(3, 0.0, 0);
   private static PIDController drivePIDY = new PIDController(3, 0.0, 0);
   private static ProfiledPIDController rotationPID =
@@ -255,7 +255,12 @@ public class AutonCommands {
                                       < pathfindEndDistance)
                       .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
               return Commands.deadline(
-                  ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret),
+                  // TODO: temporary fix
+                  ShooterCommands.shootToHubCommand(
+                      Optional.of(flywheel),
+                      Optional.of(hood),
+                      Optional.of(turret),
+                      Optional.of(drive)),
                   pathfindCommand,
                   updateJoystickHasInputCommand(suppliers));
             },
@@ -286,5 +291,19 @@ public class AutonCommands {
 
   private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {
     return Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers));
+  }
+
+  /* Actual auto commands */
+
+  public static Command runIntakeCommand(Optional<Roller> roller) {
+    return roller.map(r -> Commands.startEnd(r::runIntake, r::stop, r)).orElse(Commands.none());
+  }
+
+  public static Command deployIntakeCommand(Optional<Deploy> deploy) {
+    return deploy.map(d -> d.deployCommand()).orElse(Commands.none());
+  }
+
+  public static Command retractIntakeCommand(Optional<Deploy> deploy) {
+    return deploy.map(d -> d.retractCommand()).orElse(Commands.none());
   }
 }

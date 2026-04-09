@@ -17,6 +17,7 @@ package org.austincans.frc2026.subsystems.turret;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -25,7 +26,7 @@ public abstract class TurretIOReal implements TurretIO {
   protected final CANcoder encoder;
 
   public TurretIOReal() {
-    encoder = new CANcoder(TurretConstants.encoderId, TurretConstants.canBus);
+    encoder = new CANcoder(TurretConstants.encoderId, "rio");
 
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;

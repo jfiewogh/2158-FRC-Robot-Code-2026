@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
@@ -152,37 +153,47 @@ public class TurretCommands {
     return getClosestTarget(robotPose, possibleTargets);
   }
 
-  public static Command pointToHub(Turret turret, Drive drive) {
-    return Commands.run(
-            () -> {
-              Optional<Alliance> allianceOptional = DriverStation.getAlliance();
-              TrackingTargets target =
-                  allianceOptional.get() == Alliance.Blue
-                      ? TrackingTargets.blueHub
-                      : TrackingTargets.redHub;
-              Translation3d targetTrans = target.getTranslation3d();
-              Pose3d drivePose = drive.getPose3d();
+  public static Command pointToHub(Optional<Turret> turret, Optional<Drive> drive) {
+    return turret
+        .flatMap(
+            t ->
+                drive.map(
+                    (d) ->
+                        Commands.run(
+                                () -> {
+                                  Alliance alliance =
+                                      DriverStation.getAlliance().orElse(Alliance.Red);
+                                  TrackingTargets target =
+                                      alliance == Alliance.Blue
+                                          ? TrackingTargets.blueHub
+                                          : TrackingTargets.redHub;
+                                  Translation3d targetTranslation = target.getTranslation3d();
+                                  Pose3d drivePose = d.getPose3d();
 
-              // Transform3d applies Translation3d first, then Rotation3d
-              Pose3d turretPose = drivePose.plus(TurretConstants.robotRelTurretTransform);
-              Translation3d turretTranslation = turretPose.getTranslation();
-              Logger.recordOutput("turret pose", turretPose);
+                                  // Transform3d applies Translation3d first, then Rotation3d
+                                  Pose3d turretPose =
+                                      drivePose.plus(TurretConstants.robotRelTurretTransform);
+                                  Translation3d turretTranslation = turretPose.getTranslation();
+                                  Logger.recordOutput("turret pose", turretPose);
 
-              Rotation2d fieldRelAngle =
-                  targetTrans
-                      .toTranslation2d()
-                      .minus(turretTranslation.toTranslation2d())
-                      .getAngle();
+                                  Rotation2d fieldRelAngle =
+                                      targetTranslation
+                                          .toTranslation2d()
+                                          .minus(turretTranslation.toTranslation2d())
+                                          .getAngle();
 
-              // We need this for calculating
-              Logger.recordOutput(
-                  "turret distance from hub",
-                  turretTranslation.toTranslation2d().getDistance(targetTrans.toTranslation2d()));
+                                  // We need this for calculating
+                                  Logger.recordOutput(
+                                      "turret distance from hub",
+                                      turretTranslation
+                                          .toTranslation2d()
+                                          .getDistance(targetTranslation.toTranslation2d()));
 
-              turret.setDesiredAngleFieldRelative(fieldRelAngle, drive.getRotation());
-            },
-            turret)
-        .withTimeout(5);
+                                  t.setDesiredAngleFieldRelative(fieldRelAngle, d.getRotation());
+                                },
+                                t)
+                            .finallyDo(t::stop)))
+        .orElse((WrapperCommand) Commands.none());
   }
 
   private static Rotation2d setpointJoystickTurretAngle =
@@ -197,8 +208,7 @@ public class TurretCommands {
             setpointJoystickTurretAngle =
                 Rotation2d.fromRadians(
                     Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
-            turret.setDesiredAngleRobotRelative(
-                setpointJoystickTurretAngle);
+            turret.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
           }
         },
         turret);

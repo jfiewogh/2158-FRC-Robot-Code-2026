@@ -46,7 +46,8 @@ public class Turret extends AdvancedSubsystem {
     double gearToCameraMeters = 0.2665;
     double forwardMeters = -0.123 + gearToCameraMeters * ccwPositiveRobotRelYaw.getCos();
     // right positive, negative because sin of ccw positive is left positive
-    double sideMeters = -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin(); // left of robot center
+    double sideMeters =
+        -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin(); // left of robot center
 
     double upMeters = 0.331; // up from robot center
     double rollDeg = 0.0;
@@ -80,6 +81,10 @@ public class Turret extends AdvancedSubsystem {
     outputs.velocityRadPerSec = velocityRadPerSec;
   }
 
+  public void stop() {
+    setVoltage(0);
+  }
+
   /** Relative to turret's zero */
   public void setDesiredAngle(Rotation2d turretRelAngle) {
     outputs.mode = TurretIOOutputMode.ANGLE;
@@ -93,11 +98,13 @@ public class Turret extends AdvancedSubsystem {
 
   /**
    * Set the desired angle of the turret to a field relative angle
+   *
    * @param fieldRelativeAngle The field relative angle to set turret to
    * @param currentPose Current pose of the robot
    */
-  public void setDesiredAngleFieldRelative(Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
-    // unary minus because turret angle is clockwise positive, 
+  public void setDesiredAngleFieldRelative(
+      Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
+    // unary minus because turret angle is clockwise positive,
     // while robot rotation is counterclockwise positive
     setDesiredAngleRobotRelative(fieldRelativeAngle.minus(driveFieldRelRotation));
   }
