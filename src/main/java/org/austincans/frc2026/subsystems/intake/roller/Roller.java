@@ -54,12 +54,12 @@ public class Roller extends AdvancedSubsystem {
     io.applyOutputs(outputs);
   }
 
-  public void intake() {
+  public void runIntake() {
     running = true;
     outputs.voltage = 0.35 * Constants.maxVoltage;
   }
 
-  public void outtake() {
+  public void runOuttake() {
     running = true;
     outputs.voltage = -0.35 * Constants.maxVoltage;
   }
@@ -73,12 +73,16 @@ public class Roller extends AdvancedSubsystem {
     if (running) {
       stop();
     } else {
-      intake();
+      runIntake();
     }
   }
 
-  public Command outtakeCommand() {
-    return Commands.runOnce(this::outtake, this);
+  public Command runIntakeCommand() {
+    return Commands.runOnce(this::runIntake, this);
+  }
+
+  public Command runOuttakeCommand() {
+    return Commands.runOnce(this::runOuttake, this);
   }
 
   public Command toggleCommand() {

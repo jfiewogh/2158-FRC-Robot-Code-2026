@@ -9,6 +9,6 @@ public interface DriverMapper {
     public double getRotationY();
 
     public Trigger getShootButton();
-    public Trigger getIntakeToggleButton();
+    public Trigger getRollerToggleButton();
     public Trigger getTurnModeToggleButton();
 }

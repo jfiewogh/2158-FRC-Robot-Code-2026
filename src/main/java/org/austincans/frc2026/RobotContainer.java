@@ -81,7 +81,6 @@ public class RobotContainer {
 
   // Subsystems
   private Drive drive;
-  @SuppressWarnings("unused")
   private Vision vision;
   private ObjectDetection objectDetection;
   private Turret turret;
@@ -89,7 +88,6 @@ public class RobotContainer {
   private Roller roller;
   private Deploy deploy;
   private Flywheel flywheel;
-  @SuppressWarnings("unused")
   private Led led;
 
   // Alerts
@@ -114,10 +112,12 @@ public class RobotContainer {
   private Command driveAndScoreCommand;
   private Command shootCommand;
   private Command setTurnMode;
+  private Command pointToHubCommand;
   // auton only
   private Command shuttleCommand;
   private Command shootToHubCommand;
   private Command testShootCommand;
+  
 
   LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
@@ -316,9 +316,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
-    Command pointToHubCommand;
-
     switch (Constants.controlMode) {
       case JOYSTICK -> {
         if (driveEnabled) {
@@ -406,35 +403,7 @@ public class RobotContainer {
           driverController.back().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         }
       }
-      // case KEYBOARD -> {
-
-      // turret.setDefaultCommand(
-      // Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
-
-      // keyboardHID
-      // .z()
-      // .whileTrue(LimelightHelpersCommands.alignHeadingCommand(drive,
-      // objectDetection));
-
-      // keyboardHID
-      // .x()
-      // .whileTrue(
-      // Commands.runEnd(
-      // () -> flywheel.setVelocity(FlywheelConstants.maxRPM),
-      // () -> flywheel.setVelocity(0)));
-
-      // keyboardHID.c().whileTrue(shootToHubCommand);
-
-      // keyboardHID.v().onTrue(toggleIntakeCommand);
-
-      // keyboardHID.m().onTrue(driveAndIntakeCommand);
-
-      // keyboardHID.comma().whileTrue(driveAndScoreCommand);
-
-      // keyboardHID.period().whileTrue(shuttleCommand);
-      // }
-      default -> {
-      }
+      default -> {}
     }
 
     SmartDashboard.putData("SeqSystemCheck", AdvancedSubsystem.sequentialCheck());

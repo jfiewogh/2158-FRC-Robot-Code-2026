@@ -27,7 +27,7 @@ public class DriverMapperComp implements DriverMapper {
         return controller.rightBumper();
     }
     @Override
-    public Trigger getIntakeToggleButton() {
+    public Trigger getRollerToggleButton() {
         return controller.leftBumper();
     }
     @Override
