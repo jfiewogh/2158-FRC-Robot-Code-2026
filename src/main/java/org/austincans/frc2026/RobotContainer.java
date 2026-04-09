@@ -32,9 +32,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
-
-import org.austincans.frc2026.FieldConstants.AprilTagLayoutType;
-import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.commands.shooter.ShooterCommands;
@@ -135,7 +132,6 @@ public class RobotContainer {
           if (turretEnabled) {
             turret = new Turret(new TurretIOSparkFlex());
             drive = new Drive(
-                new DriveIOReal(),
                 new GyroIOPigeon2(),
                 new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
                 new ModuleIOTalonFXReal(TunerConstants.FrontRight),
@@ -145,7 +141,6 @@ public class RobotContainer {
                 });
           } else {
             drive = new Drive(
-                new DriveIOReal(),
                 new GyroIOPigeon2(),
                 new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
                 new ModuleIOTalonFXReal(TunerConstants.FrontRight),
@@ -174,7 +169,7 @@ public class RobotContainer {
         if (objectDetectionEnabled) {
           // TODO: add actual limelight name
           objectDetection = new ObjectDetection(
-              new ODIOReal(
+              new ObjectDetectionIOReal(
                   "limelight",
                   ObjectDetection.GamePieceType.FUEL,
                   LimelightConfig.LIMELIGHT_3G));
@@ -186,8 +181,6 @@ public class RobotContainer {
       default -> {
         // Replayed robot, disable IO implementations
         drive = new Drive(
-            new DriveIO() {
-            },
             new GyroIO() {
             },
             new ModuleIO() {
@@ -226,7 +219,7 @@ public class RobotContainer {
     if (intakeEnabled) {
       toggleIntakeCommand = roller.toggleCommand();
 
-      Command runIntakeCommand = Commands.runEnd(roller::intake, roller::outtake, roller);
+      Command runIntakeCommand = Commands.runEnd(roller::runIntake, roller::runOuttake, roller);
       NamedCommands.registerCommand("runIntake", runIntakeCommand);
     } else {
       NamedCommands.registerCommand("runIntake", Commands.none());
@@ -320,7 +313,7 @@ public class RobotContainer {
       case JOYSTICK -> {
         if (driveEnabled) {
           driverController.leftBumper().onTrue(toggleIntakeCommand);
-          operatorController.leftBumper().onTrue(roller.outtakeCommand());
+          operatorController.leftBumper().onTrue(roller.runOuttakeCommand());
           operatorController
               .rightBumper()
               .onTrue(
@@ -376,7 +369,6 @@ public class RobotContainer {
             turret.setDefaultCommand(
                 TurretCommands.joystickTurretAngleCommand(
                     turret,
-                    drive,
                     () -> -operatorController.getRightY(),
                     () -> -operatorController.getRightX()));
             operatorController.y().onTrue(turret.resetAngle());

@@ -103,8 +103,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   @AutoLogOutput private boolean velocityMode = false;
   @AutoLogOutput private boolean brakeModeEnabled = true;
 
-  private final DriveIO driveIO;
-  private final DriveIOInputsAutoLogged driveInputs = new DriveIOInputsAutoLogged();
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -137,14 +135,12 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   }
 
   public Drive(
-      DriveIO driveIO,
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
-    this.driveIO = driveIO;
     this.gyroIO = gyroIO;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
 
@@ -153,7 +149,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
     modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
 
-    driveIO.setModules(modules);
     registerCheckCommand(systemCheckCommand());
     lastMovementTimer.start();
     for (var module : modules) {
@@ -412,7 +407,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   }
 
   public Pose3d getPose3d() {
-    return driveInputs.pose;
+    return new Pose3d(RobotState.getInstance().getEstimatedPose());
   }
 
   /** Returns the current odometry pose. */
@@ -429,7 +424,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     resetSimulationPoseCallBack.accept(pose);
-    driveIO.resetPose(pose);
     RobotState.getInstance().resetPose(pose);
   }
 

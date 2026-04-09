@@ -140,7 +140,7 @@ public class AutonCommands {
                                 if (!roller.running) {
                                   intakeStartTime = Timer.getFPGATimestamp();
                                 }
-                                roller.intake();
+                                roller.runIntake();
                               }
                             }))
                     .alongWith(Commands.run(() -> updateJoystickHasInputCommand(suppliers))),

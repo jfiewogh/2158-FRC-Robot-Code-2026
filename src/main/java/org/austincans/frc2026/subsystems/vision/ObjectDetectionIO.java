@@ -18,7 +18,7 @@ package org.austincans.frc2026.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ODIO {
+public interface ObjectDetectionIO {
   @AutoLog
   public class ObjectDetectionIOInputs {
     public Pose3d nearestGamePiecePose = new Pose3d();

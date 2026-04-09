@@ -189,7 +189,7 @@ public class TurretCommands {
       Rotation2d.kZero; // should be zero on start
 
   public static Command joystickTurretAngleCommand(
-      Turret turret, Drive drive, DoubleSupplier vertSupplier, DoubleSupplier horizSupplier) {
+      Turret turret, DoubleSupplier vertSupplier, DoubleSupplier horizSupplier) {
     return Commands.run(
         () -> {
           if (Math.abs(vertSupplier.getAsDouble()) > 0.1
@@ -198,7 +198,7 @@ public class TurretCommands {
                 Rotation2d.fromRadians(
                     Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
             turret.setDesiredAngleRobotRelative(
-                setpointJoystickTurretAngle); // , drive.getPose().getRotation());
+                setpointJoystickTurretAngle);
           }
         },
         turret);
