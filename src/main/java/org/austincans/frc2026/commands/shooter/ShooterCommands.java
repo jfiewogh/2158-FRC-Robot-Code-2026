@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import java.util.Optional;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.commands.RebuiltFieldUtils;
@@ -115,6 +114,7 @@ public class ShooterCommands {
       Optional<Hood> hood,
       Optional<Turret> turret,
       Optional<Drive> drive) {
+
     return flywheel
         .flatMap(
             (f) ->
@@ -124,9 +124,10 @@ public class ShooterCommands {
                             (t) ->
                                 drive.map(
                                     (d) ->
-                                        Commands.run(() -> shootToHub(d, f, h, t), d, f, h, t)
-                                            .finallyDo(f::stopMotors)))))
-        .orElse((WrapperCommand) Commands.none());
+                                        (Command)
+                                            Commands.run(() -> shootToHub(d, f, h, t), d, f, h, t)
+                                                .finallyDo(f::stopMotors)))))
+        .orElse(Commands.none());
   }
 
   public static void trackShuttle(Drive drive, Hood hood, Turret turret) {
@@ -164,9 +165,10 @@ public class ShooterCommands {
                             (t) ->
                                 drive.map(
                                     (d) ->
-                                        Commands.run(() -> shuttle(d, f, h, t), d, f, h, t)
-                                            .finallyDo(f::stopMotors)))))
-        .orElse((WrapperCommand) Commands.none());
+                                        (Command)
+                                            Commands.run(() -> shuttle(d, f, h, t), d, f, h, t)
+                                                .finallyDo(f::stopMotors)))))
+        .orElse(Commands.none());
   }
 
   public static Command shootCommand(
@@ -183,24 +185,25 @@ public class ShooterCommands {
                             (t) ->
                                 drive.map(
                                     (d) ->
-                                        Commands.run(
-                                                () -> {
-                                                  Alliance alliance =
-                                                      DriverStation.getAlliance()
-                                                          .orElse(Alliance.Red);
-                                                  if (RebuiltFieldUtils.isInAllianceZone(
-                                                      alliance, d.getPose())) {
-                                                    shootToHub(d, f, h, t);
-                                                  } else {
-                                                    shuttle(d, f, h, t);
-                                                  }
-                                                },
-                                                d,
-                                                f,
-                                                h,
-                                                t)
-                                            .finallyDo(f::stopMotors)))))
-        .orElse((WrapperCommand) Commands.none());
+                                        (Command)
+                                            Commands.run(
+                                                    () -> {
+                                                      Alliance alliance =
+                                                          DriverStation.getAlliance()
+                                                              .orElse(Alliance.Red);
+                                                      if (RebuiltFieldUtils.isInAllianceZone(
+                                                          alliance, d.getPose())) {
+                                                        shootToHub(d, f, h, t);
+                                                      } else {
+                                                        shuttle(d, f, h, t);
+                                                      }
+                                                    },
+                                                    d,
+                                                    f,
+                                                    h,
+                                                    t)
+                                                .finallyDo(f::stopMotors)))))
+        .orElse(Commands.none());
   }
 
   public static Command trackCommand(Turret turret, Hood hood, Drive drive) {

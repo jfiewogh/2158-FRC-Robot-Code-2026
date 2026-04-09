@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda2"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -175,7 +175,7 @@ public class Robot extends LoggedRobot {
         .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
 
     // Configure Driver Station for sim
-    RoboRioSim.setTeamNumber(6328);
+    RoboRioSim.setTeamNumber(2158);
     if (Constants.getRobot() == RobotType.SIMBOT) {
       DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
       DriverStationSim.notifyNewData();
