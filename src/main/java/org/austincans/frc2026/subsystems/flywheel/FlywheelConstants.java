@@ -21,13 +21,11 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
-import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class FlywheelConstants {
-  public static final DoubleSupplier kS = new LoggedTunableNumber("Flywheel/kS", 0);
-  public static final DoubleSupplier kV = new LoggedTunableNumber("Flywheel/KV", 0);
-  public static final DoubleSupplier kA = new LoggedTunableNumber("Flywheel/KA", 0);
+  // public static final DoubleSupplier kS = new LoggedTunableNumber("Flywheel/kS", 0);
+  // public static final DoubleSupplier kV = new LoggedTunableNumber("Flywheel/KV", 0);
+  // public static final DoubleSupplier kA = new LoggedTunableNumber("Flywheel/KA", 0);
   public static final double flywheelGearRation = 2;
   public static final int maxDistFromLasarCan1 = 30;
   public static final int maxDistFromLasarCan2 = 30;

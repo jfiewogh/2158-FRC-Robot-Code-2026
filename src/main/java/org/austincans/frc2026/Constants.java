@@ -46,7 +46,7 @@ public final class Constants {
   public static final boolean isSim = currentMode == Mode.SIM;
 
   public static final double maxVoltage = 12;
-  public static final double loopPeriodWatchdogSecs = 0.02;
+  public static final double loopPeriodWatchdogSecs = 0.03;
 
   public static enum Mode {
     /** Running on a real robot. */
