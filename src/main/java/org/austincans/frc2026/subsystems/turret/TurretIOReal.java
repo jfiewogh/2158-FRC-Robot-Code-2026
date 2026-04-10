@@ -26,7 +26,7 @@ public abstract class TurretIOReal implements TurretIO {
   protected final CANcoder encoder;
 
   public TurretIOReal() {
-    encoder = new CANcoder(TurretConstants.encoderId, "rio");
+    encoder = new CANcoder(TurretConstants.encoderId, TurretConstants.cancoderCANBus);
 
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;

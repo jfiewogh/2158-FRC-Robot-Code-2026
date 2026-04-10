@@ -34,6 +34,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Robot;
+import org.austincans.frc2026.subsystems.feeder.FeederConstants;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -48,13 +49,12 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-  private final SparkFlex indexer =
-      new SparkFlex(FlywheelConstants.indexerId, MotorType.kBrushless);
+  private final SparkFlex indexer = new SparkFlex(FeederConstants.indexerId, MotorType.kBrushless);
   private final SparkFlexConfig indexerConfig = new SparkFlexConfig();
   private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
 
   private final SparkFlex spindexer =
-      new SparkFlex(FlywheelConstants.spindexerId, MotorType.kBrushless);
+      new SparkFlex(FeederConstants.spindexerId, MotorType.kBrushless);
 
   @Getter
   @Accessors(fluent = true)
@@ -131,6 +131,11 @@ public class Flywheel extends AdvancedSubsystem {
 
   public double getRPM() {
     return inputs.velocity.in(RPM);
+  }
+
+  public boolean atSetpoint() {
+    return outputs.mode == FlywheelIOOutputMode.VELOCITY
+        && Math.abs(getRPM() - outputs.velocity.in(RPM)) < FlywheelConstants.atSetpointThresholdRPM;
   }
 
   @Override

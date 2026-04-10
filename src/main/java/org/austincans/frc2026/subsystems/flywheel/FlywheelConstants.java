@@ -18,11 +18,10 @@ package org.austincans.frc2026.subsystems.flywheel;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 
-import org.austincans.frc2026.util.LoggedTunableNumber;
-
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 public class FlywheelConstants {
   LoggedTunableNumber FlywheelkP = new LoggedTunableNumber("Tuning/FlywheelKP", 2.6);
@@ -40,8 +39,6 @@ public class FlywheelConstants {
   public static final int encoderId = 0;
   public static final int lasarCan1Id = 0;
   public static final int lasarCan2Id = 1;
-  public static final int indexerId = 21;
-  public static final int spindexerId = 20;
   public static final CANBus canBus = new CANBus("rio");
 
   public static final Current statorCurrentLimit = Amps.of(70);
@@ -52,6 +49,8 @@ public class FlywheelConstants {
 
   public static final double radiusMeters = 0.0508;
   public static final double gearing = 0;
+
+  public static final double atSetpointThresholdRPM = 50.0;
 
   /* SIM */
   public static final double JKgMetersSq = 0;

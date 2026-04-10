@@ -50,6 +50,7 @@ public class TurretConstants {
 
   // values only used by TalonFX
   public static final CANBus canBus = new CANBus("2158_CAN");
+  public static final CANBus cancoderCANBus = new CANBus("rio");
 
   // values only used by SparkFlex
   public static final boolean isBrushlessMotor = true;

@@ -57,5 +57,6 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
 
   @Override
   public void applyOutputs(ModuleIOOutputs outputs) {
+    super.applyOutputs(outputs);
   }
 }
