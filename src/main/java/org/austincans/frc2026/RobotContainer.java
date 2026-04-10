@@ -254,7 +254,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return AutoBuilder.buildAuto("shoot");
     return autoChooser.getSelected();
   }
 
