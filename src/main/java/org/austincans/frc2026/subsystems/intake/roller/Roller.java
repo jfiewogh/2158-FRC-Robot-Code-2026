@@ -22,7 +22,6 @@ import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.intake.roller.RollerIO.RollerIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Roller extends AdvancedSubsystem {
   private final RollerIO io;
@@ -41,7 +40,7 @@ public class Roller extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Intake/Roller", inputs);
+    // Logger.processInputs("Intake/Roller", inputs);
     Robot.batteryLogger.reportCurrentUsage(
         "Rollers",
         false,

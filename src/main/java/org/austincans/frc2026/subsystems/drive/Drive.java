@@ -63,7 +63,6 @@ import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
-import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -149,19 +148,20 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     lastMovementTimer.start();
     for (var module : modules) {
       module.brake();
-      // Configure AutoBuilder for PathPlanner
-      AutoBuilder.configure(
-          this::getPose,
-          this::setPose,
-          this::getChassisSpeeds,
-          (speeds, feedforwards) -> runVelocity(speeds),
-          new PPHolonomicDriveController(
-              new PIDConstants(7.5, 0.0, 2), new PIDConstants(7.5, 0.0, 2)),
-          PP_CONFIG,
-          () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-          this);
-      Pathfinding.setPathfinder(new LocalADStarAK());
     }
+
+    // Configure AutoBuilder for PathPlanner
+    AutoBuilder.configure(
+        this::getPose,
+        this::setPose,
+        this::getChassisSpeeds,
+        (speeds, feedforwards) -> runVelocity(speeds),
+        new PPHolonomicDriveController(
+            new PIDConstants(7.5, 0.0, 2), new PIDConstants(7.5, 0.0, 2)),
+        PP_CONFIG,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        this);
+    Pathfinding.setPathfinder(new LocalADStarAK());
 
     // Configure SysId
     sysId =
@@ -196,8 +196,9 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
     // Log empty setpoint states when disabled
     // if (DriverStation.isDisabled()) {
-    //   Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-    //   Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+    // Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+    // Logger.recordOutput("SwerveStates/SetpointsOptimized", new
+    // SwerveModuleState[] {});
     // }
 
     // Update odometry
@@ -236,7 +237,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     SmartDashboard.putData("Field", field);
 
     // Record cycle time
-    LoggedTracer.record("Drive/Periodic");
+    // LoggedTracer.record("Drive/Periodic");
   }
 
   @Override
@@ -244,7 +245,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     for (var module : modules) {
       module.periodicAfterScheduler();
     }
-    LoggedTracer.record("Drive/PeriodicAfterScheduler");
+    // LoggedTracer.record("Drive/PeriodicAfterScheduler");
   }
 
   /**
@@ -467,23 +468,23 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   protected Command systemCheckCommand() {
 
     return Commands.none();
-    //   return Commands.sequence(
-    //           Commands.defer(
-    //               () ->
-    //                   Commands.sequence(
-    //                       modules[0].getSystemCheckCommand(),
-    //                       modules[1].getSystemCheckCommand(),
-    //                       modules[2].getSystemCheckCommand(),
-    //                       modules[3].getSystemCheckCommand()),
-    //               Set.of(this)),
-    //           Commands.waitUntil(
-    //               () ->
-    //                   modules[0].getCurrentCommand() == null
-    //                       && modules[1].getCurrentCommand() == null
-    //                       && modules[2].getCurrentCommand() == null
-    //                       && modules[3].getCurrentCommand() == null),
-    //           Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
-    //           Commands.waitSeconds(2.0))
-    //       .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
+    // return Commands.sequence(
+    // Commands.defer(
+    // () ->
+    // Commands.sequence(
+    // modules[0].getSystemCheckCommand(),
+    // modules[1].getSystemCheckCommand(),
+    // modules[2].getSystemCheckCommand(),
+    // modules[3].getSystemCheckCommand()),
+    // Set.of(this)),
+    // Commands.waitUntil(
+    // () ->
+    // modules[0].getCurrentCommand() == null
+    // && modules[1].getCurrentCommand() == null
+    // && modules[2].getCurrentCommand() == null
+    // && modules[3].getCurrentCommand() == null),
+    // Commands.runOnce(() -> runVelocity(new ChassisSpeeds(0, 0, 0.5))),
+    // Commands.waitSeconds(2.0))
+    // .andThen(Commands.runOnce(() -> runVelocity(new ChassisSpeeds()), this));
   }
 }

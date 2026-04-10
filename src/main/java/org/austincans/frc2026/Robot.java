@@ -128,7 +128,7 @@ public class Robot extends LoggedRobot {
     } catch (Exception e) {
       DriverStation.reportWarning("Failed to disable loop overrun warnings.", false);
     }
-    CommandScheduler.getInstance().setPeriod(Constants.loopPeriodWatchdogSecs);
+    CommandScheduler.getInstance().setPeriod(Constants.loopPeriodSecs);
 
     // Silence joystick alerts
     DriverStation.silenceJoystickConnectionWarning(true);

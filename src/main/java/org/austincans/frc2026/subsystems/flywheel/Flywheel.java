@@ -38,7 +38,6 @@ import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMod
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.EqualsUtil;
-import org.austincans.frc2026.util.LoggedTracer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -91,7 +90,7 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public void periodicAfterScheduler() {
     io.applyOutputs(outputs);
-    LoggedTracer.record("Flywheel/AfterScheduler");
+    // LoggedTracer.record("Flywheel/AfterScheduler");
   }
 
   /** Run closed loop at the specified velocity. */

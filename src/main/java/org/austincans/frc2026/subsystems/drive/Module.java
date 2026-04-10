@@ -15,33 +15,18 @@
 
 package org.austincans.frc2026.subsystems.drive;
 
-import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.Robot;
-import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputMode;
-import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputs;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2026.util.LoggedTracer;
-import org.austincans.frc2026.util.LoggedTunableNumber;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import org.austincans.frc2026.Robot;
 import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputMode;
 import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputs;
-import org.austincans.frc2026.util.LoggedTracer;
-
-import com.ctre.phoenix.Logger;
 
 public class Module {
 
@@ -93,12 +78,12 @@ public class Module {
     // Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Record cycle times
-    LoggedTracer.record("Drive/Module" + index + "/Periodic");
+    // LoggedTracer.record("Drive/Module" + index + "/Periodic");
   }
 
   public void periodicAfterScheduler() {
     io.applyOutputs(outputs);
-    LoggedTracer.record("Drive/Module" + index + "/AfterScheduler");
+    // LoggedTracer.record("Drive/Module" + index + "/AfterScheduler");
   }
 
   /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
@@ -112,11 +97,10 @@ public class Module {
     outputs.mode = ModuleIOOutputMode.DRIVE;
     outputs.driveVelocityRadPerSec = speedRadPerSec;
     outputs.turnRotation = state.angle;
-    outputs.turnNeutral =
-        Math.abs(state.angle.minus(getAngle()).getDegrees()) < 1;
+    outputs.turnNeutral = Math.abs(state.angle.minus(getAngle()).getDegrees()) < 1;
   }
 
-    /**
+  /**
    * Runs the module with the specified setpoint state and a setpoint wheel force used for
    * torque-based feedforward.
    */
@@ -131,7 +115,8 @@ public class Module {
     outputs.driveVelocityRadPerSec = speedRadPerSec;
     outputs.driveFeedforward = ffModel.calculate(speedRadPerSec) + wheelTorqueNm;
     outputs.turnRotation = state.angle;
-    outputs.turnNeutral = Math.abs(state.angle.minus(getAngle()).getDegrees()) < DriveConstants.turnDeadbandDeg;
+    outputs.turnNeutral =
+        Math.abs(state.angle.minus(getAngle()).getDegrees()) < DriveConstants.turnDeadbandDeg;
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
@@ -141,7 +126,7 @@ public class Module {
     outputs.turnRotation = Rotation2d.kZero;
   }
 
-    /** Runs the module with the specified output toward Angular Motions */
+  /** Runs the module with the specified output toward Angular Motions */
   public void runAngularCharacterization(double output) {
     outputs.mode = ModuleIOOutputMode.CHARACTERIZE;
     outputs.driveCharacterizationOutput = output;
