@@ -228,6 +228,8 @@ public class RobotContainer {
         .onTrue(ShooterCommands.shootCommand(flywheel, hood, turret, drive));
 
     /* Operator */
+
+    // Comp
     operatorMapper
         .getStaticShooterToggleButton()
         .onTrue(ShooterCommands.staticShooterToggleCommand());
@@ -237,6 +239,9 @@ public class RobotContainer {
           operatorMapper.getOuttakeButton().onTrue(r.runOuttakeCommand());
         });
 
+    // Test
+    operatorMapper.getPointToHubButton().whileTrue(TurretCommands.pointToHub(turret, drive));
+
     flywheel.ifPresent(
         (f) -> {
           Command runIndexerAndFlywheelCommand =
@@ -244,8 +249,6 @@ public class RobotContainer {
                   .finallyDo(f::stopMotors);
           operatorMapper.getPointToHubButton().whileTrue(runIndexerAndFlywheelCommand);
         });
-
-    operatorMapper.getPointToHubButton().whileTrue(TurretCommands.pointToHub(turret, drive));
   }
 
   /**
