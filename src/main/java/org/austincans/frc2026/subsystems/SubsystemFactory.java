@@ -24,6 +24,10 @@ import org.austincans.frc2026.subsystems.drive.GyroIO;
 import org.austincans.frc2026.subsystems.drive.GyroIOPigeon2;
 import org.austincans.frc2026.subsystems.drive.ModuleIO;
 import org.austincans.frc2026.subsystems.drive.ModuleIOTalonFXReal;
+import org.austincans.frc2026.subsystems.feeder.Indexer;
+import org.austincans.frc2026.subsystems.feeder.IndexerIOSparkFlex;
+import org.austincans.frc2026.subsystems.feeder.Spindexer;
+import org.austincans.frc2026.subsystems.feeder.SpindexerIOSparkFlex;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIOTalonFX;
 import org.austincans.frc2026.subsystems.hood.Hood;
@@ -146,6 +150,28 @@ public class SubsystemFactory {
       flywheel = new Flywheel(new FlywheelIOTalonFX());
     }
     return Optional.ofNullable(flywheel);
+  }
+
+  public static Optional<Indexer> buildIndexer() {
+    if (!RobotContainer.indexerEnabled) {
+      return Optional.empty();
+    }
+    Indexer indexer = null;
+    if (Constants.currentMode == Constants.Mode.REAL) {
+      indexer = new Indexer(new IndexerIOSparkFlex());
+    }
+    return Optional.ofNullable(indexer);
+  }
+
+  public static Optional<Spindexer> buildSpindexer() {
+    if (!RobotContainer.spindexerEnabled) {
+      return Optional.empty();
+    }
+    Spindexer spindexer = null;
+    if (Constants.currentMode == Constants.Mode.REAL) {
+      spindexer = new Spindexer(new SpindexerIOSparkFlex());
+    }
+    return Optional.ofNullable(spindexer);
   }
 
   public static Optional<ObjectDetection> buildObjectDetection() {

@@ -15,6 +15,11 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -28,9 +33,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -109,7 +111,8 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
   }
 
   private void runVelocity(AngularVelocity velocity) {
-    final MotionMagicVelocityTorqueCurrentFOC m_request = new MotionMagicVelocityTorqueCurrentFOC(0);
+    final MotionMagicVelocityTorqueCurrentFOC m_request =
+        new MotionMagicVelocityTorqueCurrentFOC(velocity.in(RotationsPerSecond));
     motor1.setControl(m_request.withFeedForward(7));
   }
 

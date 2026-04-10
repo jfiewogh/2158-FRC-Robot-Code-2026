@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.commands;
+package org.austincans.frc2026.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.RobotState;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 

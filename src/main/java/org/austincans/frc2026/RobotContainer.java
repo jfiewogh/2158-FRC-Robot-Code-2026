@@ -26,11 +26,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
-import org.austincans.frc2026.commands.DriveCommands;
-import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.input.DriverMapper;
 import org.austincans.frc2026.input.DriverMapperComp;
 import org.austincans.frc2026.input.MapperConstants;
@@ -38,6 +35,9 @@ import org.austincans.frc2026.input.OperatorMapper;
 import org.austincans.frc2026.input.OperatorMapperTest;
 import org.austincans.frc2026.subsystems.SubsystemFactory;
 import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.subsystems.drive.DriveCommands;
+import org.austincans.frc2026.subsystems.feeder.Indexer;
+import org.austincans.frc2026.subsystems.feeder.Spindexer;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
 import org.austincans.frc2026.subsystems.hood.HoodCommands;
@@ -47,8 +47,10 @@ import org.austincans.frc2026.subsystems.intake.roller.Roller;
 import org.austincans.frc2026.subsystems.intake.roller.RollerCommands;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.superstructure.SuperstructureCommands;
 import org.austincans.frc2026.subsystems.superstructure.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.turret.Turret;
+import org.austincans.frc2026.subsystems.turret.TurretCommands;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.HubShiftUtil;
@@ -71,6 +73,8 @@ public class RobotContainer {
   public static final boolean rollerEnabled = true;
   public static final boolean deployEnabled = true;
   public static final boolean flywheelEnabled = true;
+  public static final boolean indexerEnabled = true;
+  public static final boolean spindexerEnabled = true;
   public static final boolean ledEnabled = false;
 
   // Subsystems
@@ -87,6 +91,8 @@ public class RobotContainer {
   private final Optional<Roller> roller = SubsystemFactory.buildRoller();
   private final Optional<Deploy> deploy = SubsystemFactory.buildDeploy();
   private final Optional<Flywheel> flywheel = SubsystemFactory.buildFlywheel();
+  private final Optional<Indexer> indexer = SubsystemFactory.buildIndexer();
+  private final Optional<Spindexer> spindexer = SubsystemFactory.buildSpindexer();
 
   @SuppressWarnings("unused")
   private final Optional<Led> led = SubsystemFactory.buildLed();
@@ -189,7 +195,7 @@ public class RobotContainer {
     drive.ifPresent(
         (d) ->
             d.setDefaultCommand(
-                DriveCommands.joystickDriveCommand(
+                DriveCommands.driveCommand(
                     d,
                     driverMapper::getTranslationX,
                     driverMapper::getTranslationY,
@@ -207,7 +213,7 @@ public class RobotContainer {
 
     driverMapper
         .getShootButton()
-        .onTrue(ShooterCommands.shootCommand(flywheel, hood, turret, drive));
+        .whileTrue(ShooterCommands.shootCommand(flywheel, hood, turret, drive));
 
     /* Operator */
 
@@ -233,13 +239,11 @@ public class RobotContainer {
     operatorMapper.getIncrementHoodAngleButton().onTrue(HoodCommands.incrementCommand(hood));
     operatorMapper.getDecrementHoodAngleButton().onTrue(HoodCommands.decrementCommand(hood));
 
-    flywheel.ifPresent(
-        (f) -> {
-          Command runIndexerAndFlywheelCommand =
-              Commands.run(() -> f.runIndexerAndFlywheel(flywheelSpeed.getAsDouble()), f)
-                  .finallyDo(f::stopMotors);
-          operatorMapper.getRunIndexerAndFlywheelButton().whileTrue(runIndexerAndFlywheelCommand);
-        });
+    operatorMapper
+        .getRunIndexerAndFlywheelButton()
+        .whileTrue(
+            SuperstructureCommands.runFeederAndFlywheelCommand(
+                flywheel, indexer, spindexer, flywheelSpeed));
   }
 
   /**

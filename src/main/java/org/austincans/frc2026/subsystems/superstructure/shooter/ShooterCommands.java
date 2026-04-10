@@ -15,25 +15,26 @@
 
 package org.austincans.frc2026.subsystems.superstructure.shooter;
 
-import java.util.Optional;
-
-import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.commands.RebuiltFieldUtils;
-import org.austincans.frc2026.commands.TurretCommands;
-import org.austincans.frc2026.commands.TurretCommands.TrackingTargets;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.flywheel.Flywheel;
-import org.austincans.frc2026.subsystems.hood.Hood;
-import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotInputs;
-import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotParameters;
-import org.austincans.frc2026.subsystems.turret.Turret;
-import org.austincans.frc2026.subsystems.turret.TurretConstants;
-import org.austincans.frc2026.util.LoggedTunableNumber;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Optional;
+import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.commands.RebuiltFieldUtils;
+import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.subsystems.feeder.Indexer;
+import org.austincans.frc2026.subsystems.feeder.Spindexer;
+import org.austincans.frc2026.subsystems.flywheel.Flywheel;
+import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.frc2026.subsystems.superstructure.SuperstructureCommands;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotInputs;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotParameters;
+import org.austincans.frc2026.subsystems.superstructure.shooter.TargetUtil.TrackingTargets;
+import org.austincans.frc2026.subsystems.turret.Turret;
+import org.austincans.frc2026.subsystems.turret.TurretConstants;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 /** Commands dealing with turret, hood, and flywheel */
 // TODO: maybe make a ShooterSuperstructure class to handle all. this is low
@@ -42,53 +43,58 @@ public class ShooterCommands {
   private static ShotCalculator hubShotCalculator;
   private static final ShotCalculator shuttleShotCalculator;
 
-  private final LoggedTunableNumber speedMultiplier = new LoggedTunableNumber("Speed Multiplier", 1);
+  private final LoggedTunableNumber speedMultiplier =
+      new LoggedTunableNumber("Speed Multiplier", 1);
 
   public static boolean staticShooter = false;
 
   static {
-    hubShotCalculator = new ShotCalculator(
-        Constants.loopPeriodSecs,
-        ShotConstants.scoringHoodAngleMap,
-        ShotConstants.scoringFlywheelSpeedMap,
-        ShotConstants.scoringTimeOfFlightMap,
-        TurretConstants.robotRelTurretTransform);
+    hubShotCalculator =
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.scoringHoodAngleMap,
+            ShotConstants.scoringFlywheelSpeedMap,
+            ShotConstants.scoringTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
 
-    shuttleShotCalculator = new ShotCalculator(
-        Constants.loopPeriodSecs,
-        ShotConstants.passingHoodAngleMap,
-        ShotConstants.passingFlywheelSpeedMap,
-        ShotConstants.passingTimeOfFlightMap,
-        TurretConstants.robotRelTurretTransform);
+    shuttleShotCalculator =
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.passingHoodAngleMap,
+            ShotConstants.passingFlywheelSpeedMap,
+            ShotConstants.passingTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
   }
 
   private ShooterCommands() {}
 
   private static ShotParameters getHubShotParameters(Drive drive) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    ShotInputs inputs = new ShotInputs(
-        drive.getPose3d(),
-        drive.getChassisSpeeds(),
-        drive.getChassisSpeeds(),
-        alliance == Alliance.Red
-            ? TrackingTargets.redHub.getTranslation3d()
-            : TrackingTargets.blueHub.getTranslation3d());
+    ShotInputs inputs =
+        new ShotInputs(
+            drive.getPose3d(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
+            alliance == Alliance.Red
+                ? TrackingTargets.redHub.getTranslation3d()
+                : TrackingTargets.blueHub.getTranslation3d());
     return hubShotCalculator.calculate(inputs);
   }
 
+  @SuppressWarnings("unused")
   private static ShotParameters getShuttleShotParameters(Drive drive) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    ShotInputs inputs = new ShotInputs(
-        drive.getPose3d(),
-        drive.getChassisSpeeds(),
-        drive.getChassisSpeeds(),
-        TurretCommands.getShuttleTarget(drive, alliance).getTranslation3d());
+    ShotInputs inputs =
+        new ShotInputs(
+            drive.getPose3d(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
+            TargetUtil.getShuttleTarget(drive, alliance).getTranslation3d());
     return shuttleShotCalculator.calculate(inputs);
   }
 
   public static void trackHub(Drive drive, Hood hood, Turret turret) {
     ShotParameters parameters = getHubShotParameters(drive);
-    // flywheel.setVelocity(parameters.flywheelSpeedRPM());
     hood.setAngle(parameters.hoodAngle());
     turret.setDesiredAngleFieldRelative(
         parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
@@ -97,6 +103,26 @@ public class ShooterCommands {
   public static void shootToHub(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
     ShotParameters parameters = getHubShotParameters(drive);
     flywheel.runIndexerAndFlywheel(parameters.flywheelSpeedRPM());
+    hood.setAngle(parameters.hoodAngle());
+
+    if (staticShooter) {
+      turret.setDesiredAngle(Rotation2d.kZero);
+    } else {
+      turret.setDesiredAngleFieldRelative(
+          parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
+    }
+  }
+
+  public static void shootToHub(
+      Flywheel flywheel,
+      Hood hood,
+      Indexer indexer,
+      Spindexer spindexer,
+      Turret turret,
+      Drive drive) {
+    ShotParameters parameters = getHubShotParameters(drive);
+    SuperstructureCommands.runFeederAndFlywheel(
+        flywheel, indexer, spindexer, parameters.flywheelSpeedRPM());
     hood.setAngle(parameters.hoodAngle());
 
     if (staticShooter) {
@@ -119,7 +145,32 @@ public class ShooterCommands {
     Hood h = hood.get();
     Turret t = turret.get();
     Drive d = drive.get();
-    return Commands.run(() -> shootToHub(d, f, h, t), d, f, h, t).finallyDo(f::stopMotors);
+    return Commands.run(() -> shootToHub(d, f, h, t), f, h, t).finallyDo(f::stopMotors);
+  }
+
+  public static Command shootToHubCommand(
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Indexer> indexer,
+      Optional<Spindexer> spindexer,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    if (flywheel.isEmpty()
+        || hood.isEmpty()
+        || indexer.isEmpty()
+        || spindexer.isEmpty()
+        || turret.isEmpty()
+        || drive.isEmpty()) {
+      return Commands.none();
+    }
+    Flywheel f = flywheel.get();
+    Hood h = hood.get();
+    Indexer i = indexer.get();
+    Spindexer s = spindexer.get();
+    Turret t = turret.get();
+    Drive d = drive.get();
+    return Commands.run(() -> shootToHub(f, h, i, s, t, d), f, h, i, s, t)
+        .finallyDo(() -> SuperstructureCommands.stopFeederAndFlywheel(f, i, s));
   }
 
   public static void trackShuttle(Drive drive, Hood hood, Turret turret) {
@@ -130,14 +181,26 @@ public class ShooterCommands {
   }
 
   public static Command shuttleTrackingCommand(Drive drive, Hood hood, Turret turret) {
-    return Commands.run(() -> trackShuttle(drive, hood, turret));
+    return Commands.run(() -> trackShuttle(drive, hood, turret), hood, turret);
   }
 
   public static void shuttle(Drive drive, Flywheel flywheel, Hood hood, Turret turret) {
-    // ShotParameters parameters = getShuttleShotParameters(drive);
-
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
     flywheel.runIndexerAndFlywheel(6000);
+    hood.setAngle(Rotation2d.fromDegrees(60));
+    turret.setDesiredAngleFieldRelative(
+        alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
+  }
+
+  public static void shuttle(
+      Flywheel flywheel,
+      Hood hood,
+      Indexer indexer,
+      Spindexer spindexer,
+      Turret turret,
+      Drive drive) {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    SuperstructureCommands.runFeederAndFlywheel(flywheel, indexer, spindexer, 6000);
     hood.setAngle(Rotation2d.fromDegrees(60));
     turret.setDesiredAngleFieldRelative(
         alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero, drive.getRotation());
@@ -155,7 +218,31 @@ public class ShooterCommands {
     Hood h = hood.get();
     Turret t = turret.get();
     Drive d = drive.get();
-    return Commands.run(() -> shuttle(d, f, h, t), d, f, h, t).finallyDo(f::stopMotors);
+    return Commands.run(() -> shuttle(d, f, h, t), f, h, t).finallyDo(f::stopMotors);
+  }
+
+  public static Command shuttleCommand(
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Indexer> indexer,
+      Optional<Spindexer> spindexer,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    if (flywheel.isEmpty()
+        || hood.isEmpty()
+        || indexer.isEmpty()
+        || spindexer.isEmpty()
+        || turret.isEmpty()
+        || drive.isEmpty()) {
+      return Commands.none();
+    }
+    Flywheel f = flywheel.get();
+    Hood h = hood.get();
+    Indexer i = indexer.get();
+    Spindexer s = spindexer.get();
+    Turret t = turret.get();
+    Drive d = drive.get();
+    return Commands.run(() -> shuttle(f, h, i, s, t, d), f, h, i, s, t).finallyDo(f::stopMotors);
   }
 
   public static Command shootCommand(
@@ -171,33 +258,70 @@ public class ShooterCommands {
     Turret t = turret.get();
     Drive d = drive.get();
     return Commands.run(
-        () -> {
-          Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-          if (RebuiltFieldUtils.isInAllianceZone(alliance, d.getPose())) {
-            shootToHub(d, f, h, t);
-          } else {
-            shuttle(d, f, h, t);
-          }
-        },
-        d,
-        f,
-        h,
-        t)
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(alliance, d.getPose())) {
+                shootToHub(d, f, h, t);
+              } else {
+                shuttle(d, f, h, t);
+              }
+            },
+            f,
+            h,
+            t)
+        .finallyDo(f::stopMotors);
+  }
+
+  public static Command shootCommand(
+      Optional<Flywheel> flywheel,
+      Optional<Hood> hood,
+      Optional<Indexer> indexer,
+      Optional<Spindexer> spindexer,
+      Optional<Turret> turret,
+      Optional<Drive> drive) {
+    if (flywheel.isEmpty()
+        || hood.isEmpty()
+        || indexer.isEmpty()
+        || spindexer.isEmpty()
+        || turret.isEmpty()
+        || drive.isEmpty()) {
+      return Commands.none();
+    }
+    Flywheel f = flywheel.get();
+    Hood h = hood.get();
+    Indexer i = indexer.get();
+    Spindexer s = spindexer.get();
+    Turret t = turret.get();
+    Drive d = drive.get();
+    return Commands.run(
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(alliance, d.getPose())) {
+                shootToHub(f, h, i, s, t, d);
+              } else {
+                shuttle(f, h, i, s, t, d);
+              }
+            },
+            f,
+            h,
+            i,
+            s,
+            t)
         .finallyDo(f::stopMotors);
   }
 
   public static Command trackCommand(Turret turret, Hood hood, Drive drive) {
     return Commands.run(
-        () -> {
-          Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-          if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-            trackHub(drive, hood, turret);
-          } else {
-            trackShuttle(drive, hood, turret);
-          }
-        },
-        turret,
-        hood)
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
+                trackHub(drive, hood, turret);
+              } else {
+                trackShuttle(drive, hood, turret);
+              }
+            },
+            turret,
+            hood)
         .finallyDo(
             () -> {
               Drive.driveSpeedMultiplier = 1;
