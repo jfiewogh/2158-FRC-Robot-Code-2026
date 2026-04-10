@@ -18,14 +18,18 @@ package org.austincans.frc2026.subsystems.flywheel;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 
+import org.austincans.frc2026.util.LoggedTunableNumber;
+
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 
 public class FlywheelConstants {
-  // public static final DoubleSupplier kS = new LoggedTunableNumber("Flywheel/kS", 0);
-  // public static final DoubleSupplier kV = new LoggedTunableNumber("Flywheel/KV", 0);
-  // public static final DoubleSupplier kA = new LoggedTunableNumber("Flywheel/KA", 0);
+  LoggedTunableNumber FlywheelkP = new LoggedTunableNumber("Tuning/FlywheelKP", 2.6);
+  LoggedTunableNumber FlywheelkI = new LoggedTunableNumber("Tuning/FlywheelKI", 0);
+  LoggedTunableNumber FlywheelkD = new LoggedTunableNumber("Tuning/FlywheelKD", 0);
+  LoggedTunableNumber FlywheelkS = new LoggedTunableNumber("Tuning/FlywheelKS", 0);
+  LoggedTunableNumber FlywheelKV = new LoggedTunableNumber("Tuning/FlywheelKV", 0);
   public static final double flywheelGearRation = 2;
   public static final int maxDistFromLasarCan1 = 30;
   public static final int maxDistFromLasarCan2 = 30;

@@ -61,15 +61,15 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
     // set slot 0 gains
     var slot0Configs = talonFXConfigs.Slot0;
     slot0Configs.kS = 0; // Static friction
-    slot0Configs.kV = 0; // Velocity to Voltage
+    slot0Configs.kV = 0.01112; // Velocity to Voltage
     slot0Configs.kA = 0; // Acceleration to Voltage
-    slot0Configs.kP = 0; // Proportional
+    slot0Configs.kP = 2; // Proportional
     slot0Configs.kI = 0; // Integral
-    slot0Configs.kD = 0; // Derivative
+    slot0Configs.kD = 1; // Derivative
 
     // set Motion Magic Expo settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 0; // Unlimited cruise velocity
+    motionMagicConfigs.MotionMagicAcceleration = 200; // Unlimited cruise velocity
     motionMagicConfigs.MotionMagicExpo_kV = 0.12; // kV is around 0.12 V/rps
     motionMagicConfigs.MotionMagicExpo_kA = 0.1; // Use a slower kA of 0.1 V/(rps/s)
 
@@ -110,7 +110,7 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
   private void runVelocity(AngularVelocity velocity) {
     final MotionMagicVelocityTorqueCurrentFOC m_request = new MotionMagicVelocityTorqueCurrentFOC(0);
-    motor1.setControl(m_request);
+    motor1.setControl(m_request.withFeedForward(7));
   }
 
   @Override
