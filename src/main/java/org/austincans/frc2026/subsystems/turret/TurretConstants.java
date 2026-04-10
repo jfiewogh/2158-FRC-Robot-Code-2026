@@ -48,6 +48,8 @@ public class TurretConstants {
   public static final int encoderId = 25;
   public static final double magnetOffset = 0.4140625;
 
+  public static final double atSetpointThresholdRad = 0.1;
+
   // values only used by TalonFX
   public static final CANBus canBus = new CANBus("2158_CAN");
   public static final CANBus cancoderCANBus = new CANBus("rio");

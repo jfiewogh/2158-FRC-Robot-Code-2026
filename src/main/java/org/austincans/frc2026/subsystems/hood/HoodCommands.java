@@ -15,6 +15,7 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
@@ -22,8 +23,16 @@ import java.util.Optional;
 public class HoodCommands {
   private HoodCommands() {}
 
+  public static Command setAngleCommand(Optional<Hood> hood, Rotation2d angle) {
+    return hood.map((h) -> Commands.runOnce(() -> h.setAngle(angle), h)).orElse(Commands.none());
+  }
+
+  public static Command setPulseCommand(Optional<Hood> hood, int pulse) {
+    return hood.map((h) -> Commands.runOnce(() -> h.setPulse(pulse), h)).orElse(Commands.none());
+  }
+
   public static Command setLowestAngleCommand(Optional<Hood> hood) {
-    return hood.map((h) -> Commands.runOnce(() -> h.setPulse(1000), h)).orElse(Commands.none());
+    return setPulseCommand(hood, 1000);
   }
 
   public static Command incrementCommand(Optional<Hood> hood) {

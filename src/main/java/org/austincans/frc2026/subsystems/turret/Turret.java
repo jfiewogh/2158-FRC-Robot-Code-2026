@@ -113,6 +113,10 @@ public class Turret extends AdvancedSubsystem {
     return Rotation2d.fromRadians(inputs.positionRad);
   }
 
+  public boolean atSetpoint() {
+    return Math.abs(inputs.positionRad - outputs.angle.getRadians()) < TurretConstants.atSetpointThresholdRad;
+  }
+
   public Command resetAngle() {
     return Commands.runOnce(
         () -> {
