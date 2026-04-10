@@ -42,6 +42,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /** Flywheel, Indexer, and Spindexer Subsystem */
+// TODO: maybe split into Flywheel and Indexer subsystems
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
@@ -135,7 +136,7 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.run(() -> setVelocity(RPM.of(100))).withTimeout(5),
+        Commands.run(() -> setVelocity(RPM.of(100)), this).withTimeout(5),
         Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
@@ -143,7 +144,8 @@ public class Flywheel extends AdvancedSubsystem {
                 addSubsystemFault(
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
-            }),
-        Commands.runOnce(() -> setVelocity(RPM.of(0))));
+            },
+            this),
+        Commands.runOnce(() -> setVelocity(RPM.of(0)), this));
   }
 }

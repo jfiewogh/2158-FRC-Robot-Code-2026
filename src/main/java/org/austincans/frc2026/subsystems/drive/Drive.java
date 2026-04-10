@@ -127,14 +127,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
-  public static boolean joystickHasInput = false;
-
-  public static boolean isDriving = false;
-
-  public boolean isDriving() {
-    return joystickHasInput;
-  }
-
   private final Field2d field = new Field2d();
 
   public Drive(
@@ -474,7 +466,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   @Override
   protected Command systemCheckCommand() {
-
     return Commands.none();
     // return Commands.sequence(
     // Commands.defer(

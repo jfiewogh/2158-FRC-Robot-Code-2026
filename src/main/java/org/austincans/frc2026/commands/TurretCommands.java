@@ -39,12 +39,13 @@ public class TurretCommands {
   public static double flywheelExitVelocityConstant = 1;
   public static double robotShootTime = 1;
 
-  public static InterpolatingDoubleTreeMap distancesAnglesFromHub = InterpolatingDoubleTreeMap.ofEntries(
-      Map.entry(FieldConstants.fieldLength / 6, 7 * Math.PI / 18),
-      Map.entry(0.0, Math.PI / 2),
-      Map.entry(FieldConstants.fieldLength / 3, Math.PI / 4));
-  public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint = InterpolatingDoubleTreeMap
-      .ofEntries(Map.entry(5.0, 5.0), Map.entry(10.0, 10.0));
+  public static InterpolatingDoubleTreeMap distancesAnglesFromHub =
+      InterpolatingDoubleTreeMap.ofEntries(
+          Map.entry(FieldConstants.fieldLength / 6, 7 * Math.PI / 18),
+          Map.entry(0.0, Math.PI / 2),
+          Map.entry(FieldConstants.fieldLength / 3, Math.PI / 4));
+  public static InterpolatingDoubleTreeMap distancesAnglesFromShuttlingPoint =
+      InterpolatingDoubleTreeMap.ofEntries(Map.entry(5.0, 5.0), Map.entry(10.0, 10.0));
 
   // TODO: Add areas where you cannot shoot from (ex. in front of hub in neutral
   // zone, behind tower)
@@ -85,13 +86,14 @@ public class TurretCommands {
   public static boolean isShuttling = false;
   private static final double latency = 0.02;
 
+  private TurretCommands() {}
+
   private static double getActualExitVelocityMetersPerSec(double flywheelVelocityRPM) {
     return Units.rotationsToRadians(flywheelVelocityRPM) / 60 * FlywheelConstants.radiusMeters;
   }
 
   /**
-   * Only setter methods used for flywheel, turret, and hood. Only getter methods
-   * used for drive.
+   * Only setter methods used for flywheel, turret, and hood. Only getter methods used for drive.
    */
   public static double getHoodAngleFromDistance(
       double distance, InterpolatingDoubleTreeMap points) {
@@ -143,9 +145,11 @@ public class TurretCommands {
     Pose3d robotPose = new Pose3d(drive.getPose());
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
-      possibleTargets = new TrackingTargets[] { TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight };
+      possibleTargets =
+          new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
     } else {
-      possibleTargets = new TrackingTargets[] { TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight };
+      possibleTargets =
+          new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
     }
     return getClosestTarget(robotPose, possibleTargets);
   }
@@ -157,43 +161,39 @@ public class TurretCommands {
     Turret t = turret.get();
     Drive d = drive.get();
     return Commands.run(
-        () -> {
-          Alliance alliance =
-              DriverStation.getAlliance().orElse(Alliance.Red);
-          TrackingTargets target =
-              alliance == Alliance.Blue
-                  ? TrackingTargets.blueHub
-                  : TrackingTargets.redHub;
-          Translation3d targetTranslation = target.getTranslation3d();
-          Pose3d drivePose = d.getPose3d();
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              TrackingTargets target =
+                  alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
+              Translation3d targetTranslation = target.getTranslation3d();
+              Pose3d drivePose = d.getPose3d();
 
-          // Transform3d applies Translation3d first, then Rotation3d
-          Pose3d turretPose =
-              drivePose.plus(TurretConstants.robotRelTurretTransform);
-          Translation3d turretTranslation = turretPose.getTranslation();
-          Logger.recordOutput("turret pose", turretPose);
+              // Transform3d applies Translation3d first, then Rotation3d
+              Pose3d turretPose = drivePose.plus(TurretConstants.robotRelTurretTransform);
+              Translation3d turretTranslation = turretPose.getTranslation();
+              Logger.recordOutput("turret pose", turretPose);
 
-          Rotation2d fieldRelAngle =
-              targetTranslation
-                  .toTranslation2d()
-                  .minus(turretTranslation.toTranslation2d())
-                  .getAngle();
+              Rotation2d fieldRelAngle =
+                  targetTranslation
+                      .toTranslation2d()
+                      .minus(turretTranslation.toTranslation2d())
+                      .getAngle();
 
-          // We need this for calculating
-          Logger.recordOutput(
-              "turret distance from hub",
-              turretTranslation
-                  .toTranslation2d()
-                  .getDistance(targetTranslation.toTranslation2d()));
+              // We need this for calculating
+              Logger.recordOutput(
+                  "turret distance from hub",
+                  turretTranslation
+                      .toTranslation2d()
+                      .getDistance(targetTranslation.toTranslation2d()));
 
-          t.setDesiredAngleFieldRelative(
-              fieldRelAngle, d.getRotation());
-        },
-        t)
-    .finallyDo(t::stop);
+              t.setDesiredAngleFieldRelative(fieldRelAngle, d.getRotation());
+            },
+            t)
+        .finallyDo(t::stop);
   }
 
-  private static Rotation2d setpointJoystickTurretAngle = Rotation2d.kZero; // should be zero on start
+  private static Rotation2d setpointJoystickTurretAngle =
+      Rotation2d.kZero; // should be zero on start
 
   public static Command joystickTurretAngleCommand(
       Turret turret, DoubleSupplier vertSupplier, DoubleSupplier horizSupplier) {
@@ -201,11 +201,16 @@ public class TurretCommands {
         () -> {
           if (Math.abs(vertSupplier.getAsDouble()) > 0.1
               && Math.abs(horizSupplier.getAsDouble()) > 0.1) {
-            setpointJoystickTurretAngle = Rotation2d.fromRadians(
-                Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
+            setpointJoystickTurretAngle =
+                Rotation2d.fromRadians(
+                    Math.atan2(horizSupplier.getAsDouble(), vertSupplier.getAsDouble()));
             turret.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
           }
         },
         turret);
+  }
+
+  public static Command resetAngleCommand(Optional<Turret> turret) {
+    return turret.map((t) -> t.resetAngle()).orElse(Commands.none());
   }
 }

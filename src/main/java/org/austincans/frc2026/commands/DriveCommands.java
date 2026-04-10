@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
@@ -57,7 +58,6 @@ public class DriveCommands {
   private static final LoggedTunableNumber angularKD =
       new LoggedTunableNumber("DriveCommands/kD", 0.05);
 
-  public static boolean robotRelative = true;
   private static final double ANGLE_MAX_VELOCITY = Math.PI;
   private static final double ANGLE_MAX_ACCELERATION = Math.PI * 2;
 
@@ -77,22 +77,7 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
-    Drive.joystickHasInput = false;
-    for (DoubleSupplier supplier : suppliers) {
-      if (Math.abs(supplier.getAsDouble()) >= 0.1) {
-        Drive.joystickHasInput = true;
-        break;
-      }
-    }
-  }
-
   private static Rotation2d lastFieldRelRotation = Rotation2d.kZero;
-
-  // TODO: fix other joystick drive commands. check if omegaY and omegaX are
-  // correct. change
-  // rotation to estimated pose rotation. flip joystick based on red or blue
-  // alliance
 
   public static void joystickDrive(
       Drive drive,
@@ -100,8 +85,6 @@ public class DriveCommands {
       DoubleSupplier ySupplier, // left/right
       DoubleSupplier omegaXSupplier, // forward/backward
       DoubleSupplier omegaYSupplier) {
-
-    updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
 
     // Get linear velocity
     Translation2d linearVelocity =
@@ -177,8 +160,6 @@ public class DriveCommands {
         Rotation2d.fromRadians(
             // horizontal / vertical (x on joystick is horiz, y on joystick is vert)
             Math.atan2(omegaYSupplier.getAsDouble(), omegaXSupplier.getAsDouble()));
-
-    updateJoystickHasInput(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
 
     // Get linear velocity
     Translation2d linearVelocity =
@@ -420,5 +401,25 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
+  }
+
+  public static Command stopWithX(Optional<Drive> drive) {
+    return drive.map((d) -> Commands.runOnce(d::stopWithX, d)).orElse(Commands.none());
+  }
+
+  public static Command zeroPoseCommand(Optional<Drive> drive) {
+    return drive
+        .map(
+            (d) ->
+                Commands.runOnce(
+                    () ->
+                        d.setPose(
+                            new Pose2d(
+                                d.getPose().getTranslation(),
+                                DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
+                                    ? Rotation2d.k180deg
+                                    : Rotation2d.kZero)),
+                    d))
+        .orElse(Commands.none());
   }
 }

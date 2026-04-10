@@ -17,8 +17,6 @@ package org.austincans.frc2026;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,10 +29,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
-import org.austincans.frc2026.commands.AutoCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.TurretCommands;
-import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.input.DriverMapper;
 import org.austincans.frc2026.input.DriverMapperComp;
 import org.austincans.frc2026.input.MapperConstants;
@@ -44,10 +40,14 @@ import org.austincans.frc2026.subsystems.SubsystemFactory;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.frc2026.subsystems.hood.HoodCommands;
 import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
+import org.austincans.frc2026.subsystems.intake.deploy.DeployCommands;
 import org.austincans.frc2026.subsystems.intake.roller.Roller;
+import org.austincans.frc2026.subsystems.intake.roller.RollerCommands;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 import org.austincans.frc2026.subsystems.vision.Vision;
@@ -75,13 +75,20 @@ public class RobotContainer {
 
   // Subsystems
   private final Optional<Drive> drive = SubsystemFactory.buildDrive();
+
+  @SuppressWarnings("unused")
   private final Optional<Vision> vision = SubsystemFactory.buildVision(drive);
+
+  @SuppressWarnings("unused")
   private final Optional<ObjectDetection> objectDetection = SubsystemFactory.buildObjectDetection();
+
   private final Optional<Turret> turret = SubsystemFactory.buildTurret();
   private final Optional<Hood> hood = SubsystemFactory.buildHood();
   private final Optional<Roller> roller = SubsystemFactory.buildRoller();
   private final Optional<Deploy> deploy = SubsystemFactory.buildDeploy();
   private final Optional<Flywheel> flywheel = SubsystemFactory.buildFlywheel();
+
+  @SuppressWarnings("unused")
   private final Optional<Led> led = SubsystemFactory.buildLed();
 
   // Alerts
@@ -112,9 +119,9 @@ public class RobotContainer {
 
   private void registerNamedCommands() {
     /* Register named commands */
-    NamedCommands.registerCommand("Run Intake", AutoCommands.runIntakeCommand(roller));
-    NamedCommands.registerCommand("Deploy Intake", AutoCommands.deployIntakeCommand(deploy));
-    NamedCommands.registerCommand("Retract Intake", AutoCommands.retractIntakeCommand(deploy));
+    NamedCommands.registerCommand("Run Intake", RollerCommands.runIntakeCommand(roller));
+    NamedCommands.registerCommand("Deploy Intake", DeployCommands.deployCommand(deploy));
+    NamedCommands.registerCommand("Retract Intake", DeployCommands.retractCommand(deploy));
     NamedCommands.registerCommand(
         "Score", ShooterCommands.shootToHubCommand(flywheel, hood, turret, drive));
     NamedCommands.registerCommand(
@@ -177,7 +184,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /* Default Commands */
+    /* Driver */
+    // Drive
     drive.ifPresent(
         (d) ->
             d.setDefaultCommand(
@@ -188,40 +196,14 @@ public class RobotContainer {
                     driverMapper::getRotationX,
                     driverMapper::getRotationY)));
 
-    turret.ifPresent(
-        (t) ->
-            t.setDefaultCommand(
-                TurretCommands.joystickTurretAngleCommand(
-                    t, operatorMapper::getRotationX, operatorMapper::getRotationY)));
-
-    /* Driver */
     driverMapper.getTurnModeToggleButton().onTrue(DriveCommands.setTurnMode());
+    driverMapper.getStopWithXButton().onTrue(DriveCommands.stopWithX(drive));
+    driverMapper.getZeroPoseButton().onTrue(DriveCommands.zeroPoseCommand(drive));
 
-    roller.ifPresent((r) -> driverMapper.getRollerToggleButton().onTrue(r.toggleCommand()));
+    driverMapper.getRollerToggleButton().onTrue(RollerCommands.toggleCommand(roller));
 
-    deploy.ifPresent(
-        (d) -> {
-          driverMapper.getDeployButton().onTrue(d.deployCommand()).onFalse(d.stopCommand());
-          driverMapper.getRetractButton().onTrue(d.retractCommand()).onFalse(d.stopCommand());
-        });
-
-    drive.ifPresent(
-        (d) -> {
-          // Stop with X
-          driverMapper.getStopWithXButton().onTrue(Commands.runOnce(d::stopWithX));
-
-          // Reset gyro / odometry
-          Runnable resetGyro =
-              () ->
-                  d.setPose(
-                      new Pose2d(
-                          d.getPose().getTranslation(),
-                          DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-                              ? Rotation2d.k180deg
-                              : Rotation2d.kZero));
-          Command resetPoseCommand = Commands.runOnce(resetGyro, d).ignoringDisable(true);
-          driverMapper.getResetPoseButton().onTrue(resetPoseCommand);
-        });
+    driverMapper.getDeployButton().whileTrue(DeployCommands.deployCommand(deploy));
+    driverMapper.getRetractButton().whileTrue(DeployCommands.retractCommand(deploy));
 
     driverMapper
         .getShootButton()
@@ -229,25 +211,34 @@ public class RobotContainer {
 
     /* Operator */
 
-    // Comp
+    turret.ifPresent(
+        (t) ->
+            t.setDefaultCommand(
+                TurretCommands.joystickTurretAngleCommand(
+                    t, operatorMapper::getRotationX, operatorMapper::getRotationY)));
+
     operatorMapper
         .getStaticShooterToggleButton()
         .onTrue(ShooterCommands.staticShooterToggleCommand());
 
-    roller.ifPresent(
-        (r) -> {
-          operatorMapper.getOuttakeButton().onTrue(r.runOuttakeCommand());
-        });
+    operatorMapper.getResetTurretAngleButton().onTrue(TurretCommands.resetAngleCommand(turret));
+
+    operatorMapper.getOuttakeButton().whileTrue(RollerCommands.runOuttakeCommand(roller));
+
+    operatorMapper.getSetLowestHoodAngleButton().onTrue(HoodCommands.setLowestAngleCommand(hood));
 
     // Test
     operatorMapper.getPointToHubButton().whileTrue(TurretCommands.pointToHub(turret, drive));
+
+    operatorMapper.getIncrementHoodAngleButton().onTrue(HoodCommands.incrementCommand(hood));
+    operatorMapper.getDecrementHoodAngleButton().onTrue(HoodCommands.decrementCommand(hood));
 
     flywheel.ifPresent(
         (f) -> {
           Command runIndexerAndFlywheelCommand =
               Commands.run(() -> f.runIndexerAndFlywheel(flywheelSpeed.getAsDouble()), f)
                   .finallyDo(f::stopMotors);
-          operatorMapper.getPointToHubButton().whileTrue(runIndexerAndFlywheelCommand);
+          operatorMapper.getRunIndexerAndFlywheelButton().whileTrue(runIndexerAndFlywheelCommand);
         });
   }
 
@@ -279,5 +270,13 @@ public class RobotContainer {
     // Controller disconnected alerts
     primaryDisconnected.set(!DriverStation.isJoystickConnected(MapperConstants.driverPort));
     secondaryDisconnected.set(!DriverStation.isJoystickConnected(MapperConstants.operatorPort));
+  }
+
+  @SuppressWarnings("unused")
+  private boolean driverHasInput() {
+    return Math.abs(driverMapper.getTranslationX()) >= DriveCommands.deadband
+        || Math.abs(driverMapper.getTranslationY()) >= DriveCommands.deadband
+        || Math.abs(driverMapper.getRotationX()) >= DriveCommands.deadband
+        || Math.abs(driverMapper.getRotationY()) >= DriveCommands.deadband;
   }
 }

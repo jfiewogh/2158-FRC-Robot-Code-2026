@@ -41,7 +41,7 @@ public interface DriverMapper {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getResetPoseButton() {
+  public default Trigger getZeroPoseButton() {
     return new Trigger(() -> false);
   }
 

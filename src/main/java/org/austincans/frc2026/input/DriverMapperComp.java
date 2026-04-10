@@ -68,7 +68,7 @@ public class DriverMapperComp implements DriverMapper {
   }
 
   @Override
-  public Trigger getResetPoseButton() {
+  public Trigger getZeroPoseButton() {
     return controller.back();
   }
 

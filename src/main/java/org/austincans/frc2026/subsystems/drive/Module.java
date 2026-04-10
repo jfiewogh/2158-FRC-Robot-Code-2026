@@ -29,7 +29,6 @@ import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputMode;
 import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputs;
 
 public class Module {
-
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final ModuleIOOutputs outputs = new ModuleIOOutputs();

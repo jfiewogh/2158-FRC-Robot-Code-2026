@@ -38,14 +38,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.commands.shooter.ShooterCommands;
+import java.util.function.BooleanSupplier;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
-import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
 import org.austincans.frc2026.subsystems.intake.roller.Roller;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 
@@ -93,7 +92,7 @@ public class AutoCommands {
   // and the robot continues to drive with its last velocity
 
   public static Command driveToAndIntakeGamePieces(
-      Drive drive, ObjectDetection detection, Roller roller, DoubleSupplier... suppliers) {
+      Drive drive, ObjectDetection detection, Roller roller, BooleanSupplier driverHasInput) {
     return Commands.defer(
             () ->
                 // Pathfind (used to navigate quickly to nearest game piece)
@@ -118,7 +117,7 @@ public class AutoCommands {
                                       ? detection.getNearestGamePiecePoseSatisfyingCondition(
                                           drive, pose -> RebuiltFieldUtils.poseInAllianceHalf(pose))
                                       : detection.getNearestGamePiecePose();
-                              if (!Drive.joystickHasInput && targetPose != null) {
+                              if (!driverHasInput.getAsBoolean() && targetPose != null) {
                                 if (!DriverStation.isAutonomous()
                                     || RebuiltFieldUtils.robotInAllianceHalf(drive)) {
                                   driveToPose(
@@ -142,8 +141,7 @@ public class AutoCommands {
                                 }
                                 roller.runIntake();
                               }
-                            }))
-                    .alongWith(Commands.run(() -> updateJoystickHasInputCommand(suppliers))),
+                            })),
             Set.of(drive, detection, roller))
         .beforeStarting(
             () -> {
@@ -172,7 +170,7 @@ public class AutoCommands {
         .until(
             () ->
                 roller.running && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
-                    || Drive.joystickHasInput)
+                    || driverHasInput.getAsBoolean())
         .finallyDo(
             () -> {
               System.out.println("end drive intake command");
@@ -238,7 +236,7 @@ public class AutoCommands {
       Flywheel flywheel,
       Hood hood,
       ObjectDetection detection,
-      DoubleSupplier... suppliers) {
+      BooleanSupplier driverHasInput) {
     return Commands.defer(
             () -> {
               Alliance alliance =
@@ -255,14 +253,12 @@ public class AutoCommands {
                                       < pathfindEndDistance)
                       .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
               return Commands.deadline(
-                  // TODO: temporary fix
                   ShooterCommands.shootToHubCommand(
                       Optional.of(flywheel),
                       Optional.of(hood),
                       Optional.of(turret),
                       Optional.of(drive)),
-                  pathfindCommand,
-                  updateJoystickHasInputCommand(suppliers));
+                  pathfindCommand);
             },
             Set.of(drive, turret, flywheel, hood, detection))
         .beforeStarting(
@@ -280,30 +276,12 @@ public class AutoCommands {
               }
               targetRotation = minRotation;
             })
-        .until(() -> Drive.joystickHasInput)
+        .until(driverHasInput)
         .finallyDo(
             () -> {
               drive.stop();
               flywheel.setVelocity(RotationsPerSecond.of(0));
               System.out.println("end drive score command");
             });
-  }
-
-  private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {
-    return Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers));
-  }
-
-  /* Actual auto commands */
-
-  public static Command runIntakeCommand(Optional<Roller> roller) {
-    return roller.map(r -> Commands.startEnd(r::runIntake, r::stop, r)).orElse(Commands.none());
-  }
-
-  public static Command deployIntakeCommand(Optional<Deploy> deploy) {
-    return deploy.map(d -> d.deployCommand()).orElse(Commands.none());
-  }
-
-  public static Command retractIntakeCommand(Optional<Deploy> deploy) {
-    return deploy.map(d -> d.retractCommand()).orElse(Commands.none());
   }
 }

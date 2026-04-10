@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.commands.shooter;
+package org.austincans.frc2026.subsystems.superstructure.shooter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -25,11 +25,11 @@ import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.commands.TurretCommands;
 import org.austincans.frc2026.commands.TurretCommands.TrackingTargets;
-import org.austincans.frc2026.commands.shooter.ShotCalculator.ShotInputs;
-import org.austincans.frc2026.commands.shooter.ShotCalculator.ShotParameters;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotInputs;
+import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator.ShotParameters;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
@@ -41,43 +41,50 @@ public class ShooterCommands {
   private static ShotCalculator hubShotCalculator;
   private static final ShotCalculator shuttleShotCalculator;
 
-  private final LoggedTunableNumber speedMultiplier = new LoggedTunableNumber("Speed Multiplier", 1);
+  private final LoggedTunableNumber speedMultiplier =
+      new LoggedTunableNumber("Speed Multiplier", 1);
 
   static {
-    hubShotCalculator = new ShotCalculator(
-        Constants.loopPeriodSecs,
-        ShotConstants.scoringHoodAngleMap,
-        ShotConstants.scoringFlywheelSpeedMap,
-        ShotConstants.scoringTimeOfFlightMap,
-        TurretConstants.robotRelTurretTransform);
+    hubShotCalculator =
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.scoringHoodAngleMap,
+            ShotConstants.scoringFlywheelSpeedMap,
+            ShotConstants.scoringTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
 
-    shuttleShotCalculator = new ShotCalculator(
-        Constants.loopPeriodSecs,
-        ShotConstants.passingHoodAngleMap,
-        ShotConstants.passingFlywheelSpeedMap,
-        ShotConstants.passingTimeOfFlightMap,
-        TurretConstants.robotRelTurretTransform);
+    shuttleShotCalculator =
+        new ShotCalculator(
+            Constants.loopPeriodSecs,
+            ShotConstants.passingHoodAngleMap,
+            ShotConstants.passingFlywheelSpeedMap,
+            ShotConstants.passingTimeOfFlightMap,
+            TurretConstants.robotRelTurretTransform);
   }
+
+  private ShooterCommands() {}
 
   private static ShotParameters getHubShotParameters(Drive drive) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    ShotInputs inputs = new ShotInputs(
-        drive.getPose3d(),
-        drive.getChassisSpeeds(),
-        drive.getChassisSpeeds(),
-        alliance == Alliance.Red
-            ? TrackingTargets.redHub.getTranslation3d()
-            : TrackingTargets.blueHub.getTranslation3d());
+    ShotInputs inputs =
+        new ShotInputs(
+            drive.getPose3d(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
+            alliance == Alliance.Red
+                ? TrackingTargets.redHub.getTranslation3d()
+                : TrackingTargets.blueHub.getTranslation3d());
     return hubShotCalculator.calculate(inputs);
   }
 
   private static ShotParameters getShuttleShotParameters(Drive drive) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    ShotInputs inputs = new ShotInputs(
-        drive.getPose3d(),
-        drive.getChassisSpeeds(),
-        drive.getChassisSpeeds(),
-        TurretCommands.getShuttleTarget(drive, alliance).getTranslation3d());
+    ShotInputs inputs =
+        new ShotInputs(
+            drive.getPose3d(),
+            drive.getChassisSpeeds(),
+            drive.getChassisSpeeds(),
+            TurretCommands.getShuttleTarget(drive, alliance).getTranslation3d());
     return shuttleShotCalculator.calculate(inputs);
   }
 
@@ -168,29 +175,33 @@ public class ShooterCommands {
     Turret t = turret.get();
     Drive d = drive.get();
     return Commands.run(
-        () -> {
-          Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-          if (RebuiltFieldUtils.isInAllianceZone(alliance, d.getPose())) {
-            shootToHub(d, f, h, t);
-          } else {
-            shuttle(d, f, h, t);
-          }
-        },
-        d, f, h, t).finallyDo(f::stopMotors);
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(alliance, d.getPose())) {
+                shootToHub(d, f, h, t);
+              } else {
+                shuttle(d, f, h, t);
+              }
+            },
+            d,
+            f,
+            h,
+            t)
+        .finallyDo(f::stopMotors);
   }
 
   public static Command trackCommand(Turret turret, Hood hood, Drive drive) {
     return Commands.run(
-        () -> {
-          Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-          if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
-            trackHub(drive, hood, turret);
-          } else {
-            trackShuttle(drive, hood, turret);
-          }
-        },
-        turret,
-        hood)
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(alliance, drive.getPose())) {
+                trackHub(drive, hood, turret);
+              } else {
+                trackShuttle(drive, hood, turret);
+              }
+            },
+            turret,
+            hood)
         .finallyDo(
             () -> {
               Drive.driveSpeedMultiplier = 1;

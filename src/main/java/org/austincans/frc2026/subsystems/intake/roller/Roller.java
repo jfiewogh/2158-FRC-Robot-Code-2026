@@ -76,18 +76,6 @@ public class Roller extends AdvancedSubsystem {
     }
   }
 
-  public Command runIntakeCommand() {
-    return Commands.runOnce(this::runIntake, this);
-  }
-
-  public Command runOuttakeCommand() {
-    return Commands.runOnce(this::runOuttake, this);
-  }
-
-  public Command toggleCommand() {
-    return Commands.runOnce(this::toggle, this);
-  }
-
   @Override
   protected Command systemCheckCommand() {
     return Commands.none();

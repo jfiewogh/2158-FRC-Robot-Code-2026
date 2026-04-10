@@ -55,18 +55,6 @@ public class Deploy extends AdvancedSubsystem {
     outputs.voltage = 0.0;
   }
 
-  public Command deployCommand() {
-    return Commands.runOnce(this::deploy, this);
-  }
-
-  public Command retractCommand() {
-    return Commands.runOnce(this::retract, this);
-  }
-
-  public Command stopCommand() {
-    return Commands.runOnce(this::stop, this);
-  }
-
   @Override
   protected Command systemCheckCommand() {
     return Commands.none();

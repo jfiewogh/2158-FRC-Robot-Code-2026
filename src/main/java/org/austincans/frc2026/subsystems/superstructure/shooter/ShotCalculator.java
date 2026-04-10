@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.commands.shooter;
+package org.austincans.frc2026.subsystems.superstructure.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,16 +32,14 @@ import org.littletonrobotics.junction.Logger;
 // TODO: Move into lib
 // TODO: Maybe make it work for z's between floor and hub height (ex. robot on bump)
 /**
- * Used to calculate the parameters necessary for shooting based on maps of
- * empirically measured
+ * Used to calculate the parameters necessary for shooting based on maps of empirically measured
  * data.
  *
- * <p>
- * Heavily based on z
+ * <p>Heavily based on z
  *
  * <ul>
- * <li>https://github.com/Mechanical-Advantage/RobotCode2026Public/blob/main/src/main/java/org/littletonrobotics/frc2026/subsystems/launcher/LaunchCalculator.java
- * <li>https://github.com/eeveemara/frc-fire-control/blob/main/src/main/java/frc/firecontrol/ShotCalculator.java
+ *   <li>https://github.com/Mechanical-Advantage/RobotCode2026Public/blob/main/src/main/java/org/littletonrobotics/frc2026/subsystems/launcher/LaunchCalculator.java
+ *   <li>https://github.com/eeveemara/frc-fire-control/blob/main/src/main/java/frc/firecontrol/ShotCalculator.java
  * </ul>
  */
 public class ShotCalculator {
@@ -56,17 +54,18 @@ public class ShotCalculator {
   private final InterpolatingDoubleTreeMap timeOfFlightMap;
 
   private final Transform3d robotRelTurretOffset;
-  private Function<Rotation2d, Translation3d> turretRelShotOffsetFromPitchMap; // based on turret offset
-  private Function<Rotation2d, Translation3d> turretRelShotOffsetFromYawMap; // based on turret offset
+  private Function<Rotation2d, Translation3d>
+      turretRelShotOffsetFromPitchMap; // based on turret offset
+  private Function<Rotation2d, Translation3d>
+      turretRelShotOffsetFromYawMap; // based on turret offset
 
   /**
    * The key for all maps is XY distance in meters.
    *
    * @param phaseDelaySecs
    * @param pitchRadMap
-   * @param flywheelSpeedMap     RPM
-   * @param timeOfFlightMap      This is needed for needed for shooting on the
-   *                             move
+   * @param flywheelSpeedMap RPM
+   * @param timeOfFlightMap This is needed for needed for shooting on the move
    * @param robotRelTurretOffset in meters and radians
    */
   public ShotCalculator(
@@ -103,15 +102,13 @@ public class ShotCalculator {
       Pose3d driveFieldRelPose3d,
       ChassisSpeeds driveRobotRelVelocities,
       ChassisSpeeds driveFieldRelVelocities,
-      Translation3d targetFieldRelPosition3d) {
-  }
+      Translation3d targetFieldRelPosition3d) {}
 
   public record ShotParameters(
       Rotation2d hoodAngle,
       Rotation2d fieldRelTurretAngle,
       double flywheelSpeedRPM,
-      Rotation2d driveFieldRelRotation2d) {
-  }
+      Rotation2d driveFieldRelRotation2d) {}
 
   /** This only takes into account X and Y components, ignoring Z. */
   public ShotParameters calculate(ShotInputs inputs) {
@@ -126,24 +123,28 @@ public class ShotCalculator {
     // TODO: You can also try to take into account acceleration. This can be
     // achieved by storing
     // previous velocity and calculating the slope.
-    driveFieldRelPose2d = driveFieldRelPose2d.exp(
-        new Twist2d(
-            driveRobotRelVelocities.vxMetersPerSecond * phaseDelaySecs,
-            driveRobotRelVelocities.vyMetersPerSecond * phaseDelaySecs,
-            driveRobotRelVelocities.omegaRadiansPerSecond * phaseDelaySecs));
+    driveFieldRelPose2d =
+        driveFieldRelPose2d.exp(
+            new Twist2d(
+                driveRobotRelVelocities.vxMetersPerSecond * phaseDelaySecs,
+                driveRobotRelVelocities.vyMetersPerSecond * phaseDelaySecs,
+                driveRobotRelVelocities.omegaRadiansPerSecond * phaseDelaySecs));
 
     /* Calculate target */
     Translation2d targetFieldRelPosition2d = inputs.targetFieldRelPosition3d.toTranslation2d();
-    Pose2d shotFieldRelPose2d = driveFieldRelPose2d.transformBy(GeomUtil.toTransform2d(robotRelTurretOffset));
-    double shotToTargetDistance2d = targetFieldRelPosition2d.getDistance(driveFieldRelPose2d.getTranslation());
+    Pose2d shotFieldRelPose2d =
+        driveFieldRelPose2d.transformBy(GeomUtil.toTransform2d(robotRelTurretOffset));
+    double shotToTargetDistance2d =
+        targetFieldRelPosition2d.getDistance(driveFieldRelPose2d.getTranslation());
 
     /* Calculate field relative shot velocities */
     ChassisSpeeds driveFieldRelVelocities = inputs.driveFieldRelVelocities;
     Rotation2d driveRotation = driveFieldRelPose2d.getRotation();
-    ChassisSpeeds shotFieldRelVelocities = GeomUtil.transformVelocity(
-        driveFieldRelVelocities,
-        robotRelTurretOffset.getTranslation().toTranslation2d(),
-        driveRotation);
+    ChassisSpeeds shotFieldRelVelocities =
+        GeomUtil.transformVelocity(
+            driveFieldRelVelocities,
+            robotRelTurretOffset.getTranslation().toTranslation2d(),
+            driveRotation);
 
     /*
      * Account for shooter velocity to offset (lookahead pose, virtual target)
@@ -159,12 +160,15 @@ public class ShotCalculator {
 
     for (int i = 0; i < iterations; i++) {
       timeOfFlightSecs = timeOfFlightMap.get(lookaheadShotToTargetDistance2d);
-      Translation2d offset2d = new Translation2d(
-          shotFieldRelVelocities.vxMetersPerSecond * timeOfFlightSecs,
-          shotFieldRelVelocities.vyMetersPerSecond * timeOfFlightSecs);
-      lookaheadShotPose2d = new Pose2d(
-          shotFieldRelPose2d.getTranslation().plus(offset2d), shotFieldRelPose2d.getRotation());
-      lookaheadShotToTargetDistance2d = targetFieldRelPosition2d.getDistance(lookaheadShotPose2d.getTranslation());
+      Translation2d offset2d =
+          new Translation2d(
+              shotFieldRelVelocities.vxMetersPerSecond * timeOfFlightSecs,
+              shotFieldRelVelocities.vyMetersPerSecond * timeOfFlightSecs);
+      lookaheadShotPose2d =
+          new Pose2d(
+              shotFieldRelPose2d.getTranslation().plus(offset2d), shotFieldRelPose2d.getRotation());
+      lookaheadShotToTargetDistance2d =
+          targetFieldRelPosition2d.getDistance(lookaheadShotPose2d.getTranslation());
     }
 
     Logger.recordOutput("turret pose", shotFieldRelPose2d);
@@ -179,7 +183,8 @@ public class ShotCalculator {
     Rotation2d hoodAngle = pitchMap.get(lookaheadShotToTargetDistance2d);
 
     /* Turret angle */
-    Rotation2d turretAngle = targetFieldRelPosition2d.minus(lookaheadShotPose2d.getTranslation()).getAngle();
+    Rotation2d turretAngle =
+        targetFieldRelPosition2d.minus(lookaheadShotPose2d.getTranslation()).getAngle();
 
     /* Flywheel speed */
     double flywheelSpeedRPM = flywheelSpeedMap.get(lookaheadShotToTargetDistance2d);
@@ -192,7 +197,7 @@ public class ShotCalculator {
     return ShotConstants.scoringTimeOfFlightMap.get(0.0);
   }
 
-    public static double getMaxTimeOfFlight() {
+  public static double getMaxTimeOfFlight() {
     return ShotConstants.passingTimeOfFlightMap.get(100.0);
   }
 }
