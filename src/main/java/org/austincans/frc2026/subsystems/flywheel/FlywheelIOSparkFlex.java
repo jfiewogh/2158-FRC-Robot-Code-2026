@@ -23,22 +23,18 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import java.util.ArrayList;
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOSparkFlex extends FlywheelIOReal {
   private final SparkFlex motor1 = new SparkFlex(FlywheelConstants.motor1Id, MotorType.kBrushless);
-  private final SelfCheckingSparkFlex selfCheckMotor1 =
-      new SelfCheckingSparkFlex("flywheel motor 1", motor1);
   private final SparkFlex motor2 = new SparkFlex(FlywheelConstants.motor2Id, MotorType.kBrushless);
-  private final SelfCheckingSparkFlex selfCheckMotor2 =
-      new SelfCheckingSparkFlex("flywheel motor 2", motor2);
 
-  // private final CANcoder encoder =
-  //     new CANcoder(FlywheelConstants.encoderId, FlywheelConstants.canBus);
   private final SparkClosedLoopController controller = motor1.getClosedLoopController();
   private final SparkFlexConfig config = new SparkFlexConfig();
   private final SparkFlexConfig config2 = new SparkFlexConfig();
@@ -57,42 +53,38 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.appliedVolts = motor1.getBusVoltage();
-    inputs.velocityRPM = motor1.getEncoder().getVelocity();
-    // inputs.velocityRPM = encoder.getVelocity().getValue().in(Units.RPM);
-    inputs.temperatureC = motor1.getMotorTemperature();
+    inputs.appliedVolts = Volts.of(motor1.getBusVoltage());
+    inputs.velocity = RPM.of(motor1.getEncoder().getVelocity());
+    inputs.temperature = Celsius.of(motor1.getMotorTemperature());
+    inputs.current = Amps.of(motor1.getOutputCurrent());
   }
 
-  @Override
-  public void runVoltage(double volts) {
+  private void runVoltage(Voltage volts) {
     motor1.setVoltage(volts);
   }
 
-  @Override
-  public void runVelocity(double velocityRPM) {
-    controller.setSetpoint(velocityRPM * 2, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (velocityRPM == 0) {
+  private void runVelocity(AngularVelocity velocity) {
+    controller.setSetpoint(velocity.in(RPM) * 2, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (velocity == RPM.of(0)) {
       controller.setSetpoint(0, ControlType.kDutyCycle);
     }
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> motorFaults = selfCheckMotor1.checkForFaults();
-    motorFaults.addAll(selfCheckMotor2.checkForFaults());
-    if (motorFaults != null) {
-      faults.addAll(motorFaults);
-    }
-    if (faults.isEmpty()) {
-      return null;
-    } else {
-      return faults;
+  public void applyOutputs(FlywheelIOOutputs outputs) {
+    switch (outputs.mode){
+      case VELOCITY -> {
+        runVelocity(outputs.velocity);
+      }
+      case VOLTAGE -> {
+        runVoltage(outputs.voltage);
+      }
     }
   }
 
   @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckMotor1, selfCheckMotor2);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Flywheel Motor 1", motor1);
+    subsystem.registerHardware("Flywheel Motor 2", motor2);
   }
 }

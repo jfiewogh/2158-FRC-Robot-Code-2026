@@ -50,10 +50,10 @@ public class ObjectDetection extends SubsystemBase {
     }
   }
 
-  private final ODIO io;
+  private final ObjectDetectionIO io;
   private final ObjectDetectionIOInputsAutoLogged inputs = new ObjectDetectionIOInputsAutoLogged();
 
-  public ObjectDetection(ODIO io) {
+  public ObjectDetection(ObjectDetectionIO io) {
     this.io = io;
   }
 

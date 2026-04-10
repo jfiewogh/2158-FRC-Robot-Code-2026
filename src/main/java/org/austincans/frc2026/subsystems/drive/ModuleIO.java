@@ -16,9 +16,8 @@
 package org.austincans.frc2026.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
@@ -43,37 +42,25 @@ public interface ModuleIO {
     public double turnTorqueCurrentAmps = 0.0;
   }
 
-  /** Updates the set of loggable inputs. */
-  default void updateInputs(ModuleIOInputs inputs) {}
-
-  /** Run the drive motor at the specified open loop value. */
-  default void setDriveOpenLoop(double output) {}
-
-  /** Run the turn motor at the specified open loop value. */
-  default void setTurnOpenLoop(double output) {}
-
-  /** Run the drive motor at the specified velocity. */
-  default void setDriveVelocity(double velocityRadPerSec) {}
-
-  default void setDriveVelocity(double velocityRadPerSec, double feedforward) {}
-
-  /** Run the turn motor to the specified rotation. */
-  default void setTurnPosition(Rotation2d rotation) {}
-
-  /** Set P, I, and D gains for closed loop control on drive motor. */
-  public default void setDrivePID(double kP, double kI, double kD) {}
-
-  /** Set P, I, and D gains for closed loop control on turn motor. */
-  public default void setTurnPID(double kP, double kI, double kD) {}
-
-  /** Set brake mode on drive motor */
-  public default void setBrakeMode(boolean enabled) {}
-
-  default List<HardwareFault> checkForFaults() {
-    return List.of();
+  public static enum ModuleIOOutputMode {
+    COAST,
+    BRAKE,
+    DRIVE,
+    CHARACTERIZE
   }
 
-  public default List<SelfChecking> getHardware() {
-    return List.of();
+  public static class ModuleIOOutputs {
+    public ModuleIOOutputMode mode = ModuleIOOutputMode.COAST;
+    public double driveVelocityRadPerSec = 0.0;
+    public double driveFeedforward = 0.0;
+    public double driveCharacterizationOutput = 0.0;
+    public Rotation2d turnRotation = Rotation2d.kZero;
+    public boolean turnNeutral = false;
   }
+
+  public default void updateInputs(ModuleIOInputs inputs) {}
+
+  public default void applyOutputs(ModuleIOOutputs outputs) {}
+
+  public default void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

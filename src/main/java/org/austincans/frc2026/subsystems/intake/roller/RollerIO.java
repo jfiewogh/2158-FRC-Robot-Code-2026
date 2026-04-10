@@ -13,17 +13,30 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.vision;
+package org.austincans.frc2026.subsystems.intake.roller;
 
-import edu.wpi.first.math.geometry.Pose3d;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ODIO {
+public interface RollerIO {
   @AutoLog
-  public class ObjectDetectionIOInputs {
-    public Pose3d nearestGamePiecePose = new Pose3d();
-    public Pose3d[] gamePiecePoses = new Pose3d[0];
+  public class RollerIOInputs {
+    public double motorVoltage = 0.0;
+    public double velocityRadPerSec = 0.0;
+    public double temperatureCelsius = 0.0;
+    public double supplyCurrentAmps = 0.0;
+    public double followerSupplyCurrentAmps = 0.0;
+    public boolean connected = false;
+    public boolean followerConnected = false;
   }
 
-  public void updateInputs(ObjectDetectionIOInputs inputs);
+  public class RollerIOOutputs {
+    public double voltage;
+  }
+
+  public void updateInputs(RollerIOInputs inputs);
+
+  public void applyOutputs(RollerIOOutputs outputs);
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

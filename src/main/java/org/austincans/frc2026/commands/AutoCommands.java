@@ -15,6 +15,8 @@
 
 package org.austincans.frc2026.commands;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
@@ -34,19 +36,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
-
 import org.austincans.frc2026.commands.shooter.ShooterCommands;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 import org.austincans.frc2026.subsystems.hood.Hood;
-import org.austincans.frc2026.subsystems.intake.Intake;
+import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
+import org.austincans.frc2026.subsystems.intake.roller.Roller;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 
-public class AutonCommands {
+public class AutoCommands {
   private static PIDController drivePIDX = new PIDController(3, 0.0, 0);
   private static PIDController drivePIDY = new PIDController(3, 0.0, 0);
   private static ProfiledPIDController rotationPID =
@@ -90,7 +93,7 @@ public class AutonCommands {
   // and the robot continues to drive with its last velocity
 
   public static Command driveToAndIntakeGamePieces(
-      Drive drive, ObjectDetection detection, Intake intake, DoubleSupplier... suppliers) {
+      Drive drive, ObjectDetection detection, Roller roller, DoubleSupplier... suppliers) {
     return Commands.defer(
             () ->
                 // Pathfind (used to navigate quickly to nearest game piece)
@@ -134,14 +137,14 @@ public class AutonCommands {
                                           detection.getNearestGamePiecePose().toPose2d(),
                                           drive.getPose())
                                       < intakeDistanceMeters) {
-                                if (intake.getVelocityRadPerSec() == 0) {
+                                if (!roller.running) {
                                   intakeStartTime = Timer.getFPGATimestamp();
                                 }
-                                intake.setRelativeVelocity(0.5);
+                                roller.runIntake();
                               }
                             }))
                     .alongWith(Commands.run(() -> updateJoystickHasInputCommand(suppliers))),
-            Set.of(drive, detection, intake))
+            Set.of(drive, detection, roller))
         .beforeStarting(
             () -> {
               System.out.println("start drive intake command");
@@ -168,14 +171,13 @@ public class AutonCommands {
         .onlyWhile(() -> detection.getNearestGamePiecePose() != null)
         .until(
             () ->
-                intake.getVelocityRadPerSec() != 0
-                        && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
+                roller.running && Timer.getFPGATimestamp() - intakeStartTime > intakeDurationSeconds
                     || Drive.joystickHasInput)
         .finallyDo(
             () -> {
               System.out.println("end drive intake command");
               drive.stop();
-              intake.setRelativeVelocity(0);
+              roller.stop();
               Pathfinding.setDynamicObstacles(List.of(), drive.getPose().getTranslation());
             });
   }
@@ -253,7 +255,12 @@ public class AutonCommands {
                                       < pathfindEndDistance)
                       .andThen(Commands.run(drive::stop)); // must use Commands.run to stop robot
               return Commands.deadline(
-                  ShooterCommands.shootToHubCommand(drive, flywheel, hood, turret),
+                  // TODO: temporary fix
+                  ShooterCommands.shootToHubCommand(
+                      Optional.of(flywheel),
+                      Optional.of(hood),
+                      Optional.of(turret),
+                      Optional.of(drive)),
                   pathfindCommand,
                   updateJoystickHasInputCommand(suppliers));
             },
@@ -277,12 +284,26 @@ public class AutonCommands {
         .finallyDo(
             () -> {
               drive.stop();
-              flywheel.setVelocity(0);
+              flywheel.setVelocity(RotationsPerSecond.of(0));
               System.out.println("end drive score command");
             });
   }
 
   private static Command updateJoystickHasInputCommand(DoubleSupplier... suppliers) {
     return Commands.run(() -> DriveCommands.updateJoystickHasInput(suppliers));
+  }
+
+  /* Actual auto commands */
+
+  public static Command runIntakeCommand(Optional<Roller> roller) {
+    return roller.map(r -> Commands.startEnd(r::runIntake, r::stop, r)).orElse(Commands.none());
+  }
+
+  public static Command deployIntakeCommand(Optional<Deploy> deploy) {
+    return deploy.map(d -> d.deployCommand()).orElse(Commands.none());
+  }
+
+  public static Command retractIntakeCommand(Optional<Deploy> deploy) {
+    return deploy.map(d -> d.retractCommand()).orElse(Commands.none());
   }
 }

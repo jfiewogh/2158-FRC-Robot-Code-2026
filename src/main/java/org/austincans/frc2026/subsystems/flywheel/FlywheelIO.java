@@ -15,42 +15,41 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 
 public interface FlywheelIO {
   @AutoLog
   public class FlywheelIOInputs {
-    public double appliedVolts = 0;
-    public double velocityRPM = 0;
-    public double temperatureC = 0;
+    public Voltage appliedVolts = Volts.of(0);
+    public AngularVelocity velocity = RPM.of(0);
+    public Temperature temperature = Celsius.of(0);
+    public Current current = Amps.of(0);
   }
 
-  public default void updateInputs(FlywheelIOInputs inputs) {}
-
-  public default void runVoltage(double volts) {}
-
-  public default void runVelocity(double velocityRPM) {}
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
+  public static enum FlywheelIOOutputMode {
+    VELOCITY,
+    VOLTAGE
   }
 
-  public default List<SelfChecking> getHardware() {
-    return List.of();
+  public class FlywheelIOOutputs {
+    public FlywheelIOOutputMode mode = FlywheelIOOutputMode.VELOCITY;
+    public Voltage voltage = Volts.of(0);
+    public AngularVelocity velocity = RPM.of(0);
+    public Voltage feedforward = Volts.of(0);
   }
 
-  public default boolean readyToShoot() {
-    return false;
-  }
+  public void updateInputs(FlywheelIOInputs inputs);
 
-  public default boolean isShooting() {
-    return false;
-  }
+  public void applyOutputs(FlywheelIOOutputs outputs);
 
-  public default boolean noGamePiecesToShoot() {
-    return false;
-  }
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

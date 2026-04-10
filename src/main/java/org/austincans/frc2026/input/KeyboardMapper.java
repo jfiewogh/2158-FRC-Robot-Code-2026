@@ -29,7 +29,7 @@ public class KeyboardMapper implements DriverMapper {
         return keyboard.c();
     }
     @Override
-    public Trigger getIntakeToggleButton() {
+    public Trigger getRollerToggleButton() {
         return keyboard.v();
     }
     @Override

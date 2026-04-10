@@ -13,38 +13,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.intake;
+package org.austincans.frc2026.subsystems.vision;
 
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import edu.wpi.first.math.geometry.Pose3d;
 import org.littletonrobotics.junction.AutoLog;
 
-/** Add your docs here. */
-public interface IntakeIO {
+public interface ObjectDetectionIO {
   @AutoLog
-  public class IntakeIOInputs {
-    public boolean isDeployed = false;
-    public double deployMotorVoltage = 0;
-    public double deployPositionRad = 0;
-    public double deployTemperatureC = 0;
-    public double intakeMotorVoltage = 0;
-    public double intakeVelocityRadPerSec = 0;
-    public double intakeTemperatureC = 0;
+  public class ObjectDetectionIOInputs {
+    public Pose3d nearestGamePiecePose = new Pose3d();
+    public Pose3d[] gamePiecePoses = new Pose3d[0];
   }
 
-  public void updateInputs(IntakeIOInputs inputs);
-
-  // rpm
-  public void setRelativeVelocity(double velocity);
-
-  public void setVoltage(double voltage);
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
+  public void updateInputs(ObjectDetectionIOInputs inputs);
 }

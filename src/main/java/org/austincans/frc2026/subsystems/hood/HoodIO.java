@@ -15,10 +15,7 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 /* This is specifically for the linear actuator */
@@ -26,20 +23,16 @@ public abstract interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
     public int pulseWidth;
-    public Rotation2d hoodAngle;
-    public double hoodAngleDeg;
-    public double temperatureCelsius;
-    public double motorPositionRad;
-    public double velocityRadPerSec;
+    public double angleDeg;
+  }
+
+  public class HoodIOOutputs {
+    public int pulseWidth = 0;
   }
 
   public void updateInputs(HoodIOInputs inputs);
 
-  public void setHoodAngle(Rotation2d angle);
+  public void applyOutputs(HoodIOOutputs outputs);
 
-  public void setPulse(int pulseWidth);
-
-  public List<HardwareFault> checkForFaults();
-
-  public List<SelfChecking> getHardware();
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

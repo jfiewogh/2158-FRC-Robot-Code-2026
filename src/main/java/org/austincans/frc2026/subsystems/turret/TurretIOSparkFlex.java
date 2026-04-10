@@ -15,8 +15,6 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
-import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -29,26 +27,19 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
-public class TurretIOSparkFlex implements TurretIO {
+public class TurretIOSparkFlex extends TurretIOReal {
   private final SparkFlex motor;
-  private final CANcoder encoder;
   private final RelativeEncoder relativeEncoder;
   private final SparkClosedLoopController controller;
-  private final SelfCheckingSparkFlex selfCheckingMotor;
 
   public TurretIOSparkFlex() {
     super();
     motor =
         new SparkFlex(
-            TurretConstants.turretMotorId,
+            TurretConstants.motorId,
             TurretConstants.isBrushlessMotor ? MotorType.kBrushless : MotorType.kBrushed);
-    selfCheckingMotor = new SelfCheckingSparkFlex("Turret", motor);
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
@@ -63,13 +54,6 @@ public class TurretIOSparkFlex implements TurretIO {
     motor.configure(
         motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-    encoder = new CANcoder(25, new CANBus("rio"));
-
-    // CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-    // encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    // encoderConfig.MagnetSensor.MagnetOffset = 0.4140625;
-    // encoder.getConfigurator().apply(encoderConfig);
-
     relativeEncoder = motor.getEncoder();
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
@@ -78,31 +62,9 @@ public class TurretIOSparkFlex implements TurretIO {
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    controller.setSetpoint(voltage, ControlType.kVoltage);
-  }
-
-  @Override
-  public void setDesiredAngle(Rotation2d angle) {
-    double rotations =
-        MathUtil.inputModulus(
-            angle.getRotations(),
-            TurretConstants.turretMinimumRotation,
-            TurretConstants.turretMaxRotation);
-    controller.setSetpoint(rotations * 10, ControlType.kPosition); // 10:1 motor to turret rotations
-  }
-
-  @Override
-  public void setVelocity(double radiansPerSec) {
-    controller.setSetpoint(
-        Units.radiansToRotations(radiansPerSec), ControlType.kMAXMotionVelocityControl);
-  }
-
-  @Override
   public void updateInputs(TurretIOInputs inputs) {
-    // super.updateInputs(inputs);
-    inputs.encoderPosition = encoder.getPosition().getValueAsDouble();
-    inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / 10);
+    super.updateInputs(inputs);
+    inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / TurretConstants.gearing);
     inputs.motorPositionRotations = relativeEncoder.getPosition();
     inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
@@ -112,22 +74,46 @@ public class TurretIOSparkFlex implements TurretIO {
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> deployFaults = selfCheckingMotor.checkForFaults();
-    if (deployFaults != null) {
-      faults.addAll(deployFaults);
+  public void applyOutputs(TurretIOOutputs outputs){
+    switch (outputs.mode){
+      case VELOCITY -> {
+        setVelocity(outputs.velocityRadPerSec);
+      }
+      case VOLTAGE -> {
+        setVoltage(outputs.voltage);
+      }
+      case ANGLE -> {
+        setDesiredAngle(outputs.angle);
+      }
     }
-    return faults.isEmpty() ? null : faults;
+  }
+
+  private void setVoltage(double voltage) {
+    controller.setSetpoint(voltage, ControlType.kVoltage);
+  }
+
+  private void setVelocity(double velocityRadPerSec) {
+    controller.setSetpoint(
+        Units.radiansToRotations(velocityRadPerSec) * 60, 
+        ControlType.kMAXMotionVelocityControl);
+  }
+
+  private void setDesiredAngle(Rotation2d angle) {
+    double rotations =
+        MathUtil.inputModulus(
+            angle.getRotations(),
+            TurretConstants.turretMinimumRotation,
+            TurretConstants.turretMaxRotation);
+    controller.setSetpoint(rotations * TurretConstants.gearing, ControlType.kPosition);
   }
 
   @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckingMotor);
+  public void resetAngle(Rotation2d newAngle) {
+    relativeEncoder.setPosition(newAngle.getRotations() * TurretConstants.gearing);
   }
 
   @Override
-  public void resetAngle(Rotation2d angle) {
-    relativeEncoder.setPosition(angle.getRotations() * 10);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Turret", motor);
   }
 }

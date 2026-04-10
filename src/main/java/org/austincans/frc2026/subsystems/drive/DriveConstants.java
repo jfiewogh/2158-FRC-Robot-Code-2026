@@ -42,6 +42,8 @@ public class DriveConstants {
   public static final double maxLinearAcceleration = 22.0;
   public static final double maxAngularAcceleration = Math.PI;
 
+    public static final double turnDeadbandDeg = 0.3;
+
   /** Includes bumpers! */
   public static final double robotWidth =
       Units.inchesToMeters(28.0) + 2 * Units.inchesToMeters(2.0);

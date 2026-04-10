@@ -35,57 +35,52 @@ import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.04;
-  private static final LoggedTunableNumber ANGLE_KP =
-      new LoggedTunableNumber("driveAtAngle_kP", 0.5);
-  private static final LoggedTunableNumber ANGLE_KD =
-      new LoggedTunableNumber("driveAtAngle_kD", 0.0);
-  ;
+  public static final double deadband = 0.1;
+  private static final double ffStartDelay = 2.0; // Secs
+  private static final double ffRampRate = 0.1; // Volts/Sec
+  private static final double wheelRadiusMaxVelocity = 0.25; // Rad/Sec
+  private static final double wheelRadiusRampRate = 0.05; // Rad/Sec^2
+
+  private static final LoggedTunableNumber driveKP =
+      new LoggedTunableNumber("DriveCommands/kP", 6.0);
+  private static final LoggedTunableNumber driveKD =
+      new LoggedTunableNumber("DriveCommands/kD", 0.05);
+  private static final LoggedTunableNumber angularKP =
+      new LoggedTunableNumber("DriveCommands/kP", 6.0);
+  private static final LoggedTunableNumber angularKD =
+      new LoggedTunableNumber("DriveCommands/kD", 0.05);
+
+  public static boolean robotRelative = true;
   private static final double ANGLE_MAX_VELOCITY = Math.PI;
   private static final double ANGLE_MAX_ACCELERATION = Math.PI * 2;
-  private static final double FF_START_DELAY = 2.0; // Secs
-  private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
-
-  private enum OmegaMode {
-    POSITION,
-    SPEED
-  }
-
-  @SuppressWarnings("unused")
-  private static final OmegaMode omegaMode = OmegaMode.POSITION;
-
-  // if position, use joystickDriveAtAngle
-  // if speed, use joystickDrive
-
-  private static final double hasInputThreshold = 0.1;
 
   private DriveCommands() {}
 
-  private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
+  public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-    Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
+    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), deadband);
+    Rotation2d linearDirection = new Rotation2d(x, y);
 
     // Square magnitude for more precise control
     linearMagnitude = linearMagnitude * linearMagnitude;
 
     // Return new linear velocity
-    return new Pose2d(new Translation2d(), linearDirection)
-        .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+    return new Pose2d(Translation2d.kZero, linearDirection)
+        .transformBy(new Transform2d(linearMagnitude, 0.0, Rotation2d.kZero))
         .getTranslation();
   }
 
   public static void updateJoystickHasInput(DoubleSupplier... suppliers) {
     Drive.joystickHasInput = false;
     for (DoubleSupplier supplier : suppliers) {
-      if (Math.abs(supplier.getAsDouble()) >= hasInputThreshold) {
+      if (Math.abs(supplier.getAsDouble()) >= 0.1) {
         Drive.joystickHasInput = true;
         break;
       }
@@ -113,7 +108,7 @@ public class DriveCommands {
         getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
     // Apply rotation deadband
-    double omega = MathUtil.applyDeadband(omegaYSupplier.getAsDouble(), DEADBAND);
+    double omega = MathUtil.applyDeadband(omegaYSupplier.getAsDouble(), deadband);
 
     // Square rotation value for more precise control
     omega = Math.copySign(omega * omega, omega);
@@ -121,7 +116,7 @@ public class DriveCommands {
     boolean isFlipped =
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Red;
-    Logger.recordOutput("flipped", isFlipped);
+    // Logger.recordOutput("flipped", isFlipped);
 
     // Convert to field relative speeds & send command
     ChassisSpeeds speeds =
@@ -139,7 +134,8 @@ public class DriveCommands {
   }
 
   /**
-   * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   * Field or robot relative drive command using two joysticks (controlling linear and angular
+   * velocities).
    */
   public static Command joystickDriveCommand(
       Drive drive,
@@ -161,9 +157,9 @@ public class DriveCommands {
   // Create PID controller
   public static final ProfiledPIDController angleController =
       new ProfiledPIDController(
-          ANGLE_KP.getAsDouble(),
+          angularKP.getAsDouble(),
           0.0,
-          ANGLE_KD.getAsDouble(),
+          angularKD.getAsDouble(),
           new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
   static {
@@ -203,9 +199,9 @@ public class DriveCommands {
     }
 
     LoggedTunableNumber.ifChanged(
-        ANGLE_KD.hashCode(), () -> angleController.setD(ANGLE_KD.getAsDouble()), ANGLE_KD);
+        angularKD.hashCode(), () -> angleController.setD(angularKD.getAsDouble()), angularKD);
     LoggedTunableNumber.ifChanged(
-        ANGLE_KP.hashCode(), () -> angleController.setP(ANGLE_KP.getAsDouble()), ANGLE_KP);
+        angularKP.hashCode(), () -> angleController.setP(angularKP.getAsDouble()), angularKP);
 
     double omega =
         angleController.calculate(drive.getRotation().getRadians(), desiredRotation.getRadians());
@@ -303,7 +299,7 @@ public class DriveCommands {
                   drive.runCharacterization(0.0);
                 },
                 drive)
-            .withTimeout(FF_START_DELAY),
+            .withTimeout(ffStartDelay),
 
         // Start timer
         Commands.runOnce(timer::restart),
@@ -311,7 +307,7 @@ public class DriveCommands {
         // Accelerate and gather data
         Commands.run(
                 () -> {
-                  double voltage = timer.get() * FF_RAMP_RATE;
+                  double voltage = timer.get() * ffRampRate;
                   drive.runCharacterization(voltage);
                   velocitySamples.add(drive.getFFCharacterizationVelocity());
                   voltageSamples.add(voltage);
@@ -342,37 +338,21 @@ public class DriveCommands {
                 }));
   }
 
-  public static Command robotPointToPose(Drive drive, Pose2d pose) {
-    // angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    return Commands.run(
-        () -> {
-          double omega =
-              angleController.calculate(
-                  drive.getRotation().getRadians(), pose.getRotation().getDegrees());
-          ChassisSpeeds speeds = new ChassisSpeeds(0, 0, omega);
-          drive.runVelocity(speeds);
-        });
-  }
-
   /** Measures the robot's wheel radius by spinning in a circle. */
   public static Command wheelRadiusCharacterization(Drive drive) {
-    SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
+    SlewRateLimiter limiter = new SlewRateLimiter(wheelRadiusRampRate);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
 
     return Commands.parallel(
         // Drive control sequence
         Commands.sequence(
             // Reset acceleration limiter
-            Commands.runOnce(
-                () -> {
-                  limiter.reset(0.0);
-                }),
+            Commands.runOnce(() -> limiter.reset(0.0)),
 
             // Turn in place, accelerating up to full speed
             Commands.run(
                 () -> {
-                  double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
+                  double speed = limiter.calculate(wheelRadiusMaxVelocity);
                   drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
                 },
                 drive)),
@@ -386,16 +366,27 @@ public class DriveCommands {
             Commands.runOnce(
                 () -> {
                   state.positions = drive.getWheelRadiusCharacterizationPositions();
-                  state.lastAngle = drive.getRotation();
+                  state.lastAngle = RobotState.getInstance().getRotation();
                   state.gyroDelta = 0.0;
                 }),
 
             // Update gyro delta
             Commands.run(
                     () -> {
-                      var rotation = drive.getRotation();
+                      var rotation = RobotState.getInstance().getRotation();
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
+
+                      double[] positions = drive.getWheelRadiusCharacterizationPositions();
+                      double wheelDelta = 0.0;
+                      for (int i = 0; i < 4; i++) {
+                        wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
+                      }
+                      double wheelRadius =
+                          (state.gyroDelta * DriveConstants.driveBaseRadius) / wheelDelta;
+
+                      Logger.recordOutput("Drive/WheelDelta", wheelDelta);
+                      Logger.recordOutput("Drive/WheelRadius", wheelRadius);
                     })
 
                 // When cancelled, calculate and print results
@@ -406,9 +397,10 @@ public class DriveCommands {
                       for (int i = 0; i < 4; i++) {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                       }
-                      double wheelRadius = (state.gyroDelta * Drive.DRIVE_BASE_RADIUS) / wheelDelta;
+                      double wheelRadius =
+                          (state.gyroDelta * DriveConstants.driveBaseRadius) / wheelDelta;
 
-                      NumberFormat formatter = new DecimalFormat("#0.000");
+                      NumberFormat formatter = new DecimalFormat("#0.00000000");
                       System.out.println(
                           "********** Wheel Radius Characterization Results **********");
                       System.out.println(
@@ -426,7 +418,7 @@ public class DriveCommands {
 
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
-    Rotation2d lastAngle = new Rotation2d();
+    Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
   }
 }

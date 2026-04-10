@@ -18,53 +18,44 @@ package org.austincans.frc2026.subsystems.hood;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import org.austincans.frc2026.subsystems.hood.HoodIO.HoodIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
+/** This is specifically for the 2026 robot */
 public class Hood extends AdvancedSubsystem {
   public final boolean tuningModeEnabled = false;
 
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+  private final HoodIOOutputs outputs = new HoodIOOutputs();
 
   public Hood(HoodIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
-  }
-
-  public void setPulse(int pulseWidth) {
-    io.setPulse(pulseWidth);
-  }
-
-  public void addToPulse(int addend) {
-    io.setPulse(inputs.pulseWidth + addend);
-  }
-
-  public void setHoodAngle(Rotation2d hoodAngle) {
-    io.setHoodAngle(hoodAngle);
-  }
-
-  public void setShotPitchAngle(Rotation2d angle) {
-    setHoodAngle(Rotation2d.fromDegrees(90).minus(angle));
-  }
-
-  public int getPulse() {
-    return inputs.pulseWidth;
-  }
-
-  public Rotation2d getHoodAngle() {
-    return inputs.hoodAngle;
-  }
-
-  public Rotation2d getShotPitchAngle() {
-    return Rotation2d.fromDegrees(90).minus(inputs.hoodAngle);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     // Logger.processInputs("Hood/Inputs", inputs);
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+  }
+
+  public void setPulse(int pulseWidth) {
+    outputs.pulseWidth = pulseWidth;
+  }
+
+  public void addToPulse(int addend) {
+    setPulse(inputs.pulseWidth + addend);
+  }
+
+  public void setAngle(Rotation2d angle) {
+    setPulse(HoodUtil.angleToPWM(angle));
   }
 
   /** This should only be used for testing */
@@ -77,11 +68,7 @@ public class Hood extends AdvancedSubsystem {
   }
 
   public Command stopCommand() {
-    return new InstantCommand(
-        // () -> {
-        //   io.setHoodAngle(Rotation2d.fromDegrees(0));
-        // });
-        );
+    return Commands.runOnce(() -> setPulse(inputs.pulseWidth), this);
   }
 
   public Command systemCheckCommand() {
@@ -89,27 +76,19 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   clearFaults();
-                  io.setHoodAngle(Rotation2d.fromDegrees(10));
+                  setAngle(Rotation2d.fromDegrees(10));
                 },
                 this),
             Commands.waitSeconds(0.1),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.velocityRadPerSec < Math.PI * 2) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
-                  }
-                },
-                this),
             Commands.run(
                     () -> {
-                      io.setHoodAngle(Rotation2d.fromDegrees(20));
+                      setAngle(Rotation2d.fromDegrees(20));
                     },
                     this)
                 .withTimeout(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.hoodAngle.getDegrees() < 22 || inputs.hoodAngle.getDegrees() > 18) {
+                  if (inputs.angleDeg < 22 || inputs.angleDeg > 18) {
                     addSubsystemFault(
                         "HOOD", "[System Check] Hood did not reach target position", false);
                   }

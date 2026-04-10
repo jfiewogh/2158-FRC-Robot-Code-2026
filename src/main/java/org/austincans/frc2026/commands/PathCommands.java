@@ -76,8 +76,7 @@ public class PathCommands {
         .beforeStarting(followTrajectoryTimer::restart)
         .until(
             () ->
-                AutonCommands.getDistanceBetweenPoses(
-                        drive.getPose(), trajectory.getEndState().pose)
+                AutoCommands.getDistanceBetweenPoses(drive.getPose(), trajectory.getEndState().pose)
                     < endPathDistance);
   }
 }
