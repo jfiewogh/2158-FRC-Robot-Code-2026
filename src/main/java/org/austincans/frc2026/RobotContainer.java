@@ -150,7 +150,6 @@ public class RobotContainer {
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("TopAuto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
     autoChooser.addOption("Bottom Auto", AutoBuilder.buildAuto("BottomAuto"));
-    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
 
     autoChooser.addOption("Just Shoot Top", AutoBuilder.buildAuto("TopJustShoot"));
     autoChooser.addOption("Just Shoot Mid", AutoBuilder.buildAuto("MidJustShoot"));
@@ -158,6 +157,8 @@ public class RobotContainer {
 
     autoChooser.addOption("Do Nothing", AutoBuilder.buildAuto("DoNothing"));
     autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("JustShoot"));
+
+    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
