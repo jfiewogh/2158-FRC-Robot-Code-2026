@@ -44,8 +44,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -127,8 +125,6 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
 
-  private final Field2d field = new Field2d();
-
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -137,6 +133,8 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       ModuleIO brModuleIO,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.gyroIO = gyroIO;
+    gyroIO.registerSelfCheckHardware(this);
+
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
 
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
@@ -233,8 +231,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
       hasStartedCoast = false;
     }
 
-    field.setRobotPose(getPose());
-    SmartDashboard.putData("Field", field);
+    RobotState.getInstance().updateField();
 
     // Record cycle time
     // LoggedTracer.record("Drive/Periodic");

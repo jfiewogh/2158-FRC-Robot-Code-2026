@@ -26,11 +26,9 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingPigeon2;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
@@ -39,7 +37,6 @@ public class GyroIOPigeon2 implements GyroIO {
       new Pigeon2(
           TunerConstants.DrivetrainConstants.Pigeon2Id,
           new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
-  private SelfCheckingPigeon2 pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
 
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
   private final StatusSignal<Angle> pitch = pigeon.getPitch();
@@ -77,5 +74,10 @@ public class GyroIOPigeon2 implements GyroIO {
 
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
+  }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Pigeon", pigeon);
   }
 }

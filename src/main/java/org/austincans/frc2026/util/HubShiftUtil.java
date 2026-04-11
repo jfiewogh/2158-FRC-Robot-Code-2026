@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.Setter;
-import org.austincans.frc2026.subsystems.superstructure.shooter.ShotCalculator;
+import org.austincans.frc2026.superstructure.shooter.ShotCalculator;
 
 public class HubShiftUtil {
   public enum ShiftEnum {

@@ -16,7 +16,6 @@
 package org.austincans.frc2026.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -58,9 +57,9 @@ public interface ModuleIO {
     public boolean turnNeutral = false;
   }
 
-  public default void updateInputs(ModuleIOInputs inputs) {}
+  public void updateInputs(ModuleIOInputs inputs);
 
-  public default void applyOutputs(ModuleIOOutputs outputs) {}
+  public void applyOutputs(ModuleIOOutputs outputs);
 
-  public default void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

@@ -20,9 +20,9 @@ import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.RobotContainer;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.drive.GyroIO;
+import org.austincans.frc2026.subsystems.drive.GyroIOFake;
 import org.austincans.frc2026.subsystems.drive.GyroIOPigeon2;
-import org.austincans.frc2026.subsystems.drive.ModuleIO;
+import org.austincans.frc2026.subsystems.drive.ModuleIOFake;
 import org.austincans.frc2026.subsystems.drive.ModuleIOTalonFXReal;
 import org.austincans.frc2026.subsystems.feeder.Indexer;
 import org.austincans.frc2026.subsystems.feeder.IndexerIOSparkFlex;
@@ -67,11 +67,11 @@ public class SubsystemFactory {
     } else {
       drive =
           new Drive(
-              new GyroIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
+              new GyroIOFake(),
+              new ModuleIOFake(),
+              new ModuleIOFake(),
+              new ModuleIOFake(),
+              new ModuleIOFake(),
               (pose) -> {});
     }
     return Optional.ofNullable(drive);

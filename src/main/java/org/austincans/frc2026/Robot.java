@@ -111,6 +111,9 @@ public class Robot extends LoggedRobot {
         Logger.setReplaySource(new WPILOGReader(inPath));
         Logger.addDataReceiver(new WPILOGWriter(outPath));
         break;
+
+      default:
+        break;
     }
 
     // Set timing mode

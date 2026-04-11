@@ -13,24 +13,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.intake.deploy;
+package org.austincans.frc2026.subsystems.drive;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Optional;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
-public class DeployCommands {
-  private DeployCommands() {}
+public class ModuleIOFake implements ModuleIO {
+  @Override
+  public void updateInputs(ModuleIOInputs inputs) {}
 
-  public static Command deployCommand(Optional<Deploy> deploy) {
-    return deploy.map(d -> Commands.startEnd(d::deploy, d::stop, d)).orElse(Commands.none());
-  }
+  @Override
+  public void applyOutputs(ModuleIOOutputs outputs) {}
 
-  public static Command retractCommand(Optional<Deploy> deploy) {
-    return deploy.map(d -> Commands.startEnd(d::retract, d::stop, d)).orElse(Commands.none());
-  }
-
-  public static Command stopCommand(Optional<Deploy> deploy) {
-    return deploy.map(d -> Commands.runOnce(d::stop, d)).orElse(Commands.none());
-  }
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

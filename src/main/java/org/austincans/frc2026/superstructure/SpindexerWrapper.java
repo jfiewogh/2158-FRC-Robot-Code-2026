@@ -13,33 +13,31 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.hood;
+package org.austincans.frc2026.superstructure;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
+import org.austincans.frc2026.subsystems.feeder.Spindexer;
 
-public class HoodCommands {
-  private HoodCommands() {}
-
-  public static Command setAngleCommand(Optional<Hood> hood, Rotation2d angle) {
-    return hood.map((h) -> Commands.runOnce(() -> h.setAngle(angle), h)).orElse(Commands.none());
+public class SpindexerWrapper extends SubsystemWrapper<Spindexer> {
+  public SpindexerWrapper(Optional<Spindexer> subsystem) {
+    super(subsystem);
   }
 
-  public static Command setPulseCommand(Optional<Hood> hood, int pulse) {
-    return hood.map((h) -> Commands.runOnce(() -> h.setPulse(pulse), h)).orElse(Commands.none());
+  public Command runCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::run, s)).orElse(Commands.none());
   }
 
-  public static Command setLowestAngleCommand(Optional<Hood> hood) {
-    return setPulseCommand(hood, 1000);
+  public Command stopCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::stop, s)).orElse(Commands.none());
   }
 
-  public static Command incrementCommand(Optional<Hood> hood) {
-    return hood.map((h) -> h.addToPulseCommand(50)).orElse(Commands.none());
+  public void run() {
+    subsystem.ifPresent((s) -> s.run());
   }
 
-  public static Command decrementCommand(Optional<Hood> hood) {
-    return hood.map((h) -> h.addToPulseCommand(-50)).orElse(Commands.none());
+  public void stop() {
+    subsystem.ifPresent((s) -> s.stop());
   }
 }

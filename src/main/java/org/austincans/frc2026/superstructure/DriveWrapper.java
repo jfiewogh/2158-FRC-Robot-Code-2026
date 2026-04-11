@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.drive;
+package org.austincans.frc2026.superstructure;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -37,20 +38,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.RobotState;
+import org.austincans.frc2026.subsystems.drive.Drive;
+import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveCommands {
+public class DriveWrapper extends SubsystemWrapper<Drive> {
   public static final double deadband = 0.1;
   private static final double ffStartDelay = 2.0; // Secs
   private static final double ffRampRate = 0.1; // Volts/Sec
   private static final double wheelRadiusMaxVelocity = 0.25; // Rad/Sec
   private static final double wheelRadiusRampRate = 0.05; // Rad/Sec^2
 
+  @SuppressWarnings("unused")
   private static final LoggedTunableNumber driveKP =
       new LoggedTunableNumber("DriveCommands/kP", 6.0);
+
+  @SuppressWarnings("unused")
   private static final LoggedTunableNumber driveKD =
       new LoggedTunableNumber("DriveCommands/kD", 0.05);
+
   private static final LoggedTunableNumber angularKP =
       new LoggedTunableNumber("DriveCommands/kP", 6.0);
   private static final LoggedTunableNumber angularKD =
@@ -59,9 +66,30 @@ public class DriveCommands {
   private static final double ANGLE_MAX_VELOCITY = Math.PI;
   private static final double ANGLE_MAX_ACCELERATION = Math.PI * 2;
 
-  private DriveCommands() {}
+  // Create PID controller
+  private final ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          angularKP.getAsDouble(),
+          0.0,
+          angularKD.getAsDouble(),
+          new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
 
-  public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
+  public enum TurnMode {
+    TWO_AXIS,
+    ONE_AXIS
+  }
+
+  private TurnMode turnMode = TurnMode.ONE_AXIS;
+
+  private Rotation2d lastFieldRelRotation = Rotation2d.kZero;
+
+  public DriveWrapper(Optional<Drive> subsystem) {
+    super(subsystem);
+
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+  }
+
+  private Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), deadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -75,9 +103,7 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  private static Rotation2d lastFieldRelRotation = Rotation2d.kZero;
-
-  public static void joystickDrive(
+  private void joystickDrive(
       Drive drive,
       DoubleSupplier xSupplier, // forward/backward
       DoubleSupplier ySupplier, // left/right
@@ -118,13 +144,16 @@ public class DriveCommands {
    * Field or robot relative drive command using two joysticks (controlling linear and angular
    * velocities).
    */
-  public static Command joystickDriveCommand(
-      Drive drive,
+  public Command joystickDriveCommand(
       DoubleSupplier xSupplier, // forward/backward
       DoubleSupplier ySupplier, // left/right
       DoubleSupplier omegaXSupplier, // forward/backward
       DoubleSupplier omegaYSupplier // left/right
       ) {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
     return Commands.run(
         () -> joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier), drive);
   }
@@ -134,20 +163,7 @@ public class DriveCommands {
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
    */
-
-  // Create PID controller
-  public static final ProfiledPIDController angleController =
-      new ProfiledPIDController(
-          angularKP.getAsDouble(),
-          0.0,
-          angularKD.getAsDouble(),
-          new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-
-  static {
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-  }
-
-  public static void joystickDriveAtAngle(
+  private void joystickDriveAtAngle(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -197,16 +213,23 @@ public class DriveCommands {
             isFlipped ? drive.getRotation().plus(Rotation2d.k180deg) : drive.getRotation()));
   }
 
-  public static Command joystickDriveAtAngleCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaXSupplier,
-      DoubleSupplier omegaYSupplier) {
-
-    // Construct command
+  public Command joystickDriveAtAngleCommand(
+      DoubleSupplier translationXSupplier,
+      DoubleSupplier translationYSupplier,
+      DoubleSupplier rotationXSupplier,
+      DoubleSupplier rotationYSupplier) {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
     return Commands.run(
-            () -> joystickDriveAtAngle(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier),
+            () ->
+                joystickDriveAtAngle(
+                    drive,
+                    translationXSupplier,
+                    translationYSupplier,
+                    rotationXSupplier,
+                    rotationYSupplier),
             drive)
         // Reset PID controller when command starts
         .beforeStarting(
@@ -216,34 +239,37 @@ public class DriveCommands {
             });
   }
 
-  public static enum TurnMode {
-    TWO_AXIS,
-    ONE_AXIS
-  }
-
-  public static TurnMode turnMode = TurnMode.ONE_AXIS;
-
-  // TODO: there are some issues with two axis turn mode
-
-  public static Command driveCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaXSupplier,
-      DoubleSupplier omegaYSupplier) {
-
+  public Command driveCommand(
+      DoubleSupplier translationXSupplier,
+      DoubleSupplier translationYSupplier,
+      DoubleSupplier rotationXSupplier,
+      DoubleSupplier rotationYSupplier) {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
     return Commands.run(
         () -> {
           if (turnMode == TurnMode.TWO_AXIS) {
-            joystickDriveAtAngle(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+            joystickDriveAtAngle(
+                drive,
+                translationXSupplier,
+                translationYSupplier,
+                rotationXSupplier,
+                rotationYSupplier);
           } else {
-            joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier);
+            joystickDrive(
+                drive,
+                translationXSupplier,
+                translationYSupplier,
+                rotationXSupplier,
+                rotationYSupplier);
           }
         },
         drive);
   }
 
-  public static Command setTurnMode() {
+  public Command setTurnModeCommand() {
     return Commands.runOnce(
         () -> {
           if (turnMode == TurnMode.ONE_AXIS) {
@@ -259,7 +285,12 @@ public class DriveCommands {
    *
    * <p>This command should only be used in voltage control mode.
    */
-  public static Command feedforwardCharacterization(Drive drive) {
+  public Command feedforwardCharacterization() {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
+
     List<Double> velocitySamples = new LinkedList<>();
     List<Double> voltageSamples = new LinkedList<>();
     Timer timer = new Timer();
@@ -318,7 +349,12 @@ public class DriveCommands {
   }
 
   /** Measures the robot's wheel radius by spinning in a circle. */
-  public static Command wheelRadiusCharacterization(Drive drive) {
+  public Command wheelRadiusCharacterization() {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
+
     SlewRateLimiter limiter = new SlewRateLimiter(wheelRadiusRampRate);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
 
@@ -395,29 +431,53 @@ public class DriveCommands {
                     })));
   }
 
-  private static class WheelRadiusCharacterizationState {
+  private class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
   }
 
-  public static Command stopWithX(Optional<Drive> drive) {
-    return drive.map((d) -> Commands.runOnce(d::stopWithX, d)).orElse(Commands.none());
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return subsystem.map((s) -> s.sysIdQuasistatic(direction)).orElse(Commands.none());
   }
 
-  public static Command zeroPoseCommand(Optional<Drive> drive) {
-    return drive
-        .map(
-            (d) ->
-                Commands.runOnce(
-                    () ->
-                        d.setPose(
-                            new Pose2d(
-                                d.getPose().getTranslation(),
-                                DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
-                                    ? Rotation2d.k180deg
-                                    : Rotation2d.kZero)),
-                    d))
-        .orElse(Commands.none());
+  /** Returns a command to run a dynamic test in the specified direction. */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return subsystem.map((s) -> s.sysIdDynamic(direction)).orElse(Commands.none());
+  }
+
+  /**
+   * Returns a command to run a dynamic test in the specified direction and with counterClockwise
+   * Rotation.
+   */
+  public Command sysIdDynamicAngular(SysIdRoutine.Direction direction) {
+    return subsystem.map((s) -> s.sysIdDynamicAngular(direction)).orElse(Commands.none());
+  }
+
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command sysIdQuasistaticAngular(SysIdRoutine.Direction direction) {
+    return subsystem.map((s) -> s.sysIdQuasistaticAngular(direction)).orElse(Commands.none());
+  }
+
+  public Command stopWithXCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::stopWithX, s)).orElse(Commands.none());
+  }
+
+  public Command zeroPoseCommand() {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Drive drive = subsystem.get();
+
+    return Commands.runOnce(
+        () ->
+            drive.setPose(
+                new Pose2d(
+                    drive.getPose().getTranslation(),
+                    DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
+                        ? Rotation2d.k180deg
+                        : Rotation2d.kZero)),
+        drive);
   }
 }

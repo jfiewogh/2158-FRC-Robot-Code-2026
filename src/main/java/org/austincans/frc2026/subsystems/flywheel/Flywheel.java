@@ -100,7 +100,7 @@ public class Flywheel extends AdvancedSubsystem {
     outputs.velocity = velocity;
   }
 
-  public void stopShooter() {
+  public void stop() {
     setVelocity(RPM.of(0));
   }
 

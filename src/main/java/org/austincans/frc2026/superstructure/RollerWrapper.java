@@ -13,24 +13,27 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.subsystems.intake.roller;
+package org.austincans.frc2026.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
+import org.austincans.frc2026.subsystems.intake.roller.Roller;
 
-public class RollerCommands {
-  private RollerCommands() {}
-
-  public static Command runIntakeCommand(Optional<Roller> roller) {
-    return roller.map(r -> Commands.startEnd(r::runIntake, r::stop, r)).orElse(Commands.none());
+public class RollerWrapper extends SubsystemWrapper<Roller> {
+  public RollerWrapper(Optional<Roller> subsystem) {
+    super(subsystem);
   }
 
-  public static Command runOuttakeCommand(Optional<Roller> roller) {
-    return roller.map(r -> Commands.startEnd(r::runOuttake, r::stop, r)).orElse(Commands.none());
+  public Command runIntakeCommand() {
+    return subsystem.map(s -> Commands.startEnd(s::runIntake, s::stop, s)).orElse(Commands.none());
   }
 
-  public static Command toggleCommand(Optional<Roller> roller) {
-    return roller.map(r -> Commands.startEnd(r::toggle, r::stop, r)).orElse(Commands.none());
+  public Command runOuttakeCommand() {
+    return subsystem.map(s -> Commands.startEnd(s::runOuttake, s::stop, s)).orElse(Commands.none());
+  }
+
+  public Command toggleCommand() {
+    return subsystem.map(s -> Commands.startEnd(s::toggle, s::stop, s)).orElse(Commands.none());
   }
 }

@@ -34,25 +34,11 @@ import org.austincans.frc2026.input.MapperConstants;
 import org.austincans.frc2026.input.OperatorMapper;
 import org.austincans.frc2026.input.OperatorMapperTest;
 import org.austincans.frc2026.subsystems.SubsystemFactory;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.drive.DriveCommands;
-import org.austincans.frc2026.subsystems.feeder.Indexer;
-import org.austincans.frc2026.subsystems.feeder.Spindexer;
-import org.austincans.frc2026.subsystems.flywheel.Flywheel;
-import org.austincans.frc2026.subsystems.hood.Hood;
-import org.austincans.frc2026.subsystems.hood.HoodCommands;
-import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
-import org.austincans.frc2026.subsystems.intake.deploy.DeployCommands;
-import org.austincans.frc2026.subsystems.intake.roller.Roller;
-import org.austincans.frc2026.subsystems.intake.roller.RollerCommands;
 import org.austincans.frc2026.subsystems.led.Led;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2026.subsystems.superstructure.SuperstructureCommands;
-import org.austincans.frc2026.subsystems.superstructure.shooter.ShooterCommands;
-import org.austincans.frc2026.subsystems.turret.Turret;
-import org.austincans.frc2026.subsystems.turret.TurretCommands;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 import org.austincans.frc2026.subsystems.vision.Vision;
+import org.austincans.frc2026.superstructure.*;
 import org.austincans.frc2026.util.HubShiftUtil;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 
@@ -78,24 +64,28 @@ public class RobotContainer {
   public static final boolean ledEnabled = false;
 
   // Subsystems
-  private final Optional<Drive> drive = SubsystemFactory.buildDrive();
+  private final DriveWrapper drive = new DriveWrapper(SubsystemFactory.buildDrive());
 
   @SuppressWarnings("unused")
-  private final Optional<Vision> vision = SubsystemFactory.buildVision(drive);
+  private final Optional<Vision> vision = SubsystemFactory.buildVision(drive.getSubsystem());
 
   @SuppressWarnings("unused")
   private final Optional<ObjectDetection> objectDetection = SubsystemFactory.buildObjectDetection();
 
-  private final Optional<Turret> turret = SubsystemFactory.buildTurret();
-  private final Optional<Hood> hood = SubsystemFactory.buildHood();
-  private final Optional<Roller> roller = SubsystemFactory.buildRoller();
-  private final Optional<Deploy> deploy = SubsystemFactory.buildDeploy();
-  private final Optional<Flywheel> flywheel = SubsystemFactory.buildFlywheel();
-  private final Optional<Indexer> indexer = SubsystemFactory.buildIndexer();
-  private final Optional<Spindexer> spindexer = SubsystemFactory.buildSpindexer();
+  private final TurretWrapper turret = new TurretWrapper(SubsystemFactory.buildTurret());
+  private final HoodWrapper hood = new HoodWrapper(SubsystemFactory.buildHood());
+  private final RollerWrapper roller = new RollerWrapper(SubsystemFactory.buildRoller());
+  private final DeployWrapper deploy = new DeployWrapper(SubsystemFactory.buildDeploy());
+  private final FlywheelWrapper flywheel = new FlywheelWrapper(SubsystemFactory.buildFlywheel());
+  private final IndexerWrapper indexer = new IndexerWrapper(SubsystemFactory.buildIndexer());
+  private final SpindexerWrapper spindexer =
+      new SpindexerWrapper(SubsystemFactory.buildSpindexer());
 
   @SuppressWarnings("unused")
   private final Optional<Led> led = SubsystemFactory.buildLed();
+
+  private final Superstructure superstructure =
+      new Superstructure(drive, turret, hood, roller, deploy, flywheel, indexer, spindexer);
 
   // Alerts
   private final Alert primaryDisconnected =
@@ -125,13 +115,11 @@ public class RobotContainer {
 
   private void registerNamedCommands() {
     /* Register named commands */
-    NamedCommands.registerCommand("Run Intake", RollerCommands.runIntakeCommand(roller));
-    NamedCommands.registerCommand("Deploy Intake", DeployCommands.deployCommand(deploy));
-    NamedCommands.registerCommand("Retract Intake", DeployCommands.retractCommand(deploy));
-    NamedCommands.registerCommand(
-        "Score", ShooterCommands.shootToHubCommand(flywheel, hood, turret, drive));
-    NamedCommands.registerCommand(
-        "Shuttle", ShooterCommands.shuttleCommand(flywheel, hood, turret, drive));
+    NamedCommands.registerCommand("Run Intake", roller.runIntakeCommand());
+    NamedCommands.registerCommand("Deploy Intake", deploy.deployCommand());
+    NamedCommands.registerCommand("Retract Intake", deploy.retractCommand());
+    NamedCommands.registerCommand("Score", superstructure.shootToHubCommand());
+    NamedCommands.registerCommand("Shuttle", superstructure.shuttleCommand());
   }
 
   private void addAutos() {
@@ -139,29 +127,25 @@ public class RobotContainer {
     autoChooser = new SendableChooser<Command>();
 
     // Set up SysId routines
-    drive.ifPresent(
-        (d) -> {
-          autoChooser.addOption(
-              "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(d));
-          autoChooser.addOption(
-              "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(d));
-          autoChooser.addOption(
-              "Drive SysId (Quasistatic Forward)",
-              d.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-          autoChooser.addOption(
-              "Drive SysId (Quasistatic Angular)",
-              d.sysIdQuasistaticAngular(SysIdRoutine.Direction.kForward));
-          autoChooser.addOption(
-              "Drive SysId (Quasistatic Reverse)",
-              d.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-          autoChooser.addOption(
-              "Drive SysId (Dynamic Forward)", d.sysIdDynamic(SysIdRoutine.Direction.kForward));
-          autoChooser.addOption(
-              "Drive SysId (Dynam ic Angular)",
-              d.sysIdDynamicAngular(SysIdRoutine.Direction.kForward));
-          autoChooser.addOption(
-              "Drive SysId (Dynamic Reverse)", d.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        });
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", drive.wheelRadiusCharacterization());
+    autoChooser.addOption("Drive Simple FF Characterization", drive.feedforwardCharacterization());
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Angular)",
+        drive.sysIdQuasistaticAngular(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynam ic Angular)",
+        drive.sysIdDynamicAngular(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
@@ -191,59 +175,51 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver */
+
     // Drive
-    drive.ifPresent(
-        (d) ->
-            d.setDefaultCommand(
-                DriveCommands.driveCommand(
-                    d,
-                    driverMapper::getTranslationX,
-                    driverMapper::getTranslationY,
-                    driverMapper::getRotationX,
-                    driverMapper::getRotationY)));
+    drive.setDefaultCommand(
+        drive.driveCommand(
+            driverMapper::getTranslationX,
+            driverMapper::getTranslationY,
+            driverMapper::getRotationX,
+            driverMapper::getRotationY));
 
-    driverMapper.getTurnModeToggleButton().onTrue(DriveCommands.setTurnMode());
-    driverMapper.getStopWithXButton().onTrue(DriveCommands.stopWithX(drive));
-    driverMapper.getZeroPoseButton().onTrue(DriveCommands.zeroPoseCommand(drive));
+    driverMapper.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
+    driverMapper.getStopWithXButton().onTrue(drive.stopWithXCommand());
+    driverMapper.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
 
-    driverMapper.getRollerToggleButton().onTrue(RollerCommands.toggleCommand(roller));
+    driverMapper.getRollerToggleButton().onTrue(roller.toggleCommand());
 
-    driverMapper.getDeployButton().whileTrue(DeployCommands.deployCommand(deploy));
-    driverMapper.getRetractButton().whileTrue(DeployCommands.retractCommand(deploy));
+    driverMapper.getDeployButton().whileTrue(deploy.deployCommand());
+    driverMapper.getRetractButton().whileTrue(deploy.retractCommand());
 
-    driverMapper
-        .getShootButton()
-        .whileTrue(ShooterCommands.shootCommand(flywheel, hood, turret, drive));
+    driverMapper.getShootButton().whileTrue(superstructure.shootCommand());
 
     /* Operator */
 
-    turret.ifPresent(
-        (t) ->
-            t.setDefaultCommand(
-                TurretCommands.joystickTurretAngleCommand(
-                    t, operatorMapper::getRotationX, operatorMapper::getRotationY)));
+    turret.setDefaultCommand(
+        turret.joystickRobotRelAngleCommand(
+            operatorMapper::getRotationX, operatorMapper::getRotationY));
 
     operatorMapper
         .getStaticShooterToggleButton()
-        .onTrue(ShooterCommands.staticShooterToggleCommand());
+        .onTrue(superstructure.staticShooterToggleCommand());
 
-    operatorMapper.getResetTurretAngleButton().onTrue(TurretCommands.resetAngleCommand(turret));
+    operatorMapper.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
 
-    operatorMapper.getOuttakeButton().whileTrue(RollerCommands.runOuttakeCommand(roller));
+    operatorMapper.getOuttakeButton().whileTrue(roller.runOuttakeCommand());
 
-    operatorMapper.getSetLowestHoodAngleButton().onTrue(HoodCommands.setLowestAngleCommand(hood));
+    operatorMapper.getSetLowestHoodAngleButton().onTrue(hood.setLowestAngleCommand());
 
     // Test
-    operatorMapper.getPointToHubButton().whileTrue(TurretCommands.pointToHub(turret, drive));
+    operatorMapper.getPointToHubButton().whileTrue(superstructure.turretPointToHub());
 
-    operatorMapper.getIncrementHoodAngleButton().onTrue(HoodCommands.incrementCommand(hood));
-    operatorMapper.getDecrementHoodAngleButton().onTrue(HoodCommands.decrementCommand(hood));
+    operatorMapper.getIncrementHoodAngleButton().onTrue(hood.incrementCommand());
+    operatorMapper.getDecrementHoodAngleButton().onTrue(hood.decrementCommand());
 
     operatorMapper
         .getRunIndexerAndFlywheelButton()
-        .whileTrue(
-            SuperstructureCommands.runFeederAndFlywheelCommand(
-                flywheel, indexer, spindexer, flywheelSpeed));
+        .whileTrue(superstructure.runFeederAndFlywheelCommand(flywheelSpeed));
   }
 
   /**
@@ -278,9 +254,9 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private boolean driverHasInput() {
-    return Math.abs(driverMapper.getTranslationX()) >= DriveCommands.deadband
-        || Math.abs(driverMapper.getTranslationY()) >= DriveCommands.deadband
-        || Math.abs(driverMapper.getRotationX()) >= DriveCommands.deadband
-        || Math.abs(driverMapper.getRotationY()) >= DriveCommands.deadband;
+    return Math.abs(driverMapper.getTranslationX()) >= DriveWrapper.deadband
+        || Math.abs(driverMapper.getTranslationY()) >= DriveWrapper.deadband
+        || Math.abs(driverMapper.getRotationX()) >= DriveWrapper.deadband
+        || Math.abs(driverMapper.getRotationY()) >= DriveWrapper.deadband;
   }
 }
