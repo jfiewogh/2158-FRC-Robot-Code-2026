@@ -102,7 +102,7 @@ public class Superstructure {
   public Command runFeederAndFlywheelCommand(DoubleSupplier flywheelVelocityRPM) {
     return Commands.run(
         () -> runFeederAndFlywheel(flywheelVelocityRPM.getAsDouble()),
-        getRequirements(flywheel, indexer, spindexer).toArray(new SubsystemBase[0]));
+        getRequirementsArray(flywheel, indexer, spindexer));
   }
 
   /* Shooter */
@@ -127,7 +127,7 @@ public class Superstructure {
   }
 
   public Command shootToHubCommand() {
-    return Commands.run(this::shootToHub, getRequirementsArray())
+    return Commands.run(this::shootToHub, getRequirementsArray(flywheel,hood,turret,indexer,spindexer))
         .finallyDo(this::stopFeederAndFlywheel);
   }
 

@@ -56,8 +56,7 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
 
   private void pointToHub(Turret turret, Pose3d fieldRelRobotPose) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    TrackingTargets target =
-        alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
+    TrackingTargets target = alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
     Translation3d targetTranslation = target.getTranslation3d();
 
     // Transform3d applies Translation3d first, then Rotation3d
@@ -65,8 +64,8 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
     Translation3d turretTranslation = turretPose.getTranslation();
     Logger.recordOutput("turret pose", turretPose);
 
-    Rotation2d fieldRelAngle =
-        targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d()).getAngle();
+    Rotation2d fieldRelAngle = targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d())
+        .getAngle();
 
     // We need this for calculating
     Logger.recordOutput(
@@ -92,15 +91,15 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
 
   public Command joystickRobotRelAngleCommand(
       DoubleSupplier rotationXSupplier, DoubleSupplier rotationYSupplier) {
-    return subsystem
-        .map(
-            (s) ->
-                Commands.run(
-                    () ->
-                        joystickRobotRelAngle(
-                            s, rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
-                    s))
-        .orElse(Commands.none());
+    if (subsystem.isEmpty()){
+      return Commands.none();
+    }
+    Turret turret = subsystem.get();
+    return  Commands.run(
+          () -> joystickRobotRelAngle(
+              turret, rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
+          turret);
+          
   }
 
   public Command resetAngleCommand() {
