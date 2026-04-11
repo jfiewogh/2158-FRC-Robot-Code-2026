@@ -147,7 +147,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("To pAuto", AutoBuilder.buildAuto("TopAuto"));
+    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("TopAuto"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
     autoChooser.addOption("Bottom Auto", AutoBuilder.buildAuto("BottomAuto"));
     autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
