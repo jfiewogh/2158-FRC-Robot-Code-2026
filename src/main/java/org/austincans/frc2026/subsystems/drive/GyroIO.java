@@ -29,6 +29,7 @@ public interface GyroIO {
     public double yawVelocityRadPerSec = 0.0;
     public double pitchVelocityRadPerSec = 0.0;
     public double rollVelocityRadPerSec = 0.0;
+    public double[] odometryYawTimestamps;
   }
 
   public void updateInputs(GyroIOInputs inputs);

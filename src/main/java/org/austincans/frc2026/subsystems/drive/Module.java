@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputMode;
 import org.austincans.frc2026.subsystems.drive.ModuleIO.ModuleIOOutputs;
+import org.austincans.frc2026.util.LoggedTracer;
+import org.littletonrobotics.junction.Logger;
 
 public class Module {
   private final ModuleIO io;
@@ -77,15 +79,15 @@ public class Module {
 
   public void periodic() {
     io.updateInputs(inputs);
-    // Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+    Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Record cycle times
-    // LoggedTracer.record("Drive/Module" + index + "/Periodic");
+    LoggedTracer.record("Drive/Module" + index + "/Periodic");
   }
 
   public void periodicAfterScheduler() {
     io.applyOutputs(outputs);
-    // LoggedTracer.record("Drive/Module" + index + "/AfterScheduler");
+    LoggedTracer.record("Drive/Module" + index + "/AfterScheduler");
   }
 
   /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */

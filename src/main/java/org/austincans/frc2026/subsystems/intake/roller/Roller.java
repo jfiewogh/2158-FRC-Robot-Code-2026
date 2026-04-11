@@ -31,6 +31,8 @@ public class Roller extends AdvancedSubsystem {
   /** Should be not running on start */
   @AutoLogOutput public boolean running = false;
 
+  @AutoLogOutput public boolean intaking = false;
+
   public Roller(RollerIO io) {
     this.io = io;
     io.registerSelfCheckHardware(this);
@@ -55,16 +57,19 @@ public class Roller extends AdvancedSubsystem {
 
   public void runIntake() {
     running = true;
+    intaking = true;
     outputs.voltage = 0.35 * Constants.maxVoltage;
   }
 
   public void runOuttake() {
     running = true;
+    intaking = false;
     outputs.voltage = -0.35 * Constants.maxVoltage;
   }
 
   public void stop() {
     running = false;
+    intaking = false;
     outputs.voltage = 0.0;
   }
 

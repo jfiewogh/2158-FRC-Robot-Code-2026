@@ -31,6 +31,7 @@ import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
 import org.austincans.frc2026.superstructure.shooter.ShotUtil;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** This is season specific */
 public class Superstructure {
@@ -50,7 +51,7 @@ public class Superstructure {
   private final IndexerWrapper indexer;
   private final SpindexerWrapper spindexer;
 
-  private boolean staticShooter = false;
+  @AutoLogOutput private boolean staticShooter = false;
 
   public Superstructure(
       DriveWrapper drive,
@@ -127,7 +128,8 @@ public class Superstructure {
   }
 
   public Command shootToHubCommand() {
-    return Commands.run(this::shootToHub, getRequirementsArray(flywheel,hood,turret,indexer,spindexer))
+    return Commands.run(
+            this::shootToHub, getRequirementsArray(flywheel, hood, turret, indexer, spindexer))
         .finallyDo(this::stopFeederAndFlywheel);
   }
 
@@ -191,7 +193,7 @@ public class Superstructure {
   public Command staticShooterToggleCommand() {
     return Commands.runOnce(() -> staticShooter = !staticShooter);
   }
-  
+
   /* Auton Only Commands */
 
   public Command stillShootCommand() {
@@ -211,14 +213,11 @@ public class Superstructure {
   }
 
   public Command deployAndRunIntake() {
-    return Commands.sequence(
-      roller.runCommand(),
-      deploy.deploySequenceCommand()).finallyDo(roller::stopCommand);
+    return Commands.sequence(roller.runCommand(), deploy.deploySequenceCommand())
+        .finallyDo(roller::stopCommand);
   }
 
   public Command retractAndStopIntake() {
-    return Commands.sequence(
-      roller.stopCommand(),
-      deploy.retractSequenceCommand());
+    return Commands.sequence(roller.stopCommand(), deploy.retractSequenceCommand());
   }
 }

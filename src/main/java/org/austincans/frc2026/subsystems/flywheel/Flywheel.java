@@ -17,24 +17,13 @@ package org.austincans.frc2026.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.austincans.frc2026.Constants;
 import org.austincans.frc2026.Robot;
-import org.austincans.frc2026.subsystems.feeder.FeederConstants;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMode;
 import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
@@ -49,13 +38,6 @@ public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
 
-  private final SparkFlex indexer = new SparkFlex(FeederConstants.indexerId, MotorType.kBrushless);
-  private final SparkFlexConfig indexerConfig = new SparkFlexConfig();
-  private final SparkClosedLoopController indexerController = indexer.getClosedLoopController();
-
-  private final SparkFlex spindexer =
-      new SparkFlex(FeederConstants.spindexerId, MotorType.kBrushless);
-
   @Getter
   @Accessors(fluent = true)
   @AutoLogOutput(key = "Flywheel/AtGoal")
@@ -66,11 +48,6 @@ public class Flywheel extends AdvancedSubsystem {
     this.io = io;
     io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
-
-    indexerConfig.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
-    indexerConfig.closedLoop.feedForward.kV(0.00017);
-    indexer.configureAsync(
-        indexerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
@@ -102,31 +79,6 @@ public class Flywheel extends AdvancedSubsystem {
 
   public void stop() {
     setVelocity(RPM.of(0));
-  }
-
-  public void stopMotors() {
-    indexerController.setSetpoint(0, ControlType.kVelocity);
-    setVelocity(RotationsPerSecond.of(0));
-    spindexer.set(0);
-  }
-
-  public void runIndexerAndFlywheel(double velocityRPM) {
-    setVelocity(RPM.of(velocityRPM));
-    indexerController.setSetpoint(-3000, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (Math.abs(inputs.velocity.in(RPM)) > (velocityRPM * 0.9)
-        && Math.abs(indexer.getEncoder().getVelocity()) > 10) {
-      runSpindexer();
-    } else {
-      stopSpindexer();
-    }
-  }
-
-  public void runSpindexer() {
-    spindexer.setVoltage(0.2 * Constants.maxVoltage);
-  }
-
-  public void stopSpindexer() {
-    spindexer.setVoltage(0);
   }
 
   public double getRPM() {

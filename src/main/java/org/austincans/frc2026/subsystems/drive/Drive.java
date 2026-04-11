@@ -61,6 +61,7 @@ import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.util.LocalADStarAK;
+import org.austincans.frc2026.util.LoggedTracer;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -185,8 +186,8 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
-    // LoggedTracer.record("Drive/GyroInputs");
-    // Logger.processInputs("Drive/Gyro", gyroInputs);
+    LoggedTracer.record("Drive/GyroInputs");
+    Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();
     }
