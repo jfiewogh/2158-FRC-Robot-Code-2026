@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "blueMidJustShoot"
+            "pathName": "MidJustShoot1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
           }
         },
         {
@@ -17,9 +23,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Still Shoot"
+            "pathName": "MidJustShoot2"
           }
         }
       ]

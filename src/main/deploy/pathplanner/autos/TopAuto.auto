@@ -11,15 +11,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "TopAuto2"
+            "name": "Still Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TopAuto3"
+            "pathName": "TopAuto2"
           }
         }
       ]

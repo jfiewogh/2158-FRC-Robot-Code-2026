@@ -5,33 +5,21 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Still Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "BottomAuto1"
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "BottomAuto2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BottomAuto3"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Still Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomAuto2"
           }
         }
       ]

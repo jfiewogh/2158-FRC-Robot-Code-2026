@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "blueBottomJustShoot"
+            "pathName": "BottomJustShoot1"
           }
         },
         {
@@ -17,22 +17,15 @@
           }
         },
         {
-          "type": "race",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "shoot"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
-              }
-            ]
+            "name": "Still Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomJustShoot2"
           }
         }
       ]

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "blueTopJustShoot"
+            "pathName": "TopJustShoot1"
           }
         },
         {
@@ -20,6 +20,12 @@
           "type": "named",
           "data": {
             "name": "Still Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopJustShoot2"
           }
         }
       ]

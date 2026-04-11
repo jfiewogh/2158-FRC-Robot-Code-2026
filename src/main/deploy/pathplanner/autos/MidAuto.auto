@@ -3,7 +3,20 @@
   "command": {
     "type": "sequential",
     "data": {
-      "commands": []
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidAuto1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
+          }
+        }
+      ]
     }
   },
   "resetOdom": true,
