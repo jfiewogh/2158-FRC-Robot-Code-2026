@@ -29,8 +29,40 @@ public class DeployWrapper extends SubsystemWrapper<Deploy> {
     return subsystem.map(s -> Commands.startEnd(s::deploy, s::stop, s)).orElse(Commands.none());
   }
 
+  public Command runDeployCommand() {
+    return subsystem.map(s -> Commands.runOnce(s::deploy, s)).orElse(Commands.none());
+  }
+
+  public Command deploySequenceCommand() {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Deploy deploy = subsystem.get();
+    return Commands.sequence(
+      runDeployCommand(),
+      Commands.waitSeconds(1),
+      stopCommand())
+        .finallyDo(deploy::stop);
+  }
+
   public Command retractCommand() {
     return subsystem.map(s -> Commands.startEnd(s::retract, s::stop, s)).orElse(Commands.none());
+  }
+
+  public Command runRetractCommand() {
+    return subsystem.map(s -> Commands.runOnce(s::retract, s)).orElse(Commands.none());
+  }
+
+  public Command retractSequenceCommand() {
+    if (subsystem.isEmpty()) {
+      return Commands.none();
+    }
+    Deploy deploy = subsystem.get();
+    return Commands.sequence(
+      runRetractCommand(),
+      Commands.waitSeconds(1.5),
+      stopCommand())
+        .finallyDo(deploy::stop);
   }
 
   public Command stopCommand() {

@@ -30,6 +30,8 @@ public interface OperatorMapper {
 
   public Trigger getSetLowestHoodAngleButton();
 
+  public Trigger getTrackingButton();
+
   /* Just for testing */
   public default Trigger getPointToHubButton() {
     return new Trigger(() -> false);

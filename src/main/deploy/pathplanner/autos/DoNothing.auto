@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Top 1"
+            "waitTime": 5.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Top 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Top 3"
+            "pathName": "Still"
           }
         }
       ]

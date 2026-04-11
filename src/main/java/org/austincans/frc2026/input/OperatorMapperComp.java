@@ -51,4 +51,11 @@ public class OperatorMapperComp implements OperatorMapper {
   public Trigger getSetLowestHoodAngleButton() {
     return controller.x();
   }
+
+  @Override
+  public Trigger getTrackingButton(){
+    return controller.leftTrigger();
+  }
+
+
 }

@@ -191,4 +191,34 @@ public class Superstructure {
   public Command staticShooterToggleCommand() {
     return Commands.runOnce(() -> staticShooter = !staticShooter);
   }
+  
+  /* Auton Only Commands */
+
+  public Command stillShootCommand() {
+    return Commands.run(
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(
+                  alliance, RobotState.getInstance().getEstimatedPose())) {
+                shootToHub();
+              } else {
+                shuttle();
+              }
+            },
+            getRequirementsArray(flywheel, hood, indexer, spindexer, turret, drive))
+        .withTimeout(5)
+        .finallyDo(this::stopFeederAndFlywheel);
+  }
+
+  public Command deployAndRunIntake() {
+    return Commands.sequence(
+      roller.runCommand(),
+      deploy.deploySequenceCommand()).finallyDo(roller::stopCommand);
+  }
+
+  public Command retractAndStopIntake() {
+    return Commands.sequence(
+      roller.stopCommand(),
+      deploy.retractSequenceCommand());
+  }
 }

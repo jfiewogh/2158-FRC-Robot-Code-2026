@@ -94,8 +94,8 @@ public class RobotContainer {
       new Alert("Secondary controller disconnected (port 1).", AlertType.kWarning);
 
   // Controllers
-  private final DriverMapper driverMapper = new DriverMapperComp();
-  private final OperatorMapper operatorMapper = new OperatorMapperTest();
+  private final DriverMapper driver = new DriverMapperComp();
+  private final OperatorMapper operator = new OperatorMapperTest();
 
   // Dashboard inputs
   private SendableChooser<Command> autoChooser;
@@ -115,11 +115,11 @@ public class RobotContainer {
 
   private void registerNamedCommands() {
     /* Register named commands */
-    NamedCommands.registerCommand("Run Intake", roller.runIntakeCommand());
-    NamedCommands.registerCommand("Deploy Intake", deploy.deployCommand());
-    NamedCommands.registerCommand("Retract Intake", deploy.retractCommand());
+    NamedCommands.registerCommand("Start Intake", superstructure.deployAndRunIntake());
+    NamedCommands.registerCommand("End Intake", superstructure.retractAndStopIntake());
     NamedCommands.registerCommand("Score", superstructure.shootToHubCommand());
     NamedCommands.registerCommand("Shuttle", superstructure.shuttleCommand());
+    NamedCommands.registerCommand("Still Shoot", superstructure.stillShootCommand());
   }
 
   private void addAutos() {
@@ -147,22 +147,17 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
-    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
-    autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
+    autoChooser.addOption("To pAuto", AutoBuilder.buildAuto("TopAuto"));
+    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
+    autoChooser.addOption("Bottom Auto", AutoBuilder.buildAuto("BottomAuto"));
+    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
 
-    autoChooser.addOption("Blue Just Shoot Top", AutoBuilder.buildAuto("blueTopJustShoot"));
-    autoChooser.addOption("Blue Just Shoot Mid", AutoBuilder.buildAuto("blueMidJustShoot"));
-    autoChooser.addOption("Blue Just Shoot Bot", AutoBuilder.buildAuto("blueBottomJustShoot"));
+    autoChooser.addOption("Just Shoot Top", AutoBuilder.buildAuto("TopJustShoot"));
+    autoChooser.addOption("Just Shoot Mid", AutoBuilder.buildAuto("MidJustShoot"));
+    autoChooser.addOption("Just Shoot Bot", AutoBuilder.buildAuto("BottomJustShoot"));
 
-    autoChooser.addOption("Auto1", AutoBuilder.buildAuto("Auto1"));
-    autoChooser.addOption("Auto2", AutoBuilder.buildAuto("Auto2"));
-    autoChooser.addOption("Auto3", AutoBuilder.buildAuto("Auto3"));
-
-    autoChooser.addOption("Do nothing", AutoBuilder.buildAuto("Do Nothing"));
-    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("justShoot"));
-
-    autoChooser.addOption("shoot", AutoBuilder.buildAuto("shoot"));
+    autoChooser.addOption("Do Nothing", AutoBuilder.buildAuto("DoNothing"));
+    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("JustShoot"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -179,45 +174,47 @@ public class RobotContainer {
     // Drive
     drive.setDefaultCommand(
         drive.driveCommand(
-            driverMapper::getTranslationX,
-            driverMapper::getTranslationY,
-            driverMapper::getRotationX,
-            driverMapper::getRotationY));
+            driver::getTranslationX,
+            driver::getTranslationY,
+            driver::getRotationX,
+            driver::getRotationY));
 
-    driverMapper.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
-    driverMapper.getStopWithXButton().onTrue(drive.stopWithXCommand());
-    driverMapper.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
+    driver.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
+    driver.getStopWithXButton().onTrue(drive.stopWithXCommand());
+    driver.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
 
-    driverMapper.getRollerToggleButton().onTrue(roller.toggleCommand());
+    driver.getRollerToggleButton().onTrue(roller.toggleCommand());
 
-    driverMapper.getDeployButton().whileTrue(deploy.deployCommand());
-    driverMapper.getRetractButton().whileTrue(deploy.retractCommand());
+    driver.getDeployButton().whileTrue(deploy.deployCommand());
+    driver.getRetractButton().whileTrue(deploy.retractCommand());
 
-    driverMapper.getShootButton().whileTrue(superstructure.shootCommand());
+    driver.getShootButton().whileTrue(superstructure.shootCommand());
 
     /* Operator */
 
     turret.setDefaultCommand(
         turret.joystickRobotRelAngleCommand(
-            operatorMapper::getRotationX, operatorMapper::getRotationY));
+            operator::getRotationX, operator::getRotationY));
 
-    operatorMapper
+    operator
         .getStaticShooterToggleButton()
         .onTrue(superstructure.staticShooterToggleCommand());
 
-    operatorMapper.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
+    operator.getTrackingButton().whileTrue(superstructure.trackCommand());
 
-    operatorMapper.getOuttakeButton().whileTrue(roller.runOuttakeCommand());
+    operator.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
 
-    operatorMapper.getSetLowestHoodAngleButton().onTrue(hood.setLowestAngleCommand());
+    operator.getOuttakeButton().whileTrue(roller.outtakeCommand());
+
+    operator.getSetLowestHoodAngleButton().onTrue(hood.setLowestAngleCommand());
 
     // Test
-    operatorMapper.getPointToHubButton().whileTrue(superstructure.turretPointToHub());
+    operator.getPointToHubButton().whileTrue(superstructure.turretPointToHub());
 
-    operatorMapper.getIncrementHoodAngleButton().onTrue(hood.incrementCommand());
-    operatorMapper.getDecrementHoodAngleButton().onTrue(hood.decrementCommand());
+    operator.getIncrementHoodAngleButton().onTrue(hood.incrementCommand());
+    operator.getDecrementHoodAngleButton().onTrue(hood.decrementCommand());
 
-    operatorMapper
+    operator
         .getRunIndexerAndFlywheelButton()
         .whileTrue(superstructure.runFeederAndFlywheelCommand(flywheelSpeed));
   }
@@ -254,9 +251,9 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private boolean driverHasInput() {
-    return Math.abs(driverMapper.getTranslationX()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getTranslationY()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getRotationX()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getRotationY()) >= DriveWrapper.deadband;
+    return Math.abs(driver.getTranslationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getTranslationY()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationY()) >= DriveWrapper.deadband;
   }
 }

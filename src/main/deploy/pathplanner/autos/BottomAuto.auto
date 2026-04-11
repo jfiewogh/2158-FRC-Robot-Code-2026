@@ -7,49 +7,31 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "Still Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Mid 1"
+            "pathName": "BottomAuto1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Mid 1.5"
+            "pathName": "BottomAuto2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomAuto3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid 3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Mid 4"
+            "name": "Still Shoot"
           }
         }
       ]
