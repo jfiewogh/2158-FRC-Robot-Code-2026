@@ -16,10 +16,10 @@
 package org.austincans.frc2026.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -100,19 +100,19 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
     BaseStatusSignal.refreshAll(signals.toArray(new BaseStatusSignal[0]));
 
-    inputs.velocity = flywheelVelocity.getValue(); // Convert to RPM
-    inputs.appliedVolts = flywheelAppliedVolts.getValue();
-    inputs.current = flywheelCurrent.getValue();
-    inputs.temperature = flywheelTemp.getValue();
+    inputs.velocityRPM = flywheelVelocity.getValue().in(RPM); // Convert to RPM
+    inputs.appliedVolts = flywheelAppliedVolts.getValue().in(Volts);
+    inputs.currentAmps = flywheelCurrent.getValue().in(Amps);
+    inputs.temperatureCelsius = flywheelTemp.getValue().in(Celsius);
   }
 
-  private void runVoltage(Voltage volts) {
-    motor1.setVoltage(volts.in(Volts));
+  private void runVoltage(double voltage) {
+    motor1.setVoltage(voltage);
   }
 
-  private void runVelocity(AngularVelocity velocity) {
+  private void runVelocity(double velocityRPM) {
     final MotionMagicVelocityTorqueCurrentFOC m_request =
-        new MotionMagicVelocityTorqueCurrentFOC(velocity.in(RotationsPerSecond));
+        new MotionMagicVelocityTorqueCurrentFOC(velocityRPM / 60);
     motor1.setControl(m_request.withFeedForward(7));
   }
 
@@ -120,7 +120,7 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
   public void applyOutputs(FlywheelIOOutputs outputs) {
     switch (outputs.mode) {
       case VELOCITY -> {
-        runVelocity(outputs.velocity);
+        runVelocity(outputs.velocityRPM);
       }
       case VOLTAGE -> {
         runVoltage(outputs.voltage);

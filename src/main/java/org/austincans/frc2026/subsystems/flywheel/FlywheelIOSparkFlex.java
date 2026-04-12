@@ -23,12 +23,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOSparkFlex extends FlywheelIOReal {
@@ -53,19 +47,19 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.appliedVolts = Volts.of(motor1.getBusVoltage());
-    inputs.velocity = RPM.of(motor1.getEncoder().getVelocity());
-    inputs.temperature = Celsius.of(motor1.getMotorTemperature());
-    inputs.current = Amps.of(motor1.getOutputCurrent());
+    inputs.appliedVolts = motor1.getBusVoltage();
+    inputs.velocityRPM = motor1.getEncoder().getVelocity();
+    inputs.temperatureCelsius = motor1.getMotorTemperature();
+    inputs.currentAmps = motor1.getOutputCurrent();
   }
 
-  private void runVoltage(Voltage volts) {
-    motor1.setVoltage(volts);
+  private void runVoltage(double voltage) {
+    motor1.setVoltage(voltage);
   }
 
-  private void runVelocity(AngularVelocity velocity) {
-    controller.setSetpoint(velocity.in(RPM) * 2, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
-    if (velocity == RPM.of(0)) {
+  private void runVelocity(double velocityRPM) {
+    controller.setSetpoint(velocityRPM * 2, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    if (velocityRPM == 0.0) {
       controller.setSetpoint(0, ControlType.kDutyCycle);
     }
   }
@@ -74,7 +68,7 @@ public class FlywheelIOSparkFlex extends FlywheelIOReal {
   public void applyOutputs(FlywheelIOOutputs outputs) {
     switch (outputs.mode){
       case VELOCITY -> {
-        runVelocity(outputs.velocity);
+        runVelocity(outputs.velocityRPM);
       }
       case VOLTAGE -> {
         runVoltage(outputs.voltage);

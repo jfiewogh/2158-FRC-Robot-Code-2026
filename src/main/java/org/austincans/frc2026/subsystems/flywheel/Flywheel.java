@@ -15,10 +15,7 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RPM;
-
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import lombok.Getter;
@@ -31,8 +28,6 @@ import org.austincans.frc2026.util.EqualsUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-/** Flywheel, Indexer, and Spindexer Subsystem */
-// TODO: maybe split into Flywheel and Indexer subsystems
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
@@ -55,14 +50,14 @@ public class Flywheel extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
 
-    double velocityRadPerSec = inputs.velocity.in(RPM);
-    double setpointRadPerSec = outputs.velocity.in(RPM);
+    double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(inputs.velocityRPM);
+    double setpointRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(outputs.velocityRPM);
     atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadPerSec, 2.0);
     Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
     Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
 
     Robot.batteryLogger.reportCurrentUsage(
-        "Flywheel", false, inputs.current.in(Amps), inputs.current.in(Amps));
+        "Flywheel", false, inputs.currentAmps);
   }
 
   @Override
@@ -72,28 +67,28 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   /** Run closed loop at the specified velocity. */
-  public void setVelocity(AngularVelocity velocity) {
+  public void setVelocity(double velocityRPM) {
     outputs.mode = FlywheelIOOutputMode.VELOCITY;
-    outputs.velocity = velocity;
+    outputs.velocityRPM = velocityRPM;
   }
 
   public void stop() {
-    setVelocity(RPM.of(0));
+    setVelocity(0);
   }
 
   public double getRPM() {
-    return inputs.velocity.in(RPM);
+    return inputs.velocityRPM;
   }
 
   public boolean atSetpoint() {
     return outputs.mode == FlywheelIOOutputMode.VELOCITY
-        && Math.abs(getRPM() - outputs.velocity.in(RPM)) < FlywheelConstants.atSetpointThresholdRPM;
+        && Math.abs(getRPM() - outputs.velocityRPM) < FlywheelConstants.atSetpointThresholdRPM;
   }
 
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.run(() -> setVelocity(RPM.of(100)), this).withTimeout(5),
+        Commands.run(() -> setVelocity(100), this).withTimeout(5),
         Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
@@ -103,6 +98,6 @@ public class Flywheel extends AdvancedSubsystem {
               }
             },
             this),
-        Commands.runOnce(() -> setVelocity(RPM.of(0)), this));
+        Commands.runOnce(this::stop, this));
   }
 }

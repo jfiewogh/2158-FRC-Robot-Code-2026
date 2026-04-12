@@ -43,7 +43,7 @@ import org.littletonrobotics.junction.Logger;
  * </ul>
  */
 public class ShotCalculator {
-  private static final int iterations = 20;
+  private static final int iterations = 5;
 
   private final double phaseDelaySecs;
 
