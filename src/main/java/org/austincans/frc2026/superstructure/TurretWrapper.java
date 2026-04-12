@@ -43,18 +43,24 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
   }
 
   public void setAngle(Rotation2d angle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngle(angle));
+    if (isPresent) {
+      s.setDesiredAngle(angle);
+    }
   }
 
   public void setRobotRelAngle(Rotation2d robotRelAngle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngleRobotRelative(robotRelAngle));
+    if (isPresent) {
+      s.setDesiredAngleRobotRelative(robotRelAngle);
+    }
   }
 
   public void setFieldRelAngle(Rotation2d fieldRelAngle, Rotation2d robotFieldRelAngle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle));
+    if (isPresent) {
+      s.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle);
+    }
   }
 
-  private void pointToHub(Turret turret, Pose3d fieldRelRobotPose) {
+  private void pointToHub(Pose3d fieldRelRobotPose) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
     TrackingTargets target =
         alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
@@ -73,11 +79,15 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
         "turret distance from hub",
         turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
 
-    turret.setDesiredAngleFieldRelative(
+    s.setDesiredAngleFieldRelative(
         fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
   }
 
-  private void trackShuttle(Turret turret, Pose3d fieldRelRobotPose) {
+  public Command pointToHubCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
+    return isPresent ? Commands.run(() -> pointToHub(fieldRelRobotPoseSupplier.get()), s) : Commands.none();
+  }
+
+  private void trackShuttle(Pose3d fieldRelRobotPose) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
     TrackingTargets target = TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance);
     Translation3d targetTranslation = target.getTranslation3d();
@@ -95,43 +105,31 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
         "turret distance from shuttle",
         turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
 
-    turret.setDesiredAngleFieldRelative(
+    s.setDesiredAngleFieldRelative(
         fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
   }
 
-  public Command pointToHubCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
-    return subsystem
-        .map((s) -> Commands.run(() -> pointToHub(s, fieldRelRobotPoseSupplier.get()), s))
-        .orElse(Commands.none());
-  }
-
   public Command trackShuttleCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
-    return subsystem
-        .map((s) -> Commands.run(() -> trackShuttle(s, fieldRelRobotPoseSupplier.get()), s))
-        .orElse(Commands.none());
+    return isPresent ? Commands.run(() -> trackShuttle(fieldRelRobotPoseSupplier.get()), s) : Commands.none();
   }
 
-  private void joystickRobotRelAngle(Turret turret, double rotationX, double rotationY) {
+  private void joystickRobotRelAngle(double rotationX, double rotationY) {
     if (Math.abs(rotationX) > deadband && Math.abs(rotationY) > deadband) {
       setpointJoystickTurretAngle = new Translation2d(rotationX, rotationY).getAngle();
     }
-    turret.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
+    s.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
   }
 
   public Command joystickRobotRelAngleCommand(
       DoubleSupplier rotationXSupplier, DoubleSupplier rotationYSupplier) {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Turret turret = subsystem.get();
     return Commands.run(
-        () ->
-            joystickRobotRelAngle(
-                turret, rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
-        turret);
+        () -> joystickRobotRelAngle(rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()), s);
   }
 
   public Command resetAngleCommand() {
-    return subsystem.map((s) -> s.resetAngle()).orElse(Commands.none());
+    return isPresent ? s.resetAngle() : Commands.none();
   }
 }

@@ -21,13 +21,19 @@ import java.util.Optional;
 
 public abstract class SubsystemWrapper<Subsystem extends SubsystemBase> {
   protected final Optional<Subsystem> subsystem;
+  protected final boolean isPresent;
+  protected final Subsystem s;
 
   public SubsystemWrapper(Optional<Subsystem> subsystem) {
     this.subsystem = subsystem;
+    isPresent = subsystem.isPresent();
+    s = isPresent ? subsystem.get() : null;
   }
 
   public void setDefaultCommand(Command command) {
-    subsystem.ifPresent((s) -> s.setDefaultCommand(command));
+    if (isPresent) {
+      s.setDefaultCommand(command);
+    }
   }
 
   public Optional<Subsystem> getSubsystem() {

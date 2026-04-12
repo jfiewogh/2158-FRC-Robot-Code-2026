@@ -21,34 +21,27 @@ import java.util.Optional;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 
 public class FlywheelWrapper extends SubsystemWrapper<Flywheel> {
-  private final boolean isPresent;
-  private final Flywheel flywheel;
-
   public FlywheelWrapper(Optional<Flywheel> subsystem) {
     super(subsystem);
-    isPresent = subsystem.isPresent();
-    flywheel = subsystem.orElse(null);
   }
 
   public Command runCommand(double velocityRPM) {
-    return subsystem
-        .map(s -> Commands.runOnce(() -> s.setVelocity(velocityRPM), s))
-        .orElse(Commands.none());
+    return isPresent ? Commands.runOnce(() -> s.setVelocity(velocityRPM), s) : Commands.none();
   }
 
   public boolean atSetpoint() {
-    return subsystem.isPresent() && flywheel.atSetpoint();
+    return isPresent && s.atSetpoint();
   }
 
   public void setVelocity(double velocityRPM) {
     if (isPresent) {
-      flywheel.setVelocity(velocityRPM);
+      s.setVelocity(velocityRPM);
     }
   }
 
   public void stop() {
     if (isPresent) {
-      flywheel.stop();
+      s.stop();
     }
   }
 }
