@@ -15,33 +15,40 @@
 
 package org.austincans.frc2026.superstructure;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import org.austincans.frc2026.subsystems.flywheel.Flywheel;
 
 public class FlywheelWrapper extends SubsystemWrapper<Flywheel> {
+  private final boolean isPresent;
+  private final Flywheel flywheel;
+
   public FlywheelWrapper(Optional<Flywheel> subsystem) {
     super(subsystem);
+    isPresent = subsystem.isPresent();
+    flywheel = subsystem.orElse(null);
   }
 
   public Command runCommand(double velocityRPM) {
     return subsystem
-        .map((s) -> Commands.runOnce(() -> s.setVelocity(RPM.of(velocityRPM)), s))
+        .map(s -> Commands.runOnce(() -> s.setVelocity(velocityRPM), s))
         .orElse(Commands.none());
   }
 
   public boolean atSetpoint() {
-    return subsystem.map((s) -> s.atSetpoint()).orElse(true);
+    return subsystem.isPresent() && flywheel.atSetpoint();
   }
 
   public void setVelocity(double velocityRPM) {
-    subsystem.ifPresent((s) -> s.setVelocity(RPM.of(velocityRPM)));
+    if (isPresent) {
+      flywheel.setVelocity(velocityRPM);
+    }
   }
 
   public void stop() {
-    subsystem.ifPresent((s) -> s.stop());
+    if (isPresent) {
+      flywheel.stop();
+    }
   }
 }
