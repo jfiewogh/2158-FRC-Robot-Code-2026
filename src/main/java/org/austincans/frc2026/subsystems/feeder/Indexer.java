@@ -53,8 +53,11 @@ public class Indexer extends AdvancedSubsystem {
   }
 
   public boolean atSetpoint() {
-    return Math.abs(inputs.velocity.in(RPM) - outputs.velocity.in(RPM))
-        < FeederConstants.indexerAtSetpointThresholdRPM;
+    boolean a =
+        Math.abs(inputs.velocity.in(RPM) - outputs.velocity.in(RPM))
+            < outputs.velocity.in(RPM) * 0.05;
+    // Logger.recordOutput("indexer at setpoint", a);
+    return a;
   }
 
   @Override

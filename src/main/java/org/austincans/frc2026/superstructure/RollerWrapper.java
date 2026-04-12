@@ -26,18 +26,13 @@ public class RollerWrapper extends SubsystemWrapper<Roller> {
   }
 
   /** Start end */
-  public Command intakeCommand() {
-    return subsystem.map(s -> Commands.startEnd(s::runIntake, s::stop, s)).orElse(Commands.none());
-  }
-
-  /** Start end */
   public Command outtakeCommand() {
     return subsystem.map(s -> Commands.startEnd(s::runOuttake, s::stop, s)).orElse(Commands.none());
   }
 
-  /** Start end */
+  /** Run once */
   public Command toggleCommand() {
-    return subsystem.map(s -> Commands.startEnd(s::toggle, s::stop, s)).orElse(Commands.none());
+    return subsystem.map(s -> Commands.runOnce(s::toggle, s)).orElse(Commands.none());
   }
 
   /** Run once */

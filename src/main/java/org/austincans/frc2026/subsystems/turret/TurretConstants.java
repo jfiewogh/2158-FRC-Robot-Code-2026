@@ -46,7 +46,7 @@ public class TurretConstants {
   public static final boolean isBrakeMode = false;
 
   public static final int encoderId = 25;
-  public static final double magnetOffset = 0.4140625;
+  public static final double magnetOffset = -0.439208984375;
 
   public static final double atSetpointThresholdRad = 0.1;
 

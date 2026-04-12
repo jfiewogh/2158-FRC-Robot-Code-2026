@@ -39,7 +39,7 @@ public class IndexerIOSparkFlex implements IndexerIO {
 
     config = new SparkFlexConfig();
     config.closedLoop.pid(0.0002, 0, 0.005, ClosedLoopSlot.kSlot0);
-    config.closedLoop.feedForward.kV(0.00017);
+    config.closedLoop.feedForward.kV(0.00034);
     motor.configureAsync(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 

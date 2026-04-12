@@ -86,8 +86,11 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public boolean atSetpoint() {
-    return outputs.mode == FlywheelIOOutputMode.VELOCITY
-        && Math.abs(getRPM() - outputs.velocity.in(RPM)) < FlywheelConstants.atSetpointThresholdRPM;
+    boolean a =
+        outputs.mode == FlywheelIOOutputMode.VELOCITY
+            && Math.abs(getRPM() - outputs.velocity.in(RPM)) < outputs.velocity.in(RPM) * 0.1;
+    Logger.recordOutput("flywheel at setpoint", a);
+    return a;
   }
 
   @Override

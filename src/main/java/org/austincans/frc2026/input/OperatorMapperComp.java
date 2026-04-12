@@ -53,9 +53,7 @@ public class OperatorMapperComp implements OperatorMapper {
   }
 
   @Override
-  public Trigger getTrackingButton(){
-    return controller.leftTrigger();
+  public Trigger getTrackingButton() {
+    return controller.povUp();
   }
-
-
 }

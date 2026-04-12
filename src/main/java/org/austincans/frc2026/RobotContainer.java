@@ -194,14 +194,11 @@ public class RobotContainer {
     /* Operator */
 
     turret.setDefaultCommand(
-        turret.joystickRobotRelAngleCommand(
-            operator::getRotationX, operator::getRotationY));
+        turret.joystickRobotRelAngleCommand(operator::getRotationX, operator::getRotationY));
 
-    operator
-        .getStaticShooterToggleButton()
-        .onTrue(superstructure.staticShooterToggleCommand());
+    operator.getStaticShooterToggleButton().onTrue(superstructure.staticShooterToggleCommand());
 
-    operator.getTrackingButton().whileTrue(superstructure.trackCommand());
+    operator.getTrackingButton().whileTrue(superstructure.turretTrackShuttle());
 
     operator.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
 

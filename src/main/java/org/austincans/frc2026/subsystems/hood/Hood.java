@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.austincans.frc2026.subsystems.hood.HoodIO.HoodIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /** This is specifically for the 2026 robot */
 public class Hood extends AdvancedSubsystem {
@@ -38,7 +39,8 @@ public class Hood extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    // Logger.processInputs("Hood/Inputs", inputs);
+    Logger.processInputs("Hood", inputs);
+    Logger.recordOutput("Hood/AngleDeg", HoodUtil.pwmToAngle(inputs.pulseWidth));
   }
 
   @Override
@@ -86,14 +88,14 @@ public class Hood extends AdvancedSubsystem {
                     },
                     this)
                 .withTimeout(1.0),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.angleDeg < 22 || inputs.angleDeg > 18) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood did not reach target position", false);
-                  }
-                },
-                this),
+            // Commands.runOnce(
+            //     () -> {
+            //       if (inputs.angleDeg < 22 || inputs.angleDeg > 18) {
+            //         addSubsystemFault(
+            //             "HOOD", "[System Check] Hood did not reach target position", false);
+            //       }
+            //     },
+            //     this),
             Commands.waitSeconds(0.25))
         .andThen(Commands.runOnce(this::stopCommand, this));
   }

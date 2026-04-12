@@ -17,13 +17,11 @@ package org.austincans.frc2026.superstructure.shooter;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.austincans.frc2026.commands.RebuiltFieldUtils;
-import org.austincans.frc2026.subsystems.drive.Drive;
 
 public class TargetUtil {
-  private static double yOff = Units.inchesToMeters(158.32 - 25.62);
+  private static double yOff = 2; // Units.inchesToMeters(158.32 - 25.62);
 
   public enum TrackingTargets {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
@@ -66,8 +64,7 @@ public class TargetUtil {
     return closestTarget;
   }
 
-  public static TrackingTargets getShuttleTarget(Drive drive, Alliance alliance) {
-    Pose3d robotPose = new Pose3d(drive.getPose());
+  public static TrackingTargets getShuttleTarget(Pose3d fieldRelRobotPose, Alliance alliance) {
     TrackingTargets[] possibleTargets;
     if (alliance == Alliance.Blue) {
       possibleTargets =
@@ -76,6 +73,6 @@ public class TargetUtil {
       possibleTargets =
           new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
     }
-    return getClosestTarget(robotPose, possibleTargets);
+    return getClosestTarget(fieldRelRobotPose, possibleTargets);
   }
 }

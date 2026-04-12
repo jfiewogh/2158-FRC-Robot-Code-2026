@@ -23,7 +23,6 @@ public abstract interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
     public int pulseWidth;
-    public double angleDeg;
   }
 
   public class HoodIOOutputs {

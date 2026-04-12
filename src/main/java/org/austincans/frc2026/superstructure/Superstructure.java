@@ -86,10 +86,15 @@ public class Superstructure {
     return turret.pointToHubCommand(() -> new Pose3d(RobotState.getInstance().getEstimatedPose()));
   }
 
+  public Command turretTrackShuttle() {
+    return turret.trackShuttleCommand(
+        () -> new Pose3d(RobotState.getInstance().getEstimatedPose()));
+  }
+
   public void runFeederAndFlywheel(double flywheelVelocityRPM) {
     flywheel.setVelocity(flywheelVelocityRPM);
     indexer.run();
-    if (flywheel.atSetpoint() && indexer.atSetpoint()) {
+    if (flywheel.atSetpoint()) {
       spindexer.run();
     }
   }
@@ -102,8 +107,9 @@ public class Superstructure {
 
   public Command runFeederAndFlywheelCommand(DoubleSupplier flywheelVelocityRPM) {
     return Commands.run(
-        () -> runFeederAndFlywheel(flywheelVelocityRPM.getAsDouble()),
-        getRequirementsArray(flywheel, indexer, spindexer));
+            () -> runFeederAndFlywheel(flywheelVelocityRPM.getAsDouble()),
+            getRequirementsArray(flywheel, indexer, spindexer))
+        .finallyDo(this::stopFeederAndFlywheel);
   }
 
   /* Shooter */
@@ -134,11 +140,9 @@ public class Superstructure {
   }
 
   public void trackShuttle() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    hood.setAngle(Rotation2d.fromDegrees(50));
-    turret.setFieldRelAngle(
-        alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero,
-        RobotState.getInstance().getRotation());
+    ShotParameters parameters = ShotUtil.getShuttleShotParameters();
+    hood.setAngle(parameters.hoodAngle());
+    turret.setFieldRelAngle(parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
 
   public Command shuttleTrackingCommand() {
@@ -146,12 +150,10 @@ public class Superstructure {
   }
 
   public void shuttle() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    runFeederAndFlywheel(6000);
-    hood.setAngle(Rotation2d.fromDegrees(60));
-    turret.setFieldRelAngle(
-        alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero,
-        RobotState.getInstance().getRotation());
+    ShotParameters parameters = ShotUtil.getShuttleShotParameters();
+    runFeederAndFlywheel(parameters.flywheelSpeedRPM());
+    hood.setAngle(parameters.hoodAngle());
+    turret.setFieldRelAngle(parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
 
   public Command shuttleCommand() {

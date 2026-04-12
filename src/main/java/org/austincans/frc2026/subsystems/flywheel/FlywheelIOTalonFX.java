@@ -77,6 +77,8 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
     motor1.getConfigurator().apply(talonFXConfigs);
     motor2.setControl(new Follower(FlywheelConstants.motor1Id, MotorAlignmentValue.Opposed));
+    // talonFXConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    // motor2.getConfigurator().apply(talonFXConfigs);
 
     flywheelVelocity = motor1.getVelocity();
     flywheelAppliedVolts = motor1.getMotorVoltage();
@@ -112,8 +114,9 @@ public class FlywheelIOTalonFX extends FlywheelIOReal {
 
   private void runVelocity(AngularVelocity velocity) {
     final MotionMagicVelocityTorqueCurrentFOC m_request =
-        new MotionMagicVelocityTorqueCurrentFOC(velocity.in(RotationsPerSecond));
-    motor1.setControl(m_request.withFeedForward(7));
+        new MotionMagicVelocityTorqueCurrentFOC(velocity.in(RotationsPerSecond)).withFeedForward(7);
+    motor1.setControl(m_request);
+    // motor2.setControl(m_request);
   }
 
   @Override

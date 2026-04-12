@@ -27,7 +27,7 @@ public class FeederConstants {
   public static final int spindexerId = 20;
 
   public static final AngularVelocity indexerVelocity = RPM.of(-3000.0);
-  public static final Voltage spindexerVoltage = Volts.of(0.2 * Constants.maxVoltage);
+  public static final Voltage spindexerVoltage = Volts.of(0.5 * Constants.maxVoltage);
 
   public static final double indexerAtSetpointThresholdRPM = 10.0;
 }

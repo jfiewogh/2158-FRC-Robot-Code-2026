@@ -19,7 +19,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.austincans.frc2026.RobotState;
-import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotInputs;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
@@ -59,14 +58,15 @@ public class ShotUtil {
     return hubShotCalculator.calculate(inputs);
   }
 
-  public static ShotParameters getShuttleShotParameters(Drive drive) {
+  public static ShotParameters getShuttleShotParameters() {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    Pose3d fieldRelRobotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
     ShotInputs inputs =
         new ShotInputs(
-            new Pose3d(RobotState.getInstance().getEstimatedPose()),
+            fieldRelRobotPose,
             RobotState.getInstance().getRobotVelocity(),
             RobotState.getInstance().getFieldVelocity(),
-            TargetUtil.getShuttleTarget(drive, alliance).getTranslation3d());
+            TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance).getTranslation3d());
     return shuttleShotCalculator.calculate(inputs);
   }
 }

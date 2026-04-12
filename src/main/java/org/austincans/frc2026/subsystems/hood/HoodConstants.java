@@ -25,16 +25,16 @@ public class HoodConstants {
     // angle is measured from being placed on
     // the metal right above the linear actuator
     // subtract all angles from 90 to get shot angle
-    angleToPWM.put(90 - 10.9, 1000.0);
-    angleToPWM.put(90 - 12.4, 1050.0);
-    angleToPWM.put(90 - 14.2, 1100.0);
-    angleToPWM.put(90 - 16.0, 1150.0);
-    angleToPWM.put(90 - 17.7, 1200.0);
-    angleToPWM.put(90 - 19.5, 1250.0);
-    angleToPWM.put(90 - 21.3, 1300.0);
-    angleToPWM.put(90 - 23.1, 1350.0);
-    angleToPWM.put(90 - 25.0, 1400.0);
-    angleToPWM.put(90 - 26.9, 1450.0);
+    angleToPWM.put(79.1, 1000.0);
+    angleToPWM.put(77.6, 1050.0);
+    angleToPWM.put(75.8, 1100.0);
+    angleToPWM.put(74.0, 1150.0);
+    angleToPWM.put(72.3, 1200.0);
+    angleToPWM.put(70.05, 1250.0);
+    angleToPWM.put(68.7, 1300.0);
+    angleToPWM.put(66.9, 1350.0);
+    angleToPWM.put(65.0, 1400.0);
+    angleToPWM.put(63.1, 1450.0);
     angleToPWM.put(90 - 28.7, 1500.0);
     angleToPWM.put(90 - 30.6, 1550.0);
     angleToPWM.put(90 - 32.4, 1600.0);
