@@ -63,6 +63,10 @@ public class Turret extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
 
+    Logger.recordOutput("Turret/Outputs/VelocityRadPerSec", outputs.velocityRadPerSec);
+    Logger.recordOutput("Turret/Outputs/Voltage", outputs.voltage);
+    Logger.recordOutput("Turret/Outputs/Angle", outputs.angle);
+
     updateLimelightRobotSpace();
   }
 
@@ -114,7 +118,8 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public boolean atSetpoint() {
-    return Math.abs(inputs.positionRad - outputs.angle.getRadians()) < TurretConstants.atSetpointThresholdRad;
+    return Math.abs(inputs.positionRad - outputs.angle.getRadians())
+        < TurretConstants.atSetpointThresholdRad;
   }
 
   public Command resetAngle() {

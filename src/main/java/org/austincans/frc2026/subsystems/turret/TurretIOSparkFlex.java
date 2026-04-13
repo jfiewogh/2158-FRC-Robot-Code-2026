@@ -64,7 +64,8 @@ public class TurretIOSparkFlex extends TurretIOReal {
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     super.updateInputs(inputs);
-    inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / TurretConstants.gearing);
+    inputs.positionRad =
+        Units.rotationsToRadians(relativeEncoder.getPosition() / TurretConstants.gearing);
     inputs.motorPositionRotations = relativeEncoder.getPosition();
     inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
@@ -74,8 +75,8 @@ public class TurretIOSparkFlex extends TurretIOReal {
   }
 
   @Override
-  public void applyOutputs(TurretIOOutputs outputs){
-    switch (outputs.mode){
+  public void applyOutputs(TurretIOOutputs outputs) {
+    switch (outputs.mode) {
       case VELOCITY -> {
         setVelocity(outputs.velocityRadPerSec);
       }
@@ -94,8 +95,7 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
   private void setVelocity(double velocityRadPerSec) {
     controller.setSetpoint(
-        Units.radiansToRotations(velocityRadPerSec) * 60, 
-        ControlType.kMAXMotionVelocityControl);
+        Units.radiansToRotations(velocityRadPerSec) * 60, ControlType.kMAXMotionVelocityControl);
   }
 
   private void setDesiredAngle(Rotation2d angle) {
