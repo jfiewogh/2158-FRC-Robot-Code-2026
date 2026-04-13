@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda2"));
+        Logger.addDataReceiver(new WPILOGWriter("/media/sdb1"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 

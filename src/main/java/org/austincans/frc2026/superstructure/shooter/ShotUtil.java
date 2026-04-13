@@ -22,7 +22,7 @@ import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotInputs;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
-import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTargets;
+import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTarget;
 
 public class ShotUtil {
   private static final ShotCalculator hubShotCalculator;
@@ -53,8 +53,8 @@ public class ShotUtil {
             RobotState.getInstance().getRobotVelocity(),
             RobotState.getInstance().getFieldVelocity(),
             alliance == Alliance.Red
-                ? TrackingTargets.redHub.getTranslation3d()
-                : TrackingTargets.blueHub.getTranslation3d());
+                ? TrackingTarget.redHub.getTranslation3d()
+                : TrackingTarget.blueHub.getTranslation3d());
     return hubShotCalculator.calculate(inputs);
   }
 

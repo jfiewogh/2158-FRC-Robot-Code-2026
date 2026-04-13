@@ -210,7 +210,7 @@ public class Superstructure {
               }
             },
             getRequirementsArray(flywheel, hood, indexer, spindexer, turret, drive))
-        .withTimeout(5)
+        .withTimeout(7)
         .finallyDo(this::stopFeederAndFlywheel);
   }
 

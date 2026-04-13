@@ -23,7 +23,7 @@ import org.austincans.frc2026.commands.RebuiltFieldUtils;
 public class TargetUtil {
   private static double yOff = 2; // Units.inchesToMeters(158.32 - 25.62);
 
-  public enum TrackingTargets {
+  public enum TrackingTarget {
     redHub(new Translation3d(11.938, 4.034536, 1.5748)),
     blueHub(new Translation3d(4.5974, 4.034536, 1.5748)),
     blueOutTrench(new Translation3d(4.625594, 0.632968, 0)),
@@ -40,7 +40,7 @@ public class TargetUtil {
 
     private final Translation3d targetTranslation3d;
 
-    private TrackingTargets(
+    private TrackingTarget(
         Translation3d target) { // Constructor must be private or package-private
       this.targetTranslation3d = target;
     }
@@ -50,11 +50,11 @@ public class TargetUtil {
     }
   }
 
-  private static TrackingTargets getClosestTarget(Pose3d pose, TrackingTargets[] possibleTargets) {
+  private static TrackingTarget getClosestTarget(Pose3d pose, TrackingTarget[] possibleTargets) {
     Translation3d translation = pose.getTranslation();
-    TrackingTargets closestTarget = possibleTargets[0];
+    TrackingTarget closestTarget = possibleTargets[0];
     for (int i = 1; i < possibleTargets.length; i++) {
-      TrackingTargets target = possibleTargets[i];
+      TrackingTarget target = possibleTargets[i];
       double distance = translation.getDistance(target.getTranslation3d());
       double currentClosestDistance = translation.getDistance(closestTarget.getTranslation3d());
       if (distance < currentClosestDistance) {
@@ -64,14 +64,14 @@ public class TargetUtil {
     return closestTarget;
   }
 
-  public static TrackingTargets getShuttleTarget(Pose3d fieldRelRobotPose, Alliance alliance) {
-    TrackingTargets[] possibleTargets;
+  public static TrackingTarget getShuttleTarget(Pose3d fieldRelRobotPose, Alliance alliance) {
+    TrackingTarget[] possibleTargets;
     if (alliance == Alliance.Blue) {
       possibleTargets =
-          new TrackingTargets[] {TrackingTargets.blueShuttleLeft, TrackingTargets.blueShuttleRight};
+          new TrackingTarget[] {TrackingTarget.blueShuttleLeft, TrackingTarget.blueShuttleRight};
     } else {
       possibleTargets =
-          new TrackingTargets[] {TrackingTargets.redShuttleLeft, TrackingTargets.redShuttleRight};
+          new TrackingTarget[] {TrackingTarget.redShuttleLeft, TrackingTarget.redShuttleRight};
     }
     return getClosestTarget(fieldRelRobotPose, possibleTargets);
   }

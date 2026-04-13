@@ -1,0 +1,112 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.8228245363766047,
+        "y": 2.3958433734939764
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.125905848787445,
+        "y": 2.7710644861901246
+      },
+      "isLocked": false,
+      "linkedName": "BottomAuto1End"
+    },
+    {
+      "anchor": {
+        "x": 6.1351212553495005,
+        "y": 1.69957203994294
+      },
+      "prevControl": {
+        "x": 5.5602378491692,
+        "y": 2.581951221522008
+      },
+      "nextControl": {
+        "x": 6.691483594864478,
+        "y": 0.8456205420827393
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.014950071326675,
+        "y": 3.174579172610556
+      },
+      "prevControl": {
+        "x": 7.558373751783167,
+        "y": 1.7772039942938658
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7292110874200428,
+      "rotationDegrees": -45.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.2045914922349783,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 360.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Turret Track Hub",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 1.7231600270087861,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Turret Track Hub"
+        }
+      }
+    },
+    {
+      "name": "Shuttle",
+      "waypointRelativePos": 1.3342336259284224,
+      "endWaypointRelativePos": 2.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Shuttle"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 108.92464441605115
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": -45.0
+  },
+  "useDefaultConstraints": true
+}

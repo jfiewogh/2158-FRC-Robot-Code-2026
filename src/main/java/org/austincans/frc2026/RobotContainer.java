@@ -148,13 +148,14 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("TopAuto"));
+    autoChooser.addOption("Left Auto", AutoBuilder.buildAuto("LeftAuto"));
+    autoChooser.addOption("Left Auto with Depot", AutoBuilder.buildAuto("LeftAutoWithDepot"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
-    autoChooser.addOption("Bottom Auto", AutoBuilder.buildAuto("BottomAuto"));
+    autoChooser.addOption("Right Auto", AutoBuilder.buildAuto("RightAuto"));
 
-    autoChooser.addOption("Just Shoot Top", AutoBuilder.buildAuto("TopJustShoot"));
-    autoChooser.addOption("Just Shoot Mid", AutoBuilder.buildAuto("MidJustShoot"));
-    autoChooser.addOption("Just Shoot Bot", AutoBuilder.buildAuto("BottomJustShoot"));
+    autoChooser.addOption("Left Just Shoot", AutoBuilder.buildAuto("LeftJustShoot"));
+    autoChooser.addOption("Mid Just Shoot", AutoBuilder.buildAuto("MidJustShoot"));
+    autoChooser.addOption("Right Just Shoot", AutoBuilder.buildAuto("RightJustShoot"));
 
     autoChooser.addOption("Do Nothing", AutoBuilder.buildAuto("DoNothing"));
     autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("JustShoot"));

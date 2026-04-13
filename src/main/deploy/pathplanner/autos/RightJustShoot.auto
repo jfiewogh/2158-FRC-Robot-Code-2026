@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomAuto1"
+            "pathName": "RightJustShoot1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
           }
         },
         {
@@ -19,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomAuto2"
+            "pathName": "RightJustShoot2"
           }
         }
       ]

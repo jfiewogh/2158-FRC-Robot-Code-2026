@@ -52,8 +52,8 @@
         "y": 4.9083594864479325
       },
       "prevControl": {
-        "x": 6.638033503177924,
-        "y": 4.737000787461264
+        "x": 6.638033503177927,
+        "y": 4.737000787461262
       },
       "nextControl": {
         "x": 5.617574893009986,
@@ -64,16 +64,16 @@
     },
     {
       "anchor": {
-        "x": 2.751506024096386,
+        "x": 3.133352353780314,
         "y": 5.4993132530120485
       },
       "prevControl": {
-        "x": 5.658277108427232,
+        "x": 6.040123438111154,
         "y": 5.400963855417317
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopAuto1End"
+      "linkedName": "LeftAuto1End"
     }
   ],
   "rotationTargets": [
@@ -94,15 +94,15 @@
       "rotationDegrees": 135.0
     },
     {
-      "waypointRelativePos": 3.8891257995735513,
+      "waypointRelativePos": 3.9573560767590554,
       "rotationDegrees": 135.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.3180283592167423,
-      "maxWaypointRelativePos": 2.225523295070915,
+      "minWaypointRelativePos": 1.5665091154625284,
+      "maxWaypointRelativePos": 2.8413234301147874,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -139,7 +139,7 @@
     },
     {
       "name": "Turret Track Hub",
-      "waypointRelativePos": 2.765698852126938,
+      "waypointRelativePos": 3.0141796083727312,
       "endWaypointRelativePos": 4.0,
       "command": {
         "type": "named",
@@ -159,7 +159,7 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 135.0
+    "rotation": 45.0
   },
   "reversed": false,
   "folder": null,

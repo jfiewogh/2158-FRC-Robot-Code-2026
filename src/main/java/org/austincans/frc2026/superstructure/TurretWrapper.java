@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.superstructure.shooter.TargetUtil;
-import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTargets;
+import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTarget;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretWrapper extends SubsystemWrapper<Turret> {
@@ -60,27 +60,31 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
     }
   }
 
-  private void pointToHub(Pose3d fieldRelRobotPose) {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    TrackingTargets target =
-        alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
+  private void pointToTarget(TrackingTarget target, Pose3d fieldRelRobotPose, boolean log) {
     Translation3d targetTranslation = target.getTranslation3d();
 
     // Transform3d applies Translation3d first, then Rotation3d
     Pose3d turretPose = fieldRelRobotPose.plus(TurretConstants.robotRelTurretTransform);
     Translation3d turretTranslation = turretPose.getTranslation();
-    Logger.recordOutput("turret pose", turretPose);
 
     Rotation2d fieldRelAngle =
         targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d()).getAngle();
 
-    // We need this for calculating
-    Logger.recordOutput(
-        "turret distance from hub",
-        turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
+    if (log) {
+      // Used to get values for maps
+      Logger.recordOutput("turret pose", turretPose); 
+      Logger.recordOutput("turret distance from " + target.name(), turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
+    }
 
     s.setDesiredAngleFieldRelative(
         fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+  }
+
+  private void pointToHub(Pose3d fieldRelRobotPose) {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    TrackingTarget target =
+        alliance == Alliance.Blue ? TrackingTarget.blueHub : TrackingTarget.redHub;
+    pointToTarget(target, fieldRelRobotPose, true);
   }
 
   public Command pointToHubCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
@@ -89,24 +93,8 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
 
   private void trackShuttle(Pose3d fieldRelRobotPose) {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    TrackingTargets target = TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance);
-    Translation3d targetTranslation = target.getTranslation3d();
-
-    // Transform3d applies Translation3d first, then Rotation3d
-    Pose3d turretPose = fieldRelRobotPose.plus(TurretConstants.robotRelTurretTransform);
-    Translation3d turretTranslation = turretPose.getTranslation();
-    Logger.recordOutput("turret pose", turretPose);
-
-    Rotation2d fieldRelAngle =
-        targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d()).getAngle();
-
-    // We need this for calculating
-    Logger.recordOutput(
-        "turret distance from shuttle",
-        turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
-
-    s.setDesiredAngleFieldRelative(
-        fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+    TrackingTarget target = TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance);
+    pointToTarget(target, fieldRelRobotPose, true);
   }
 
   public Command trackShuttleCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
