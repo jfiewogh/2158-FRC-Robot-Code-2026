@@ -120,6 +120,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Score", superstructure.shootToHubCommand());
     NamedCommands.registerCommand("Shuttle", superstructure.shuttleCommand());
     NamedCommands.registerCommand("Still Shoot", superstructure.stillShootCommand());
+    NamedCommands.registerCommand("Turret Track Hub", superstructure.turretPointToHub());
   }
 
   private void addAutos() {

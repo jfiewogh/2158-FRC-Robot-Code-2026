@@ -37,10 +37,7 @@ public class DeployWrapper extends SubsystemWrapper<Deploy> {
     if (!isPresent) {
       return Commands.none();
     }
-    return Commands.sequence(
-      runDeployCommand(),
-      Commands.waitSeconds(1),
-      stopCommand())
+    return Commands.sequence(runDeployCommand(), Commands.waitSeconds(1.5), stopCommand())
         .finallyDo(s::stop);
   }
 
@@ -56,10 +53,7 @@ public class DeployWrapper extends SubsystemWrapper<Deploy> {
     if (!isPresent) {
       return Commands.none();
     }
-    return Commands.sequence(
-      runRetractCommand(),
-      Commands.waitSeconds(1.5),
-      stopCommand())
+    return Commands.sequence(runRetractCommand(), Commands.waitSeconds(1.5), stopCommand())
         .finallyDo(s::stop);
   }
 

@@ -92,6 +92,8 @@ public class ShotConstants {
       scoringHoodAngleMap.put(4.0, Rotation2d.fromDegrees(68.7)); // 1300
       scoringHoodAngleMap.put(4.5, Rotation2d.fromDegrees(68.7)); // 1300
       scoringHoodAngleMap.put(5.0, Rotation2d.fromDegrees(68.7)); // 1300
+      scoringHoodAngleMap.put(5.5, Rotation2d.fromDegrees(65.0)); // 1400
+      scoringHoodAngleMap.put(6.0, Rotation2d.fromDegrees(61.3)); // 1500
 
       scoringFlywheelSpeedMap.put(1.5, 2750.0);
       scoringFlywheelSpeedMap.put(2.0, 2875.0);
@@ -101,6 +103,8 @@ public class ShotConstants {
       scoringFlywheelSpeedMap.put(4.0, 3500.0);
       scoringFlywheelSpeedMap.put(4.5, 4000.0);
       scoringFlywheelSpeedMap.put(5.0, 4700.0);
+      scoringFlywheelSpeedMap.put(5.5, 5000.0);
+      scoringFlywheelSpeedMap.put(6.0, 5000.0);
 
       scoringTimeOfFlightMap.put(1.5, 1.02);
       scoringTimeOfFlightMap.put(2.0, 1.05);
@@ -110,7 +114,8 @@ public class ShotConstants {
       scoringTimeOfFlightMap.put(4.0, 1.22);
       scoringTimeOfFlightMap.put(4.5, 1.27);
       scoringTimeOfFlightMap.put(5.0, 1.38);
-      scoringTimeOfFlightMap.put(100.0, 1.38);
+      scoringTimeOfFlightMap.put(5.5, 1.31);
+      scoringTimeOfFlightMap.put(6.0, 1.16);
 
       passingHoodAngleMap.put(4.5, Rotation2d.fromDegrees(72.3)); // 1200
       passingHoodAngleMap.put(7.0, Rotation2d.fromDegrees(65.0)); // 1400
