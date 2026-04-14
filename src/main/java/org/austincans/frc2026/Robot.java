@@ -59,7 +59,7 @@ public class Robot extends LoggedRobot {
   public static final BatteryLogger batteryLogger = new BatteryLogger();
   private final BatteryIOInputsAutoLogged batteryInputs = new BatteryIOInputsAutoLogged();
 
-  private final Timer fuelLoggingTimer = new Timer();
+  private final Timer garbageTimer = new Timer();
   private static final Timer disabledTimer = new Timer();
 
   public Robot() {
@@ -95,7 +95,7 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        Logger.addDataReceiver(new WPILOGWriter("/media/sdb1"));
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -248,6 +248,10 @@ public class Robot extends LoggedRobot {
 
     // Record cycle time
     LoggedTracer.record("Robot/Periodic");
+
+    if (garbageTimer.advanceIfElapsed(5)) {
+      System.gc();
+    }
   }
 
   /** Returns whether performance should be throttled to conserve power. */
