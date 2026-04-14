@@ -11,15 +11,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Still Shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "MidAuto2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
           }
         }
       ]

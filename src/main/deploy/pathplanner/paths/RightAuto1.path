@@ -100,7 +100,7 @@
         "y": 2.3958433734939764
       },
       "prevControl": {
-        "x": 3.8616485436604564,
+        "x": 3.861648543660457,
         "y": 2.3811155387444436
       },
       "nextControl": {
@@ -181,7 +181,7 @@
     {
       "name": "Start Intake",
       "waypointRelativePos": 1.0965563808237837,
-      "endWaypointRelativePos": 7.0,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
@@ -202,8 +202,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,

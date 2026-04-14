@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5844365192582024,
-        "y": 5.943452211126962
+        "x": 0.4938659058487873,
+        "y": 5.930513552068473
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1149215406534752,
-        "y": 5.930513552068444
+        "x": 1.02435092724406,
+        "y": 5.917574893009955
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LeftAutoWithDepot1End"
     },
     {
       "anchor": {
@@ -24,7 +24,7 @@
         "y": 5.982268188302396
       },
       "nextControl": {
-        "x": 3.101459483041992,
+        "x": 3.1014594830419915,
         "y": 5.829110303121229
       },
       "isLocked": false,
@@ -108,6 +108,10 @@
     {
       "waypointRelativePos": 3.2089552238806034,
       "rotationDegrees": 20.0
+    },
+    {
+      "waypointRelativePos": 3.837953091684426,
+      "rotationDegrees": -70.0
     }
   ],
   "constraintZones": [
@@ -164,8 +168,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,

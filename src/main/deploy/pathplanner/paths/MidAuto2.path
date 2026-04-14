@@ -8,38 +8,33 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2313694721825963,
-        "y": 5.930513552068473
+        "x": 1.0915258128780296,
+        "y": 5.955798153623879
       },
       "isLocked": false,
       "linkedName": "MidAuto1End"
     },
     {
       "anchor": {
-        "x": 2.3958487874465044,
+        "x": 1.7618544935805986,
         "y": 5.956390870185448
       },
       "prevControl": {
-        "x": 1.8783024251069897,
-        "y": 6.046961483594864
+        "x": 1.4472557722724992,
+        "y": 5.984408640688622
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3944562899786811,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -47,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,

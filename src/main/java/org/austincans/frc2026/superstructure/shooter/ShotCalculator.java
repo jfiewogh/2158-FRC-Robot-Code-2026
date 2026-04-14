@@ -33,9 +33,9 @@ import org.littletonrobotics.junction.Logger;
 // TODO: Maybe make it work for z's between floor and hub height (ex. robot on bump)
 /**
  * Used to calculate the parameters necessary for shooting based on maps of empirically measured
- * data.
+ * data
  *
- * <p>Heavily based on z
+ * <p>Heavily based on
  *
  * <ul>
  *   <li>https://github.com/Mechanical-Advantage/RobotCode2026Public/blob/main/src/main/java/org/littletonrobotics/frc2026/subsystems/launcher/LaunchCalculator.java
@@ -43,7 +43,7 @@ import org.littletonrobotics.junction.Logger;
  * </ul>
  */
 public class ShotCalculator {
-  private static final int iterations = 5;
+  private static final int iterations = 7;
 
   private final double phaseDelaySecs;
 
