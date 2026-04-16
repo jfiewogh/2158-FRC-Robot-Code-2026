@@ -56,8 +56,7 @@ public class Flywheel extends AdvancedSubsystem {
     Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
     Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
 
-    Robot.batteryLogger.reportCurrentUsage(
-        "Flywheel", false, inputs.currentAmps);
+    Robot.batteryLogger.reportCurrentUsage("Flywheel", false, inputs.currentAmps);
   }
 
   @Override
@@ -73,7 +72,8 @@ public class Flywheel extends AdvancedSubsystem {
   }
 
   public void stop() {
-    setVelocity(0);
+    outputs.mode = FlywheelIOOutputMode.VOLTAGE;
+    outputs.voltage = 0;
   }
 
   public double getRPM() {

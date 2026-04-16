@@ -246,13 +246,13 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
 
   @Override
   public void periodic() {
-    cycles++;
-    if (cycles % 12 == 0) {
-      checkForFaults();
-    }
-    if (cycles % 50 == 0) {
-      publishStatus();
-      cycles = 0;
-    }
+    // cycles++;
+    // if (cycles % 12 == 0) {
+    //   checkForFaults();
+    // }
+    // if (cycles % 50 == 0) {
+    //   publishStatus();
+    //   cycles = 0;
+    // }
   }
 }

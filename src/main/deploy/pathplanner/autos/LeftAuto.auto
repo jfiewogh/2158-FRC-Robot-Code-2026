@@ -15,12 +15,6 @@
           "data": {
             "name": "Still Shoot"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftAuto2"
-          }
         }
       ]
     }

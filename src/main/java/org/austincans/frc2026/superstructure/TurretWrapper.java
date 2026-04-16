@@ -72,12 +72,13 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
 
     if (log) {
       // Used to get values for maps
-      Logger.recordOutput("turret pose", turretPose); 
-      Logger.recordOutput("turret distance from " + target.name(), turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
+      Logger.recordOutput("turret pose", turretPose.toPose2d());
+      Logger.recordOutput(
+          "turret distance from " + target.name(),
+          turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
     }
 
-    s.setDesiredAngleFieldRelative(
-        fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+    s.setDesiredAngleFieldRelative(fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
   }
 
   private void pointToHub(Pose3d fieldRelRobotPose) {
@@ -88,7 +89,9 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
   }
 
   public Command pointToHubCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
-    return isPresent ? Commands.run(() -> pointToHub(fieldRelRobotPoseSupplier.get()), s) : Commands.none();
+    return isPresent
+        ? Commands.run(() -> pointToHub(fieldRelRobotPoseSupplier.get()), s)
+        : Commands.none();
   }
 
   private void trackShuttle(Pose3d fieldRelRobotPose) {
@@ -98,7 +101,9 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
   }
 
   public Command trackShuttleCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
-    return isPresent ? Commands.run(() -> trackShuttle(fieldRelRobotPoseSupplier.get()), s) : Commands.none();
+    return isPresent
+        ? Commands.run(() -> trackShuttle(fieldRelRobotPoseSupplier.get()), s)
+        : Commands.none();
   }
 
   private void joystickRobotRelAngle(double rotationX, double rotationY) {
@@ -114,7 +119,9 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
       return Commands.none();
     }
     return Commands.run(
-        () -> joystickRobotRelAngle(rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()), s);
+        () ->
+            joystickRobotRelAngle(rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
+        s);
   }
 
   public Command resetAngleCommand() {

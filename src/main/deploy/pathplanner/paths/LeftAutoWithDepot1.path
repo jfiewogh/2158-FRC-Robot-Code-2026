@@ -20,44 +20,44 @@
         "y": 6.319
       },
       "prevControl": {
-        "x": 5.73836278485561,
-        "y": 5.084397041678214
+        "x": 5.862201440790439,
+        "y": 5.020288750978055
       },
       "nextControl": {
-        "x": 7.712348070146765,
-        "y": 8.48038601980816
+        "x": 7.325477888730385,
+        "y": 8.220656205420829
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.843819277108434,
+        "x": 7.674821683309556,
         "y": 5.4993132530120485
       },
       "prevControl": {
-        "x": 7.859885852226821,
-        "y": 6.4311746096045255
+        "x": 7.956162306688322,
+        "y": 6.149913444575446
       },
       "nextControl": {
-        "x": 7.821963855415186,
-        "y": 4.231698795176353
+        "x": 7.4678031383737515,
+        "y": 5.020582867847998
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.455999999993498,
-        "y": 4.9083594864479325
+        "x": 5.578758915834522,
+        "y": 5.4993132530120485
       },
       "prevControl": {
-        "x": 6.638033503177927,
-        "y": 4.737000787461262
+        "x": 6.445649072753208,
+        "y": 5.516476462196862
       },
       "nextControl": {
-        "x": 5.617574893009986,
-        "y": 5.697617689015692
+        "x": 4.427513656297802,
+        "y": 5.476520211639095
       },
       "isLocked": false,
       "linkedName": null
@@ -106,7 +106,7 @@
       "rotationDegrees": -90.0
     },
     {
-      "waypointRelativePos": 3.35,
+      "waypointRelativePos": 2.8464818763326387,
       "rotationDegrees": 135.0
     },
     {
@@ -137,7 +137,7 @@
       "minWaypointRelativePos": 3.7272113436866965,
       "maxWaypointRelativePos": 5.0,
       "constraints": {
-        "maxVelocity": 0.75,
+        "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 360.0,
         "maxAngularAcceleration": 360.0,
@@ -161,7 +161,7 @@
     },
     {
       "name": "Start Intake",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 1.012829169480083,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -172,8 +172,8 @@
     },
     {
       "name": "Turret Track Hub",
-      "waypointRelativePos": 3.268062120189041,
-      "endWaypointRelativePos": 3.89,
+      "waypointRelativePos": 2.86293045239703,
+      "endWaypointRelativePos": 3.5,
       "command": {
         "type": "named",
         "data": {
@@ -183,7 +183,7 @@
     },
     {
       "name": "Score",
-      "waypointRelativePos": 3.8892640108035126,
+      "waypointRelativePos": 3.57,
       "endWaypointRelativePos": 5.0,
       "command": {
         "type": "named",
@@ -195,7 +195,7 @@
   ],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 5.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,

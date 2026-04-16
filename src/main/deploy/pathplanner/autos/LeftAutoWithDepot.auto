@@ -15,6 +15,12 @@
           "data": {
             "pathName": "LeftAutoWithDepot2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
+          }
         }
       ]
     }

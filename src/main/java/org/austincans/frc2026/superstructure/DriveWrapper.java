@@ -136,8 +136,7 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
 
     s.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
+            speeds, isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
   }
 
   /**
@@ -153,7 +152,8 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
     if (!isPresent) {
       return Commands.none();
     }
-    return Commands.run(() -> joystickDrive(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier), s);
+    return Commands.run(
+        () -> joystickDrive(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier), s);
   }
 
   /**
@@ -203,11 +203,10 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
         new ChassisSpeeds(
             linearVelocity.getX() * s.getMaxLinearSpeedMetersPerSec(),
             linearVelocity.getY() * s.getMaxLinearSpeedMetersPerSec(),
-            omega);
+            omega * s.getMaxAngularSpeedRadPerSec());
     s.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
+            speeds, isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
   }
 
   public Command joystickDriveAtAngleCommand(
@@ -246,16 +245,10 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
         () -> {
           if (turnMode == TurnMode.TWO_AXIS) {
             joystickDriveAtAngle(
-                translationXSupplier,
-                translationYSupplier,
-                rotationXSupplier,
-                rotationYSupplier);
+                translationXSupplier, translationYSupplier, rotationXSupplier, rotationYSupplier);
           } else {
             joystickDrive(
-                translationXSupplier,
-                translationYSupplier,
-                rotationXSupplier,
-                rotationYSupplier);
+                translationXSupplier, translationYSupplier, rotationXSupplier, rotationYSupplier);
           }
         },
         s);
