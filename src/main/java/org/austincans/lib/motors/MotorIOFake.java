@@ -6,16 +6,16 @@ public class MotorIOFake implements MotorIO {
     private double positionRad;
 
     @Override
-    public void updateRecords(MotorIORecords records) {
-        records.positionRad = positionRad;
-        records.velocityRadPerSec = velocityRadPerSec;
-        records.appliedVolts = appliedVolts;
+    public void updateInputs(MotorIOInputs inputs) {
+        inputs.positionRad = positionRad;
+        inputs.velocityRadPerSec = velocityRadPerSec;
+        inputs.appliedVolts = appliedVolts;
     }
 
     @Override
-    public void applyRequests(MotorIORequests requests) {
-        appliedVolts = requests.voltage;
-        velocityRadPerSec = requests.velocityRadPerSec;
-        positionRad = requests.positionRad;
+    public void applyOutputs(MotorIOOutputs outputs) {
+        appliedVolts = outputs.voltage;
+        velocityRadPerSec = outputs.velocityRadPerSec;
+        positionRad = outputs.positionRad;
     }
 }

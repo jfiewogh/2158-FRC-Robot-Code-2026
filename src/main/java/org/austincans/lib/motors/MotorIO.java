@@ -5,7 +5,7 @@ public interface MotorIO {
      * Includes values that are common for all motors. 
      * Values that are not common should be separated into other records, such as SensorIORecords. 
      */
-    public class MotorIORecords {
+    public class MotorIOInputs {
         public boolean connected = false;
         public double positionRad;
         public double velocityRadPerSec;
@@ -32,23 +32,23 @@ public interface MotorIO {
         POSITION
     }
 
-    public class MotorIORequests {
-        public MotorIORequestMode requestMode;
+    public class MotorIOOutputs {
+        public MotorIORequestMode mode;
         public double voltage;
         public double velocityRadPerSec;
         public double positionRad;
         public NeutralMode neutralMode;
 
         public void setVoltage(double voltage) {
-            requestMode = MotorIORequestMode.VOLTAGE;
+            mode = MotorIORequestMode.VOLTAGE;
             this.voltage = voltage;
         }
         public void setVelocity(double velocityRadPerSec) {
-            requestMode = MotorIORequestMode.VELOCITY;
+            mode = MotorIORequestMode.VELOCITY;
             this.velocityRadPerSec = velocityRadPerSec;
         }
         public void setPosition(double positionRad) {
-            requestMode = MotorIORequestMode.POSITION;
+            mode = MotorIORequestMode.POSITION;
             this.positionRad = positionRad;
         }
         public void setNeutralMode(NeutralMode neutralMode) {
@@ -56,7 +56,7 @@ public interface MotorIO {
         }
     }
 
-    public void updateRecords(MotorIORecords records);
+    public void updateInputs(MotorIOInputs inputs);
 
-    public void applyRequests(MotorIORequests requests);
+    public void applyOutputs(MotorIOOutputs outputs);
 }

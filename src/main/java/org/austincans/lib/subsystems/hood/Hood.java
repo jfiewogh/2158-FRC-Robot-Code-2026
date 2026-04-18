@@ -107,4 +107,10 @@ public class Hood extends AdvancedSubsystem {
         Commands.waitSeconds(0.25))
         .andThen(Commands.runOnce(this::stopCommand, this));
   }
+
+  @Override
+  public void periodicAfterScheduler() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'periodicAfterScheduler'");
+  }
 }

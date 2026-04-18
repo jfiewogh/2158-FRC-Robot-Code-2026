@@ -27,21 +27,21 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     }
 
     @Override
-    public void updateRecords(MotorIORecords records) {
-        records.connected = true; // TODO: make this based on some property of the motor
-        records.positionRad = Units.rotationsToRadians(encoder.getPosition());
-        records.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
-        records.appliedVolts = motor.getBusVoltage();
-        records.statorCurrentAmps = motor.getOutputCurrent();
-        records.temperatureCelsius = motor.getMotorTemperature();
+    public void updateInputs(MotorIOInputs inputs) {
+        inputs.connected = true; // TODO: make this based on some property of the motor
+        inputs.positionRad = Units.rotationsToRadians(encoder.getPosition());
+        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        inputs.appliedVolts = motor.getBusVoltage();
+        inputs.statorCurrentAmps = motor.getOutputCurrent();
+        inputs.temperatureCelsius = motor.getMotorTemperature();
     }
 
     @Override
-    public void applyRequests(MotorIORequests requests) {
-        switch (requests.requestMode) {
-            case VOLTAGE -> setVoltage(requests.voltage);
-            case VELOCITY -> setVelocity(requests.velocityRadPerSec);
-            case POSITION -> setPosition(requests.positionRad);
+    public void applyOutputs(MotorIOOutputs outputs) {
+        switch (outputs.mode) {
+            case VOLTAGE -> setVoltage(outputs.voltage);
+            case VELOCITY -> setVelocity(outputs.velocityRadPerSec);
+            case POSITION -> setPosition(outputs.positionRad);
         }
     }
 

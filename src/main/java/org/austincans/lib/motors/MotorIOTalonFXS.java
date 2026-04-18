@@ -23,23 +23,23 @@ public class MotorIOTalonFXS extends MotorIOReal {
     }
 
     @Override
-    public void updateRecords(MotorIORecords records) {
-        records.connected = motor.isConnected();
-        records.positionRad = motor.getPosition().getValue().in(Radians);
-        records.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
-        records.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
-        records.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
-        records.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
-        records.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
-        records.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+    public void updateInputs(MotorIOInputs inputs) {
+        inputs.connected = motor.isConnected();
+        inputs.positionRad = motor.getPosition().getValue().in(Radians);
+        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
+        inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
+        inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
+        inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
+        inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
     }
 
     @Override
-    public void applyRequests(MotorIORequests requests) {
-        switch (requests.requestMode) {
-            case VOLTAGE -> setVoltage(requests.voltage);
-            case VELOCITY -> setVelocity(requests.velocityRadPerSec);
-            case POSITION -> setPosition(requests.positionRad);
+    public void applyOutputs(MotorIOOutputs outputs) {
+        switch (outputs.mode) {
+            case VOLTAGE -> setVoltage(outputs.voltage);
+            case VELOCITY -> setVelocity(outputs.velocityRadPerSec);
+            case POSITION -> setPosition(outputs.positionRad);
         }
     }
 

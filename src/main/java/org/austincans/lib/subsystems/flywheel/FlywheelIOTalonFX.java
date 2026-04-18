@@ -53,23 +53,4 @@ public class FlywheelIOTalonFX implements FlywheelIO {
   public void runVelocity(double velocityRPM) {
     motorIO.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM));
   }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> motorFaults = selfCheckMotor.checkForFaults();
-    if (motorFaults != null) {
-      faults.addAll(motorFaults);
-    }
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckMotor);
-  }
 }

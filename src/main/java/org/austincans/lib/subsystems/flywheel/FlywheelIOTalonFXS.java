@@ -25,6 +25,7 @@ import java.util.List;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFX;
 import org.austincans.lib.motors.MotorIOTalonFXS;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
@@ -57,21 +58,14 @@ public class FlywheelIOTalonFXS implements FlywheelIO {
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> motorFaults = selfCheckMotor.checkForFaults();
-    if (motorFaults != null) {
-      faults.addAll(motorFaults);
-    }
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
+  public void applyOutputs(FlywheelIOOutputs outputs) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'applyOutputs'");
   }
 
   @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckMotor);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'registerSelfCheckHardware'");
   }
 }
