@@ -184,12 +184,14 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
 
     // MapleSim libraries
-    implementation 'org.dyn4j:dyn4j:5.0.2'
-    // 3D Physics Engine
-    implementation "com.github.stephengold:Libbulletjme-Windows64:22.0.3"
-    runtimeOnly "com.github.stephengold:Libbulletjme-Windows64:22.0.3:SpDebug"
-    implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
-    runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
+    // implementation 'org.dyn4j:dyn4j:5.0.2'
+    // // 3D Physics Engine
+
+
+    // implementation "com.github.stephengold:Libbulletjme-Windows64:22.0.3"
+    // runtimeOnly "com.github.stephengold:Libbulletjme-Windows64:22.0.3:SpDebug"
+    // implementation("com.github.stephengold:jolt-jni-Windows64:3.5.2")
+    // runtimeOnly "com.github.stephengold:jolt-jni-Windows64:3.5.2:ReleaseDp"
 
 
 

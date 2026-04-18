@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/main/java/org/austincans/lib/util/VirtualSubsystem.java
 // Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
@@ -14,22 +15,37 @@
 // at the root directory of this project.
 
 package org.austincans.lib.util;
+=======
+package org.austincans.frc2026.util;
+>>>>>>> develop:src/main/java/org/austincans/frc2026/util/VirtualSubsystem.java
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class VirtualSubsystem {
-  private static List<VirtualSubsystem> subsystems = new ArrayList<>();
+    private static List<VirtualSubsystem> instances = new ArrayList<>();
 
-  public VirtualSubsystem() {
-    subsystems.add(this);
-  }
-
-  public static void periodicAll() {
-    for (VirtualSubsystem subsystem : subsystems) {
-      subsystem.periodic();
+    public VirtualSubsystem() {
+        instances.add(this);
     }
-  }
 
-  public abstract void periodic();
+    /** This method is called periodically before the command scheduler. */
+    public abstract void periodic();
+
+    /** This method is called periodically after the command scheduler, and should be used for applying outputs. */
+    public abstract void periodicAfterScheduler();
+
+    /** Run the periodic methods for all subsystems. */
+    public static void runAllPeriodic() {
+        for (VirtualSubsystem instance : instances) {
+            instance.periodic();
+        }
+    }
+
+    /** Run the "after periodic" methods for all subsystems. */
+    public static void runAllPeriodicAfterScheduler() {
+        for (VirtualSubsystem instance : instances) {
+            instance.periodicAfterScheduler();
+        }
+    }
 }

@@ -13,32 +13,35 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/api/Error.java
 package org.austincans.lib.lidar.api;
+========
+package org.austincans.frc2026.superstructure;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SpindexerWrapper.java
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
-import java.util.function.Consumer;
+import org.austincans.frc2026.subsystems.feeder.Spindexer;
 
-/**
- * Represents some kind of error.
- *
- * <p>Each error has a code and some data. The string representation is also suitable for easy
- * reporting.
- *
- * <p>Many API methods return {@code Optional<Error<?>>}. This should be handled by {@link
- * Optional#ifPresent(Consumer)} in most cases, where you throw an exception better detailing the
- * error for your use case.
- */
-public interface Error<T> {
+public class SpindexerWrapper extends SubsystemWrapper<Spindexer> {
+  public SpindexerWrapper(Optional<Spindexer> subsystem) {
+    super(subsystem);
+  }
 
-  String code();
+  public Command runCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::run, s)).orElse(Commands.none());
+  }
 
-  T data();
+  public Command stopCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::stop, s)).orElse(Commands.none());
+  }
 
-  /**
-   * Provides a reportable representation of the error.
-   *
-   * <p>Typically this will look like {@code [$code] $message}.
-   */
-  @Override
-  String toString();
+  public void run() {
+    subsystem.ifPresent((s) -> s.run());
+  }
+
+  public void stop() {
+    subsystem.ifPresent((s) -> s.stop());
+  }
 }

@@ -15,37 +15,44 @@
 
 package org.austincans.lib.controllers;
 
-import com.revrobotics.servohub.ServoChannel;
-import com.revrobotics.servohub.ServoHub;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+// import com.revrobotics.servohub.ServoChannel;
+// import com.revrobotics.servohub.ServoHub;
+// import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class LinearActuatorServoHub {
+<<<<<<< HEAD:src/main/java/org/austincans/lib/controllers/LinearActuatorServoHub.java
   private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
   private ServoHub hub = ServoHubController.hub;
   private ServoChannel linearActuator;
+=======
+  //   private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+  //   private ServoHub hub = ServoHubController.getInstance().hub;
+  //   private ServoChannel linearActuator;
+>>>>>>> develop:src/main/java/org/austincans/frc2026/controllers/LinearActuatorServoHub.java
 
-  // L16-100-35-6-R
-  public LinearActuatorServoHub(int linearActuatorDeviceID) {
-    linearActuator = hub.getServoChannel(ServoChannel.ChannelId.fromInt(linearActuatorDeviceID));
-    linearActuator.setEnabled(true);
+  //   // L16-100-35-6-R
+  //   public LinearActuatorServoHub(int linearActuatorDeviceID) {
+  //     linearActuator =
+  // hub.getServoChannel(ServoChannel.ChannelId.fromInt(linearActuatorDeviceID));
+  //     linearActuator.setEnabled(true);
 
-    // Position Percentage
-    map.put(0.0, 1000.0);
-    map.put(100.0, 2000.0);
-  }
+  //     // Position Percentage
+  //     map.put(0.0, 1000.0);
+  //     map.put(100.0, 2000.0);
+  //   }
 
-  public void setPulseWidth(int width) {
-    linearActuator.setEnabled(true);
-    linearActuator.setPowered(true);
-    linearActuator.setPulseWidth(width);
-  }
+  //   public void setPulseWidth(int width) {
+  //     linearActuator.setEnabled(true);
+  //     linearActuator.setPowered(true);
+  //     linearActuator.setPulseWidth(width);
+  //   }
 
-  public void disable() {
-    linearActuator.setEnabled(false);
-    linearActuator.setPowered(false);
-  }
+  //   public void disable() {
+  //     linearActuator.setEnabled(false);
+  //     linearActuator.setPowered(false);
+  //   }
 
-  public void setDistance(double percent) {
-    linearActuator.setPulseWidth(Integer.parseInt(map.get(percent).toString()));
-  }
+  //   public void setDistance(double percent) {
+  //     linearActuator.setPulseWidth(Integer.parseInt(map.get(percent).toString()));
+  //   }
 }

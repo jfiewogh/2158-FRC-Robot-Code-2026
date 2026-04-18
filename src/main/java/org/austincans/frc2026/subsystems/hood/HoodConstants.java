@@ -15,17 +15,46 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
-import org.austincans.lib.util.ConfigUtil;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class HoodConstants {
-  static int flexMotorID = ConfigUtil.getConfigInt("HOOD_SPARK_FLEX_MOTOR_ID", 0);
-  static int talonMotorID = ConfigUtil.getConfigInt("HOOD_TALON_ID", 0);
-  static int linearActuatorID = ConfigUtil.getConfigInt("HOOD_LINEAR_ACTUATOR_ID", 0);
-  static double kP = ConfigUtil.getConfigDouble("HOOD_P", 0);
-  static double kI = ConfigUtil.getConfigDouble("HOOD_I", 0);
-  static double kD = ConfigUtil.getConfigDouble("HOOD_D", 0);
-  static double kV = ConfigUtil.getConfigDouble("HOOD_V", 0);
-  public static final double rotationalInertiaMetersSq =
-      ConfigUtil.getConfigDouble("HOOD_ROTATIONAL_INERTIAL_METERS_SQ", 5);
-  public static final double gearing = ConfigUtil.getConfigDouble("HOOD_GEARING", 5);
+  public static final InterpolatingDoubleTreeMap angleToPWM = new InterpolatingDoubleTreeMap();
+  public static final InterpolatingDoubleTreeMap pwmToAngle = new InterpolatingDoubleTreeMap();
+
+  static {
+    // angle is measured from being placed on
+    // the metal right above the linear actuator
+    // subtract all angles from 90 to get shot angle
+    angleToPWM.put(90 - 10.9, 1000.0);
+    angleToPWM.put(90 - 12.4, 1050.0);
+    angleToPWM.put(90 - 14.2, 1100.0);
+    angleToPWM.put(90 - 16.0, 1150.0);
+    angleToPWM.put(90 - 17.7, 1200.0);
+    angleToPWM.put(90 - 19.5, 1250.0);
+    angleToPWM.put(90 - 21.3, 1300.0);
+    angleToPWM.put(90 - 23.1, 1350.0);
+    angleToPWM.put(90 - 25.0, 1400.0);
+    angleToPWM.put(90 - 26.9, 1450.0);
+    angleToPWM.put(90 - 28.7, 1500.0);
+    angleToPWM.put(90 - 30.6, 1550.0);
+    angleToPWM.put(90 - 32.4, 1600.0);
+    angleToPWM.put(90 - 34.3, 1650.0);
+    angleToPWM.put(90 - 36.15, 1700.0);
+
+    pwmToAngle.put(1000.0, 90 - 10.9);
+    pwmToAngle.put(1050.0, 90 - 12.4);
+    pwmToAngle.put(1100.0, 90 - 14.2);
+    pwmToAngle.put(1150.0, 90 - 16.0);
+    pwmToAngle.put(1200.0, 90 - 17.7);
+    pwmToAngle.put(1250.0, 90 - 19.5);
+    pwmToAngle.put(1300.0, 90 - 21.3);
+    pwmToAngle.put(1350.0, 90 - 23.1);
+    pwmToAngle.put(1400.0, 90 - 25.0);
+    pwmToAngle.put(1450.0, 90 - 26.9);
+    pwmToAngle.put(1500.0, 90 - 28.7);
+    pwmToAngle.put(1550.0, 90 - 30.6);
+    pwmToAngle.put(1600.0, 90 - 32.4);
+    pwmToAngle.put(1650.0, 90 - 34.3);
+    pwmToAngle.put(1700.0, 90 - 36.15);
+  }
 }

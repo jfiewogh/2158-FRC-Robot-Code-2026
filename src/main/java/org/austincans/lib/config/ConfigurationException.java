@@ -13,19 +13,21 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/config/ConfigurationException.java
 package org.austincans.lib.config;
+========
+package org.austincans.frc2026.subsystems.vision;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/vision/ObjectDetectionIO.java
 
-import org.jetbrains.annotations.NotNull;
+import edu.wpi.first.math.geometry.Pose3d;
+import org.littletonrobotics.junction.AutoLog;
 
-/**
- * An exception that is raised when specific situations emerge when interacting with configurations
- * in bad ways.
- *
- * @since 2.0.0
- */
-public class ConfigurationException extends RuntimeException {
-
-  ConfigurationException(@NotNull String message) {
-    super(message);
+public interface ObjectDetectionIO {
+  @AutoLog
+  public class ObjectDetectionIOInputs {
+    public Pose3d nearestGamePiecePose = new Pose3d();
+    public Pose3d[] gamePiecePoses = new Pose3d[0];
   }
+
+  public void updateInputs(ObjectDetectionIOInputs inputs);
 }

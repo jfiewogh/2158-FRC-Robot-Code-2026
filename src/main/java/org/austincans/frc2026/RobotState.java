@@ -25,6 +25,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,6 +47,7 @@ public class RobotState {
   // Pose estimation fields
   @Getter @AutoLogOutput private Pose2d odometryPose = Pose2d.kZero;
   @Getter @AutoLogOutput private Pose2d estimatedPose = Pose2d.kZero;
+  private Field2d field = new Field2d();
 
   private final TimeInterpolatableBuffer<Pose2d> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(poseBufferSizeSec);
@@ -80,6 +83,8 @@ public class RobotState {
       qStdDevs.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));
     }
     kinematics = new SwerveDriveKinematics(DriveConstants.moduleTranslations);
+
+    SmartDashboard.putData("Field", field);
   }
 
   // MARK: - Drive & vision methods
@@ -218,6 +223,11 @@ public class RobotState {
   public Optional<Rotation3d> getEstimatedRotation3dAtTimestamp(double timestamp) {
     var estimatedRotation = rotationBuffer.getSample(timestamp);
     return estimatedRotation;
+  }
+
+  public void updateField() {
+    field.setRobotPose(estimatedPose);
+    field.getObject("OdometryPose").setPose(odometryPose);
   }
 
   // MARK: - Type declarations

@@ -13,32 +13,43 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/Deadband.java
 package org.austincans.lib.util;
+========
+package org.austincans.frc2026.input;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/input/DriverMapper.java
 
-/*
- * @author Austin Cans Robotics Team 2158
- */
-public class Deadband {
-  public static double applyLowHigh(
-      double input, double lowPass, double highPass, double defaultValue) {
-    if (inDeadbandLowHigh(input, lowPass, highPass)) {
-      return defaultValue;
-    }
-    return input;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+public interface DriverMapper {
+  public double getTranslationX();
+
+  public double getTranslationY();
+
+  public double getRotationX();
+
+  public double getRotationY();
+
+  public Trigger getShootButton();
+
+  public Trigger getRollerToggleButton();
+
+  public Trigger getTurnModeToggleButton();
+
+  /* Just for real/comp */
+  public default Trigger getDeployButton() {
+    return new Trigger(() -> false);
   }
 
-  public static boolean inDeadband(double input, double window) {
-    return inDeadbandLowHigh(input, -window, window);
+  public default Trigger getRetractButton() {
+    return new Trigger(() -> false);
   }
 
-  public static boolean inDeadbandLowHigh(double input, double lowPass, double highPass) {
-    return input < highPass && input > lowPass;
+  public default Trigger getZeroPoseButton() {
+    return new Trigger(() -> false);
   }
 
-  public static double apply(double input, double window) {
-    if (inDeadband(input, window)) {
-      return 0;
-    }
-    return input;
+  public default Trigger getStopWithXButton() {
+    return new Trigger(() -> false);
   }
 }

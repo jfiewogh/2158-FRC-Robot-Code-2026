@@ -15,32 +15,45 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.ctre.phoenix6.CANBus;
-import org.austincans.lib.util.ConfigUtil;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Time;
+import org.austincans.lib.util.LoggedTunableNumber;
 
 public class FlywheelConstants {
-  // TODO: get from config
-  public static final double kS = ConfigUtil.getConfigDouble("FLYWHEEL_S", 0);
-  public static final double kV = ConfigUtil.getConfigDouble("FLYWHEEL_V", 0);
-  public static final double kA = ConfigUtil.getConfigDouble("FLYWHEEL_A", 0);
-  public static final int maxDistFromLasarCan1 =
-      ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_1", 30);
-  public static final int maxDistFromLasarCan2 =
-      ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_2", 30);
+  LoggedTunableNumber FlywheelkP = new LoggedTunableNumber("Tuning/FlywheelKP", 2.6);
+  LoggedTunableNumber FlywheelkI = new LoggedTunableNumber("Tuning/FlywheelKI", 0);
+  LoggedTunableNumber FlywheelkD = new LoggedTunableNumber("Tuning/FlywheelKD", 0);
+  LoggedTunableNumber FlywheelkS = new LoggedTunableNumber("Tuning/FlywheelKS", 0);
+  LoggedTunableNumber FlywheelKV = new LoggedTunableNumber("Tuning/FlywheelKV", 0);
+  public static final double flywheelGearRation = 2;
+  public static final int maxDistFromLasarCan1 = 30;
+  public static final int maxDistFromLasarCan2 = 30;
 
   /* REAL */
-  public static final int motorId = ConfigUtil.getConfigInt("FLYWHEEL_MOTOR_ID", 0);
-  public static final int encoderId = ConfigUtil.getConfigInt("FLYWHEEL_ENCODER_ID", 0);
-  public static final int lasarCan1Id = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_ID_1", 0);
-  public static final int lasarCan2Id = ConfigUtil.getConfigInt("FLYWHEEL_LASER_CAN_ID_2", 1);
-  public static final CANBus canBus = new CANBus("*");
+  public static final int motor1Id = 22;
+  public static final int motor2Id = 23;
+  public static final int encoderId = 0;
+  public static final int lasarCan1Id = 0;
+  public static final int lasarCan2Id = 1;
+  public static final CANBus canBus = new CANBus("rio");
+
+  public static final Current statorCurrentLimit = Amps.of(70);
+  public static final Current supplyCurrentLimit = Amps.of(50);
+
+  public static final Time flywheelClosedLoopRamp = Seconds.of(0.5);
+  public static final Time flywheelOpenLoopRamp = Seconds.of(0.5);
 
   public static final double radiusMeters = 0.0508;
+  public static final double gearing = 0;
 
-  public static final double gearing = ConfigUtil.getConfigDouble("FLYWHEEL_GEARING", 0);
+  public static final double atSetpointThresholdRPM = 50.0;
 
   /* SIM */
-  public static final double JKgMetersSq = ConfigUtil.getConfigDouble("FLYWHEEL_KG_METER_SQ", 0);
+  public static final double JKgMetersSq = 0;
 
   public static final double maxRPM = 2100;
 }

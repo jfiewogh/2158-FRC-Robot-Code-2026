@@ -16,31 +16,21 @@
 package org.austincans.lib.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-
-import java.util.List;
-
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
   public static class GyroIORecords {
     public boolean connected = false;
-
     public Rotation2d yawPosition = Rotation2d.kZero;
-    public double yawVelocityRadPerSec = 0.0;
     public Rotation2d pitchPosition = Rotation2d.kZero;
-    public double pitchVelocityRadPerSec = 0.0;
     public Rotation2d rollPosition = Rotation2d.kZero;
+    public double yawVelocityRadPerSec = 0.0;
+    public double pitchVelocityRadPerSec = 0.0;
     public double rollVelocityRadPerSec = 0.0;
-
-    public double[] odometryYawTimestamps = new double[] {};
-    public double imuRate;
-    public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
-
-    public List<HardwareFault> faults;
   }
 
-  public void updateRecords(GyroIORecords records);
+  public void updateInputs(GyroIOInputs inputs);
 
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

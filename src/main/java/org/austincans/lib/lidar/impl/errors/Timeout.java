@@ -13,29 +13,28 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/errors/Timeout.java
 package org.austincans.lib.lidar.impl.errors;
 
 import com.google.auto.value.AutoValue;
 import org.austincans.lib.lidar.impl.ErrorBase;
+========
+package org.austincans.frc2026.subsystems.feeder;
 
-public class Timeout extends ErrorBase<Timeout.Data> {
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/feeder/FeederConstants.java
 
-  public static Timeout waitingFor(String waitingFor) {
-    return new Timeout(new AutoValue_Timeout_Data(waitingFor));
-  }
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
+import org.austincans.frc2026.Constants;
 
-  @AutoValue
-  public abstract static class Data {
+public class FeederConstants {
+  public static final int indexerId = 21;
+  public static final int spindexerId = 20;
 
-    public abstract String waitingFor();
+  public static final AngularVelocity indexerVelocity = RPM.of(-3000.0);
+  public static final Voltage spindexerVoltage = Volts.of(0.2 * Constants.maxVoltage);
 
-    @Override
-    public final String toString() {
-      return "Timed out waiting for " + waitingFor();
-    }
-  }
-
-  private Timeout(Data data) {
-    super("timeout", data);
-  }
+  public static final double indexerAtSetpointThresholdRPM = 10.0;
 }

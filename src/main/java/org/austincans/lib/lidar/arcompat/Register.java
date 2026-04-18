@@ -13,36 +13,30 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/Register.java
 package org.austincans.lib.lidar.arcompat;
+========
+package org.austincans.frc2026.subsystems.intake.deploy;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/intake/deploy/DeployIO.java
 
-/**
- * Simplistic API for registers on the I2C target. Usually implemented by an enum for easy
- * iteration.
- */
-public interface Register {
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.AutoLog;
 
-  interface Bound {
-    boolean write(short value);
-
-    boolean write16Bit(int value);
-
-    boolean write32Bit(long value);
-
-    boolean writeMulti(byte[] value);
-
-    // Unsigned values, so one size too large:
-    short read();
-
-    int read16Bit();
-
-    long read32Bit();
-
-    void readMulti(byte[] result);
+public interface DeployIO {
+  @AutoLog
+  public class DeployIOInputs {
+    public double motorVoltage = 0.0;
+    public double positionRad = 0.0;
+    public double temperatureCelsius = 0.0;
   }
 
-  short address();
-
-  default Bound on(PololuI2c i2c) {
-    return new RegisterBinding(address(), i2c);
+  public class DeployIOOutputs {
+    public double voltage = 0.0;
   }
+
+  public void updateInputs(DeployIOInputs inputs);
+
+  public void applyOutputs(DeployIOOutputs outputs);
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

@@ -13,55 +13,46 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/RegisterBinding.java
 package org.austincans.lib.lidar.arcompat;
+========
+package org.austincans.frc2026.input;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/input/OperatorMapperComp.java
 
-class RegisterBinding implements Register.Bound {
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-  private final short reg;
-  private final PololuI2c i2c;
+public class OperatorMapperComp implements OperatorMapper {
+  protected final CommandXboxController controller =
+      new CommandXboxController(MapperConstants.operatorPort);
 
-  RegisterBinding(short reg, PololuI2c i2c) {
-    this.reg = reg;
-    this.i2c = i2c;
+  @Override
+  public double getRotationX() {
+    return -controller.getRightY();
   }
 
   @Override
-  public boolean write(short value) {
-    return i2c.writeReg(reg, value);
+  public double getRotationY() {
+    return -controller.getRightX();
   }
 
   @Override
-  public boolean write16Bit(int value) {
-    return i2c.writeReg16Bit(reg, value);
+  public Trigger getOuttakeButton() {
+    return controller.leftBumper();
   }
 
   @Override
-  public boolean write32Bit(long value) {
-    return i2c.writeReg32Bit(reg, value);
+  public Trigger getStaticShooterToggleButton() {
+    return controller.rightBumper();
   }
 
   @Override
-  public boolean writeMulti(byte[] value) {
-    return i2c.writeRegMulti(reg, value);
+  public Trigger getResetTurretAngleButton() {
+    return controller.y();
   }
 
   @Override
-  public short read() {
-    return i2c.readReg(reg);
-  }
-
-  @Override
-  public int read16Bit() {
-    return i2c.readReg16Bit(reg);
-  }
-
-  @Override
-  public long read32Bit() {
-    return i2c.readReg32Bit(reg);
-  }
-
-  @Override
-  public void readMulti(byte[] result) {
-    i2c.readRegMulti(reg, result);
+  public Trigger getSetLowestHoodAngleButton() {
+    return controller.x();
   }
 }

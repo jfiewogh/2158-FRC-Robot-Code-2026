@@ -26,18 +26,17 @@ public abstract class TurretIOReal implements TurretIO {
   protected final CANcoder encoder;
 
   public TurretIOReal() {
-    encoder = new CANcoder(TurretConstants.turretEncoderId, TurretConstants.turretCANBus);
+    encoder = new CANcoder(TurretConstants.encoderId, TurretConstants.cancoderCANBus);
 
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    encoderConfig.MagnetSensor.MagnetOffset = TurretConstants.magnetOffset;
     encoder.getConfigurator().apply(encoderConfig);
-
-    encoder.setPosition(0);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-    inputs.positionRad = encoder.getPosition().getValue().in(Radians);
-    inputs.velocityRadPerSec = encoder.getVelocity().getValue().in(RadiansPerSecond);
+    inputs.encoderPositionRad = encoder.getPosition().getValue().in(Radians);
+    inputs.encoderVelocityRadPerSec = encoder.getVelocity().getValue().in(RadiansPerSecond);
   }
 }

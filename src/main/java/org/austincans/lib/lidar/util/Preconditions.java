@@ -13,32 +13,39 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/util/Preconditions.java
 package org.austincans.lib.lidar.util;
+========
+package org.austincans.frc2026.superstructure;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/IndexerWrapper.java
 
-/** Low-quality variant of Guava's Preconditions. */
-public class Preconditions {
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Optional;
+import org.austincans.frc2026.subsystems.feeder.Indexer;
 
-  public static void checkArgument(boolean condition, String message) {
-    if (!condition) {
-      throw new IllegalArgumentException(message);
-    }
+public class IndexerWrapper extends SubsystemWrapper<Indexer> {
+  public IndexerWrapper(Optional<Indexer> subsystem) {
+    super(subsystem);
   }
 
-  public static void checkArgument(boolean condition, String message, Object... parameters) {
-    if (!condition) {
-      throw new IllegalArgumentException(String.format(message, parameters));
-    }
+  public Command runCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::run, s)).orElse(Commands.none());
   }
 
-  public static void checkState(boolean condition, String message) {
-    if (!condition) {
-      throw new IllegalStateException(message);
-    }
+  public Command stopCommand() {
+    return subsystem.map((s) -> Commands.runOnce(s::stop, s)).orElse(Commands.none());
   }
 
-  public static void checkState(boolean condition, String message, Object... parameters) {
-    if (!condition) {
-      throw new IllegalStateException(String.format(message, parameters));
-    }
+  public boolean atSetpoint() {
+    return subsystem.map((s) -> s.atSetpoint()).orElse(false);
+  }
+
+  public void run() {
+    subsystem.ifPresent((s) -> s.run());
+  }
+
+  public void stop() {
+    subsystem.ifPresent((s) -> s.stop());
   }
 }

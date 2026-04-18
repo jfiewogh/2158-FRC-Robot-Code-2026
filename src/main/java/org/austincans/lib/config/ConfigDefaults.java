@@ -13,17 +13,15 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/config/ConfigDefaults.java
 package org.austincans.lib.config;
+========
+package org.austincans.frc2026.controllers;
+>>>>>>>> develop:src/main/java/org/austincans/lib/controllers/ControllerConstants.java
 
-final class ConfigDefaults {
-
-  private ConfigDefaults() {}
-
-  static final String PATH = "";
-
-  static final String RESOURCE = "";
-
-  static final boolean AUTO_SAVE = false;
-
-  static final boolean SAVE_DEFAULT_RESOURCE = true;
+public class ControllerConstants {
+  public static final int linearActuatorPort = 0;
+  public static final int linearActuatorMax = 1800;
+  public static final int linearActuatorMid = 1500;
+  public static final int linearActuatorMin = 1000;
 }

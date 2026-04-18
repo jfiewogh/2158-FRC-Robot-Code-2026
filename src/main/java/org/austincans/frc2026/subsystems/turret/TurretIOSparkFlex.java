@@ -16,6 +16,7 @@
 package org.austincans.frc2026.subsystems.turret;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -23,84 +24,96 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOSparkFlex extends TurretIOReal {
   private final SparkFlex motor;
+  private final RelativeEncoder relativeEncoder;
   private final SparkClosedLoopController controller;
-  private final SelfCheckingSparkFlex selfCheckingMotor;
 
   public TurretIOSparkFlex() {
     super();
     motor =
         new SparkFlex(
-            TurretConstants.turretMotorId,
+            TurretConstants.motorId,
             TurretConstants.isBrushlessMotor ? MotorType.kBrushless : MotorType.kBrushed);
-    selfCheckingMotor = new SelfCheckingSparkFlex("Turret", motor);
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
-    motorConfig.closedLoop.pid(TurretConstants.kP, TurretConstants.kI, TurretConstants.kD);
-    motorConfig.closedLoop.feedForward.kS(TurretConstants.kS);
-    motorConfig.closedLoop.feedForward.kV(TurretConstants.kV);
-    motorConfig.closedLoop.feedForward.kA(TurretConstants.kA);
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
-    motorConfig.softLimit.forwardSoftLimit(TurretConstants.forwardSoftLimit);
+    motorConfig.softLimit.forwardSoftLimit(3);
     motorConfig.softLimit.reverseSoftLimitEnabled(TurretConstants.reverseSoftLimitEnabled);
-    motorConfig.softLimit.reverseSoftLimit(TurretConstants.reverseSoftLimit);
+    motorConfig.softLimit.reverseSoftLimit(-3);
+    motorConfig.closedLoop.maxMotion.cruiseVelocity(TurretConstants.maxVelocityRotationsPerSec);
+    motorConfig.closedLoop.maxMotion.maxAcceleration(
+        TurretConstants.maxAccelerationRotationsPerSecSq);
     motorConfig.smartCurrentLimit(TurretConstants.smartCurrentLimit);
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
+    motor.configure(
+        motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    relativeEncoder = motor.getEncoder();
+    relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
     controller = motor.getClosedLoopController();
-  }
-
-  @Override
-  public void setVoltage(double voltage) {
-    controller.setSetpoint(voltage, ControlType.kVoltage);
-  }
-
-  @Override
-  public void setDesiredAngle(Rotation2d angle) {
-    double rotations = MathUtil.inputModulus(angle.getRotations(), TurretConstants.turretMaxRotation, TurretConstants.turretMinimumRotation);
-    // rotations = MathUtil.clamp(angle.getRotations(), TurretConstants.turretMaxRotation, TurretConstants.turretMinimumRotation);
-    controller.setSetpoint(rotations, ControlType.kPosition);
-  }
-
-  @Override
-  public void setVelocity(double radiansPerSec) {
-    controller.setSetpoint(Units.radiansToRotations(radiansPerSec), ControlType.kVelocity);
+    controller.setSetpoint(0, ControlType.kPosition);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     super.updateInputs(inputs);
+    inputs.positionRad = Units.rotationsToRadians(relativeEncoder.getPosition() / TurretConstants.gearing);
+    inputs.motorPositionRotations = relativeEncoder.getPosition();
+    inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
     inputs.currentAmps = motor.getOutputCurrent();
     inputs.voltage = motor.getBusVoltage();
     inputs.temperatureCelsius = motor.getMotorTemperature();
+    relativeEncoder.setPosition(encoder.getPosition().getValueAsDouble());
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-    List<HardwareFault> deployFaults = selfCheckingMotor.checkForFaults();
-    if (deployFaults != null) {
-      faults.addAll(deployFaults);
+  public void applyOutputs(TurretIOOutputs outputs){
+    switch (outputs.mode){
+      case VELOCITY -> {
+        setVelocity(outputs.velocityRadPerSec);
+      }
+      case VOLTAGE -> {
+        setVoltage(outputs.voltage);
+      }
+      case ANGLE -> {
+        setDesiredAngle(outputs.angle);
+      }
     }
-    return faults.isEmpty() ? null : faults;
+  }
+
+  private void setVoltage(double voltage) {
+    controller.setSetpoint(voltage, ControlType.kVoltage);
+  }
+
+  private void setVelocity(double velocityRadPerSec) {
+    controller.setSetpoint(
+        Units.radiansToRotations(velocityRadPerSec) * 60, 
+        ControlType.kMAXMotionVelocityControl);
+  }
+
+  private void setDesiredAngle(Rotation2d angle) {
+    double rotations =
+        MathUtil.inputModulus(
+            angle.getRotations(),
+            TurretConstants.turretMinimumRotation,
+            TurretConstants.turretMaxRotation);
+    controller.setSetpoint(rotations * TurretConstants.gearing, ControlType.kPosition);
   }
 
   @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckingMotor);
+  public void resetAngle(Rotation2d newAngle) {
+    relativeEncoder.setPosition(newAngle.getRotations() * TurretConstants.gearing);
+  }
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Turret", motor);
   }
 }

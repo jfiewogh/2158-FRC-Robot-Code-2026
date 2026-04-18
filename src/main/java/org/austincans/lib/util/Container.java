@@ -13,20 +13,18 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/Container.java
 package org.austincans.lib.util;
+========
+package org.austincans.frc2026.subsystems.drive;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/drive/GyroIOFake.java
 
-/**
- * Stores mutable a value
- *
- * @author Austin Cans Robotics Team 2158
- */
-public class Container<T> {
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
-  /** The value being stored */
-  public T value;
+public class GyroIOFake implements GyroIO {
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {}
 
-  /** Create new container with initial value. */
-  public Container(T value) {
-    this.value = value;
-  }
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

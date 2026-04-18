@@ -15,102 +15,85 @@
 
 package org.austincans.frc2026.subsystems.turret;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.function.DoubleSupplier;
-
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.subsystems.turret.TurretIO.TurretIOOutputMode;
+import org.austincans.frc2026.subsystems.turret.TurretIO.TurretIOOutputs;
+import org.austincans.frc2026.subsystems.vision.LimelightHelpers;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+  private final TurretIOOutputs outputs = new TurretIOOutputs();
 
   public Turret(TurretIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> {
-          if (e != null) {
-            registerHardware(e);
-          }
-        });
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
+    setDesiredAngle(Rotation2d.kZero);
+  }
+
+  public void updateLimelightRobotSpace() {
+    Rotation2d ccwPositiveRobotRelYaw =
+        Rotation2d.fromRadians(inputs.positionRad)
+            .unaryMinus()
+            .plus(TurretConstants.robotRelTurretRotationOffset);
+
+    double gearToCameraMeters = 0.2665;
+    double forwardMeters = -0.123 + gearToCameraMeters * ccwPositiveRobotRelYaw.getCos();
+    // right positive, negative because sin of ccw positive is left positive
+    double sideMeters =
+        -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin(); // left of robot center
+
+    double upMeters = 0.331; // up from robot center
+    double rollDeg = 0.0;
+    double pitchDeg = 15.0; // tilted down (e.g. camera tilted down as arm moves)
+    double yawDeg = ccwPositiveRobotRelYaw.getDegrees();
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        "limelight-turret", forwardMeters, sideMeters, upMeters, rollDeg, pitchDeg, yawDeg);
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
+
+    updateLimelightRobotSpace();
   }
 
   @Override
-  public void simulationPeriodic() {}
-
-  public void setTurretVoltage(double voltage) {
-    io.setVoltage(voltage);
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
   }
 
-  public void setTurretVelocity(double velocityRadPerSec) {
-    io.setVelocity(velocityRadPerSec);
+  public void setVoltage(double voltage) {
+    outputs.mode = TurretIOOutputMode.VOLTAGE;
+    outputs.voltage = voltage;
   }
 
-  /**
-   * Get the value of the absolute encoder
-   *
-   * @return Absolute turret angle in radians
-   */
-  public double getTurretAngle() {
-    return inputs.positionRad;
+  public void setVelocity(double velocityRadPerSec) {
+    outputs.mode = TurretIOOutputMode.VELOCITY;
+    outputs.velocityRadPerSec = velocityRadPerSec;
   }
 
-  /**
-   * Create a command to set the turret angle
-   *
-   * @param turretAngle Desired turret angle
-   * @return Command to rotate turret to given angle
-   */
-  public Command setTurretAngleCommand(Rotation2d turretAngle) {
-    return Commands.run(() -> io.setDesiredAngle(turretAngle), this);
+  public void stop() {
+    setVoltage(0);
   }
 
-  public void pointTurretToPosition(Translation3d targetPos, double aimPointLeft) {
-    Pose2d robotPose = new Pose2d(); // TODO insert robot pose
-    Rotation2d jointToTargetAngle =
-        targetPos.toTranslation2d().minus(robotPose.getTranslation()).getAngle();
-
-    double distance = targetPos.toTranslation2d().getDistance(robotPose.getTranslation());
-
-    double cosC =
-        (Math.pow(distance, 2) + Math.pow(distance, 2) - Math.pow(aimPointLeft, 2))
-            / (2 * distance * distance);
-    double angleOffset = Math.copySign(Math.acos(cosC), aimPointLeft);
-
-    setDesiredAngleFieldRelative(
-        jointToTargetAngle.minus(new Rotation2d(angleOffset)), robotPose.getRotation());
+  /** Relative to turret's zero */
+  public void setDesiredAngle(Rotation2d turretRelAngle) {
+    outputs.mode = TurretIOOutputMode.ANGLE;
+    outputs.angle = turretRelAngle.unaryMinus();
   }
 
-  public double getTurretVelocity() {
-    return inputs.velocityRadPerSec;
-  }
-
-  public Command pointTurretToPositionCommand(Translation3d fieldPos, double aimPointLeft) {
-    return Commands.run(() -> pointTurretToPosition(fieldPos, aimPointLeft), this);
-  }
-
-  /**
-   * Create a command to move the turret to the resting position
-   *
-   * @return Command to move turret to resting position
-   */
-  public Command turretRestingCommand() {
-    return Commands.run(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0)), this);
-  }
-
+  /** Relative to robot's zero */
   public void setDesiredAngleRobotRelative(Rotation2d robotRelativeAngle) {
-    io.setDesiredAngle(robotRelativeAngle);
+    setDesiredAngle(robotRelativeAngle.plus(TurretConstants.robotRelTurretRotationOffset));
   }
 
   /**
@@ -120,72 +103,77 @@ public class Turret extends AdvancedSubsystem {
    * @param currentPose Current pose of the robot
    */
   public void setDesiredAngleFieldRelative(
-      Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
-    io.setDesiredAngle(fieldRelativeAngle.minus(robotRotation));
+      Rotation2d fieldRelativeAngle, Rotation2d driveFieldRelRotation) {
+    // unary minus because turret angle is clockwise positive,
+    // while robot rotation is counterclockwise positive
+    setDesiredAngleRobotRelative(fieldRelativeAngle.minus(driveFieldRelRotation));
   }
 
-  /**
-   * Create a command to hold the turret at a field relative angle
-   *
-   * @param fieldRelativeAngle The field relative angle to hold, in degrees
-   * @return Command to hold turret at field relative angle
-   */
-  public Command fieldRelativeAngleCommand(
-      Rotation2d fieldRelativeAngle, Rotation2d robotRotation) {
-    return Commands.run(
-        () -> setDesiredAngleFieldRelative(fieldRelativeAngle, robotRotation), this);
+  public Rotation2d getAngle() {
+    return Rotation2d.fromRadians(inputs.positionRad);
   }
 
-  /**
-   * Create a command to move the turret angle manually
-   *
-   * @param angleControl gets the button configured to command
-   * @return A command to move the turret angle manually
-   */
-  public Command angleManualControl(DoubleSupplier angleControl) {
-    return Commands.run(
-        () ->
-            io.setDesiredAngle(
-                Rotation2d.fromRadians(getTurretAngle() + angleControl.getAsDouble() * 1)),
+  public boolean atSetpoint() {
+    return Math.abs(inputs.positionRad - outputs.angle.getRadians()) < TurretConstants.atSetpointThresholdRad;
+  }
+
+  public Command resetAngle() {
+    return Commands.runOnce(
+        () -> {
+          io.resetAngle(Rotation2d.kZero);
+        },
         this);
   }
 
   @Override
-  protected Command systemCheckCommand() {
+  public Command systemCheckCommand() {
     return Commands.sequence(
             Commands.waitSeconds(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.velocityRadPerSec < Units.degreesToRadians(5)) {
+                  if (inputs.encoderVelocityRadPerSec < Units.degreesToRadians(5)) {
                     addSubsystemFault(
                         "TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
                         false);
                   }
-                  io.setVelocity(0);
+                  setVelocity(0);
                 },
                 this),
-            Commands.runOnce(() -> io.setDesiredAngle(Rotation2d.fromDegrees(-20.0)), this),
+            Commands.runOnce(() -> setDesiredAngle(Rotation2d.fromDegrees(-20.0)), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (getTurretAngle() < Units.degreesToRadians(-25)
-                      || getTurretAngle() > Units.degreesToRadians(-15)) {
+                  if (inputs.positionRad < Units.degreesToRadians(-25)
+                      || inputs.positionRad > Units.degreesToRadians(-15)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
                 this),
-            Commands.runOnce(() -> io.setDesiredAngle(Rotation2d.fromDegrees(0.0)), this),
+            Commands.runOnce(() -> setDesiredAngle(Rotation2d.kZero), this),
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Math.abs(getTurretAngle()) > Units.degreesToRadians(5)) {
+                  if (Math.abs(inputs.positionRad) > Units.degreesToRadians(5)) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
                 },
-                this))
-        .andThen(Commands.runOnce(() -> io.setVelocity(0), this));
+                this),
+            Commands.runOnce(
+                () -> {
+                  setDesiredAngle(Rotation2d.fromDegrees(0));
+                },
+                this),
+            Commands.waitSeconds(2))
+        // Commands.runOnce(
+        // () -> {
+        // if (magLimitSwitch.get() != true) {
+        // addSubsystemFault(
+        // "TRRT", "[System Check] Turret did not reach it's zero position");
+        // }
+        // }))
+        .andThen(Commands.runOnce(() -> setVelocity(0), this));
   }
 }

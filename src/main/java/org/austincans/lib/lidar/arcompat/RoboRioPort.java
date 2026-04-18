@@ -13,23 +13,21 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/RoboRioPort.java
 package org.austincans.lib.lidar.arcompat;
+========
+package org.austincans.frc2026.subsystems.drive;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/drive/ModuleIOFake.java
 
-/** Ports available on the RoboRIO board. */
-public enum RoboRioPort implements Port {
-  /** The I2C port on the RoboRIO's board. */
-  ONBOARD(0),
-  /** The I2C port on the MXP output. */
-  MXP(1);
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 
-  private final int port;
-
-  RoboRioPort(int port) {
-    this.port = port;
-  }
+public class ModuleIOFake implements ModuleIO {
+  @Override
+  public void updateInputs(ModuleIOInputs inputs) {}
 
   @Override
-  public int value() {
-    return port;
-  }
+  public void applyOutputs(ModuleIOOutputs outputs) {}
+
+  @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

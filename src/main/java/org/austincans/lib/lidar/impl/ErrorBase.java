@@ -13,36 +13,34 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/ErrorBase.java
 package org.austincans.lib.lidar.impl;
 
 import org.austincans.lib.lidar.api.Error;
+========
+package org.austincans.frc2026.input;
 
-public abstract class ErrorBase<T> implements Error<T> {
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/input/OperatorMapperTest.java
 
-  private final String code;
-  private final T data;
-
-  protected ErrorBase(String code, T data) {
-    this.code = code;
-    this.data = data;
+public class OperatorMapperTest extends OperatorMapperComp {
+  @Override
+  public Trigger getPointToHubButton() {
+    return controller.povDown();
   }
 
   @Override
-  public final String code() {
-    return code;
+  public Trigger getIncrementHoodAngleButton() {
+    return controller.b();
   }
 
   @Override
-  public T data() {
-    return data;
-  }
-
-  protected String formatMessage() {
-    return data.toString();
+  public Trigger getDecrementHoodAngleButton() {
+    return controller.a();
   }
 
   @Override
-  public String toString() {
-    return "[" + code + "] " + formatMessage();
+  public Trigger getRunIndexerAndFlywheelButton() {
+    return controller.povUp();
   }
 }

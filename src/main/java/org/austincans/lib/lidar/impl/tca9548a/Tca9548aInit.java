@@ -13,24 +13,33 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/tca9548a/Tca9548aInit.java
 package org.austincans.lib.lidar.impl.tca9548a;
+========
+package org.austincans.frc2026.superstructure;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SubsystemWrapper.java
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/tca9548a/Tca9548aInit.java
 import org.austincans.lib.lidar.api.Error;
 import org.austincans.lib.lidar.arcompat.PololuI2c;
+========
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SubsystemWrapper.java
 
-@SuppressWarnings("unused")
-class Tca9548aInit {
+public abstract class SubsystemWrapper<Subsystem extends SubsystemBase> {
+  protected final Optional<Subsystem> subsystem;
 
-  private final Tca9548aI2c target;
-  private final PololuI2c i2c;
-
-  Tca9548aInit(Tca9548aI2c target) {
-    this.target = target;
-    this.i2c = target.getI2c();
+  public SubsystemWrapper(Optional<Subsystem> subsystem) {
+    this.subsystem = subsystem;
   }
 
-  public Optional<Error<?>> initialize() {
-    throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+  public void setDefaultCommand(Command command) {
+    subsystem.ifPresent((s) -> s.setDefaultCommand(command));
+  }
+
+  public Optional<Subsystem> getSubsystem() {
+    return subsystem;
   }
 }

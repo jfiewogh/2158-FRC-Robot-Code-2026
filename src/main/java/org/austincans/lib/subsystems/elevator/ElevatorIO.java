@@ -13,6 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/subsystems/elevator/ElevatorIO.java
 package org.austincans.lib.subsystems.elevator;
 
 import java.util.List;
@@ -21,10 +22,16 @@ import org.austincans.lib.motors.MotorIO.MotorIORecords;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
+========
+package org.austincans.frc2026.subsystems.intake.roller;
+
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/intake/roller/RollerIO.java
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ElevatorIO {
+public interface RollerIO {
   @AutoLog
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/subsystems/elevator/ElevatorIO.java
   public class ElevatorIOInputs {
     public MotorIORecords motorRecords;
     public double heightMeters = 0.0;
@@ -39,9 +46,25 @@ public interface ElevatorIO {
 
   public default List<HardwareFault> checkForFaults() {
     return List.of();
+========
+  public class RollerIOInputs {
+    public double motorVoltage = 0.0;
+    public double velocityRadPerSec = 0.0;
+    public double temperatureCelsius = 0.0;
+    public double supplyCurrentAmps = 0.0;
+    public double followerSupplyCurrentAmps = 0.0;
+    public boolean connected = false;
+    public boolean followerConnected = false;
   }
 
-  public default List<SelfChecking> getHardware() {
-    return List.of();
+  public class RollerIOOutputs {
+    public double voltage;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/intake/roller/RollerIO.java
   }
+
+  public void updateInputs(RollerIOInputs inputs);
+
+  public void applyOutputs(RollerIOOutputs outputs);
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

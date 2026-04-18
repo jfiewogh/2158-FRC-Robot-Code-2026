@@ -13,27 +13,34 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/vl53l0x/errors/NoSpadInfo.java
 package org.austincans.lib.lidar.impl.vl53l0x.errors;
 
 import com.google.auto.value.AutoValue;
 import org.austincans.lib.lidar.impl.ErrorBase;
+========
+package org.austincans.frc2026.subsystems.feeder;
 
-public class NoSpadInfo extends ErrorBase<NoSpadInfo.Data> {
+import static edu.wpi.first.units.Units.Volts;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/feeder/SpindexerIO.java
 
-  public static NoSpadInfo getInstance() {
-    return new NoSpadInfo(new AutoValue_NoSpadInfo_Data());
+import edu.wpi.first.units.measure.Voltage;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.AutoLog;
+
+public interface SpindexerIO {
+  @AutoLog
+  public class SpindexerIOInputs {
+    public Voltage voltage = Volts.of(0);
   }
 
-  @AutoValue
-  public abstract static class Data {
-
-    @Override
-    public final String toString() {
-      return "No spad info";
-    }
+  public class SpindexerIOOutputs {
+    public Voltage voltage = Volts.of(0);
   }
 
-  private NoSpadInfo(Data data) {
-    super("no.spad.info", data);
-  }
+  public void updateInputs(SpindexerIOInputs inputs);
+
+  public void applyOutputs(SpindexerIOOutputs outputs);
+
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

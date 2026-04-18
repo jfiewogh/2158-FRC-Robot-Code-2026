@@ -15,55 +15,32 @@
 
 package org.austincans.frc2026.subsystems.hood;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import org.austincans.lib.controllers.LinearActuatorController;
-import org.austincans.lib.math.Angle;
+import com.revrobotics.servohub.ServoChannel.ChannelId;
+import org.austincans.lib.controllers.ServoHubController;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOServoLinear implements HoodIO {
-  LinearActuatorController linearActuator;
-  InterpolatingDoubleTreeMap angles = new InterpolatingDoubleTreeMap();
-  Angle currentAngle = Angle.fromDegrees(0);
+  private final ServoHubController servoHub = new ServoHubController();
+  private final ChannelId id = ChannelId.kChannelId0;
 
   public HoodIOServoLinear() {
-    this.linearActuator = new LinearActuatorController(HoodConstants.linearActuatorID);
-    angles.put(0.0, 0.0); // (Angles, Position)  Angles [0, 90], Position [0, 1]
-
-    // if (HoodConstants.potentiometer == true);
+    setPulse(1000);
   }
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    inputs.hoodAngleDeg = currentAngle.getRotation2d().getDegrees();
+    inputs.pulseWidth = servoHub.getPulseWidth(id);
+  }
+
+  public void setPulse(int pulseWidth) {
+    servoHub.setPulse(id, pulseWidth);
   }
 
   @Override
-  public Angle getAngle() {
-    return currentAngle;
+  public void applyOutputs(HoodIOOutputs outputs) {
+    setPulse(outputs.pulseWidth);
   }
 
   @Override
-  public void setAngle(Angle setPoint) {
-    linearActuator.setSpeed(angles.get(setPoint.toDegrees()));
-    currentAngle = Angle.fromDegrees(setPoint.toDegrees());
-  }
-
-  @Override
-  public void setAngleRotation2d(Rotation2d angle) {
-    linearActuator.setSpeed(angles.get(angle.getDegrees()));
-    currentAngle = Angle.fromDegrees(angle.getDegrees());
-  }
-
-  @Override
-  public Rotation2d getAngleRotation2d() {
-    return Rotation2d.fromDegrees(currentAngle.toDegrees());
-  }
-
-  @Override
-  public boolean atAngle(Angle setpoint) {
-    return currentAngle.toDegrees() == setpoint.toDegrees();
-  }
-
-  @Override
-  public void setVoltage(double voltage) {}
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

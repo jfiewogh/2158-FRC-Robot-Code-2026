@@ -13,30 +13,42 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/viz/FieldViz.java
 package org.austincans.lib.util.viz;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.austincans.lib.util.ScoringLocation;
+========
+package org.austincans.frc2026.superstructure;
 
-/** Visualization for the whole field */
-public class FieldViz implements Drawable {
+import static edu.wpi.first.units.Units.RPM;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/FlywheelWrapper.java
 
-  /** Put coral on the reef */
-  public void scoreCoral(
-      Alliance alliance, ScoringLocation.CoralLocation branch, ScoringLocation.Height height) {
-    //
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Optional;
+import org.austincans.frc2026.subsystems.flywheel.Flywheel;
+
+public class FlywheelWrapper extends SubsystemWrapper<Flywheel> {
+  public FlywheelWrapper(Optional<Flywheel> subsystem) {
+    super(subsystem);
   }
 
-  /** Put algae in the barge */
-  public void scoreAlgaeInBarge(Alliance alliance, double yPos) {
-    //
+  public Command runCommand(double velocityRPM) {
+    return subsystem
+        .map((s) -> Commands.runOnce(() -> s.setVelocity(RPM.of(velocityRPM)), s))
+        .orElse(Commands.none());
   }
 
-  /** Put algae in the processor */
-  public void scoreAlgaeInProcessor(Alliance alliance, double yPos) {
-    //
+  public boolean atSetpoint() {
+    return subsystem.map((s) -> s.atSetpoint()).orElse(true);
   }
 
-  @Override
-  public void drawImpl() {}
+  public void setVelocity(double velocityRPM) {
+    subsystem.ifPresent((s) -> s.setVelocity(RPM.of(velocityRPM)));
+  }
+
+  public void stop() {
+    subsystem.ifPresent((s) -> s.stop());
+  }
 }

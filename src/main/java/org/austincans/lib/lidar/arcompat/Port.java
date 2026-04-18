@@ -13,10 +13,19 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
+<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/Port.java
 package org.austincans.lib.lidar.arcompat;
+========
+package org.austincans.frc2026.energy;
+>>>>>>>> develop:src/main/java/org/austincans/frc2026/energy/CurrentLimits.java
 
-/** Represents an I2C port. */
-public interface Port {
-
-  int value();
+public class CurrentLimits {
+  public static final double driveLimitAmps = 30;
+  public static final double turnLimitAmps = 25;
+  public static final double hopperLimitAmps = 30;
+  public static final double kickerLimitAmps = 30;
+  public static final double flywheelLimitAmps = 60;
+  public static final double hoodLimitAmps = 12;
+  public static final double slamLimitAmps = 20;
+  public static final double intakeLimitAmps = 70;
 }

@@ -26,16 +26,17 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Frequency;
 import java.util.Queue;
-import org.austincans.lib.util.PhoenixUtil;
-import org.austincans.lib.configs.GyroConfigPigeon2;
-import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
+import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.lib.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon;
+  private final Pigeon2 pigeon =
+      new Pigeon2(
+          TunerConstants.DrivetrainConstants.Pigeon2Id,
+          new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
 
   private final StatusSignal<Angle> yaw;
   private final StatusSignal<Angle> pitch;
@@ -82,20 +83,12 @@ public class GyroIOPigeon2 implements GyroIO {
     records.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
     records.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
 
-    records.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    records.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
-
-    records.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
   }
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Gyro", pigeon);
+    subsystem.registerHardware("Pigeon", pigeon);
   }
 }
