@@ -104,7 +104,7 @@
       "minWaypointRelativePos": 1.5665091154625284,
       "maxWaypointRelativePos": 2.8413234301147874,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 360.0,
         "maxAngularAcceleration": 360.0,
@@ -140,18 +140,29 @@
     {
       "name": "Turret Track Hub",
       "waypointRelativePos": 3.0141796083727312,
-      "endWaypointRelativePos": 4.0,
+      "endWaypointRelativePos": 3.88,
       "command": {
         "type": "named",
         "data": {
           "name": "Turret Track Hub"
         }
       }
+    },
+    {
+      "name": "Score",
+      "waypointRelativePos": 3.7995037220843715,
+      "endWaypointRelativePos": 4.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Score"
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,

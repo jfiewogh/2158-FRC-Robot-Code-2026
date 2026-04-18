@@ -22,6 +22,7 @@ import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 public class HoodIOServoLinear implements HoodIO {
   private final ServoHubController servoHub = new ServoHubController();
   private final ChannelId id = ChannelId.kChannelId0;
+  private final ChannelId id2 = ChannelId.kChannelId2;
 
   public HoodIOServoLinear() {
     setPulse(1000);
@@ -34,6 +35,7 @@ public class HoodIOServoLinear implements HoodIO {
 
   public void setPulse(int pulseWidth) {
     servoHub.setPulse(id, pulseWidth);
+    servoHub.setPulse(id2, pulseWidth);
   }
 
   @Override

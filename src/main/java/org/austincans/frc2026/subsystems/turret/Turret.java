@@ -47,7 +47,8 @@ public class Turret extends AdvancedSubsystem {
     double forwardMeters = -0.123 + gearToCameraMeters * ccwPositiveRobotRelYaw.getCos();
     // right positive, negative because sin of ccw positive is left positive
     double sideMeters =
-        -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin(); // left of robot center
+        -gearToCameraMeters * ccwPositiveRobotRelYaw.getSin()
+            + Units.inchesToMeters(0.25); // left of robot center
 
     double upMeters = 0.331; // up from robot center
     double rollDeg = 0.0;

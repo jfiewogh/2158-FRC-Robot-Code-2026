@@ -31,6 +31,11 @@ public class ServoHubController {
         .channel0
         .pulseRange(1000, 1350, 1700)
         .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
+
+    config
+        .channel2
+        .pulseRange(1000, 1350, 1700)
+        .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
     hub.configure(config, ResetMode.kNoResetSafeParameters);
   }
 

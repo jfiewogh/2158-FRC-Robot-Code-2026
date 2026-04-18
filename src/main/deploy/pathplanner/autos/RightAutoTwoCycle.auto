@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftAutoOneCycle1"
+            "pathName": "RightAuto1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Still Shoot"
+            "name": "Still Shoot 3s"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightAuto2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot 5s"
           }
         }
       ]

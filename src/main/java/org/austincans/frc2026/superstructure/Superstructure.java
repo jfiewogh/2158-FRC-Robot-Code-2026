@@ -196,9 +196,21 @@ public class Superstructure {
     return Commands.runOnce(() -> staticShooter = !staticShooter);
   }
 
+  public Command deployCommand() {
+    return deploy.deployCommand().alongWith(roller.stopCommand());
+  }
+
+  public Command retractCommand() {
+    return deploy.retractCommand().alongWith(roller.stopCommand());
+  }
+
   /* Auton Only Commands */
 
   public Command stillShootCommand() {
+    return stillShootCommand(7);
+  }
+
+  public Command stillShootCommand(double seconds) {
     return Commands.run(
             () -> {
               Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
@@ -210,13 +222,14 @@ public class Superstructure {
               }
             },
             getRequirementsArray(flywheel, hood, indexer, spindexer, turret, drive))
-        .withTimeout(7)
+        .withTimeout(seconds)
         .finallyDo(this::stopFeederAndFlywheel);
   }
 
   public Command deployAndRunIntake() {
-    return Commands.sequence(roller.runCommand(), deploy.deploySequenceCommand())
-        .finallyDo(roller::stopCommand);
+    return Commands.parallel(
+        Commands.sequence(Commands.waitSeconds(0.2), roller.runCommand()),
+        deploy.deploySequenceCommand());
   }
 
   public Command retractAndStopIntake() {

@@ -21,8 +21,8 @@ import java.util.Optional;
 
 public abstract class SubsystemWrapper<Subsystem extends SubsystemBase> {
   protected final Optional<Subsystem> subsystem;
-  protected final boolean isPresent;
-  protected final Subsystem s;
+  public final boolean isPresent;
+  public final Subsystem s;
 
   public SubsystemWrapper(Optional<Subsystem> subsystem) {
     this.subsystem = subsystem;

@@ -112,11 +112,11 @@
     },
     {
       "anchor": {
-        "x": 2.8228245363766047,
+        "x": 3.029843081312411,
         "y": 2.3958433734939764
       },
       "prevControl": {
-        "x": 3.249800285306705,
+        "x": 3.4568188302425114,
         "y": 2.372382310984309
       },
       "nextControl": null,
@@ -156,7 +156,7 @@
       "minWaypointRelativePos": 1.8338960162052722,
       "maxWaypointRelativePos": 3.6866981769075577,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 1.5,
         "maxAcceleration": 1.0,
         "maxAngularVelocity": 360.0,
         "maxAngularAcceleration": 360.0,
@@ -192,18 +192,29 @@
     {
       "name": "Turret Track Hub",
       "waypointRelativePos": 4.63200540175555,
-      "endWaypointRelativePos": 7.0,
+      "endWaypointRelativePos": 5.537468982630278,
       "command": {
         "type": "named",
         "data": {
           "name": "Turret Track Hub"
         }
       }
+    },
+    {
+      "name": "Score",
+      "waypointRelativePos": 5.54,
+      "endWaypointRelativePos": 7.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Score"
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -211,7 +222,7 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -135.0
+    "rotation": -45.0
   },
   "reversed": false,
   "folder": null,

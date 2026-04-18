@@ -36,28 +36,60 @@
         "y": 6.900912981455065
       },
       "prevControl": {
-        "x": 6.380955777460769,
-        "y": 6.952667617689015
+        "x": 6.379048261273367,
+        "y": 6.930042551233941
       },
       "nextControl": {
-        "x": 7.309732068647115,
-        "y": 6.852259369993196
+        "x": 7.713637660485022,
+        "y": 6.849158345221112
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.092582025677602,
-        "y": 4.623708987161199
+        "x": 6.859686162624821,
+        "y": 4.559015691868759
       },
       "prevControl": {
-        "x": 7.209029957203994,
-        "y": 5.529415121255349
+        "x": 7.719713985217101,
+        "y": 3.926479099768631
+      },
+      "nextControl": {
+        "x": 4.854194008559201,
+        "y": 6.034022824536376
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.6120827389443653,
+        "y": 5.619985734664765
+      },
+      "prevControl": {
+        "x": 3.8597286145390397,
+        "y": 5.585758255924038
+      },
+      "nextControl": {
+        "x": 2.0206276747503575,
+        "y": 5.83994293865906
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.24906024096385548,
+        "y": 5.991060240963854
+      },
+      "prevControl": {
+        "x": 2.2286750769125003,
+        "y": 5.848734991320487
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LeftAuto2End"
     }
   ],
   "rotationTargets": [
@@ -66,18 +98,52 @@
       "rotationDegrees": 45.0
     },
     {
-      "waypointRelativePos": 1.4008528784648184,
-      "rotationDegrees": 20.0
+      "waypointRelativePos": 2.5266524520255826,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 3.16631130063966,
+      "rotationDegrees": 135.0
+    },
+    {
+      "waypointRelativePos": 4.029850746268652,
+      "rotationDegrees": 135.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.4179608372721164,
-      "maxWaypointRelativePos": 3.0,
+      "minWaypointRelativePos": 2.160702228224171,
+      "maxWaypointRelativePos": 3.1870357866306573,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 2.0,
         "maxAcceleration": 3.0,
+        "maxAngularVelocity": 360.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 4.719602977667485,
+      "maxWaypointRelativePos": 5.0,
+      "constraints": {
+        "maxVelocity": 0.75,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 360.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 4.0,
+      "maxWaypointRelativePos": 5.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.0,
         "maxAngularVelocity": 360.0,
         "maxAngularAcceleration": 360.0,
         "nominalVoltage": 12.0,
@@ -90,18 +156,40 @@
     {
       "name": "Turret Track Hub",
       "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 2.4956110735989014,
+      "endWaypointRelativePos": 2.8764348413234266,
       "command": {
         "type": "named",
         "data": {
           "name": "Turret Track Hub"
         }
       }
+    },
+    {
+      "name": "Turret Track Hub",
+      "waypointRelativePos": 3.160027008777861,
+      "endWaypointRelativePos": 5.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Turret Track Hub"
+        }
+      }
+    },
+    {
+      "name": "Score",
+      "waypointRelativePos": 3.57816377171216,
+      "endWaypointRelativePos": 5.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Score"
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -109,7 +197,7 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -97.66680426181424
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,

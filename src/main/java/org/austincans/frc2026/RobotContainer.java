@@ -63,6 +63,10 @@ public class RobotContainer {
   public static final boolean spindexerEnabled = true;
   public static final boolean ledEnabled = false;
 
+  // Controllers
+  private final DriverMapper driver = new DriverMapperComp();
+  private final OperatorMapper operator = new OperatorMapperTest();
+
   // Subsystems
   private final DriveWrapper drive = new DriveWrapper(SubsystemFactory.buildDrive());
 
@@ -93,10 +97,6 @@ public class RobotContainer {
   private final Alert secondaryDisconnected =
       new Alert("Secondary controller disconnected (port 1).", AlertType.kWarning);
 
-  // Controllers
-  private final DriverMapper driver = new DriverMapperComp();
-  private final OperatorMapper operator = new OperatorMapperTest();
-
   // Dashboard inputs
   private SendableChooser<Command> autoChooser;
 
@@ -120,6 +120,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Score", superstructure.shootToHubCommand());
     NamedCommands.registerCommand("Shuttle", superstructure.shuttleCommand());
     NamedCommands.registerCommand("Still Shoot", superstructure.stillShootCommand());
+    NamedCommands.registerCommand("Still Shoot 3s", superstructure.stillShootCommand(3));
+    NamedCommands.registerCommand("Still Shoot 5s", superstructure.stillShootCommand(5));
     NamedCommands.registerCommand("Turret Track Hub", superstructure.turretPointToHub());
   }
 
@@ -149,10 +151,10 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     autoChooser.addOption("Left Auto", AutoBuilder.buildAuto("LeftAuto"));
-    // autoChooser.addOption("Left Auto-One Cycle", AutoBuilder.buildAuto("LeftAutoOneCycle"));
-    // autoChooser.addOption("Left Auto with Depot", AutoBuilder.buildAuto("LeftAutoWithDepot"));
+    autoChooser.addOption("Left Auto with Depot", AutoBuilder.buildAuto("LeftAutoWithDepot"));
     autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
     autoChooser.addOption("Right Auto", AutoBuilder.buildAuto("RightAuto"));
+    autoChooser.addOption("Right Auto Two Cycle", AutoBuilder.buildAuto("RightAutoTwoCycle"));
 
     autoChooser.addOption("Left Just Shoot", AutoBuilder.buildAuto("LeftJustShoot"));
     autoChooser.addOption("Mid Just Shoot", AutoBuilder.buildAuto("MidJustShoot"));
@@ -189,8 +191,8 @@ public class RobotContainer {
 
     driver.getRollerToggleButton().onTrue(roller.toggleCommand());
 
-    driver.getDeployButton().whileTrue(deploy.deployCommand());
-    driver.getRetractButton().whileTrue(deploy.retractCommand());
+    driver.getDeployButton().whileTrue(superstructure.deployCommand());
+    driver.getRetractButton().whileTrue(superstructure.retractCommand());
 
     driver.getShootButton().whileTrue(superstructure.shootCommand());
 

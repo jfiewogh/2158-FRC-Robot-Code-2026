@@ -72,7 +72,6 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
 
     if (log) {
       // Used to get values for maps
-      Logger.recordOutput("turret pose", turretPose.toPose2d());
       Logger.recordOutput(
           "turret distance from " + target.name(),
           turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));

@@ -15,6 +15,8 @@
 
 package org.austincans.frc2026;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
@@ -118,7 +120,12 @@ public class Robot extends LoggedRobot {
     setUseTiming(Constants.getMode() != Mode.REPLAY);
 
     // Start AdvantageKit logger
-    Logger.start();
+    // Logger.start();
+    // Phoenix CanBUS Loggger (HOOT)
+    SignalLogger.enableAutoLogging(false);
+    SignalLogger.stop();
+    StatusLogger.disableAutoLogging();
+    StatusLogger.stop();
 
     // Adjust loop overrun warning timeout
     try {

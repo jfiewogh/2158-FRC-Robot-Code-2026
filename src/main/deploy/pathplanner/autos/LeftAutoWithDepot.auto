@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftAutoWithDepot1"
+            "pathName": "LeftAuto1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot 3s"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeftAutoWithDepot2"
+            "pathName": "LeftAuto2"
           }
         },
         {
