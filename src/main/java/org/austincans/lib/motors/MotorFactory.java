@@ -86,7 +86,7 @@ public class MotorFactory {
 
   /* CTRE */
 
-  private static MotorIOTalonFX createTalonFX(MotorConfigTalon motorConfig, TalonFXConfiguration config) {
+  public static MotorIOTalonFX createTalonFX(MotorConfigTalon motorConfig, TalonFXConfiguration config) {
     config.MotionMagic.MotionMagicCruiseVelocity = motorConfig.maxSpeedRotationsPerSec;
     config.MotionMagic.MotionMagicAcceleration = motorConfig.maxAccelerationRotationsPerSecSq;
     PIDConfig pidConfig = motorConfig.pidConfig;
@@ -126,7 +126,7 @@ public class MotorFactory {
     return createTalonFX(motorConfig, config);
   }
 
-  private static MotorIOTalonFXS createTalonFXS(MotorConfigTalon motorConfig, TalonFXSConfiguration config) {
+  public static MotorIOTalonFXS createTalonFXS(MotorConfigTalon motorConfig, TalonFXSConfiguration config) {
     config.MotionMagic.MotionMagicCruiseVelocity = motorConfig.maxSpeedRotationsPerSec;
     config.MotionMagic.MotionMagicAcceleration = motorConfig.maxAccelerationRotationsPerSecSq;
     PIDConfig pidConfig = motorConfig.pidConfig;

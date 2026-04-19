@@ -15,42 +15,30 @@
 
 package org.austincans.lib.subsystems.flywheel;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFX;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
-  private MotorIOTalonFX motorIO;
-  private final SelfCheckingTalonFXPro selfCheckMotor;
+  private final MotorIOTalonFX motorIO;
 
   public FlywheelIOTalonFX(FlywheelConfig flywheelConfig) {
-    motorIO = MotorFactory.createTalonFX(flywheelConfig.motorConfig);
-    selfCheckMotor = new SelfCheckingTalonFXPro("flywheel", motorIO.getMotor());
+    motorIO = MotorFactory.createTalonFX(flywheelConfig.motorTalonConfig, flywheelConfig.talonFXConfig);
+    
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     motorIO.updateInputs(inputs.motorInputs);
-    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(inputs.motorInputs.velocityRadPerSec);
-    inputs.appliedVolts = inputs.motorInputs.appliedVolts;
   }
 
   @Override
-  public void runVoltage(double volts) {
-    motorIO.setVoltage(volts);
+  public void applyOutputs(FlywheelIOOutputs outputs) {
+    motorIO.applyOutputs(outputs.motorOutputs);
   }
 
   @Override
-  public void runVelocity(double velocityRPM) {
-    motorIO.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM));
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Flywheel", motorIO.getMotor());
   }
 }

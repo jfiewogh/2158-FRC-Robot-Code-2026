@@ -15,36 +15,18 @@
 
 package org.austincans.lib.subsystems.flywheel;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
+import org.austincans.lib.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 
 public interface FlywheelIO {
-  @AutoLog
   public class FlywheelIOInputs {
-    public Voltage appliedVolts = Volts.of(0);
-    public AngularVelocity velocity = RPM.of(0);
-    public Temperature temperature = Celsius.of(0);
-    public Current current = Amps.of(0);
-  }
-
-  public static enum FlywheelIOOutputMode {
-    VELOCITY,
-    VOLTAGE
+    public MotorIOInputs motorInputs; 
   }
 
   public class FlywheelIOOutputs {
-    public FlywheelIOOutputMode mode = FlywheelIOOutputMode.VELOCITY;
-    public Voltage voltage = Volts.of(0);
-    public double velocity = RPM.of(0);
-    public Voltage feedforward = Volts.of(0);
+    public MotorIOOutputs motorOutputs;
   }
 
   public void updateInputs(FlywheelIOInputs inputs);

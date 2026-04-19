@@ -14,58 +14,30 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.flywheel;
-
-import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class FlywheelIOSparkFlex implements FlywheelIO{
   private final MotorIOSparkFlex motorIO;
-  private final SelfCheckingSparkFlex selfCheckMotor;
 
   public FlywheelIOSparkFlex(FlywheelConfig flywheelConfig) {
-    motorIO = MotorFactory.createSparkFlex(flywheelConfig.motorConfig);
-    selfCheckMotor = new SelfCheckingSparkFlex("flywheel", motorIO.getMotor());
+    motorIO = MotorFactory.createSparkFlex(flywheelConfig.motorSparkConfig);
+    
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     motorIO.updateInputs(inputs.motorInputs);
-    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(inputs.motorInputs.velocityRadPerSec);
-    inputs.appliedVolts = inputs.motorInputs.appliedVolts;
-  }
-
-  @Override
-  public void runVoltage(double volts) {
-    motorIO.setVoltage(volts);
-  }
-
-  @Override
-  public void runVelocity(double velocityRPM) {
-    motorIO.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM));
   }
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
-    switch (outputs.mode){
-      case VELOCITY:
-        motorIO.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(outputs.velocity));
-        break;
-      case VOLTAGE:
-        motorIO.setVoltage(outputs.voltage);
-        break;
-    }
+    motorIO.applyOutputs(outputs.motorOutputs);
   }
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'registerSelfCheckHardware'");
+    subsystem.registerHardware("Flywheel", motorIO.getMotor());
   }
 }

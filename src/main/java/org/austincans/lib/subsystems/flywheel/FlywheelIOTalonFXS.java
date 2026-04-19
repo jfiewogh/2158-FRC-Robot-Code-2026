@@ -15,57 +15,30 @@
 
 package org.austincans.lib.subsystems.flywheel;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOTalonFX;
 import org.austincans.lib.motors.MotorIOTalonFXS;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
 
 public class FlywheelIOTalonFXS implements FlywheelIO {
-  private MotorIOTalonFXS motorIO;
-  private final SelfCheckingTalonFXS selfCheckMotor;
+  private final MotorIOTalonFXS motorIO;
 
   public FlywheelIOTalonFXS(FlywheelConfig flywheelConfig) {
-    motorIO = MotorFactory.createTalonFXS(flywheelConfig.motorConfig);
-    selfCheckMotor = new SelfCheckingTalonFXS("flywheel", motorIO.getMotor());
+    motorIO = MotorFactory.createTalonFXS(flywheelConfig.motorTalonConfig,flywheelConfig.talonFXSConfig);
+    
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     motorIO.updateInputs(inputs.motorInputs);
-    inputs.velocityRPM = Units.radiansPerSecondToRotationsPerMinute(inputs.motorInputs.velocityRadPerSec);
-    inputs.appliedVolts = inputs.motorInputs.appliedVolts;
-  }
-
-  @Override
-  public void runVoltage(double volts) {
-    motorIO.setVoltage(volts);
-  }
-
-  @Override
-  public void runVelocity(double velocityRPM) {
-    motorIO.setVelocity(Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM));
   }
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'applyOutputs'");
+    motorIO.applyOutputs(outputs.motorOutputs);
   }
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'registerSelfCheckHardware'");
+    subsystem.registerHardware("Flywheel", motorIO.getMotor());
   }
 }

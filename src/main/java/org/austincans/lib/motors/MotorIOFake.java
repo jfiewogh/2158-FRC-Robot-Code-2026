@@ -1,21 +1,26 @@
 package org.austincans.lib.motors;
 
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
+
 public class MotorIOFake implements MotorIO {
-    private double appliedVolts;
-    private double velocityRadPerSec;
-    private double positionRad;
+    private Voltage appliedVolts;
+    private AngularVelocity velocity;
+    private Angle position;
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = positionRad;
-        inputs.velocityRadPerSec = velocityRadPerSec;
-        inputs.appliedVolts = appliedVolts;
+        inputs.position = position;
+        inputs.velocity = velocity;
+        inputs.voltage = appliedVolts;
     }
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
         appliedVolts = outputs.voltage;
-        velocityRadPerSec = outputs.velocityRadPerSec;
-        positionRad = outputs.positionRad;
+        velocity = outputs.velocity;
+        position = outputs.position;
     }
 }

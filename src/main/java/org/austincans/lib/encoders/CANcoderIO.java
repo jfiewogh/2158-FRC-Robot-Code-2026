@@ -35,4 +35,8 @@ public class CANcoderIO implements AbsoluteEncoderIO {
     public int getDeviceId() {
         return encoder.getDeviceID();
     }
+
+    public CANcoder getEncoder(){
+        return encoder;
+    }
 }

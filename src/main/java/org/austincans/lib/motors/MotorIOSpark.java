@@ -1,5 +1,10 @@
 package org.austincans.lib.motors;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -7,7 +12,9 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /*
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
@@ -29,35 +36,39 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     @Override
     public void updateInputs(MotorIOInputs inputs) {
         inputs.connected = true; // TODO: make this based on some property of the motor
-        inputs.positionRad = Units.rotationsToRadians(encoder.getPosition());
-        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
-        inputs.appliedVolts = motor.getBusVoltage();
+        inputs.position = Rotations.of(encoder.getPosition());
+        inputs.velocity = RotationsPerSecond.of(encoder.getVelocity());
+        inputs.voltage = Volts.of(motor.getBusVoltage());
         inputs.statorCurrentAmps = motor.getOutputCurrent();
         inputs.temperatureCelsius = motor.getMotorTemperature();
+    }
+
+    public Mtr getMotor(){
+        return motor;
     }
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
         switch (outputs.mode) {
             case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocityRadPerSec);
-            case POSITION -> setPosition(outputs.positionRad);
+            case VELOCITY -> setVelocity(outputs.velocity);
+            case POSITION -> setPosition(outputs.position);
         }
     }
 
-    private void setVoltage(double voltage) {
-        controller.setSetpoint(voltage, ControlType.kVoltage);
+    private void setVoltage(Voltage voltage) {
+        controller.setSetpoint(voltage.baseUnitMagnitude(), ControlType.kVoltage);
     }
 
-    private void setVelocity(double velocityRadPerSec) {
+    private void setVelocity(AngularVelocity velocity) {
         controller.setSetpoint(
-            Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), 
+            velocity.in(RPM), 
             ControlType.kMAXMotionVelocityControl);
     }
 
-    private void setPosition(double positionRad) {
+    private void setPosition(Angle position) {
         controller.setSetpoint(
-            Units.radiansToRotations(positionRad), ControlType.kMAXMotionVelocityControl);
+            position.in(Rotations), ControlType.kMAXMotionVelocityControl);
     }
 
     public void setEncoderPosition(double positionRotations) {

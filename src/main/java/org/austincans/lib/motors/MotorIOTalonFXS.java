@@ -7,9 +7,14 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 
 public class MotorIOTalonFXS extends MotorIOReal {
     private final TalonFXS motor;
@@ -25,9 +30,9 @@ public class MotorIOTalonFXS extends MotorIOReal {
     @Override
     public void updateInputs(MotorIOInputs inputs) {
         inputs.connected = motor.isConnected();
-        inputs.positionRad = motor.getPosition().getValue().in(Radians);
-        inputs.velocityRadPerSec = motor.getVelocity().getValue().in(RadiansPerSecond);
-        inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
+        inputs.position = Rotations.of(motor.getPosition().getValueAsDouble());
+        inputs.velocity = RotationsPerSecond.of(motor.getVelocity().getValueAsDouble());
+        inputs.voltage = Volts.of(motor.getMotorVoltage().getValueAsDouble());
         inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
         inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
         inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
@@ -38,23 +43,25 @@ public class MotorIOTalonFXS extends MotorIOReal {
     public void applyOutputs(MotorIOOutputs outputs) {
         switch (outputs.mode) {
             case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocityRadPerSec);
-            case POSITION -> setPosition(outputs.positionRad);
+            case VELOCITY -> setVelocity(outputs.velocity);
+            case POSITION -> setPosition(outputs.position);
         }
     }
 
-    private void setVoltage(double voltage) {
-        motor.setVoltage(voltage);
+    private void setVoltage(Voltage voltage) {
+        motor.setVoltage(voltage.baseUnitMagnitude());
     }
 
-    private void setVelocity(double velocityRadPerSec) {
-        motor.setControl(velocityVoltage.withVelocity(
-            AngularVelocity.ofBaseUnits(velocityRadPerSec, RadiansPerSecond))); 
+    private void setVelocity(AngularVelocity velocity) {
+        motor.setControl(velocityVoltage.withVelocity(velocity)); 
     }
 
-    private void setPosition(double positionRad) {
-        motor.setControl(positionVoltage.withPosition(
-            Units.radiansToRotations(positionRad)));
+     private void setPosition(Angle position) {
+        motor.setControl(positionVoltage.withPosition(position));
+    }
+
+    public TalonFXS getMotor(){
+        return motor;
     }
 
     public void setEncoderPosition(double positionRotations) {
