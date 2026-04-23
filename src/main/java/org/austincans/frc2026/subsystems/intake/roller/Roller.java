@@ -58,7 +58,7 @@ public class Roller extends AdvancedSubsystem {
   public void runIntake() {
     running = true;
     intaking = true;
-    outputs.voltage = 0.7 * Constants.maxVoltage;
+    outputs.voltage = 0.4 * Constants.maxVoltage;
   }
 
   public void runOuttake() {

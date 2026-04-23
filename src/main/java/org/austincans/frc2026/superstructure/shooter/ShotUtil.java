@@ -31,14 +31,14 @@ public class ShotUtil {
   static {
     hubShotCalculator =
         new ShotCalculator(
-            0.02,
+            0.0,
             ShotConstants.scoringHoodAngleMap,
             ShotConstants.scoringFlywheelSpeedMap,
             ShotConstants.scoringTimeOfFlightMap,
             TurretConstants.robotRelTurretTransform);
     shuttleShotCalculator =
         new ShotCalculator(
-            0.02,
+            0.0,
             ShotConstants.passingHoodAngleMap,
             ShotConstants.passingFlywheelSpeedMap,
             ShotConstants.passingTimeOfFlightMap,
