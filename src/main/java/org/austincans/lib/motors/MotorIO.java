@@ -1,5 +1,9 @@
 package org.austincans.lib.motors;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -64,6 +68,9 @@ public interface MotorIO {
         }
         public double getVeolcity(){
             return velocity.baseUnitMagnitude();
+        }
+        public double getVoltage(){
+            return this.voltage.baseUnitMagnitude();
         }
     }
 

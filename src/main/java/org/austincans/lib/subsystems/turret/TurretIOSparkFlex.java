@@ -27,19 +27,26 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
+
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.austincans.lib.configs.MotorConfig;
+import org.austincans.lib.motors.MotorFactory;
+import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputMode;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOSparkFlex extends TurretIOReal {
-  private final SparkFlex motor;
+  private final MotorIOSparkFlex motorIO;
   private final RelativeEncoder relativeEncoder;
-  private final SparkClosedLoopController controller;
 
-  public TurretIOSparkFlex() {
-    super();
-    motor =
-        new SparkFlex(
-            TurretConstants.motorId,
-            TurretConstants.isBrushlessMotor ? MotorType.kBrushless : MotorType.kBrushed);
+  public TurretIOSparkFlex(TurretConfig turretConfig) {
+    super(turretConfig.encoderConfig);
 
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     motorConfig.softLimit.forwardSoftLimitEnabled(TurretConstants.forwardSoftLimitEnabled);
@@ -51,51 +58,24 @@ public class TurretIOSparkFlex extends TurretIOReal {
         TurretConstants.maxAccelerationRotationsPerSecSq);
     motorConfig.smartCurrentLimit(TurretConstants.smartCurrentLimit);
     motorConfig.idleMode(TurretConstants.isBrakeMode ? IdleMode.kBrake : IdleMode.kCoast);
-    motor.configure(
-        motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    motorIO = MotorFactory.createSparkFlex(turretConfig.motorSparkConfig,motorConfig);
 
-    relativeEncoder = motor.getEncoder();
+    relativeEncoder = motorIO.getMotor().getEncoder();
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
 
-    controller = motor.getClosedLoopController();
-    controller.setSetpoint(0, ControlType.kPosition);
+    setDesiredAngle(new Rotation2d());
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     super.updateInputs(inputs);
-    inputs.positionRad =
-        Units.rotationsToRadians(relativeEncoder.getPosition() / TurretConstants.gearing);
-    inputs.motorPositionRotations = relativeEncoder.getPosition();
-    inputs.motorVelocityRotationsPerSec = relativeEncoder.getVelocity() / 60;
-    inputs.currentAmps = motor.getOutputCurrent();
-    inputs.voltage = motor.getBusVoltage();
-    inputs.temperatureCelsius = motor.getMotorTemperature();
+    motorIO.updateInputs(inputs.motorInputs);
     relativeEncoder.setPosition(encoder.getPosition().getValueAsDouble());
   }
 
   @Override
   public void applyOutputs(TurretIOOutputs outputs) {
-    switch (outputs.mode) {
-      case VELOCITY -> {
-        setVelocity(outputs.velocityRadPerSec);
-      }
-      case VOLTAGE -> {
-        setVoltage(outputs.voltage);
-      }
-      case ANGLE -> {
-        setDesiredAngle(outputs.angle);
-      }
-    }
-  }
-
-  private void setVoltage(double voltage) {
-    controller.setSetpoint(voltage, ControlType.kVoltage);
-  }
-
-  private void setVelocity(double velocityRadPerSec) {
-    controller.setSetpoint(
-        Units.radiansToRotations(velocityRadPerSec) * 60, ControlType.kMAXMotionVelocityControl);
+    motorIO.applyOutputs(outputs.motorOutputs);
   }
 
   private void setDesiredAngle(Rotation2d angle) {
@@ -104,7 +84,9 @@ public class TurretIOSparkFlex extends TurretIOReal {
             angle.getRotations(),
             TurretConstants.turretMinimumRotation,
             TurretConstants.turretMaxRotation);
-    controller.setSetpoint(rotations * TurretConstants.gearing, ControlType.kPosition);
+    MotorIOOutputs outputs = new MotorIOOutputs();
+    outputs.setPosition(Rotations.of(rotations * TurretConstants.gearing));
+    motorIO.applyOutputs(outputs);
   }
 
   @Override
@@ -114,6 +96,6 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Turret", motor);
+    subsystem.registerHardware("Turret", motorIO.getMotor());
   }
 }

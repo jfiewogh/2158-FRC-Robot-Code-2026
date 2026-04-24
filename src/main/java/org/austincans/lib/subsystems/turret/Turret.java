@@ -19,7 +19,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volt;
+
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputMode;
 import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputs;
 import org.austincans.lib.subsystems.vision.LimelightHelpers;
 import org.littletonrobotics.junction.Logger;
@@ -63,8 +70,8 @@ public class Turret extends AdvancedSubsystem {
     io.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
 
-    Logger.recordOutput("Turret/Outputs/VelocityRadPerSec", outputs.velocityRadPerSec);
-    Logger.recordOutput("Turret/Outputs/Voltage", outputs.voltage);
+    Logger.recordOutput("Turret/Outputs/VelocityRadPerSec", outputs.motorOutputs.getVeolcity());
+    Logger.recordOutput("Turret/Outputs/Voltage", outputs.motorOutputs.);
     Logger.recordOutput("Turret/Outputs/Angle", outputs.angle);
 
     updateLimelightRobotSpace();
@@ -77,12 +84,12 @@ public class Turret extends AdvancedSubsystem {
 
   public void setVoltage(double voltage) {
     outputs.mode = TurretIOOutputMode.VOLTAGE;
-    outputs.voltage = voltage;
+    outputs.motorOutputs.voltage = Volt.of(voltage);
   }
 
   public void setVelocity(double velocityRadPerSec) {
     outputs.mode = TurretIOOutputMode.VELOCITY;
-    outputs.velocityRadPerSec = velocityRadPerSec;
+    outputs.motorOutputs.velocity = RadiansPerSecond.of(velocityRadPerSec);
   }
 
   public void stop() {
@@ -92,7 +99,7 @@ public class Turret extends AdvancedSubsystem {
   /** Relative to turret's zero */
   public void setDesiredAngle(Rotation2d turretRelAngle) {
     outputs.mode = TurretIOOutputMode.ANGLE;
-    outputs.angle = turretRelAngle.unaryMinus();
+    outputs.motorOutputs.position = Radians.of(turretRelAngle.unaryMinus().getRadians());
   }
 
   /** Relative to robot's zero */

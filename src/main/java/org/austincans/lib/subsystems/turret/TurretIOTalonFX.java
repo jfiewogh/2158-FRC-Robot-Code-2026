@@ -16,9 +16,6 @@
 package org.austincans.lib.subsystems.turret;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -26,20 +23,20 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+
+import org.austincans.lib.motors.MotorFactory;
+import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputMode;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOTalonFX extends TurretIOReal {
-  private final TalonFX motor;
-  private final PositionVoltage positionRequest;
-  private final VelocityVoltage velocityRequest;
+  private final MotorIOTalonFX motorIO;
 
-  public TurretIOTalonFX() {
-    super();
-
-    motor = new TalonFX(TurretConstants.motorId, TurretConstants.canBus);
-    positionRequest = new PositionVoltage(0).withSlot(0);
-    velocityRequest = new VelocityVoltage(0).withSlot(0);
+  public TurretIOTalonFX(TurretConfig turretConfig) {
+    super(turretConfig.encoderConfig);
 
     TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     motorConfig.Slot0.kP = TurretConstants.kP.getAsDouble();
@@ -59,36 +56,18 @@ public class TurretIOTalonFX extends TurretIOReal {
         TurretConstants.isBrakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     motorConfig.Feedback.FeedbackRemoteSensorID = encoder.getDeviceID();
+    motorIO = MotorFactory.createTalonFX(turretConfig.motorTalonConfig, motorConfig);
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     super.updateInputs(inputs);
-    inputs.motorPositionRotations = motor.getPosition().getValueAsDouble();
-    inputs.positionRad = Units.rotationsToRadians(inputs.motorPositionRotations / TurretConstants.gearing);
-    inputs.motorVelocityRotationsPerSec = motor.getVelocity().getValue().in(RotationsPerSecond);
-    inputs.currentAmps = motor.getStatorCurrent().getValueAsDouble();
-    inputs.voltage = motor.getMotorVoltage().getValueAsDouble();
-    inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+    motorIO.updateInputs(inputs.motorInputs);
   }
 
   @Override
   public void applyOutputs(TurretIOOutputs outputs){
-    switch (outputs.mode){
-      case VELOCITY -> {
-        setVelocity(outputs.velocityRadPerSec);
-      }
-      case VOLTAGE -> {
-        setVoltage(outputs.voltage);
-      }
-      case ANGLE -> {
-        setDesiredAngle(outputs.angle);
-      }
-    }
-  }
-
-  private void setDesiredAngle(Rotation2d angle) {
-    setDesiredAngle(angle, 0);
+    motorIO.applyOutputs(outputs.motorOutputs);
   }
 
   private void setDesiredAngle(Rotation2d angle, double accelerationRadPerSecSq) {
@@ -99,13 +78,11 @@ public class TurretIOTalonFX extends TurretIOReal {
             angle.getRotations(),
             TurretConstants.turretMinimumRotation,
             TurretConstants.turretMaxRotation);
-    motor.setControl(positionRequest.withPosition(positionRotations * TurretConstants.gearing));
+    MotorIOOutputs outputs = new MotorIOOutputs();
+    outputs.setPosition(Rotations.of(positionRotations));
+    outputs.mode = MotorIOOutputMode.POSITION;
+    motorIO.applyOutputs(outputs);
   }
-
-  private void setVelocity(double velocityRadPerSec) {
-    setVelocity(velocityRadPerSec, 0);
-  }
-
   /**
    * Set pivot angular velocity with acceleration.
    * @param velocityDegPerSec The target velocity in radians per second
@@ -113,20 +90,22 @@ public class TurretIOTalonFX extends TurretIOReal {
    */
   private void setVelocity(double velocityRadPerSec, double acceleration) {
     double velocityRotationsPerSec = Units.rotationsToRadians(velocityRadPerSec);
-    motor.setControl(velocityRequest.withVelocity(velocityRotationsPerSec));
-  }
-
-  private void setVoltage(double voltage) {
-    motor.setVoltage(voltage);
+    MotorIOOutputs outputs = new MotorIOOutputs();
+    outputs.setVelocity(RadiansPerSecond.of(velocityRotationsPerSec));
+    outputs.mode = MotorIOOutputMode.VELOCITY;
+    motorIO.applyOutputs(outputs);
   }
 
   @Override
   public void resetAngle(Rotation2d angle) {
-    motor.setPosition(angle.getRotations() * TurretConstants.gearing);
+    MotorIOOutputs outputs = new MotorIOOutputs();
+    outputs.setPosition(Rotations.of(angle.getRotations() * TurretConstants.gearing));
+    outputs.mode = MotorIOOutputMode.POSITION;
+    motorIO.applyOutputs(outputs);
   }
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Turret", motor);
+    subsystem.registerHardware("Turret", motorIO.getMotor());
   }
 }

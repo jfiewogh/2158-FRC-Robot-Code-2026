@@ -14,6 +14,7 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.turret;
+import org.austincans.lib.configs.AbsoluteEncoderConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -24,8 +25,8 @@ public abstract class TurretIOReal implements TurretIO {
   protected final CANcoderIO encoderIO;
   protected final CANcoder encoder;
 
-  public TurretIOReal(TurretConfig turretConfig) {
-    encoderIO = AbsoluteEncoderFactory.createCANcoder(turretConfig.encoderConfig);
+  public TurretIOReal(AbsoluteEncoderConfig absoluteEncoderConfig) {
+    encoderIO = AbsoluteEncoderFactory.createCANcoder(absoluteEncoderConfig);
     encoder = encoderIO.getEncoder();
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;

@@ -50,7 +50,7 @@ public class MotorFactory {
     return config;
   }
 
-  private static MotorIOSparkFlex createSparkFlex(MotorConfigSpark motorConfig, SparkFlexConfig sparkFlexConfig) {
+  public static MotorIOSparkFlex createSparkFlex(MotorConfigSpark motorConfig, SparkFlexConfig sparkFlexConfig) {
     return new MotorIOSparkFlex(
         motorConfig.deviceId,
         motorConfig.isBrushless ? MotorType.kBrushless : MotorType.kBrushed,
