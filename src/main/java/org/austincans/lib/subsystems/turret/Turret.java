@@ -26,6 +26,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.lib.subsystems.turret.TurretIO.TurretIOInputs;
 import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputMode;
 import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputs;
 import org.austincans.lib.subsystems.vision.LimelightHelpers;
@@ -33,7 +34,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Turret extends AdvancedSubsystem {
   private final TurretIO io;
-  private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+  private final TurretIOInputs inputs = new TurretIOInputs();
   private final TurretIOOutputs outputs = new TurretIOOutputs();
 
   public Turret(TurretIO io) {
@@ -45,7 +46,7 @@ public class Turret extends AdvancedSubsystem {
 
   public void updateLimelightRobotSpace() {
     Rotation2d ccwPositiveRobotRelYaw =
-        Rotation2d.fromRadians(inputs.positionRad)
+        Rotation2d.fromRadians(inputs.motorInputs.)
             .unaryMinus()
             .plus(TurretConstants.robotRelTurretRotationOffset);
 
@@ -121,7 +122,7 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public Rotation2d getAngle() {
-    return Rotation2d.fromRadians(inputs.positionRad);
+    return Rotation2d.fromRadians(inputs.motorInputs.);
   }
 
   public boolean atSetpoint() {

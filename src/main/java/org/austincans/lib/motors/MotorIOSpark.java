@@ -12,6 +12,9 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
+
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -37,7 +40,7 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     public void updateInputs(MotorIOInputs inputs) {
         inputs.connected = true; // TODO: make this based on some property of the motor
         inputs.position = Rotations.of(encoder.getPosition());
-        inputs.velocity = RotationsPerSecond.of(encoder.getVelocity());
+        inputs.velocity = RPM.of(encoder.getVelocity());
         inputs.voltage = Volts.of(motor.getBusVoltage());
         inputs.statorCurrentAmps = motor.getOutputCurrent();
         inputs.temperatureCelsius = motor.getMotorTemperature();
@@ -51,8 +54,8 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     public void applyOutputs(MotorIOOutputs outputs) {
         switch (outputs.mode) {
             case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocity);
-            case POSITION -> setPosition(outputs.position);
+            case VELOCITY -> setVelocity(outputs.velocity, outputs.velocityMode);
+            case POSITION -> setPosition(outputs.position, outputs.positionMode);
         }
     }
 
@@ -60,15 +63,15 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
         controller.setSetpoint(voltage.baseUnitMagnitude(), ControlType.kVoltage);
     }
 
-    private void setVelocity(AngularVelocity velocity) {
+    private void setVelocity(AngularVelocity velocity, AngularVelocityUnit mode) {
         controller.setSetpoint(
-            velocity.in(RPM), 
+            velocity.in(mode), 
             ControlType.kMAXMotionVelocityControl);
     }
 
-    private void setPosition(Angle position) {
+    private void setPosition(Angle position, AngleUnit mode) {
         controller.setSetpoint(
-            position.in(Rotations), ControlType.kMAXMotionVelocityControl);
+            position.in(mode), ControlType.kMAXMotionVelocityControl);
     }
 
     public void setEncoderPosition(double positionRotations) {

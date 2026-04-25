@@ -25,7 +25,7 @@ import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
-  @AutoLog
+//   @AutoLog
   class TurretIOInputs {
     MotorIOInputs motorInputs;
     AbsoluteEncoderIOInputs encoderInputs;

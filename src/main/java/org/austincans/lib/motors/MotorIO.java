@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -23,8 +25,11 @@ public interface MotorIO {
         public double torqueCurrentAmps;
         public double temperatureCelsius;
         
-        public double getVelocity(){
-            return velocity.baseUnitMagnitude();
+        public double getVelocity(AngularVelocityUnit unit){
+            return this.velocity.in(unit);
+        }
+        public double getPosition(AngleUnit unit){
+            return this.position.in(unit);
         }
     }    
 
@@ -46,31 +51,29 @@ public interface MotorIO {
 
     public class MotorIOOutputs {
         public MotorIOOutputMode mode;
+        public AngleUnit positionMode;
+        public AngularVelocityUnit velocityMode;
         public Voltage voltage;
         public AngularVelocity velocity;
         public Angle position;
         public NeutralMode neutralMode;
 
-        public void setVoltage(Voltage voltage) {
+        public void setVoltage(double voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
-            this.voltage = voltage;
+            this.voltage = Volts.of(voltage);
         }
-        public void setVelocity(AngularVelocity velocity) {
+        public void setVelocity(double velocity, AngularVelocityUnit unit) {
             mode = MotorIOOutputMode.VELOCITY;
-            this.velocity = velocity;
+            this.velocity = unit.of(velocity);
+            this.velocityMode = unit;
         }
-        public void setPosition(Angle position) {
+        public void setPosition(double position, AngleUnit unit) {
             mode = MotorIOOutputMode.POSITION;
-            this.position = position;
+            this.position = unit.of(position);
+            this.positionMode = unit;
         }
         public void setNeutralMode(NeutralMode neutralMode) {
             this.neutralMode = neutralMode;
-        }
-        public double getVeolcity(){
-            return velocity.baseUnitMagnitude();
-        }
-        public double getVoltage(){
-            return this.voltage.baseUnitMagnitude();
         }
     }
 

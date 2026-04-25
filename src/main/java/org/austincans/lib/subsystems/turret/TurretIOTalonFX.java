@@ -16,6 +16,9 @@
 package org.austincans.lib.subsystems.turret;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -23,8 +26,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFX;
@@ -70,42 +73,14 @@ public class TurretIOTalonFX extends TurretIOReal {
     motorIO.applyOutputs(outputs.motorOutputs);
   }
 
-  private void setDesiredAngle(Rotation2d angle, double accelerationRadPerSecSq) {
-    double positionRad = angle.getRadians();
-    double positionRotations = Units.radiansToRotations(positionRad);
-    positionRotations =
-        MathUtil.inputModulus(
-            angle.getRotations(),
-            TurretConstants.turretMinimumRotation,
-            TurretConstants.turretMaxRotation);
-    MotorIOOutputs outputs = new MotorIOOutputs();
-    outputs.setPosition(Rotations.of(positionRotations));
-    outputs.mode = MotorIOOutputMode.POSITION;
-    motorIO.applyOutputs(outputs);
-  }
-  /**
-   * Set pivot angular velocity with acceleration.
-   * @param velocityDegPerSec The target velocity in radians per second
-   * @param acceleration The acceleration in radians per second squared
-   */
-  private void setVelocity(double velocityRadPerSec, double acceleration) {
-    double velocityRotationsPerSec = Units.rotationsToRadians(velocityRadPerSec);
-    MotorIOOutputs outputs = new MotorIOOutputs();
-    outputs.setVelocity(RadiansPerSecond.of(velocityRotationsPerSec));
-    outputs.mode = MotorIOOutputMode.VELOCITY;
-    motorIO.applyOutputs(outputs);
-  }
-
+  
   @Override
   public void resetAngle(Rotation2d angle) {
-    MotorIOOutputs outputs = new MotorIOOutputs();
-    outputs.setPosition(Rotations.of(angle.getRotations() * TurretConstants.gearing));
-    outputs.mode = MotorIOOutputMode.POSITION;
-    motorIO.applyOutputs(outputs);
+    motorIO.getMotor().setPosition(angle.getRotations() * TurretConstants.gearing);
   }
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Turret", motorIO.getMotor());
+    subsystem.registerHardware("Turret", motor);
   }
 }

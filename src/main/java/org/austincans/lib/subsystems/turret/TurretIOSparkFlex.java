@@ -62,8 +62,6 @@ public class TurretIOSparkFlex extends TurretIOReal {
 
     relativeEncoder = motorIO.getMotor().getEncoder();
     relativeEncoder.setPosition(encoder.getAbsolutePosition().getValueAsDouble());
-
-    setDesiredAngle(new Rotation2d());
   }
 
   @Override
@@ -76,17 +74,6 @@ public class TurretIOSparkFlex extends TurretIOReal {
   @Override
   public void applyOutputs(TurretIOOutputs outputs) {
     motorIO.applyOutputs(outputs.motorOutputs);
-  }
-
-  private void setDesiredAngle(Rotation2d angle) {
-    double rotations =
-        MathUtil.inputModulus(
-            angle.getRotations(),
-            TurretConstants.turretMinimumRotation,
-            TurretConstants.turretMaxRotation);
-    MotorIOOutputs outputs = new MotorIOOutputs();
-    outputs.setPosition(Rotations.of(rotations * TurretConstants.gearing));
-    motorIO.applyOutputs(outputs);
   }
 
   @Override
