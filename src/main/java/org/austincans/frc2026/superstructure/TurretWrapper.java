@@ -28,81 +28,102 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
-import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTargets;
+import org.austincans.frc2026.superstructure.shooter.TargetUtil;
+import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTarget;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretWrapper extends SubsystemWrapper<Turret> {
   /** Should probably be moved to some constants class */
   private static final double deadband = 0.1;
 
-  /** Should be zero on start */
-  private Rotation2d setpointJoystickTurretAngle = Rotation2d.kZero;
+  private Rotation2d setpointJoystickTurretAngle = Rotation2d.k180deg;
 
   public TurretWrapper(Optional<Turret> subsystem) {
     super(subsystem);
   }
 
   public void setAngle(Rotation2d angle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngle(angle));
+    if (isPresent) {
+      s.setDesiredAngle(angle);
+    }
   }
 
   public void setRobotRelAngle(Rotation2d robotRelAngle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngleRobotRelative(robotRelAngle));
+    if (isPresent) {
+      s.setDesiredAngleRobotRelative(robotRelAngle);
+    }
   }
 
   public void setFieldRelAngle(Rotation2d fieldRelAngle, Rotation2d robotFieldRelAngle) {
-    subsystem.ifPresent((s) -> s.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle));
+    if (isPresent) {
+      s.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle);
+    }
   }
 
-  private void pointToHub(Turret turret, Pose3d fieldRelRobotPose) {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    TrackingTargets target = alliance == Alliance.Blue ? TrackingTargets.blueHub : TrackingTargets.redHub;
+  private void pointToTarget(TrackingTarget target, Pose3d fieldRelRobotPose, boolean log) {
     Translation3d targetTranslation = target.getTranslation3d();
 
     // Transform3d applies Translation3d first, then Rotation3d
     Pose3d turretPose = fieldRelRobotPose.plus(TurretConstants.robotRelTurretTransform);
     Translation3d turretTranslation = turretPose.getTranslation();
-    Logger.recordOutput("turret pose", turretPose);
 
-    Rotation2d fieldRelAngle = targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d())
-        .getAngle();
+    Rotation2d fieldRelAngle =
+        targetTranslation.toTranslation2d().minus(turretTranslation.toTranslation2d()).getAngle();
 
-    // We need this for calculating
-    Logger.recordOutput(
-        "turret distance from hub",
-        turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
+    if (log) {
+      // Used to get values for maps
+      Logger.recordOutput(
+          "turret distance from " + target.name(),
+          turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
+    }
 
-    turret.setDesiredAngleFieldRelative(
-        fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+    s.setDesiredAngleFieldRelative(fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+  }
+
+  private void pointToHub(Pose3d fieldRelRobotPose) {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    TrackingTarget target =
+        alliance == Alliance.Blue ? TrackingTarget.blueHub : TrackingTarget.redHub;
+    pointToTarget(target, fieldRelRobotPose, true);
   }
 
   public Command pointToHubCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
-    return subsystem
-        .map((s) -> Commands.run(() -> pointToHub(s, fieldRelRobotPoseSupplier.get()), s))
-        .orElse(Commands.none());
+    return isPresent
+        ? Commands.run(() -> pointToHub(fieldRelRobotPoseSupplier.get()), s)
+        : Commands.none();
   }
 
-  private void joystickRobotRelAngle(Turret turret, double rotationX, double rotationY) {
+  private void trackShuttle(Pose3d fieldRelRobotPose) {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    TrackingTarget target = TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance);
+    pointToTarget(target, fieldRelRobotPose, true);
+  }
+
+  public Command trackShuttleCommand(Supplier<Pose3d> fieldRelRobotPoseSupplier) {
+    return isPresent
+        ? Commands.run(() -> trackShuttle(fieldRelRobotPoseSupplier.get()), s)
+        : Commands.none();
+  }
+
+  private void joystickRobotRelAngle(double rotationX, double rotationY) {
     if (Math.abs(rotationX) > deadband && Math.abs(rotationY) > deadband) {
       setpointJoystickTurretAngle = new Translation2d(rotationX, rotationY).getAngle();
     }
-    turret.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
+    s.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
   }
 
   public Command joystickRobotRelAngleCommand(
       DoubleSupplier rotationXSupplier, DoubleSupplier rotationYSupplier) {
-    if (subsystem.isEmpty()){
+    if (!isPresent) {
       return Commands.none();
     }
-    Turret turret = subsystem.get();
-    return  Commands.run(
-          () -> joystickRobotRelAngle(
-              turret, rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
-          turret);
-          
+    return Commands.run(
+        () ->
+            joystickRobotRelAngle(rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
+        s);
   }
 
   public Command resetAngleCommand() {
-    return subsystem.map((s) -> s.resetAngle()).orElse(Commands.none());
+    return isPresent ? s.resetAngle() : Commands.none();
   }
 }

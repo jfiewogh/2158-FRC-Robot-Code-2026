@@ -5,21 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "point to hub"
+            "pathName": "RightJustShoot1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "Still Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3.1"
+            "pathName": "RightJustShoot2"
           }
         }
       ]

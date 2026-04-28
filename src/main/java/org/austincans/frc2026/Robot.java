@@ -15,13 +15,14 @@
 
 package org.austincans.frc2026;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.MathShared;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -34,10 +35,14 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import org.austincans.lib.Constants.RobotType;
-import org.austincans.lib.controllers.REVDigitController;
-import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.Constants.Mode;
+import org.austincans.frc2026.Constants.RobotType;
+import org.austincans.frc2026.energy.BatteryLogger;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.HubShiftUtil;
+import org.austincans.frc2026.util.VirtualSubsystem;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -54,7 +59,7 @@ public class Robot extends LoggedRobot {
   public static final BatteryLogger batteryLogger = new BatteryLogger();
   private final BatteryIOInputsAutoLogged batteryInputs = new BatteryIOInputsAutoLogged();
 
-  private final Timer fuelLoggingTimer = new Timer();
+  private final Timer garbageTimer = new Timer();
   private static final Timer disabledTimer = new Timer();
 
   public Robot() {
@@ -90,7 +95,7 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda2"));
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -115,7 +120,12 @@ public class Robot extends LoggedRobot {
     setUseTiming(Constants.getMode() != Mode.REPLAY);
 
     // Start AdvantageKit logger
-    Logger.start();
+    // Logger.start();
+    // Phoenix CanBUS Loggger (HOOT)
+    SignalLogger.enableAutoLogging(false);
+    SignalLogger.stop();
+    StatusLogger.disableAutoLogging();
+    StatusLogger.stop();
 
     // Adjust loop overrun warning timeout
     try {
@@ -165,12 +175,12 @@ public class Robot extends LoggedRobot {
               "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
           Logger.recordOutput("CommandsAll/" + name, count > 0);
         };
-    CommandScheduler.getInstance()
-        .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
-    CommandScheduler.getInstance()
-        .onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
-    CommandScheduler.getInstance()
-        .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
+    // CommandScheduler.getInstance()
+    //     .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
+    // CommandScheduler.getInstance()
+    //     .onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
+    // CommandScheduler.getInstance()
+    //     .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
 
     // Configure Driver Station for sim
     RoboRioSim.setTeamNumber(2158);
@@ -192,26 +202,25 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-
     // Reset logged tracer
-    LoggedTracer.reset();
+    // LoggedTracer.reset();
 
-    // Update battery inputs
-    batteryInputs.batteryVoltage = RobotController.getBatteryVoltage();
-    batteryInputs.rioCurrent = RobotController.getInputCurrent();
-    batteryInputs.macMiniCurrent = 0.0;
-    Logger.processInputs("BatteryLogger", batteryInputs);
-    batteryLogger.setBatteryVoltage(batteryInputs.batteryVoltage);
-    batteryLogger.setRioCurrent(batteryInputs.rioCurrent);
-    batteryLogger.setMacMiniCurrent(batteryInputs.macMiniCurrent);
-    LoggedTracer.record("BatteryLogger/Periodic");
+    // // Update battery inputs
+    // batteryInputs.batteryVoltage = RobotController.getBatteryVoltage();
+    // batteryInputs.rioCurrent = RobotController.getInputCurrent();
+    // batteryInputs.macMiniCurrent = 0.0;
+    // Logger.processInputs("BatteryLogger", batteryInputs);
+    // batteryLogger.setBatteryVoltage(batteryInputs.batteryVoltage);
+    // batteryLogger.setRioCurrent(batteryInputs.rioCurrent);
+    // batteryLogger.setMacMiniCurrent(batteryInputs.macMiniCurrent);
+    // LoggedTracer.record("BatteryLogger/Periodic");
 
     // Main periodic functions
     VirtualSubsystem.runAllPeriodic();
     CommandScheduler.getInstance().run();
-    LoggedTracer.record("Robot/Commands");
+    // LoggedTracer.record("Robot/Commands");
     AdvancedSubsystem.runAllPeriodicAfterScheduler();
-    LoggedTracer.record("Robot/AfterScheduler");
+    // LoggedTracer.record("Robot/AfterScheduler");
 
     // Reset disabled timer
     if (DriverStation.isEnabled()) {
@@ -243,7 +252,11 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("HubShift/Shifted", HubShiftUtil.getShiftedShiftInfo());
 
     // Record cycle time
-    LoggedTracer.record("Robot/Periodic");
+    // LoggedTracer.record("Robot/Periodic");
+
+    if (garbageTimer.advanceIfElapsed(5)) {
+      System.gc();
+    }
   }
 
   /** Returns whether performance should be throttled to conserve power. */

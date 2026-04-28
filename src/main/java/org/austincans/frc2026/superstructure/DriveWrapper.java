@@ -43,6 +43,7 @@ import org.austincans.frc2026.subsystems.drive.DriveConstants;
 import org.austincans.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
+// TODO: in the future, update this to use RobotState methods instead of getting them from drive
 public class DriveWrapper extends SubsystemWrapper<Drive> {
   public static final double deadband = 0.1;
   private static final double ffStartDelay = 2.0; // Secs
@@ -104,7 +105,6 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
   }
 
   private void joystickDrive(
-      Drive drive,
       DoubleSupplier xSupplier, // forward/backward
       DoubleSupplier ySupplier, // left/right
       DoubleSupplier omegaXSupplier, // forward/backward
@@ -128,16 +128,15 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
     // Convert to field relative speeds & send command
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-            omega * drive.getMaxAngularSpeedRadPerSec());
+            linearVelocity.getX() * s.getMaxLinearSpeedMetersPerSec(),
+            linearVelocity.getY() * s.getMaxLinearSpeedMetersPerSec(),
+            omega * s.getMaxAngularSpeedRadPerSec());
 
-    lastFieldRelRotation = drive.getRotation();
+    lastFieldRelRotation = s.getRotation();
 
-    drive.runVelocity(
+    s.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? drive.getRotation().plus(Rotation2d.k180deg) : drive.getRotation()));
+            speeds, isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
   }
 
   /**
@@ -150,12 +149,11 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
       DoubleSupplier omegaXSupplier, // forward/backward
       DoubleSupplier omegaYSupplier // left/right
       ) {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
     return Commands.run(
-        () -> joystickDrive(drive, xSupplier, ySupplier, omegaXSupplier, omegaYSupplier), drive);
+        () -> joystickDrive(xSupplier, ySupplier, omegaXSupplier, omegaYSupplier), s);
   }
 
   /**
@@ -164,7 +162,6 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
    * absolute rotation with a joystick.
    */
   private void joystickDriveAtAngle(
-      Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaXSupplier,
@@ -199,18 +196,17 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
         angularKP.hashCode(), () -> angleController.setP(angularKP.getAsDouble()), angularKP);
 
     double omega =
-        angleController.calculate(drive.getRotation().getRadians(), desiredRotation.getRadians());
+        angleController.calculate(s.getRotation().getRadians(), desiredRotation.getRadians());
 
     // Convert to field relative speeds & send command
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-            omega);
-    drive.runVelocity(
+            linearVelocity.getX() * s.getMaxLinearSpeedMetersPerSec(),
+            linearVelocity.getY() * s.getMaxLinearSpeedMetersPerSec(),
+            omega * s.getMaxAngularSpeedRadPerSec());
+    s.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? drive.getRotation().plus(Rotation2d.k180deg) : drive.getRotation()));
+            speeds, isFlipped ? s.getRotation().plus(Rotation2d.k180deg) : s.getRotation()));
   }
 
   public Command joystickDriveAtAngleCommand(
@@ -218,24 +214,22 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
       DoubleSupplier translationYSupplier,
       DoubleSupplier rotationXSupplier,
       DoubleSupplier rotationYSupplier) {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
     return Commands.run(
             () ->
                 joystickDriveAtAngle(
-                    drive,
                     translationXSupplier,
                     translationYSupplier,
                     rotationXSupplier,
                     rotationYSupplier),
-            drive)
+            s)
         // Reset PID controller when command starts
         .beforeStarting(
             () -> {
-              angleController.reset(drive.getRotation().getRadians());
-              lastFieldRelRotation = drive.getRotation();
+              angleController.reset(s.getRotation().getRadians());
+              lastFieldRelRotation = s.getRotation();
             });
   }
 
@@ -244,31 +238,23 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
       DoubleSupplier translationYSupplier,
       DoubleSupplier rotationXSupplier,
       DoubleSupplier rotationYSupplier) {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
     return Commands.run(
         () -> {
           if (turnMode == TurnMode.TWO_AXIS) {
             joystickDriveAtAngle(
-                drive,
-                translationXSupplier,
-                translationYSupplier,
-                rotationXSupplier,
-                rotationYSupplier);
+                translationXSupplier, translationYSupplier, rotationXSupplier, rotationYSupplier);
           } else {
             joystickDrive(
-                drive,
-                translationXSupplier,
-                translationYSupplier,
-                rotationXSupplier,
-                rotationYSupplier);
+                translationXSupplier, translationYSupplier, rotationXSupplier, rotationYSupplier);
           }
         },
-        drive);
+        s);
   }
 
+  /** No requirements needed */
   public Command setTurnModeCommand() {
     return Commands.runOnce(
         () -> {
@@ -286,11 +272,9 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
    * <p>This command should only be used in voltage control mode.
    */
   public Command feedforwardCharacterization() {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
-
     List<Double> velocitySamples = new LinkedList<>();
     List<Double> voltageSamples = new LinkedList<>();
     Timer timer = new Timer();
@@ -306,9 +290,9 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
         // Allow modules to orient
         Commands.run(
                 () -> {
-                  drive.runCharacterization(0.0);
+                  s.runCharacterization(0.0);
                 },
-                drive)
+                s)
             .withTimeout(ffStartDelay),
 
         // Start timer
@@ -318,11 +302,11 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
         Commands.run(
                 () -> {
                   double voltage = timer.get() * ffRampRate;
-                  drive.runCharacterization(voltage);
-                  velocitySamples.add(drive.getFFCharacterizationVelocity());
+                  s.runCharacterization(voltage);
+                  velocitySamples.add(s.getFFCharacterizationVelocity());
                   voltageSamples.add(voltage);
                 },
-                drive)
+                s)
 
             // When cancelled, calculate and print results
             .finallyDo(
@@ -350,11 +334,9 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
 
   /** Measures the robot's wheel radius by spinning in a circle. */
   public Command wheelRadiusCharacterization() {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
-
     SlewRateLimiter limiter = new SlewRateLimiter(wheelRadiusRampRate);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
 
@@ -368,9 +350,9 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(wheelRadiusMaxVelocity);
-                  drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
+                  s.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
                 },
-                drive)),
+                s)),
 
         // Measurement sequence
         Commands.sequence(
@@ -380,7 +362,7 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
             // Record starting measurement
             Commands.runOnce(
                 () -> {
-                  state.positions = drive.getWheelRadiusCharacterizationPositions();
+                  state.positions = s.getWheelRadiusCharacterizationPositions();
                   state.lastAngle = RobotState.getInstance().getRotation();
                   state.gyroDelta = 0.0;
                 }),
@@ -392,7 +374,7 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
                       state.gyroDelta += Math.abs(rotation.minus(state.lastAngle).getRadians());
                       state.lastAngle = rotation;
 
-                      double[] positions = drive.getWheelRadiusCharacterizationPositions();
+                      double[] positions = s.getWheelRadiusCharacterizationPositions();
                       double wheelDelta = 0.0;
                       for (int i = 0; i < 4; i++) {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
@@ -407,7 +389,7 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
                 // When cancelled, calculate and print results
                 .finallyDo(
                     () -> {
-                      double[] positions = drive.getWheelRadiusCharacterizationPositions();
+                      double[] positions = s.getWheelRadiusCharacterizationPositions();
                       double wheelDelta = 0.0;
                       for (int i = 0; i < 4; i++) {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
@@ -439,12 +421,12 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
 
   /** Returns a command to run a quasistatic test in the specified direction. */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return subsystem.map((s) -> s.sysIdQuasistatic(direction)).orElse(Commands.none());
+    return isPresent ? s.sysIdQuasistatic(direction) : Commands.none();
   }
 
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return subsystem.map((s) -> s.sysIdDynamic(direction)).orElse(Commands.none());
+    return isPresent ? s.sysIdDynamic(direction) : Commands.none();
   }
 
   /**
@@ -452,32 +434,30 @@ public class DriveWrapper extends SubsystemWrapper<Drive> {
    * Rotation.
    */
   public Command sysIdDynamicAngular(SysIdRoutine.Direction direction) {
-    return subsystem.map((s) -> s.sysIdDynamicAngular(direction)).orElse(Commands.none());
+    return isPresent ? s.sysIdDynamicAngular(direction) : Commands.none();
   }
 
   /** Returns a command to run a quasistatic test in the specified direction. */
   public Command sysIdQuasistaticAngular(SysIdRoutine.Direction direction) {
-    return subsystem.map((s) -> s.sysIdQuasistaticAngular(direction)).orElse(Commands.none());
+    return isPresent ? s.sysIdQuasistaticAngular(direction) : Commands.none();
   }
 
   public Command stopWithXCommand() {
-    return subsystem.map((s) -> Commands.runOnce(s::stopWithX, s)).orElse(Commands.none());
+    return isPresent ? Commands.runOnce(s::stopWithX, s) : Commands.none();
   }
 
   public Command zeroPoseCommand() {
-    if (subsystem.isEmpty()) {
+    if (!isPresent) {
       return Commands.none();
     }
-    Drive drive = subsystem.get();
-
     return Commands.runOnce(
         () ->
-            drive.setPose(
+            s.setPose(
                 new Pose2d(
-                    drive.getPose().getTranslation(),
+                    s.getPose().getTranslation(),
                     DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red
                         ? Rotation2d.k180deg
                         : Rotation2d.kZero)),
-        drive);
+        s);
   }
 }

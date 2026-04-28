@@ -13,16 +13,8 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/viz/FieldViz.java
-package org.austincans.lib.util.viz;
 
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import org.austincans.lib.util.ScoringLocation;
-========
 package org.austincans.frc2026.superstructure;
-
-import static edu.wpi.first.units.Units.RPM;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/FlywheelWrapper.java
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,20 +27,22 @@ public class FlywheelWrapper extends SubsystemWrapper<Flywheel> {
   }
 
   public Command runCommand(double velocityRPM) {
-    return subsystem
-        .map((s) -> Commands.runOnce(() -> s.setVelocity(RPM.of(velocityRPM)), s))
-        .orElse(Commands.none());
+    return isPresent ? Commands.runOnce(() -> s.setVelocity(velocityRPM), s) : Commands.none();
   }
 
   public boolean atSetpoint() {
-    return subsystem.map((s) -> s.atSetpoint()).orElse(true);
+    return isPresent && s.atSetpoint();
   }
 
   public void setVelocity(double velocityRPM) {
-    subsystem.ifPresent((s) -> s.setVelocity(RPM.of(velocityRPM)));
+    if (isPresent) {
+      s.setVelocity(velocityRPM);
+    }
   }
 
   public void stop() {
-    subsystem.ifPresent((s) -> s.stop());
+    if (isPresent) {
+      s.stop();
+    }
   }
 }

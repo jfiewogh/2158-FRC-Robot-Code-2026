@@ -19,11 +19,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.austincans.frc2026.RobotState;
-import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotInputs;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
-import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTargets;
+import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTarget;
 
 public class ShotUtil {
   private static final ShotCalculator hubShotCalculator;
@@ -32,14 +31,14 @@ public class ShotUtil {
   static {
     hubShotCalculator =
         new ShotCalculator(
-            0.02,
+            0.0,
             ShotConstants.scoringHoodAngleMap,
             ShotConstants.scoringFlywheelSpeedMap,
             ShotConstants.scoringTimeOfFlightMap,
             TurretConstants.robotRelTurretTransform);
     shuttleShotCalculator =
         new ShotCalculator(
-            0.02,
+            0.0,
             ShotConstants.passingHoodAngleMap,
             ShotConstants.passingFlywheelSpeedMap,
             ShotConstants.passingTimeOfFlightMap,
@@ -54,19 +53,20 @@ public class ShotUtil {
             RobotState.getInstance().getRobotVelocity(),
             RobotState.getInstance().getFieldVelocity(),
             alliance == Alliance.Red
-                ? TrackingTargets.redHub.getTranslation3d()
-                : TrackingTargets.blueHub.getTranslation3d());
+                ? TrackingTarget.redHub.getTranslation3d()
+                : TrackingTarget.blueHub.getTranslation3d());
     return hubShotCalculator.calculate(inputs);
   }
 
-  public static ShotParameters getShuttleShotParameters(Drive drive) {
+  public static ShotParameters getShuttleShotParameters() {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+    Pose3d fieldRelRobotPose = new Pose3d(RobotState.getInstance().getEstimatedPose());
     ShotInputs inputs =
         new ShotInputs(
-            new Pose3d(RobotState.getInstance().getEstimatedPose()),
+            fieldRelRobotPose,
             RobotState.getInstance().getRobotVelocity(),
             RobotState.getInstance().getFieldVelocity(),
-            TargetUtil.getShuttleTarget(drive, alliance).getTranslation3d());
+            TargetUtil.getShuttleTarget(fieldRelRobotPose, alliance).getTranslation3d());
     return shuttleShotCalculator.calculate(inputs);
   }
 }

@@ -5,39 +5,27 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "MidJustShoot1"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "driveAndScore"
+            "name": "Still Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Dynamic Auto 1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "driveAndIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "driveAndScore"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "driveAndIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "driveAndScore"
+            "pathName": "MidJustShoot2"
           }
         }
       ]

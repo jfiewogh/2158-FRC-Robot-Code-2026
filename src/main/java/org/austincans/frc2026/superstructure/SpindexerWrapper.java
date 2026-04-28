@@ -30,18 +30,22 @@ public class SpindexerWrapper extends SubsystemWrapper<Spindexer> {
   }
 
   public Command runCommand() {
-    return subsystem.map((s) -> Commands.runOnce(s::run, s)).orElse(Commands.none());
+    return isPresent ? Commands.runOnce(s::run, s) : Commands.none();
   }
 
   public Command stopCommand() {
-    return subsystem.map((s) -> Commands.runOnce(s::stop, s)).orElse(Commands.none());
+    return isPresent ? Commands.runOnce(s::stop, s) : Commands.none();
   }
 
   public void run() {
-    subsystem.ifPresent((s) -> s.run());
+    if (isPresent) {
+      s.run();
+    }
   }
 
   public void stop() {
-    subsystem.ifPresent((s) -> s.stop());
+    if (isPresent) {
+      s.stop();
+    }
   }
 }

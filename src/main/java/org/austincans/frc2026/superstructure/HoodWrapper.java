@@ -27,19 +27,17 @@ public class HoodWrapper extends SubsystemWrapper<Hood> {
   }
 
   public void setAngle(Rotation2d angle) {
-    subsystem.ifPresent((s) -> s.setAngle(angle));
+    if (isPresent) {
+      s.setAngle(angle);
+    }
   }
 
   public Command setAngleCommand(Rotation2d angle) {
-    return subsystem
-        .map((s) -> Commands.runOnce(() -> s.setAngle(angle), s))
-        .orElse(Commands.none());
+    return isPresent ? Commands.runOnce(() -> s.setAngle(angle), s) : Commands.none();
   }
 
   public Command setPulseCommand(int pulse) {
-    return subsystem
-        .map((s) -> Commands.runOnce(() -> s.setPulse(pulse), s))
-        .orElse(Commands.none());
+    return isPresent ? Commands.runOnce(() -> s.setPulse(pulse), s) : Commands.none();
   }
 
   public Command setLowestAngleCommand() {
@@ -47,10 +45,10 @@ public class HoodWrapper extends SubsystemWrapper<Hood> {
   }
 
   public Command incrementCommand() {
-    return subsystem.map((s) -> s.addToPulseCommand(50)).orElse(Commands.none());
+    return isPresent ? s.addToPulseCommand(50) : Commands.none();
   }
 
   public Command decrementCommand() {
-    return subsystem.map((s) -> s.addToPulseCommand(-50)).orElse(Commands.none());
+    return isPresent ? s.addToPulseCommand(-50) : Commands.none();
   }
 }

@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 5.0
+            "pathName": "LeftAuto1"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "still"
+            "name": "Still Shoot"
           }
         }
       ]

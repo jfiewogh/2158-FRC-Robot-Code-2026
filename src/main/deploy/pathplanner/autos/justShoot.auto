@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "still"
+            "pathName": "Still"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "Still Shoot"
           }
         }
       ]

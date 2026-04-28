@@ -1,0 +1,215 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.508573466476462,
+        "y": 5.4993132530120485
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.805689281131924,
+        "y": 5.643005390207132
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.455999999993498,
+        "y": 6.319
+      },
+      "prevControl": {
+        "x": 5.636994034878182,
+        "y": 5.149180840320481
+      },
+      "nextControl": {
+        "x": 7.868901569186875,
+        "y": 8.337104136947218
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.674821683309556,
+        "y": 5.4993132530120485
+      },
+      "prevControl": {
+        "x": 7.670898504976232,
+        "y": 6.208127589984182
+      },
+      "nextControl": {
+        "x": 7.687760342368046,
+        "y": 3.161640513552069
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.578758915834522,
+        "y": 5.4993132530120485
+      },
+      "prevControl": {
+        "x": 6.445649072753208,
+        "y": 5.516476462196862
+      },
+      "nextControl": {
+        "x": 4.427513656297802,
+        "y": 5.476520211639095
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.913395149786019,
+        "y": 5.64586305278174
+      },
+      "prevControl": {
+        "x": 3.911391887857725,
+        "y": 5.395636699097233
+      },
+      "nextControl": {
+        "x": 1.5548359486447922,
+        "y": 5.986492738428749
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.4938659058487873,
+        "y": 5.930513552068473
+      },
+      "prevControl": {
+        "x": 1.3348787446504988,
+        "y": 5.891697574893009
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LeftAutoWithDepot1End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7004149377593404,
+      "rotationDegrees": -45.0
+    },
+    {
+      "waypointRelativePos": 1.483817427385896,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.0813278008298726,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.8464818763326387,
+      "rotationDegrees": 135.0
+    },
+    {
+      "waypointRelativePos": 3.859275053304928,
+      "rotationDegrees": 135.0
+    },
+    {
+      "waypointRelativePos": 4.594882729211063,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.3180283592167423,
+      "maxWaypointRelativePos": 2.930452397029008,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 360.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 3.7272113436866965,
+      "maxWaypointRelativePos": 5.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 360.0,
+        "maxAngularAcceleration": 360.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Turret Track Hub",
+      "waypointRelativePos": 0.675219446320048,
+      "endWaypointRelativePos": 0.9453072248480775,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Turret Track Hub"
+        }
+      }
+    },
+    {
+      "name": "Start Intake",
+      "waypointRelativePos": 1.012829169480083,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Intake"
+        }
+      }
+    },
+    {
+      "name": "Turret Track Hub",
+      "waypointRelativePos": 2.86293045239703,
+      "endWaypointRelativePos": 3.5,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Turret Track Hub"
+        }
+      }
+    },
+    {
+      "name": "Score",
+      "waypointRelativePos": 3.57,
+      "endWaypointRelativePos": 5.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Score"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": -45.0
+  },
+  "useDefaultConstraints": true
+}

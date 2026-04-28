@@ -50,7 +50,25 @@ import org.austincans.lib.util.LoggedTunableNumber;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
-public class RobotContainer extends RobotContainerBase {
+public class RobotContainer {
+  // Subsystem Enabled // only matters for real robot
+  // Maybe move this somewhere else (e.g., RobotConstants)
+  public static final boolean driveEnabled = true;
+  public static final boolean visionEnabled = true;
+  public static final boolean objectDetectionEnabled = false;
+  public static final boolean turretEnabled = true;
+  public static final boolean hoodEnabled = true;
+  public static final boolean rollerEnabled = true;
+  public static final boolean deployEnabled = true;
+  public static final boolean flywheelEnabled = true;
+  public static final boolean indexerEnabled = true;
+  public static final boolean spindexerEnabled = true;
+  public static final boolean ledEnabled = false;
+
+  // Controllers
+  private final DriverMapper driver = new DriverMapperComp();
+  private final OperatorMapper operator = new OperatorMapperTest();
+
   // Subsystems
   private final DriveWrapper drive = new DriveWrapper(SubsystemFactory.buildDrive());
 
@@ -81,10 +99,6 @@ public class RobotContainer extends RobotContainerBase {
   private final Alert secondaryDisconnected =
       new Alert("Secondary controller disconnected (port 1).", AlertType.kWarning);
 
-  // Controllers
-  private final DriverMapper driverMapper = new DriverMapperComp();
-  private final OperatorMapper operatorMapper = new OperatorMapperTest();
-
   // Dashboard inputs
   private SendableChooser<Command> autoChooser;
 
@@ -113,11 +127,14 @@ public class RobotContainer extends RobotContainerBase {
 
   private void registerNamedCommands() {
     /* Register named commands */
-    NamedCommands.registerCommand("Run Intake", roller.runIntakeCommand());
-    NamedCommands.registerCommand("Deploy Intake", deploy.deployCommand());
-    NamedCommands.registerCommand("Retract Intake", deploy.retractCommand());
+    NamedCommands.registerCommand("Start Intake", superstructure.deployAndRunIntake());
+    NamedCommands.registerCommand("End Intake", superstructure.retractAndStopIntake());
     NamedCommands.registerCommand("Score", superstructure.shootToHubCommand());
     NamedCommands.registerCommand("Shuttle", superstructure.shuttleCommand());
+    NamedCommands.registerCommand("Still Shoot", superstructure.stillShootCommand());
+    NamedCommands.registerCommand("Still Shoot 3s", superstructure.stillShootCommand(3));
+    NamedCommands.registerCommand("Still Shoot 5s", superstructure.stillShootCommand(5));
+    NamedCommands.registerCommand("Turret Track Hub", superstructure.turretPointToHub());
   }
 
   private void addAutos() {
@@ -145,22 +162,20 @@ public class RobotContainer extends RobotContainerBase {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
-    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
-    autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
+    autoChooser.addOption("Left Auto", AutoBuilder.buildAuto("LeftAuto"));
+    autoChooser.addOption("Left Auto with Depot", AutoBuilder.buildAuto("LeftAutoWithDepot"));
+    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
+    autoChooser.addOption("Right Auto", AutoBuilder.buildAuto("RightAuto"));
+    autoChooser.addOption("Right Auto Two Cycle", AutoBuilder.buildAuto("RightAutoTwoCycle"));
 
-    autoChooser.addOption("Blue Just Shoot Top", AutoBuilder.buildAuto("blueTopJustShoot"));
-    autoChooser.addOption("Blue Just Shoot Mid", AutoBuilder.buildAuto("blueMidJustShoot"));
-    autoChooser.addOption("Blue Just Shoot Bot", AutoBuilder.buildAuto("blueBottomJustShoot"));
+    autoChooser.addOption("Left Just Shoot", AutoBuilder.buildAuto("LeftJustShoot"));
+    autoChooser.addOption("Mid Just Shoot", AutoBuilder.buildAuto("MidJustShoot"));
+    autoChooser.addOption("Right Just Shoot", AutoBuilder.buildAuto("RightJustShoot"));
 
-    autoChooser.addOption("Auto1", AutoBuilder.buildAuto("Auto1"));
-    autoChooser.addOption("Auto2", AutoBuilder.buildAuto("Auto2"));
-    autoChooser.addOption("Auto3", AutoBuilder.buildAuto("Auto3"));
+    autoChooser.addOption("Do Nothing", AutoBuilder.buildAuto("DoNothing"));
+    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("JustShoot"));
 
-    autoChooser.addOption("Do nothing", AutoBuilder.buildAuto("Do Nothing"));
-    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("justShoot"));
-
-    autoChooser.addOption("shoot", AutoBuilder.buildAuto("shoot"));
+    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -177,45 +192,44 @@ public class RobotContainer extends RobotContainerBase {
     // Drive
     drive.setDefaultCommand(
         drive.driveCommand(
-            driverMapper::getTranslationX,
-            driverMapper::getTranslationY,
-            driverMapper::getRotationX,
-            driverMapper::getRotationY));
+            driver::getTranslationX,
+            driver::getTranslationY,
+            driver::getRotationX,
+            driver::getRotationY));
 
-    driverMapper.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
-    driverMapper.getStopWithXButton().onTrue(drive.stopWithXCommand());
-    driverMapper.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
+    driver.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
+    driver.getStopWithXButton().onTrue(drive.stopWithXCommand());
+    driver.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
 
-    driverMapper.getRollerToggleButton().onTrue(roller.toggleCommand());
+    driver.getRollerToggleButton().onTrue(roller.toggleCommand());
 
-    driverMapper.getDeployButton().whileTrue(deploy.deployCommand());
-    driverMapper.getRetractButton().whileTrue(deploy.retractCommand());
+    driver.getDeployButton().whileTrue(superstructure.deployCommand());
+    driver.getRetractButton().whileTrue(superstructure.retractCommand());
 
-    driverMapper.getShootButton().whileTrue(superstructure.shootCommand());
+    driver.getShootButton().whileTrue(superstructure.shootCommand());
 
     /* Operator */
 
     turret.setDefaultCommand(
-        turret.joystickRobotRelAngleCommand(
-            operatorMapper::getRotationX, operatorMapper::getRotationY));
+        turret.joystickRobotRelAngleCommand(operator::getRotationX, operator::getRotationY));
 
-    operatorMapper
-        .getStaticShooterToggleButton()
-        .onTrue(superstructure.staticShooterToggleCommand());
+    operator.getStaticShooterToggleButton().onTrue(superstructure.staticShooterToggleCommand());
 
-    operatorMapper.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
+    operator.getTrackingButton().whileTrue(superstructure.turretTrackShuttle());
 
-    operatorMapper.getOuttakeButton().whileTrue(roller.runOuttakeCommand());
+    operator.getResetTurretAngleButton().onTrue(turret.resetAngleCommand());
 
-    operatorMapper.getSetLowestHoodAngleButton().onTrue(hood.setLowestAngleCommand());
+    operator.getOuttakeButton().whileTrue(roller.outtakeCommand());
+
+    operator.getSetLowestHoodAngleButton().onTrue(hood.setLowestAngleCommand());
 
     // Test
-    operatorMapper.getPointToHubButton().whileTrue(superstructure.turretPointToHub());
+    operator.getPointToHubButton().whileTrue(superstructure.turretPointToHub());
 
-    operatorMapper.getIncrementHoodAngleButton().onTrue(hood.incrementCommand());
-    operatorMapper.getDecrementHoodAngleButton().onTrue(hood.decrementCommand());
+    operator.getIncrementHoodAngleButton().onTrue(hood.incrementCommand());
+    operator.getDecrementHoodAngleButton().onTrue(hood.decrementCommand());
 
-    operatorMapper
+    operator
         .getRunIndexerAndFlywheelButton()
         .whileTrue(superstructure.runFeederAndFlywheelCommand(flywheelSpeed));
   }
@@ -252,9 +266,9 @@ public class RobotContainer extends RobotContainerBase {
 
   @SuppressWarnings("unused")
   private boolean driverHasInput() {
-    return Math.abs(driverMapper.getTranslationX()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getTranslationY()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getRotationX()) >= DriveWrapper.deadband
-        || Math.abs(driverMapper.getRotationY()) >= DriveWrapper.deadband;
+    return Math.abs(driver.getTranslationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getTranslationY()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationY()) >= DriveWrapper.deadband;
   }
 }

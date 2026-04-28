@@ -5,21 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "turretAngleFar"
+            "pathName": "RightAuto1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "Still Shoot 3s"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "still"
+            "pathName": "RightAuto2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot 5s"
           }
         }
       ]

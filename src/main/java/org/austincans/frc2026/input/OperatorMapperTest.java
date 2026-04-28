@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class OperatorMapperTest extends OperatorMapperComp {
   @Override
   public Trigger getPointToHubButton() {
-    return controller.povDown();
+    return controller.rightTrigger();
   }
 
   @Override
@@ -37,6 +37,6 @@ public class OperatorMapperTest extends OperatorMapperComp {
 
   @Override
   public Trigger getRunIndexerAndFlywheelButton() {
-    return controller.povUp();
+    return controller.leftTrigger();
   }
 }

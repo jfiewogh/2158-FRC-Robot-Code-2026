@@ -31,6 +31,7 @@ import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
 import org.austincans.frc2026.superstructure.shooter.ShotUtil;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** This is season specific */
 public class Superstructure {
@@ -50,7 +51,7 @@ public class Superstructure {
   private final IndexerWrapper indexer;
   private final SpindexerWrapper spindexer;
 
-  private boolean staticShooter = false;
+  @AutoLogOutput private boolean staticShooter = false;
 
   public Superstructure(
       DriveWrapper drive,
@@ -85,10 +86,15 @@ public class Superstructure {
     return turret.pointToHubCommand(() -> new Pose3d(RobotState.getInstance().getEstimatedPose()));
   }
 
+  public Command turretTrackShuttle() {
+    return turret.trackShuttleCommand(
+        () -> new Pose3d(RobotState.getInstance().getEstimatedPose()));
+  }
+
   public void runFeederAndFlywheel(double flywheelVelocityRPM) {
     flywheel.setVelocity(flywheelVelocityRPM);
     indexer.run();
-    if (flywheel.atSetpoint() && indexer.atSetpoint()) {
+    if (flywheel.atSetpoint()) {
       spindexer.run();
     }
   }
@@ -101,8 +107,9 @@ public class Superstructure {
 
   public Command runFeederAndFlywheelCommand(DoubleSupplier flywheelVelocityRPM) {
     return Commands.run(
-        () -> runFeederAndFlywheel(flywheelVelocityRPM.getAsDouble()),
-        getRequirementsArray(flywheel, indexer, spindexer));
+            () -> runFeederAndFlywheel(flywheelVelocityRPM.getAsDouble()),
+            getRequirementsArray(flywheel, indexer, spindexer))
+        .finallyDo(this::stopFeederAndFlywheel);
   }
 
   /* Shooter */
@@ -127,16 +134,15 @@ public class Superstructure {
   }
 
   public Command shootToHubCommand() {
-    return Commands.run(this::shootToHub, getRequirementsArray(flywheel,hood,turret,indexer,spindexer))
+    return Commands.run(
+            this::shootToHub, getRequirementsArray(flywheel, hood, turret, indexer, spindexer))
         .finallyDo(this::stopFeederAndFlywheel);
   }
 
   public void trackShuttle() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    hood.setAngle(Rotation2d.fromDegrees(50));
-    turret.setFieldRelAngle(
-        alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero,
-        RobotState.getInstance().getRotation());
+    ShotParameters parameters = ShotUtil.getShuttleShotParameters();
+    hood.setAngle(parameters.hoodAngle());
+    turret.setFieldRelAngle(parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
 
   public Command shuttleTrackingCommand() {
@@ -144,12 +150,10 @@ public class Superstructure {
   }
 
   public void shuttle() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-    runFeederAndFlywheel(6000);
-    hood.setAngle(Rotation2d.fromDegrees(60));
-    turret.setFieldRelAngle(
-        alliance == Alliance.Blue ? Rotation2d.k180deg : Rotation2d.kZero,
-        RobotState.getInstance().getRotation());
+    ShotParameters parameters = ShotUtil.getShuttleShotParameters();
+    runFeederAndFlywheel(parameters.flywheelSpeedRPM());
+    hood.setAngle(parameters.hoodAngle());
+    turret.setFieldRelAngle(parameters.fieldRelTurretAngle(), parameters.driveFieldRelRotation2d());
   }
 
   public Command shuttleCommand() {
@@ -190,5 +194,45 @@ public class Superstructure {
 
   public Command staticShooterToggleCommand() {
     return Commands.runOnce(() -> staticShooter = !staticShooter);
+  }
+
+  public Command deployCommand() {
+    return deploy.deployCommand().alongWith(roller.stopCommand());
+  }
+
+  public Command retractCommand() {
+    return deploy.retractCommand().alongWith(roller.stopCommand());
+  }
+
+  /* Auton Only Commands */
+
+  public Command stillShootCommand() {
+    return stillShootCommand(7);
+  }
+
+  public Command stillShootCommand(double seconds) {
+    return Commands.run(
+            () -> {
+              Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+              if (RebuiltFieldUtils.isInAllianceZone(
+                  alliance, RobotState.getInstance().getEstimatedPose())) {
+                shootToHub();
+              } else {
+                shuttle();
+              }
+            },
+            getRequirementsArray(flywheel, hood, indexer, spindexer, turret, drive))
+        .withTimeout(seconds)
+        .finallyDo(this::stopFeederAndFlywheel);
+  }
+
+  public Command deployAndRunIntake() {
+    return Commands.parallel(
+        Commands.sequence(Commands.waitSeconds(0.2), roller.runCommand()),
+        deploy.deploySequenceCommand());
+  }
+
+  public Command retractAndStopIntake() {
+    return Commands.sequence(roller.stopCommand(), deploy.retractSequenceCommand());
   }
 }

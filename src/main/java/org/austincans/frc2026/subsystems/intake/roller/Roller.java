@@ -70,6 +70,7 @@ public class Roller extends AdvancedSubsystem {
   public void stop() {
     running = false;
     intaking = false;
+    intaking = false;
     outputs.voltage = 0.0;
   }
 

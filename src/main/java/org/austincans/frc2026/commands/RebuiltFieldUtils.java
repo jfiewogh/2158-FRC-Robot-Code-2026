@@ -30,8 +30,8 @@ public class RebuiltFieldUtils {
   public static final double fieldLength = Units.inchesToMeters(651.22);
   public static final double fieldWidth = Units.inchesToMeters(317.69);
 
-  private static double blueAllianceZoneX = Units.inchesToMeters(156.61);
-  private static double redAllianceZoneX = Units.inchesToMeters(651.22 - 156.61);
+  private static double blueAllianceZoneX = Units.inchesToMeters(182.11);
+  private static double redAllianceZoneX = fieldLength - Units.inchesToMeters(182.11);
 
   public static boolean isInAllianceZone(Alliance alliance, Pose2d robotPose) {
     return alliance == Alliance.Blue

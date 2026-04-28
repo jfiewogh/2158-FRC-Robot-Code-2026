@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "point to hub"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "2.1"
+            "pathName": "RightAuto1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
           }
         }
       ]

@@ -7,19 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Top 1"
+            "pathName": "MidAuto1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Top 2"
+            "pathName": "MidAuto2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Top 3"
+            "pathName": "MidAuto3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Still Shoot"
           }
         }
       ]

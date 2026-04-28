@@ -25,15 +25,23 @@ public class RollerWrapper extends SubsystemWrapper<Roller> {
     super(subsystem);
   }
 
-  public Command runIntakeCommand() {
-    return subsystem.map(s -> Commands.startEnd(s::runIntake, s::stop, s)).orElse(Commands.none());
+  /** Start end */
+  public Command outtakeCommand() {
+    return isPresent ? Commands.startEnd(s::runOuttake, s::stop, s) : Commands.none();
   }
 
-  public Command runOuttakeCommand() {
-    return subsystem.map(s -> Commands.startEnd(s::runOuttake, s::stop, s)).orElse(Commands.none());
-  }
-
+  /** Run once */
   public Command toggleCommand() {
-    return subsystem.map(s -> Commands.startEnd(s::toggle, s::stop, s)).orElse(Commands.none());
+    return isPresent ? Commands.runOnce(s::toggle, s) : Commands.none();
+  }
+
+  /** Run once */
+  public Command runCommand() {
+    return isPresent ? Commands.runOnce(s::runIntake, s) : Commands.none();
+  }
+
+  /** Run once */
+  public Command stopCommand() {
+    return isPresent ? Commands.runOnce(s::stop, s) : Commands.none();
   }
 }
