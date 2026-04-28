@@ -37,12 +37,13 @@ public class DriveConstants {
           ? Units.inchesToMeters(20.75)
           : Units.inchesToMeters(22.75);
   public static final double driveBaseRadius = Math.hypot(trackWidthX / 2, trackWidthY / 2);
-  public static final double maxLinearSpeed = 4.69;
+  //   public static final double maxLinearSpeed = 4.69;
+  public static final double maxLinearSpeed = 5;
   public static final double maxAngularSpeed = 4.69 / driveBaseRadius;
   public static final double maxLinearAcceleration = 22.0;
   public static final double maxAngularAcceleration = Math.PI;
 
-    public static final double turnDeadbandDeg = 0.3;
+  public static final double turnDeadbandDeg = 0.3;
 
   /** Includes bumpers! */
   public static final double robotWidth =
