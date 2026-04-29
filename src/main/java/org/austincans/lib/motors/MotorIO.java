@@ -58,22 +58,26 @@ public interface MotorIO {
         public Angle position;
         public NeutralMode neutralMode;
 
-        public void setVoltage(double voltage) {
+        public void setVoltage(Voltage voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
-            this.voltage = Volts.of(voltage);
+            this.voltage = voltage;
         }
-        public void setVelocity(double velocity, AngularVelocityUnit unit) {
+        public void setVelocity(AngularVelocity velocity) {
             mode = MotorIOOutputMode.VELOCITY;
-            this.velocity = unit.of(velocity);
-            this.velocityMode = unit;
+            this.velocity = velocity;
         }
-        public void setPosition(double position, AngleUnit unit) {
+        public void setPosition(Angle position) {
             mode = MotorIOOutputMode.POSITION;
-            this.position = unit.of(position);
-            this.positionMode = unit;
+            this.position = position;
         }
         public void setNeutralMode(NeutralMode neutralMode) {
             this.neutralMode = neutralMode;
+        }
+        public double getVelocity(AngularVelocityUnit unit){
+            return this.velocity.in(unit);
+        }
+        public double getPosition(AngleUnit unit){
+            return this.position.in(unit);
         }
     }
 

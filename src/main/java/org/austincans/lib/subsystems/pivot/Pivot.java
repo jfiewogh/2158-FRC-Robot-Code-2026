@@ -21,41 +21,45 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volt;
+
+import org.austincans.lib.subsystems.pivot.PivotIO.PivotIOInputs;
+import org.austincans.lib.subsystems.pivot.PivotIO.PivotIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends AdvancedSubsystem {
-  private final PivotIO pivotIO;
-  private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
+  private final PivotIO io;
+  private final PivotIOInputs inputs = new PivotIOInputs();
+  private final PivotIOOutputs outputs = new PivotIOOutputs();
   
-  protected Pivot(PivotIO pivotIO) {
-    this.pivotIO = pivotIO;
-    pivotIO.getHardware().forEach(e -> {
-          if (e != null) {
-            registerHardware(e);
-          }
-        });
+  protected Pivot(PivotIO io) {
+    this.io = io;
     registerCheckCommand(systemCheckCommand());
   }
 
   @Override
   public void periodic() {
-    pivotIO.updateInputs(inputs);
-    Logger.processInputs(getName(), inputs);
-    
-    pivotIO.checkForFaults().forEach(this::addHardwareFault);
+    io.updateInputs(inputs);
+    // Logger.processInputs(getName(), inputs);
   }
 
   public void setAngle(Rotation2d angle) {
-    pivotIO.setPosition(angle.getRadians());
+    outputs.motorOutputs.setPosition(Radians.of(angle.getRadians()));
   }
 
   public double getPositionRad() {
-    return inputs.position;
+    return inputs.motorInputs.getPosition(Radians);
   }
 
   public double getVelocityRadPerSec() {
-    return inputs.velocity;
+    return inputs.motorInputs.getVelocity(RadiansPerSecond);
   }
 
   public Command setAngleCommand(Rotation2d rotation) {
@@ -63,22 +67,22 @@ public class Pivot extends AdvancedSubsystem {
   }
 
   public Command moveToAngleCommand(Rotation2d angle) {
-    return Commands.runOnce(() -> pivotIO.setPosition(angle.getRadians()))
+    return Commands.runOnce(() -> setAngle(angle))
       .until(() -> Math.abs(angle.getRadians() - getPositionRad()) < Units.degreesToRadians(2));
   }
 
   public Command stopCommand() {
-    return new InstantCommand(() -> pivotIO.setVoltage(0));
+    return new InstantCommand(() -> outputs.motorOutputs.setVoltage(Volt.of(0)));
   }
 
   public Command moveAtVelocityCommand(double velocityDegPerSec) {
-    return new InstantCommand(() -> pivotIO.setVoltage(velocityDegPerSec));
+    return new InstantCommand(() -> outputs.motorOutputs.setVelocity(DegreesPerSecond.of(velocityDegPerSec)));
   }
 
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(() -> pivotIO.setVelocity(2)),
+            Commands.runOnce(() -> outputs.motorOutputs.setVelocity(RPM.of(2))),
             Commands.waitSeconds(0.5),
             Commands.runOnce(
                 () -> {
@@ -86,7 +90,7 @@ public class Pivot extends AdvancedSubsystem {
                     addSubsystemFault(
                         getName(), "[System Check] Extension velocity measured too slow", false);
                   }
-                  pivotIO.setVelocity(0);
+                  outputs.motorOutputs.setVelocity(RPM.of(0));
                 },
                 this),
             Commands.runOnce(() -> setAngle(Rotation2d.fromDegrees(0)), this),
@@ -114,8 +118,13 @@ public class Pivot extends AdvancedSubsystem {
         .andThen(
             Commands.runOnce(
                 () -> {
-                  pivotIO.setVoltage(0);
+                  outputs.motorOutputs.setVelocity(RPM.of(0));
                 },
                 this));
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    
   }
 }

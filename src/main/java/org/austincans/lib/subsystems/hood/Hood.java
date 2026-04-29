@@ -16,60 +16,60 @@
 package org.austincans.lib.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-import org.austincans.lib.math.Angle;
+import org.austincans.lib.subsystems.hood.HoodIO.HoodIOInputs;
+import org.austincans.lib.subsystems.hood.HoodIO.HoodIOOutputs;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+import com.google.protobuf.ByteString.Output;
+
 public class Hood extends AdvancedSubsystem {
   private final HoodIO io;
-  private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+  private final HoodIOInputs inputs = new HoodIOInputs();
+  private final HoodIOOutputs outputs = new HoodIOOutputs();
 
   public Hood(HoodIO io) {
     this.io = io;
-    io.getHardware().forEach(
-        e -> {
-          if (e != null) {
-            registerHardware(e);
-          }
-        });
     registerCheckCommand(systemCheckCommand());
-  }
-
-  Command runHoodMotorCommand(Angle angle) {
-    return Commands.run((() -> io.setAngle(angle)));
   }
 
   // TODO: Only IO with setVelocity implementation is HoodIOTest
   public void setVelocity(double velocityRadPerSec) {
-    io.setVelocity(velocityRadPerSec);
+    outputs.motorOutputs.setVelocity(RadiansPerSecond.of(velocityRadPerSec));
   }
 
   public void setAngle(Rotation2d angle) {
-    io.setAngleRotation2d(angle);
+    outputs.motorOutputs.setPosition(Radians.of(angle.getRadians()));
   }
 
   public Rotation2d getAngle() {
-    return io.getAngleRotation2d();
+    return new Rotation2d(inputs.motorInputs.position);
   }
 
   public boolean atAngle(Angle setpoint) {
-    return io.atAngle(setpoint);
+    return inputs.motorInputs.position == setpoint;
   }
 
   @Override
   public void periodic() {
-    Logger.processInputs("Hood/Inputs", inputs);
+    // Logger.processInputs("Hood/Inputs", inputs);
     io.updateInputs(inputs);
   }
 
   public Command stopCommand() {
     return new InstantCommand(
         () -> {
-          io.setAngle(Angle.fromDegrees(0));
+          outputs.motorOutputs.setPosition(Degrees.of(0));
         });
   }
 
@@ -78,13 +78,13 @@ public class Hood extends AdvancedSubsystem {
         Commands.runOnce(
             () -> {
               clearFaults();
-              io.setAngle(Angle.fromDegrees(10));
+               outputs.motorOutputs.setPosition(Degrees.of(10));
             },
             this),
         Commands.waitSeconds(0.1),
         Commands.runOnce(
             () -> {
-              if (inputs.velocityRadPerSec < Math.PI * 2) {
+              if (inputs.motorInputs.getPosition(Radians) < Math.PI * 2) {
                 addSubsystemFault(
                     "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
               }
@@ -92,13 +92,13 @@ public class Hood extends AdvancedSubsystem {
             this),
         Commands.run(
             () -> {
-              io.setAngle(Angle.fromDegrees(20));
+               outputs.motorOutputs.setPosition(Degrees.of(20));
             },
             this)
             .withTimeout(1.0),
         Commands.runOnce(
             () -> {
-              if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
+              if (inputs.motorInputs.getPosition(Degrees) < 22 || inputs.motorInputs.getPosition(Degrees) > 18) {
                 addSubsystemFault(
                     "HOOD", "[System Check] Hood did not reach target position", false);
               }
@@ -110,7 +110,6 @@ public class Hood extends AdvancedSubsystem {
 
   @Override
   public void periodicAfterScheduler() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'periodicAfterScheduler'");
+    io.applyOutputs(outputs);
   }
 }

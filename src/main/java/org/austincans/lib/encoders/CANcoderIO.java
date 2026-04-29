@@ -39,4 +39,9 @@ public class CANcoderIO implements AbsoluteEncoderIO {
     public CANcoder getEncoder(){
         return encoder;
     }
+
+    @Override
+    public Angle getAbsolutePosition() {
+        return encoder.getAbsolutePosition().getValue();
+    }
 }

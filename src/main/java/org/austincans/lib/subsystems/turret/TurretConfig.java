@@ -6,7 +6,7 @@ import org.austincans.lib.configs.MotorConfigTalon;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class TurretConfig {
-    public static AbsoluteEncoderConfig encoderConfig;
+    public AbsoluteEncoderConfig encoderConfig;
     public MotorConfigSpark motorSparkConfig;
     public MotorConfigTalon motorTalonConfig;
     public SparkFlexConfig sparkFlexConfig;

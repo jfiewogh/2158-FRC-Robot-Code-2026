@@ -16,23 +16,12 @@
 package org.austincans.lib.subsystems.turret;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFX;
-import org.austincans.lib.motors.MotorIO.MotorIOOutputMode;
-import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOTalonFX extends TurretIOReal {
@@ -81,6 +70,6 @@ public class TurretIOTalonFX extends TurretIOReal {
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Turret", motor);
+    subsystem.registerHardware("Turret", motorIO.getMotor());
   }
 }

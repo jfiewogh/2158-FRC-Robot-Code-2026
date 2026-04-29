@@ -15,31 +15,24 @@
 
 package org.austincans.lib.subsystems.pivot;
 
-import java.util.List;
+import static edu.wpi.first.units.Units.Rotations;
 import org.austincans.lib.util.KalmanFilter1D;
-import org.austincans.lib.configs.PivotConfig;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class PivotIOSparkFlexCANcoder extends PivotIOReal<MotorIOSparkFlex, CANcoderIO> {
-  private final SelfCheckingSparkFlex selfCheckingMotor;
-
   @SuppressWarnings("unused")
   private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
 
-  public PivotIOSparkFlexCANcoder(PivotConfig armConfig) {
+  public PivotIOSparkFlexCANcoder(PivotConfig pivotConfig) {
     super(
-      MotorFactory.createSparkFlex(armConfig.motorConfig()), 
-      AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
+      MotorFactory.createSparkFlex(pivotConfig.motorSparkConfig,pivotConfig.sparkFlexConfig), 
+      AbsoluteEncoderFactory.createCANcoder(pivotConfig.absoluteEncoderConfig));
 
-    selfCheckingMotor = new SelfCheckingSparkFlex("Arm", motorIO.getMotor());
-
-    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePositionRotations());
+    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePosition().in(Rotations));
   }
 
   @Override
@@ -48,22 +41,12 @@ public class PivotIOSparkFlexCANcoder extends PivotIOReal<MotorIOSparkFlex, CANc
   }
 
   @Override
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("pivot", motorIO.getMotor());
+  }
+
+  @Override
   public void stop() {
-    motorIO.stop();
-  }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = selfCheckingMotor.checkForFaults();
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(selfCheckingMotor);
+    motorIO.getMotor().set(0);
   }
 }

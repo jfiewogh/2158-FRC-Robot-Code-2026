@@ -15,29 +15,24 @@
 
 package org.austincans.lib.subsystems.pivot;
 
-import java.util.List;
-
-import org.austincans.lib.configs.PivotConfig;
+import static edu.wpi.first.units.Units.Rotations;
+import org.austincans.lib.util.KalmanFilter1D;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFXS;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXS;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
-// TODO: have SelfChecking as generic
 public class PivotIOTalonFXSCANcoder extends PivotIOReal<MotorIOTalonFXS, CANcoderIO> {
-  private SelfCheckingTalonFXS motorSelfCheck;
+  @SuppressWarnings("unused")
+  private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
 
-  public PivotIOTalonFXSCANcoder(PivotConfig armConfig) {
+  public PivotIOTalonFXSCANcoder(PivotConfig pivotConfig) {
     super(
-      MotorFactory.createTalonFXSWithFusedCANcoder(armConfig.motorConfig(), armConfig.absoluteEncoderConfig().deviceId()),
-      AbsoluteEncoderFactory.createCANcoder(armConfig.absoluteEncoderConfig()));
+      MotorFactory.createTalonFXS(pivotConfig.motorTalonConfig,pivotConfig.talonFXSConfig), 
+      AbsoluteEncoderFactory.createCANcoder(pivotConfig.absoluteEncoderConfig));
 
-    motorSelfCheck = new SelfCheckingTalonFXS("Arm Motor", motorIO.getMotor());
-
-    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePositionRotations());
+    motorIO.setEncoderPosition(absoluteEncoderIO.getAbsolutePosition().in(Rotations));
   }
 
   @Override
@@ -46,21 +41,12 @@ public class PivotIOTalonFXSCANcoder extends PivotIOReal<MotorIOTalonFXS, CANcod
   }
 
   @Override
-  public void stop() {
-    setVoltage(0);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("pivot", motorIO.getMotor());
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = motorSelfCheck.checkForFaults();
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
-  }
-
-  public List<SelfChecking> getHardware() {
-    return List.of(motorSelfCheck);
+  public void stop() {
+    motorIO.getMotor().set(0);
   }
 }

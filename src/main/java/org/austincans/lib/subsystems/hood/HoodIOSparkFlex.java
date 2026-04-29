@@ -17,86 +17,36 @@ package org.austincans.lib.subsystems.hood;
 
 
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-
+import static edu.wpi.first.units.Units.Rotations;
 import org.austincans.lib.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.encoders.CANcoderIO;
-import org.austincans.lib.math.Angle;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOSparkFlex implements HoodIO {
   private MotorIOSparkFlex motorIO;
   private RelativeEncoder encoder;
   private CANcoderIO absoluteEncoderIO;
-  private SelfCheckingSparkFlex hoodMotorCheck;
 
   public HoodIOSparkFlex(HoodConfig hoodConfig){
-    motorIO = MotorFactory.createSparkFlex(hoodConfig.motorConfig());
-    hoodMotorCheck = new SelfCheckingSparkFlex("Hood Motor", motorIO.getMotor());
-    absoluteEncoderIO = AbsoluteEncoderFactory.createCANcoder(hoodConfig.encoderConfig());
+    motorIO = MotorFactory.createSparkFlex(hoodConfig.motorConfig, hoodConfig.sparkFlexConfig);
+    absoluteEncoderIO = AbsoluteEncoderFactory.createCANcoder(hoodConfig.encoderConfig);
     encoder = motorIO.getMotor().getEncoder();
-    encoder.setPosition(absoluteEncoderIO.getAbsolutePositionRotations());
-  }
-
-
-
-  @Override
-  public Angle getAngle() {
-    return Angle.fromRadians(Units.rotationsToRadians(encoder.getPosition()));
-  }
-
-  @Override
-  public Rotation2d getAngleRotation2d() {
-    return Rotation2d.fromRadians(Units.rotationsToRadians(encoder.getPosition()));
-  }
-
-  public void setAngle(Angle setpoint) {
-    motorIO.setPosition(setpoint.toRadians());
+    encoder.setPosition(absoluteEncoderIO.getAbsolutePosition().in(Rotations));
   }
 
   public void updateInputs(HoodIOInputs inputs) {
     motorIO.updateInputs(inputs.motorInputs);
   }
 
-  public void setAngleRotation2d(Rotation2d angle) {
-    motorIO.setPosition(angle.getRadians());
+  @Override
+  public void applyOutputs(HoodIOOutputs outputs) {
+    motorIO.applyOutputs(outputs.motorOutputs);;
   }
 
   @Override
-  public boolean atAngle(Angle setpoint) {
-    return getAngle() == setpoint;
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(hoodMotorCheck);
-  }
-
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-
-    List<HardwareFault> deployFault = hoodMotorCheck.checkForFaults();
-    if (deployFault != null) {
-      faults.addAll(deployFault);
-    }
-
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
-  }
-
-  @Override
-  public void setVoltage(double voltage) {
-    motorIO.setVoltage(voltage);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("hood", motorIO.getMotor());
   }
 }

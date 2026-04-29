@@ -16,29 +16,19 @@
 package org.austincans.lib.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-
-import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
 //   @AutoLog
-  class TurretIOInputs {
-    MotorIOInputs motorInputs;
-    AbsoluteEncoderIOInputs encoderInputs;
-  }
-
-  public static enum TurretIOOutputMode {
-    VOLTAGE,
-    ANGLE,
-    VELOCITY
+  public class TurretIOInputs {
+    public MotorIOInputs motorInputs;
+    public AbsoluteEncoderIOInputs encoderInputs;
   }
 
   public class TurretIOOutputs {
-    public TurretIOOutputMode mode = TurretIOOutputMode.ANGLE;
     public MotorIOOutputs motorOutputs;
   }
 

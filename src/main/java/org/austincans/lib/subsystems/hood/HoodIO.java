@@ -14,44 +14,22 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.hood;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.List;
-
-import org.austincans.lib.math.Angle;
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.littletonrobotics.junction.AutoLog;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public interface HoodIO {
-  @AutoLog
   public class HoodIOInputs {
     public MotorIOInputs motorInputs;
-    public double hoodAngleRad; //only for servo
+  }
+
+  public class HoodIOOutputs {
+    public MotorIOOutputs motorOutputs;
   }
 
   public void updateInputs(HoodIOInputs inputs);
 
-  public default void setVelocity(double velocityRadPerSec) {}
+  public void applyOutputs(HoodIOOutputs outputs);
 
-  public void setAngle(Angle angle);
-
-  public void setAngleRotation2d(Rotation2d angle);
-
-  public Angle getAngle();
-
-  public Rotation2d getAngleRotation2d();
-
-  public boolean atAngle(Angle setpoint);
-
-  public void setVoltage(double voltage);
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

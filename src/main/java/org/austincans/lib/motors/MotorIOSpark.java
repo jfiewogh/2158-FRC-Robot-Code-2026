@@ -1,6 +1,7 @@
 package org.austincans.lib.motors;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -46,7 +47,7 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
         inputs.temperatureCelsius = motor.getMotorTemperature();
     }
 
-    public Mtr getMotor(){
+    public Mtr getMotor() {
         return motor;
     }
 
@@ -54,8 +55,8 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     public void applyOutputs(MotorIOOutputs outputs) {
         switch (outputs.mode) {
             case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocity, outputs.velocityMode);
-            case POSITION -> setPosition(outputs.position, outputs.positionMode);
+            case VELOCITY -> setVelocity(outputs.velocity);
+            case POSITION -> setPosition(outputs.position);
         }
     }
 
@@ -63,15 +64,15 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
         controller.setSetpoint(voltage.baseUnitMagnitude(), ControlType.kVoltage);
     }
 
-    private void setVelocity(AngularVelocity velocity, AngularVelocityUnit mode) {
+    private void setVelocity(AngularVelocity velocity) {
         controller.setSetpoint(
-            velocity.in(mode), 
+            velocity.in(RPM), 
             ControlType.kMAXMotionVelocityControl);
     }
 
-    private void setPosition(Angle position, AngleUnit mode) {
+    private void setPosition(Angle position) {
         controller.setSetpoint(
-            position.in(mode), ControlType.kMAXMotionVelocityControl);
+            position.in(Rotations), ControlType.kMAXMotionVelocityControl);
     }
 
     public void setEncoderPosition(double positionRotations) {

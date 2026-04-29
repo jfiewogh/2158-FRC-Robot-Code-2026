@@ -18,33 +18,28 @@ package org.austincans.lib.subsystems.pivot;
 import java.util.List;
 import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.littletonrobotics.junction.AutoLog;
 
 /** PivotIO */
 public interface PivotIO {
-  @AutoLog
   public class PivotIOInputs {
     public MotorIOInputs motorInputs;
     public AbsoluteEncoderIOInputs absoluteEncoderInputs;
   }
 
+  public class PivotIOOutputs {
+    public MotorIOOutputs motorOutputs;
+  }
+
   public void updateInputs(PivotIOInputs inputs);
 
-  public void setVoltage(double voltage);
+  public void applyOutputs(PivotIOOutputs outputs);
 
-  public void setPosition(double positionRad);
-
-  public void setVelocity(double velocityRadPerSec);
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 
   public void stop();
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
-  }
-
-  public default List<SelfChecking> getHardware() {
-    return List.of();
-  }
 }

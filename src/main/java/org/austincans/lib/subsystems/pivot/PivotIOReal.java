@@ -16,20 +16,9 @@ public abstract class PivotIOReal<T extends MotorIOReal, U extends AbsoluteEncod
     public void updateInputs(PivotIOInputs inputs) {
         motorIO.updateInputs(inputs.motorInputs);
         absoluteEncoderIO.updateInputs(inputs.absoluteEncoderInputs);
-    }    
-
-    @Override
-    public void setVoltage(double voltage) {
-        motorIO.setVoltage(voltage);
     }
-
-    @Override
-    public void setPosition(double positionRad) {
-        motorIO.setPosition(positionRad);
-    }
-
-    @Override
-    public void setVelocity(double velocityRadPerSec) {
-        motorIO.setVelocity(velocityRadPerSec);
+    
+    public void applyOutputs(PivotIOOutputs outputs){
+        motorIO.applyOutputs(outputs.motorOutputs);
     }
 }

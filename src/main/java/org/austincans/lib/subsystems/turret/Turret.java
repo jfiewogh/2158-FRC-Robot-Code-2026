@@ -20,14 +20,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.turret.TurretIO.TurretIOInputs;
-import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputMode;
 import org.austincans.lib.subsystems.turret.TurretIO.TurretIOOutputs;
 import org.austincans.lib.subsystems.vision.LimelightHelpers;
 import org.littletonrobotics.junction.Logger;
@@ -46,7 +46,7 @@ public class Turret extends AdvancedSubsystem {
 
   public void updateLimelightRobotSpace() {
     Rotation2d ccwPositiveRobotRelYaw =
-        Rotation2d.fromRadians(inputs.motorInputs.)
+        Rotation2d.fromRadians(inputs.motorInputs.getPosition(Radians))
             .unaryMinus()
             .plus(TurretConstants.robotRelTurretRotationOffset);
 
@@ -69,11 +69,11 @@ public class Turret extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Turret", inputs);
+    // Logger.processInputs("Turret", inputs);
 
-    Logger.recordOutput("Turret/Outputs/VelocityRadPerSec", outputs.motorOutputs.getVeolcity());
-    Logger.recordOutput("Turret/Outputs/Voltage", outputs.motorOutputs.);
-    Logger.recordOutput("Turret/Outputs/Angle", outputs.angle);
+    Logger.recordOutput("Turret/Outputs/VelocityRadPerSec", outputs.motorOutputs.getVelocity(RadiansPerSecond));
+    Logger.recordOutput("Turret/Outputs/Voltage", outputs.motorOutputs.voltage.in(Volts));
+    Logger.recordOutput("Turret/Outputs/Angle", outputs.motorOutputs.getPosition(Radians));
 
     updateLimelightRobotSpace();
   }
@@ -84,13 +84,11 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public void setVoltage(double voltage) {
-    outputs.mode = TurretIOOutputMode.VOLTAGE;
-    outputs.motorOutputs.voltage = Volt.of(voltage);
+    outputs.motorOutputs.setVoltage(Volts.of(voltage));
   }
 
   public void setVelocity(double velocityRadPerSec) {
-    outputs.mode = TurretIOOutputMode.VELOCITY;
-    outputs.motorOutputs.velocity = RadiansPerSecond.of(velocityRadPerSec);
+    outputs.motorOutputs.setVelocity(RadiansPerSecond.of(velocityRadPerSec));
   }
 
   public void stop() {
@@ -99,8 +97,7 @@ public class Turret extends AdvancedSubsystem {
 
   /** Relative to turret's zero */
   public void setDesiredAngle(Rotation2d turretRelAngle) {
-    outputs.mode = TurretIOOutputMode.ANGLE;
-    outputs.motorOutputs.position = Radians.of(turretRelAngle.unaryMinus().getRadians());
+    outputs.motorOutputs.setPosition(Radians.of(turretRelAngle.unaryMinus().getRadians()));
   }
 
   /** Relative to robot's zero */
@@ -122,11 +119,11 @@ public class Turret extends AdvancedSubsystem {
   }
 
   public Rotation2d getAngle() {
-    return Rotation2d.fromRadians(inputs.motorInputs.);
+    return Rotation2d.fromRadians(inputs.motorInputs.getPosition(Radians));
   }
 
   public boolean atSetpoint() {
-    return Math.abs(inputs.positionRad - outputs.angle.getRadians())
+    return Math.abs(inputs.motorInputs.getPosition(Radians) - outputs.motorOutputs.getPosition(Radians))
         < TurretConstants.atSetpointThresholdRad;
   }
 
@@ -144,7 +141,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(1.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.encoderVelocityRadPerSec < Units.degreesToRadians(5)) {
+                  if (inputs.motorInputs.getVelocity(DegreesPerSecond) < 5) {
                     addSubsystemFault(
                         "TRRT",
                         "[System Check] Turret absolute encoder velocity measured too slow",
@@ -157,8 +154,8 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (inputs.positionRad < Units.degreesToRadians(-25)
-                      || inputs.positionRad > Units.degreesToRadians(-15)) {
+                  if (inputs.motorInputs.getPosition(Degrees) < -25
+                      || inputs.motorInputs.getPosition(Degrees) > -15) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }
@@ -168,7 +165,7 @@ public class Turret extends AdvancedSubsystem {
             Commands.waitSeconds(2.0),
             Commands.runOnce(
                 () -> {
-                  if (Math.abs(inputs.positionRad) > Units.degreesToRadians(5)) {
+                  if (Math.abs(inputs.motorInputs.getPosition(Degrees)) > 5) {
                     addSubsystemFault(
                         "TRRT", "[System Check] Turret did not reach desired angle", false);
                   }

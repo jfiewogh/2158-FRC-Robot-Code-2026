@@ -18,7 +18,6 @@ package org.austincans.lib.subsystems.flywheel;
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.AutoLog;
 
 public interface FlywheelIO {
   public class FlywheelIOInputs {

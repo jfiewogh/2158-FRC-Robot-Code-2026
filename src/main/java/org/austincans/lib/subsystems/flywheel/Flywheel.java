@@ -14,15 +14,13 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.flywheel;
-
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.frc2026.Robot;
@@ -54,10 +52,10 @@ public class Flywheel extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Flywheel", inputs);
+    // Logger.processInputs("Flywheel", inputs);
 
-    double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(inputs.motorInputs.getVelocity());
-    double setpointRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(outputs.motorOutputs.getVeolcity());
+    double velocityRadPerSec = inputs.motorInputs.getVelocity(RadiansPerSecond);
+    double setpointRadPerSec = outputs.motorOutputs.getVelocity(RadiansPerSecond);
     atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadPerSec, 2.0);
     Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
     Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
@@ -87,7 +85,7 @@ public class Flywheel extends AdvancedSubsystem {
   public boolean atSetpoint() {
     boolean a =
         outputs.motorOutputs.mode == MotorIOOutputMode.VELOCITY
-            && Math.abs(getRPM() - outputs.motorOutputs.getVeolcity()) < outputs.motorOutputs.getVeolcity() * 0.1;
+            && Math.abs(getRPM() - outputs.motorOutputs.getVelocity(RPM)) < outputs.motorOutputs.getVelocity(RPM) * 0.1;
     Logger.recordOutput("flywheel at setpoint", a);
     return a;
   }
