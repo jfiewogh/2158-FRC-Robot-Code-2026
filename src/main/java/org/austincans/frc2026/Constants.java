@@ -68,7 +68,7 @@ public final class Constants {
     KEYBOARD
   }
 
-  public static final ControlMode controlMode = ControlMode.KEYBOARD;
+  public static final ControlMode controlMode = ControlMode.JOYSTICK;
 
   public static final double loopPeriodSecs = 0.02;
   private static RobotType robotType = RobotBase.isReal() ? RobotType.COMPBOT : RobotType.SIMBOT;
