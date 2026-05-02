@@ -20,26 +20,19 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import java.util.ArrayList;
-import java.util.List;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 
 public class ElevatorIOSpark implements ElevatorIO {
   private final boolean brakeMode = true;
 
   private final MotorIOSparkFlex motorIO;
-  private final SelfCheckingSparkFlex motorSelfCheck;
   private final RelativeEncoder encoder;
   private SparkFlexConfig config;
 
   public ElevatorIOSpark(ElevatorConfig elevatorConfig) {
-    motorIO = MotorFactory.createSparkFlex(elevatorConfig.motorConfig);
-    motorSelfCheck = new SelfCheckingSparkFlex("Elevator Motor", motorIO.getMotor());
+    motorIO = MotorFactory.createSparkFlex(elevatorConfig.motorConfigSpark,elevatorConfig.sparkFlexConfig);
     config = new SparkFlexConfig();
     config.idleMode(brakeMode ? IdleMode.kBrake : IdleMode.kCoast);
 
@@ -60,11 +53,6 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public void runVoltage(double voltage) {
-    motorIO.setVoltage(voltage);
-  }
-
-  @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.heightMeters = encoder.getPosition();
     inputs.velocityMetersPerSec = encoder.getVelocity();
@@ -72,28 +60,13 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
+  public void applyOutputs(ElevatorIOOutputs outputs) {
+    motorIO.applyOutputs(outputs.motorOutputs);
+  }
+
+  @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-
+    subsystem.registerHardware("Flywheel", motorIO.getMotor());
   }
 
-  @Override
-  public List<HardwareFault> checkForFaults() {
-    List<HardwareFault> faults = new ArrayList<>();
-
-    List<HardwareFault> motorFaults = motorSelfCheck.checkForFaults();
-    if (motorFaults != null) {
-      faults.addAll(motorFaults);
-    }
-
-    if (faults.isEmpty()) {
-      return List.of();
-    } else {
-      return faults;
-    }
-  }
-
-  @Override
-  public List<SelfChecking> getHardware() {
-    return List.of(motorSelfCheck);
-  }
 }

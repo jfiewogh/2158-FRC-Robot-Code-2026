@@ -20,13 +20,19 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import static edu.wpi.first.units.Units.Volts;
+
 import org.austincans.lib.subsystems.elevator.ElevatorConfig.ElevatorState;
+import org.austincans.lib.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
+import org.austincans.lib.subsystems.elevator.ElevatorIO.ElevatorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends AdvancedSubsystem {
   private final ElevatorIO io;
-  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+  private final ElevatorIOInputs inputs = new ElevatorIOInputs();
+  private final ElevatorIOOutputs outputs = new ElevatorIOOutputs();
 
   private final ProfiledPIDController elevatorPID =
       new ProfiledPIDController(
@@ -47,11 +53,6 @@ public class Elevator extends AdvancedSubsystem {
 
   public Elevator(ElevatorIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> {
-          if (e != null) {
-            registerHardware(e);
-          }
-        });
     registerCheckCommand(systemCheckCommand());
     elevatorPID.setTolerance(ElevatorConfig.pidTolerance);
   }
@@ -59,12 +60,12 @@ public class Elevator extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Elevator/Inputs", inputs);
+    // Logger.processInputs("Elevator/Inputs", inputs);
 
-    double feedbackOutput = elevatorPID.calculate(getHeight()) * Constants.maxVoltage;
+    double feedbackOutput = elevatorPID.calculate(getHeight()) * ElevatorConfig.maxVoltage;
     double feedforwardOutput = feedforward.calculate(elevatorPID.getSetpoint().velocity);
     double output = Math.max(feedbackOutput + feedforwardOutput, ElevatorConfig.minVoltage);
-    io.runVoltage(output);
+    outputs.motorOutputs.setVoltage(Volts.of(output));
   }
 
   /**
@@ -99,13 +100,11 @@ public class Elevator extends AdvancedSubsystem {
 
   public Command moveAtVelocityCommand(double velocity) {
     return Commands.runOnce(
-        () ->
-            io.runVoltage(
-                velocity / ElevatorConfig.maxVelocityMetersPerSec * Constants.maxVoltage));
+        () -> outputs.motorOutputs.setVoltage(Volts.of(velocity / ElevatorConfig.maxVelocityMetersPerSec * ElevatorConfig.maxVoltage)));
   }
 
   public Command stopCommand() {
-    return Commands.runOnce(() -> io.runVoltage(0));
+    return Commands.runOnce(() -> outputs.motorOutputs.setVoltage(Volts.of(0)));
   }
 
   @Override
@@ -114,7 +113,7 @@ public class Elevator extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   clearFaults();
-                  io.runVoltage(0);
+                  outputs.motorOutputs.setVoltage(Volts.of(0));
                   setPosition(0.5);
                 },
                 this),
@@ -162,5 +161,10 @@ public class Elevator extends AdvancedSubsystem {
                 this),
             Commands.waitSeconds(0.25))
         .andThen(Commands.runOnce(this::stopCommand, this));
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
   }
 }

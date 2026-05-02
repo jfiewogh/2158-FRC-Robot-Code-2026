@@ -1,9 +1,12 @@
 package org.austincans.lib.subsystems.elevator;
 
-import org.austincans.lib.configs.MotorConfig;
+import org.austincans.lib.configs.MotorConfigSpark;
+
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class ElevatorConfig {
-    public MotorConfig motorConfig;
+    public MotorConfigSpark motorConfigSpark;
+    public SparkFlexConfig sparkFlexConfig;
     public static final double maxVelocityMetersPerSec = 3;
     public static final double maxAccelerationMetersPerSecSq = 3;
 
@@ -16,6 +19,7 @@ public class ElevatorConfig {
     public static final double drumRadius = 0.0254;
 
     public static final double minVoltage = -7;
+    public static final double maxVoltage = 12;
 
     public static final double pidTolerance = 0.05;
 
