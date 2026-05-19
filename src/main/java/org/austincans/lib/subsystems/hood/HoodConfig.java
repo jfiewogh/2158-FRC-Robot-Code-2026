@@ -9,10 +9,10 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class HoodConfig{
-    public MotorConfigSpark motorConfig;
+    public SparkConfig motorConfig;
     public SparkFlexConfig sparkFlexConfig;
     public AbsoluteEncoderConfig encoderConfig;
-    public MotorConfigTalon motorConfigTalon;
+    public TalonConfig motorConfigTalon;
     public TalonFXConfiguration talonConfig;
     public TalonFXSConfiguration talonFXSConfig;
     public int ServoLinearId;

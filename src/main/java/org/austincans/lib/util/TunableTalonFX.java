@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026.util;
+package org.austincans.lib.util;
 
 // Copyright 2021-2024 FRC 6328
 // http://github.com/Mechanical-Advantage

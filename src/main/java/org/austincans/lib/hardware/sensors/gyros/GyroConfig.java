@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.sensors.gyros;
 
 public abstract class GyroConfig {
     public int deviceId;

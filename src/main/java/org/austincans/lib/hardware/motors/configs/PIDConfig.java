@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.motors.configs;
 
 public record PIDConfig(
     double kP,

@@ -1,4 +1,4 @@
-package org.austincans.lib;
+package org.austincans.lib.util;
 
 import java.io.File;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +21,7 @@ public class ConfigManager<T> {
         try {
             config = mapper.readValue(configFile, type);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to read config", e);
         }
     }
 

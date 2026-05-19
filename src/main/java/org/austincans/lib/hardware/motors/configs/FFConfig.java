@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.motors.configs;
 
 /** Feedforward Config */
 public record FFConfig(

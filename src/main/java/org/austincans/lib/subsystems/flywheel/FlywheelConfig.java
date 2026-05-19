@@ -8,8 +8,8 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class FlywheelConfig {
-    public MotorConfigSpark motorSparkConfig;
-    public MotorConfigTalon motorTalonConfig;
+    public SparkConfig motorSparkConfig;
+    public TalonConfig motorTalonConfig;
     public SparkFlexConfig sparkFlexConfig;
     public TalonFXConfiguration talonFXConfig;
     public TalonFXSConfiguration talonFXSConfig;

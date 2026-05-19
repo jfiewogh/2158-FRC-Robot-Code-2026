@@ -8,7 +8,7 @@ import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.sensors.encoders.CANcoderIO;
 
 public class ModuleIOTalonFXCANcoder extends ModuleIOBase<TalonFXIO, TalonFXIO, CANcoderIO> {
-    public ModuleIOTalonFXCANcoder(SwerveModuleConfig<MotorConfigTalon, MotorConfigTalon> moduleConfig) {
+    public ModuleIOTalonFXCANcoder(SwerveModuleConfig<TalonConfig, TalonConfig> moduleConfig) {
         super(
             MotorFactory.createTalonFX(moduleConfig.driveMotorConfig),
             MotorFactory.createTalonFX(moduleConfig.steerMotorConfig),

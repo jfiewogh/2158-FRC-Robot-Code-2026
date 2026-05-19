@@ -74,11 +74,11 @@ public class RobotState {
     return instance;
   }
 
-  private RobotState() {
+  public RobotState(Translation2d... moduleTranslations) {
     for (int i = 0; i < 3; ++i) {
       qStdDevs.set(i, 0, Math.pow(odometryStateStdDevs.get(i, 0), 2));
     }
-    kinematics = new SwerveDriveKinematics(SwerveDriveStateConstants.moduleTranslations);
+    kinematics = new SwerveDriveKinematics(moduleTranslations);
   }
 
   // MARK: - Drive & vision methods

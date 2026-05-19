@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.sensors.gyros;
 
 public class GyroConfigPigeon2 extends GyroConfig {
     public String canbus;

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,44 +12,35 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/Deadband.java
 package org.austincans.lib.util;
-========
-package org.austincans.frc2026.input;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/input/DriverMapper.java
 
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-public interface DriverMapper {
-  public double getTranslationX();
-
-  public double getTranslationY();
-
-  public double getRotationX();
-
-  public double getRotationY();
-
-  public Trigger getShootButton();
-
-  public Trigger getRollerToggleButton();
-
-  public Trigger getTurnModeToggleButton();
-
-  /* Just for real/comp */
-  public default Trigger getDeployButton() {
-    return new Trigger(() -> false);
+/*
+ * @author Austin Cans Robotics Team 2158
+ */
+public class Deadband {
+  public static double applyLowHigh(
+      double input, double lowPass, double highPass, double defaultValue) {
+    if (inDeadbandLowHigh(input, lowPass, highPass)) {
+      return defaultValue;
+    }
+    return input;
   }
 
-  public default Trigger getRetractButton() {
-    return new Trigger(() -> false);
+  public static boolean inDeadband(double input, double window) {
+    return inDeadbandLowHigh(input, -window, window);
   }
 
-  public default Trigger getZeroPoseButton() {
-    return new Trigger(() -> false);
+  public static boolean inDeadbandLowHigh(double input, double lowPass, double highPass) {
+    return input < highPass && input > lowPass;
   }
 
-  public default Trigger getStopWithXButton() {
-    return new Trigger(() -> false);
+  public static double apply(double input, double window) {
+    if (inDeadband(input, window)) {
+      return 0;
+    }
+    return input;
   }
 }

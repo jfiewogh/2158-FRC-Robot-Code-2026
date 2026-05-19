@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,16 +12,20 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/config/ConfigDefaults.java
 package org.austincans.lib.config;
-========
-package org.austincans.frc2026.controllers;
->>>>>>>> develop:src/main/java/org/austincans/lib/controllers/ControllerConstants.java
 
-public class ControllerConstants {
-  public static final int linearActuatorPort = 0;
-  public static final int linearActuatorMax = 1800;
-  public static final int linearActuatorMid = 1500;
-  public static final int linearActuatorMin = 1000;
+final class ConfigDefaults {
+
+  private ConfigDefaults() {}
+
+  static final String PATH = "";
+
+  static final String RESOURCE = "";
+
+  static final boolean AUTO_SAVE = false;
+
+  static final boolean SAVE_DEFAULT_RESOURCE = true;
 }

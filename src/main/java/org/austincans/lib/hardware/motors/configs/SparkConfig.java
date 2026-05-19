@@ -1,6 +1,6 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.motors.configs;
 
-public class MotorConfigSpark extends MotorConfig {
+public class SparkConfig extends MotorConfig {
    public double allowedClosedLoopErrorRad; // after gearing
    public boolean isBrushless;
    public int smartCurrentStallLimitAmps;

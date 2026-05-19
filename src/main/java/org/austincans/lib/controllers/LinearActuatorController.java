@@ -24,14 +24,14 @@ public class LinearActuatorController extends SubsystemBase {
   private double speed = 0; // PWM in ms
 
   // L16-100-35-6-R
-  public LinearActuatorController(int linearActuatorDeviceID) {
+  public LinearActuatorController(int linearActuatorDeviceID, int max, int mid, int min) {
     linearActuator = new Servo(linearActuatorDeviceID);
     linearActuator.setBoundsMicroseconds(
-        ControllerConstants.linearActuatorMax,
+        max,
         1550,
-        ControllerConstants.linearActuatorMid,
+        mid,
         1450,
-        ControllerConstants.linearActuatorMin);
+        min);
   }
 
   public void setSpeed(double speed) {

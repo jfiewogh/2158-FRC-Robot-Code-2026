@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.motors.configs;
 
 /**
  * Values as recorded in REV client or Phoenix Tuner X. 

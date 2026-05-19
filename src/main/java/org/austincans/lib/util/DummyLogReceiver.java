@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,35 +12,24 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/DummyLogReceiver.java
 package org.austincans.lib.util;
-========
-package org.austincans.frc2026.subsystems.feeder;
 
-import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.wpilibj.Threads;
+import org.littletonrobotics.junction.LogDataReceiver;
+import org.littletonrobotics.junction.LogTable;
 
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-
-public class SpindexerIOSparkFlex implements SpindexerIO {
-  private final SparkFlex motor = new SparkFlex(FeederConstants.spindexerId, MotorType.kBrushless);
-
-  public SpindexerIOSparkFlex() {}
-
+/** Dummy log receiver used to adjust the thread priority of the log receiver thread. */
+public class DummyLogReceiver implements LogDataReceiver {
   @Override
-  public void updateInputs(SpindexerIOInputs inputs) {
-    inputs.voltage = Volts.of(motor.getBusVoltage());
+  public void start() {
+    // DO NOT COPY UNLESS YOU UNDERSTAND THE CONSEQUENCES
+    // https://docs.advantagekit.org/getting-started/template-projects/spark-swerve-template#real-time-thread-priority
+    Threads.setCurrentThreadPriority(true, 1);
   }
 
   @Override
-  public void applyOutputs(SpindexerIOOutputs outputs) {
-    motor.setVoltage(outputs.voltage.in(Volts));
-  }
-
-  @Override
-  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Spindexer", motor);
-  }
+  public void putTable(LogTable table) throws InterruptedException {}
 }

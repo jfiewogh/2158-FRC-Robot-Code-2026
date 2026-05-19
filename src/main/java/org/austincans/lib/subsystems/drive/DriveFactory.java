@@ -2,7 +2,6 @@ package org.austincans.lib.subsystems.drive;
 
 import java.io.IOException;
 
-import org.austincans.lib.ConfigManager;
 import org.austincans.lib.configs.DriveConfig;
 import org.austincans.lib.configs.DriveConfigDifferential;
 import org.austincans.lib.configs.DriveConfigSwerve;
@@ -14,6 +13,7 @@ import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.SparkMaxIO;
 import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.sensors.gyros.GyroFactory;
+import org.austincans.lib.util.ConfigManager;
 
 import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;

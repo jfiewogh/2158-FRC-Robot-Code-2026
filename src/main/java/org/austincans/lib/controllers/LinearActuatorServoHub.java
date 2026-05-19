@@ -20,15 +20,9 @@ package org.austincans.lib.controllers;
 // import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class LinearActuatorServoHub {
-<<<<<<< HEAD:src/main/java/org/austincans/lib/controllers/LinearActuatorServoHub.java
-  private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
-  private ServoHub hub = ServoHubController.hub;
-  private ServoChannel linearActuator;
-=======
   //   private InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
   //   private ServoHub hub = ServoHubController.getInstance().hub;
   //   private ServoChannel linearActuator;
->>>>>>> develop:src/main/java/org/austincans/frc2026/controllers/LinearActuatorServoHub.java
 
   //   // L16-100-35-6-R
   //   public LinearActuatorServoHub(int linearActuatorDeviceID) {

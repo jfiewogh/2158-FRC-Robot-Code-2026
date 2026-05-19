@@ -7,7 +7,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class TurretConfig {
     public AbsoluteEncoderConfig encoderConfig;
-    public MotorConfigSpark motorSparkConfig;
-    public MotorConfigTalon motorTalonConfig;
+    public SparkConfig motorSparkConfig;
+    public TalonConfig motorTalonConfig;
     public SparkFlexConfig sparkFlexConfig;
 }

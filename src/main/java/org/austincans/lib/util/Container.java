@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,19 +12,23 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/Container.java
 package org.austincans.lib.util;
-========
-package org.austincans.frc2026.subsystems.drive;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/drive/GyroIOFake.java
 
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+/**
+ * Stores mutable a value
+ *
+ * @author Austin Cans Robotics Team 2158
+ */
+public class Container<T> {
 
-public class GyroIOFake implements GyroIO {
-  @Override
-  public void updateInputs(GyroIOInputs inputs) {}
+  /** The value being stored */
+  public T value;
 
-  @Override
-  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
+  /** Create new container with initial value. */
+  public Container(T value) {
+    this.value = value;
+  }
 }

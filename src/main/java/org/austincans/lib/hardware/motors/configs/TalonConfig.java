@@ -1,6 +1,6 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.hardware.motors.configs;
 
-public class MotorConfigTalon extends MotorConfig {
+public class TalonConfig extends MotorConfig {
     public String canbus;
     public double statorCurrentLimitAmps;
     public double supplyCurrentLimitAmps;

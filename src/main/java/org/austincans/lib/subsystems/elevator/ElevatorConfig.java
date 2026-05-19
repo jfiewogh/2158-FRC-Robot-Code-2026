@@ -5,7 +5,7 @@ import org.austincans.lib.configs.MotorConfigSpark;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class ElevatorConfig {
-    public MotorConfigSpark motorConfigSpark;
+    public SparkConfig motorConfigSpark;
     public SparkFlexConfig sparkFlexConfig;
     public static final double maxVelocityMetersPerSec = 3;
     public static final double maxAccelerationMetersPerSecSq = 3;

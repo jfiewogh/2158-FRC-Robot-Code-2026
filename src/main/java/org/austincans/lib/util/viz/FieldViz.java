@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,43 +12,33 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/util/viz/FieldViz.java
 package org.austincans.lib.util.viz;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.austincans.lib.util.ScoringLocation;
-========
-package org.austincans.frc2026.superstructure;
 
-import static edu.wpi.first.units.Units.RPM;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/FlywheelWrapper.java
+/** Visualization for the whole field */
+public class FieldViz implements Drawable {
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Optional;
-import org.austincans.frc2026.subsystems.flywheel.Flywheel;
-
-public class FlywheelWrapper extends SubsystemWrapper<Flywheel> {
-  public FlywheelWrapper(Optional<Flywheel> subsystem) {
-    super(subsystem);
+  /** Put coral on the reef */
+  public void scoreCoral(
+      Alliance alliance, ScoringLocation.CoralLocation branch, ScoringLocation.Height height) {
+    //
   }
 
-  public Command runCommand(double velocityRPM) {
-    return subsystem
-        .map((s) -> Commands.runOnce(() -> s.setVelocity(RPM.of(velocityRPM)), s))
-        .orElse(Commands.none());
+  /** Put algae in the barge */
+  public void scoreAlgaeInBarge(Alliance alliance, double yPos) {
+    //
   }
 
-  public boolean atSetpoint() {
-    return subsystem.map((s) -> s.atSetpoint()).orElse(true);
+  /** Put algae in the processor */
+  public void scoreAlgaeInProcessor(Alliance alliance, double yPos) {
+    //
   }
 
-  public void setVelocity(double velocityRPM) {
-    subsystem.ifPresent((s) -> s.setVelocity(RPM.of(velocityRPM)));
-  }
-
-  public void stop() {
-    subsystem.ifPresent((s) -> s.stop());
-  }
+  @Override
+  public void drawImpl() {}
 }

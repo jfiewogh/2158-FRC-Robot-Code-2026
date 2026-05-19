@@ -16,10 +16,6 @@
 package org.austincans.lib.controllers;
 
 import edu.wpi.first.wpilibj.Servo;
-<<<<<<< HEAD:src/main/java/org/austincans/lib/controllers/ServoController.java
-import org.austincans.lib.util.ConfigUtil;
-=======
->>>>>>> develop:src/main/java/org/austincans/frc2026/controllers/ServoController.java
 
 // This class is used to control the servo that is used to rotate the color pie
 // The servo is mounted on the robot and is used to rotate the color pie

@@ -17,8 +17,8 @@ package org.austincans.lib.util;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import java.nio.file.FileSystems;
-import org.austincans.frc2026.config.Configuration;
-import org.austincans.frc2026.config.ConfigurationLoader;
+import org.austincans.lib.config.Configuration;
+import org.austincans.lib.config.ConfigurationLoader;
 
 /*
  * This class is used to load the configuration from the config.yml file. The configuration

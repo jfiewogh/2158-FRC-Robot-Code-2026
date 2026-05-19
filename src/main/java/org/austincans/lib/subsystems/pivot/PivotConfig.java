@@ -6,8 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class PivotConfig {
-    public MotorConfigSpark motorSparkConfig;
-    public MotorConfigTalon motorTalonConfig;
+    public SparkConfig motorSparkConfig;
+    public TalonConfig motorTalonConfig;
     public SparkFlexConfig sparkFlexConfig;
     public TalonFXSConfiguration talonFXSConfig;
     public AbsoluteEncoderConfig absoluteEncoderConfig;

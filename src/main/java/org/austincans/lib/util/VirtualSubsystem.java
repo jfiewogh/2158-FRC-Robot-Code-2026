@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/main/java/org/austincans/lib/util/VirtualSubsystem.java
 // Copyright (c) 2026 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
@@ -15,9 +14,6 @@
 // at the root directory of this project.
 
 package org.austincans.lib.util;
-=======
-package org.austincans.frc2026.util;
->>>>>>> develop:src/main/java/org/austincans/frc2026/util/VirtualSubsystem.java
 
 import java.util.ArrayList;
 import java.util.List;

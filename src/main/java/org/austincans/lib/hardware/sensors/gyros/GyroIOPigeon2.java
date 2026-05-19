@@ -24,7 +24,6 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
-import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.util.PhoenixUtil;
 
