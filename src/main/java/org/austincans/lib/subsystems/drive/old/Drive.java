@@ -72,7 +72,7 @@ import org.austincans.frc2026.RobotState.OdometryObservation;
 import org.austincans.frc2026.RobotState.VisionObservation;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.lib.configs.DriveConfig;
-import org.austincans.lib.subsystems.drive.GyroIO;
+import org.austincans.lib.sensors.gyros.GyroIO;
 import org.austincans.lib.subsystems.drive.old.DriveIO;
 import org.austincans.lib.subsystems.drive.old.Module;
 import org.austincans.lib.subsystems.drive.old.ModuleIO;

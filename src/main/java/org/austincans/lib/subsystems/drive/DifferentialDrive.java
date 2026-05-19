@@ -7,6 +7,7 @@ import org.austincans.lib.Constants;
 import org.austincans.lib.configs.DifferentialDriveConfig;
 import org.austincans.lib.configs.MotorConfig;
 import org.austincans.lib.configs.WheelConfig;
+import org.austincans.lib.sensors.gyros.GyroIO;
 import org.austincans.lib.util.LocalADStarAK;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;

@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.sensors.gyros;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.math.geometry.Rotation2d;

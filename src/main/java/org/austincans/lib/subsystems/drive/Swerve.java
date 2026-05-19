@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import org.austincans.lib.Constants;
 import org.austincans.lib.configs.SwerveConfig;
 import org.austincans.lib.configs.SwerveModuleConfig;
+import org.austincans.lib.sensors.gyros.GyroIO;
 import org.austincans.lib.configs.GyroConfig;
 import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.configs.MotorConfig;

@@ -13,6 +13,7 @@ import org.austincans.lib.configs.SwerveConfig;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkMax;
 import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.sensors.gyros.GyroFactory;
 
 import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
