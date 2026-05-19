@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l1x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x;
 
 class Calculations {
 

@@ -21,19 +21,20 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Hardw
         private Current statorCurrent;
         private Temperature temperature;
 
-        protected void setPosition(Angle position) {
+        /* Setter methods should only be called by IO */
+        void setPosition(Angle position) {
             this.position = position;
         }
-        protected void setVelocity(AngularVelocity velocity) {
+        void setVelocity(AngularVelocity velocity) {
             this.velocity = velocity;
         }
-        protected void setVoltage(Voltage voltage) {
+        void setVoltage(Voltage voltage) {
             this.voltage = voltage;
         }
-        protected void setStatorCurrent(Current statorCurrent) {
+        void setStatorCurrent(Current statorCurrent) {
             this.statorCurrent = statorCurrent;
         }
-        protected void setTemperature(Temperature temperature) {
+        void setTemperature(Temperature temperature) {
             this.temperature = temperature;
         }
 
@@ -93,19 +94,20 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Hardw
             this.neutralMode = neutralMode;
         }
 
-        protected MotorIOOutputMode getMode() {
+        /* Getter methods should only be called by IO */
+        MotorIOOutputMode getMode() {
             return mode;
         }
-        protected Voltage getVoltage() {
+        Voltage getVoltage() {
             return voltage;
         }
-        protected AngularVelocity getVelocity() {
+        AngularVelocity getVelocity() {
             return velocity;
         }
-        protected Angle getPosition() {
+        Angle getPosition() {
             return position;
         }
-        protected NeutralMode getNeutralMode() {
+        NeutralMode getNeutralMode() {
             return neutralMode;
         }
     }

@@ -13,17 +13,17 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l1x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Register;
-import org.austincans.lib.sensors.lidar.impl.errors.IncorrectModelId;
-import org.austincans.lib.sensors.lidar.impl.errors.Timeout;
-import org.austincans.lib.sensors.lidar.util.SleepEasy;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.impl.errors.IncorrectModelId;
+import org.austincans.lib.hardware.sensors.lidar.impl.errors.Timeout;
+import org.austincans.lib.hardware.sensors.lidar.util.SleepEasy;
 
 /** Companion class for initializing {@link Vl53l1xI2c}. */
 class Vl53l1xInit {

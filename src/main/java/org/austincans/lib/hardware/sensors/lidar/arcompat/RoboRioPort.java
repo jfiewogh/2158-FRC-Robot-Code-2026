@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,20 +12,26 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/Port.java
-package org.austincans.lib.lidar.arcompat;
-========
-package org.austincans.lib.sensors.lidar.arcompat;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/energy/CurrentLimits.java
+package org.austincans.lib.hardware.sensors.lidar.arcompat;
 
-public class CurrentLimits {
-  public static final double driveLimitAmps = 30;
-  public static final double turnLimitAmps = 25;
-  public static final double hopperLimitAmps = 30;
-  public static final double kickerLimitAmps = 30;
-  public static final double flywheelLimitAmps = 60;
-  public static final double hoodLimitAmps = 12;
-  public static final double slamLimitAmps = 20;
-  public static final double intakeLimitAmps = 70;
+/** Ports available on the RoboRIO board. */
+public enum RoboRioPort implements Port {
+  /** The I2C port on the RoboRIO's board. */
+  ONBOARD(0),
+  /** The I2C port on the MXP output. */
+  MXP(1);
+
+  private final int port;
+
+  RoboRioPort(int port) {
+    this.port = port;
+  }
+
+  @Override
+  public int value() {
+    return port;
+  }
 }

@@ -13,34 +13,34 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl6180x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl6180x;
 
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Calculations.constrain;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.I2C_SLAVE__DEVICE_ADDRESS;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.IDENTIFICATION__MODEL_ID;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.INTERLEAVED_MODE__ENABLE;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.RANGE_SCALER;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.READOUT__AVERAGING_SAMPLE_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__ALS_VAL;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__INTERRUPT_STATUS_GPIO;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__RANGE_VAL;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__ANALOGUE_GAIN;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__INTEGRATION_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__INTERMEASUREMENT_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__START;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__CROSSTALK_VALID_HEIGHT;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__INTERMEASUREMENT_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__MAX_CONVERGENCE_TIME;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__PART_TO_PART_RANGE_OFFSET;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__RANGE_CHECK_ENABLES;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__START;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__VHV_RECALIBRATE;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__VHV_REPEAT_RATE;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__FRESH_OUT_OF_RESET;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__INTERRUPT_CLEAR;
-import static org.austincans.lib.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__INTERRUPT_CONFIG_GPIO;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkArgument;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkState;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Calculations.constrain;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.I2C_SLAVE__DEVICE_ADDRESS;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.IDENTIFICATION__MODEL_ID;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.INTERLEAVED_MODE__ENABLE;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.RANGE_SCALER;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.READOUT__AVERAGING_SAMPLE_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__ALS_VAL;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__INTERRUPT_STATUS_GPIO;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.RESULT__RANGE_VAL;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__ANALOGUE_GAIN;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__INTEGRATION_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__INTERMEASUREMENT_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSALS__START;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__CROSSTALK_VALID_HEIGHT;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__INTERMEASUREMENT_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__MAX_CONVERGENCE_TIME;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__PART_TO_PART_RANGE_OFFSET;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__RANGE_CHECK_ENABLES;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__START;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__VHV_RECALIBRATE;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSRANGE__VHV_REPEAT_RATE;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__FRESH_OUT_OF_RESET;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__INTERRUPT_CLEAR;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl6180x.Vl6180xReg.SYSTEM__INTERRUPT_CONFIG_GPIO;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkArgument;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkState;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -48,11 +48,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.api.Vl6180x;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Port;
-import org.austincans.lib.sensors.lidar.impl.errors.IncorrectModelId;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.api.Vl6180x;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Port;
+import org.austincans.lib.hardware.sensors.lidar.impl.errors.IncorrectModelId;
 
 /**
  * A near-direct port of the <a href="https://github.com/pololu/vl6180x-arduino">vl6180x-arduino</a>

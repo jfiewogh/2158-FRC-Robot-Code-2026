@@ -13,26 +13,26 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l1x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x;
 
-import static org.austincans.lib.sensors.lidar.impl.vl53l1x.Calculations.calcMacroPeriod;
-import static org.austincans.lib.sensors.lidar.impl.vl53l1x.Calculations.decodeTimeout;
-import static org.austincans.lib.sensors.lidar.impl.vl53l1x.Calculations.encodeTimeout;
-import static org.austincans.lib.sensors.lidar.impl.vl53l1x.Calculations.timeoutMclksToMicroseconds;
-import static org.austincans.lib.sensors.lidar.impl.vl53l1x.Calculations.timeoutMicrosecondsToMclks;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkArgument;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkState;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Calculations.calcMacroPeriod;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Calculations.decodeTimeout;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Calculations.encodeTimeout;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Calculations.timeoutMclksToMicroseconds;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Calculations.timeoutMicrosecondsToMclks;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkArgument;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkState;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.api.Vl53l1x;
-import org.austincans.lib.sensors.lidar.api.Wire;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Port;
-import org.austincans.lib.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.api.Vl53l1x;
+import org.austincans.lib.hardware.sensors.lidar.api.Wire;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Port;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
 
 /**
  * A near-direct port of the <a href="https://github.com/pololu/vl53l1x-arduino">vl53l1x-arduino</a>

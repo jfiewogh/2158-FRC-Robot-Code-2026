@@ -13,9 +13,9 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.errors;
+package org.austincans.lib.hardware.sensors.lidar.impl.errors;
 
-import org.austincans.lib.sensors.lidar.impl.ErrorBase;
+import org.austincans.lib.hardware.sensors.lidar.impl.ErrorBase;
 
 import com.google.auto.value.AutoValue;
 

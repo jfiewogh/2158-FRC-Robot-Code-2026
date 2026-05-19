@@ -13,16 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.tca9548a;
+package org.austincans.lib.hardware.sensors.lidar.impl.tca9548a;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.api.Tca9548a;
-import org.austincans.lib.sensors.lidar.api.Wire;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Port;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.api.Tca9548a;
+import org.austincans.lib.hardware.sensors.lidar.api.Wire;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Port;
 
 public class Tca9548aI2c implements Tca9548a {
 

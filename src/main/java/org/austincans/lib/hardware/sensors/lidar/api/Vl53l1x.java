@@ -13,14 +13,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.api;
+package org.austincans.lib.hardware.sensors.lidar.api;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.impl.vl53l1x.DistanceMode;
-import org.austincans.lib.sensors.lidar.impl.vl53l1x.Vl53l1xI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.DistanceMode;
+import org.austincans.lib.hardware.sensors.lidar.impl.vl53l1x.Vl53l1xI2c;
 
 /**
  * API for interacting with a VL53L1X range-finder.

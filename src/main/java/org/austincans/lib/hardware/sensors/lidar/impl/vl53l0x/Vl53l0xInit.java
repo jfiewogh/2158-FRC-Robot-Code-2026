@@ -13,26 +13,26 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l0x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x;
 
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.DYNAMIC_SPAD_REF_EN_START_OFFSET;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_REF_EN_START_SELECT;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_SPAD_ENABLES_REF_0;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GPIO_HV_MUX_ACTIVE_HIGH;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.MSRC_CONFIG_CONTROL;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CLEAR;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CONFIG_GPIO;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_SEQUENCE_CONFIG;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.DYNAMIC_SPAD_REF_EN_START_OFFSET;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_REF_EN_START_SELECT;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_SPAD_ENABLES_REF_0;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GPIO_HV_MUX_ACTIVE_HIGH;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.MSRC_CONFIG_CONTROL;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CLEAR;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CONFIG_GPIO;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_SEQUENCE_CONFIG;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV;
 
 import java.util.Optional;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Register;
-import org.austincans.lib.sensors.lidar.impl.errors.Timeout;
-import org.austincans.lib.sensors.lidar.impl.vl53l0x.errors.NoSpadInfo;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.impl.errors.Timeout;
+import org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.errors.NoSpadInfo;
 
 class Vl53l0xInit {
   private final Vl53l0xI2c target;

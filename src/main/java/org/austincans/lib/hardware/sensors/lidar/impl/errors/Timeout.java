@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,35 +12,32 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/ErrorBase.java
-package org.austincans.lib.lidar.impl;
+package org.austincans.lib.hardware.sensors.lidar.impl.errors;
 
-import org.austincans.lib.lidar.api.Error;
-========
-package org.austincans.lib.sensors.lidar.impl;
+import com.google.auto.value.AutoValue;
+import org.austincans.lib.hardware.sensors.lidar.impl.ErrorBase;
 
-import edu.wpi.first.wpilibj2.command.button.Trigger;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/input/OperatorMapperTest.java
+public class Timeout extends ErrorBase<Timeout.Data> {
 
-public class OperatorMapperTest extends OperatorMapperComp {
-  @Override
-  public Trigger getPointToHubButton() {
-    return controller.povDown();
+  public static Timeout waitingFor(String waitingFor) {
+    return new Timeout(new AutoValue_Timeout_Data(waitingFor));
   }
 
-  @Override
-  public Trigger getIncrementHoodAngleButton() {
-    return controller.b();
+  @AutoValue
+  public abstract static class Data {
+
+    public abstract String waitingFor();
+
+    @Override
+    public final String toString() {
+      return "Timed out waiting for " + waitingFor();
+    }
   }
 
-  @Override
-  public Trigger getDecrementHoodAngleButton() {
-    return controller.a();
-  }
-
-  @Override
-  public Trigger getRunIndexerAndFlywheelButton() {
-    return controller.povUp();
+  private Timeout(Data data) {
+    super("timeout", data);
   }
 }

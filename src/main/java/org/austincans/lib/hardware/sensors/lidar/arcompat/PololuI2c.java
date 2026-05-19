@@ -13,10 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.arcompat;
+package org.austincans.lib.hardware.sensors.lidar.arcompat;
 
-import org.austincans.lib.sensors.lidar.api.Wire;
-import org.austincans.lib.sensors.lidar.util.Preconditions;
+import org.austincans.lib.hardware.sensors.lidar.api.Wire;
+import org.austincans.lib.hardware.sensors.lidar.util.Preconditions;
 
 /**
  * Pololu's APIs for Arduino use extended I2C protocol frequently. This class implements those using

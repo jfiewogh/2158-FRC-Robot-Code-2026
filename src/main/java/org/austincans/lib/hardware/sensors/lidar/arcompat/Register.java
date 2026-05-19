@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,31 +12,39 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/Register.java
-package org.austincans.lib.lidar.arcompat;
-========
-package org.austincans.lib.sensors.lidar.arcompat;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/intake/deploy/DeployIO.java
+package org.austincans.lib.hardware.sensors.lidar.arcompat;
 
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.AutoLog;
+/**
+ * Simplistic API for registers on the I2C target. Usually implemented by an enum for easy
+ * iteration.
+ */
+public interface Register {
 
-public interface DeployIO {
-  @AutoLog
-  public class DeployIOInputs {
-    public double motorVoltage = 0.0;
-    public double positionRad = 0.0;
-    public double temperatureCelsius = 0.0;
+  interface Bound {
+    boolean write(short value);
+
+    boolean write16Bit(int value);
+
+    boolean write32Bit(long value);
+
+    boolean writeMulti(byte[] value);
+
+    // Unsigned values, so one size too large:
+    short read();
+
+    int read16Bit();
+
+    long read32Bit();
+
+    void readMulti(byte[] result);
   }
 
-  public class DeployIOOutputs {
-    public double voltage = 0.0;
+  short address();
+
+  default Bound on(PololuI2c i2c) {
+    return new RegisterBinding(address(), i2c);
   }
-
-  public void updateInputs(DeployIOInputs inputs);
-
-  public void applyOutputs(DeployIOOutputs outputs);
-
-  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }

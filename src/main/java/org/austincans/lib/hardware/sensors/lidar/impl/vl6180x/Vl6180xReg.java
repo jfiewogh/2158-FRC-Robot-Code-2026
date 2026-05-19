@@ -13,10 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl6180x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl6180x;
 
-import org.austincans.lib.sensors.lidar.arcompat.Register;
-import org.austincans.lib.sensors.lidar.util.Preconditions;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.util.Preconditions;
 
 public enum Vl6180xReg implements Register {
   IDENTIFICATION__MODEL_ID(0x000),

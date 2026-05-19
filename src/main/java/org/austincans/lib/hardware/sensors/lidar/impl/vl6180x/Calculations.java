@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl6180x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl6180x;
 
 public class Calculations {
   public static short constrain(short value, short min, short max) {

@@ -13,44 +13,44 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l0x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x;
 
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Calculations.calcMacroPeriod;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Calculations.decodeVcselPeriod;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Calculations.encodeVcselPeriod;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.ALGO_PHASECAL_CONFIG_TIMEOUT;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.ALGO_PHASECAL_LIM;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VALID_PHASE_HIGH;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VALID_PHASE_LOW;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VCSEL_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_VCSEL_WIDTH;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.MSRC_CONFIG_TIMEOUT_MACROP;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.OSC_CALIBRATE_VAL;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VALID_PHASE_HIGH;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VALID_PHASE_LOW;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VCSEL_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.RESULT_INTERRUPT_STATUS;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.RESULT_RANGE_STATUS;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSRANGE_START;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERMEASUREMENT_PERIOD;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CLEAR;
-import static org.austincans.lib.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_SEQUENCE_CONFIG;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkArgument;
-import static org.austincans.lib.sensors.lidar.util.Preconditions.checkState;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Calculations.calcMacroPeriod;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Calculations.decodeVcselPeriod;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Calculations.encodeVcselPeriod;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.ALGO_PHASECAL_CONFIG_TIMEOUT;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.ALGO_PHASECAL_LIM;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VALID_PHASE_HIGH;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VALID_PHASE_LOW;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.FINAL_RANGE_CONFIG_VCSEL_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.GLOBAL_CONFIG_VCSEL_WIDTH;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.MSRC_CONFIG_TIMEOUT_MACROP;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.OSC_CALIBRATE_VAL;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VALID_PHASE_HIGH;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VALID_PHASE_LOW;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.PRE_RANGE_CONFIG_VCSEL_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.RESULT_INTERRUPT_STATUS;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.RESULT_RANGE_STATUS;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSRANGE_START;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERMEASUREMENT_PERIOD;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_INTERRUPT_CLEAR;
+import static org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x.Vl53l0xReg.SYSTEM_SEQUENCE_CONFIG;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkArgument;
+import static org.austincans.lib.hardware.sensors.lidar.util.Preconditions.checkState;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.austincans.lib.sensors.lidar.api.Error;
-import org.austincans.lib.sensors.lidar.api.Vl53l0x;
-import org.austincans.lib.sensors.lidar.arcompat.PololuI2c;
-import org.austincans.lib.sensors.lidar.arcompat.Port;
-import org.austincans.lib.sensors.lidar.arcompat.Register;
-import org.austincans.lib.sensors.lidar.util.Preconditions;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.api.Vl53l0x;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Port;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.util.Preconditions;
 
 /**
  * A near-direct port of the <a href="https://github.com/pololu/vl53l0x-arduino">vl53l0x-arduino</a>

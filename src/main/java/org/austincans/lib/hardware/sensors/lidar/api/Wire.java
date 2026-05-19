@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.api;
+package org.austincans.lib.hardware.sensors.lidar.api;
 
 import edu.wpi.first.hal.I2CJNI;
 import java.nio.ByteBuffer;
@@ -21,8 +21,8 @@ import java.nio.ByteOrder;
 import java.util.IllegalFormatException;
 import java.util.Objects;
 
-import org.austincans.lib.sensors.lidar.arcompat.Port;
-import org.austincans.lib.sensors.lidar.util.Preconditions;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Port;
+import org.austincans.lib.hardware.sensors.lidar.util.Preconditions;
 
 /**
  * Drop-in replacement for Arduino's Wire class. Only works for master mode.

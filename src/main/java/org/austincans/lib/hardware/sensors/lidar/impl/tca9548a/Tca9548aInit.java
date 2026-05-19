@@ -1,4 +1,4 @@
-// Copyright (c) 2026 the ausTIN CANs
+// Copyright (c) 2025 the ausTIN CANs
 // https://github.com/AusTINCANsProgrammingTeam
 //
 // oooooooooooo ooooooooo.     .oooooo.        ooooooooo.              .o8                     .   
@@ -12,22 +12,27 @@
 // Use of this source code is governed by a BSD
 // license that can be found in the LICENSE file
 // at the root directory of this project.
+//
+// Updated on Wednesday November 05, 2025 at 18:44:58 CST
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/arcompat/RoboRioPort.java
-package org.austincans.lib.lidar.arcompat;
-========
-package org.austincans.lib.sensors.lidar.arcompat;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/subsystems/drive/ModuleIOFake.java
+package org.austincans.lib.hardware.sensors.lidar.impl.tca9548a;
 
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import java.util.Optional;
+import org.austincans.lib.hardware.sensors.lidar.api.Error;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.PololuI2c;
 
-public class ModuleIOFake implements ModuleIO {
-  @Override
-  public void updateInputs(ModuleIOInputs inputs) {}
+@SuppressWarnings("unused")
+class Tca9548aInit {
 
-  @Override
-  public void applyOutputs(ModuleIOOutputs outputs) {}
+  private final Tca9548aI2c target;
+  private final PololuI2c i2c;
 
-  @Override
-  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
+  Tca9548aInit(Tca9548aI2c target) {
+    this.target = target;
+    this.i2c = target.getI2c();
+  }
+
+  public Optional<Error<?>> initialize() {
+    throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+  }
 }

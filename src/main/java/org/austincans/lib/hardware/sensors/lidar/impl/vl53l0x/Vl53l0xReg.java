@@ -13,10 +13,10 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.lidar.impl.vl53l0x;
+package org.austincans.lib.hardware.sensors.lidar.impl.vl53l0x;
 
-import org.austincans.lib.sensors.lidar.arcompat.Register;
-import org.austincans.lib.sensors.lidar.util.Preconditions;
+import org.austincans.lib.hardware.sensors.lidar.arcompat.Register;
+import org.austincans.lib.hardware.sensors.lidar.util.Preconditions;
 
 /** Taken from the Arduino library code. */
 public enum Vl53l0xReg implements Register {
