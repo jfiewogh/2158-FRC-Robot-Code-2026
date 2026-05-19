@@ -13,20 +13,11 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/tca9548a/Tca9548aInit.java
-package org.austincans.lib.lidar.impl.tca9548a;
-========
-package org.austincans.frc2026.superstructure;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SubsystemWrapper.java
+package org.austincans.lib.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/impl/tca9548a/Tca9548aInit.java
-import org.austincans.lib.lidar.api.Error;
-import org.austincans.lib.lidar.arcompat.PololuI2c;
-========
->>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SubsystemWrapper.java
 
 public abstract class SubsystemWrapper<Subsystem extends SubsystemBase> {
   protected final Optional<Subsystem> subsystem;

@@ -1,4 +1,4 @@
-package org.austincans.lib.sensors.encoders;
+package org.austincans.lib.hardware.sensors.encoders;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;

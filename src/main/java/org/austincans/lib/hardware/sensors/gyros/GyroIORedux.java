@@ -13,21 +13,16 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.gyros;
+package org.austincans.lib.hardware.sensors.gyros;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import java.util.Queue;
-import org.austincans.lib.subsystems.drive.old.PhoenixOdometryThread;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class GyroIORedux implements GyroIO {
   private final Canandgyro gyro = new Canandgyro(30);
-
-  private final Queue<Double> yawTimestampQueue;
-  private final Queue<Double> yawPositionQueue;
 
   public GyroIORedux(double odometryFrequencyHz) {
     // Configure the gyro
@@ -39,32 +34,19 @@ public class GyroIORedux implements GyroIO {
     gyro.setSettings(settings, 0.25, 5);
     gyro.setYaw(0.0); // gyro.setYaw(0.0, 0.1);
     gyro.clearStickyFaults();
-
-    // Register the gyro signals
-    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(gyro::getYaw);
   }
 
   @Override
-  public void updateRecords(GyroIORecords records) {
-    records.connected = gyro.isConnected();
-    records.yawPosition = Rotation2d.fromRotations(gyro.getYaw());
-    records.yawVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityYaw());
-    records.pitchPosition = Rotation2d.fromRotations(gyro.getPitch());
-    records.pitchVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityPitch());
-    records.rollPosition = Rotation2d.fromRotations(gyro.getRoll());
-    records.rollVelocityRadPerSec = Units.rotationsToRadians(gyro.getAngularVelocityRoll());
-
-    records.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    records.odometryYawPositions =
-        yawPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
-
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.setConnected(gyro.isConnected());
+    inputs.setYawPosition(Rotations.of(gyro.getYaw()));
+    inputs.setYawVelocity(RotationsPerSecond.of(gyro.getAngularVelocityYaw()));
+    inputs.setPitchPosition(Rotations.of(gyro.getPitch()));
+    inputs.setPitchVelocity(RotationsPerSecond.of(gyro.getAngularVelocityPitch()));
+    inputs.setRollPosition(Rotations.of(gyro.getRoll()));
+    inputs.setRollVelocity(RotationsPerSecond.of(gyro.getAngularVelocityRoll()));
   }
 
-  // TODO: add self checking
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {}
 }

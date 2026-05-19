@@ -13,34 +13,36 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.gyros;
+package org.austincans.lib.hardware.sensors.gyros;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import edu.wpi.first.math.geometry.Rotation2d;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
+import com.studica.frc.AHRS.NavXUpdateRate;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.util.PhoenixUtil;
-import org.ironmaple.simulation.drivesims.GyroSimulation;
 
-public class GyroIOSim implements GyroIO {
-  private final GyroSimulation gyroSimulation;
+/** IO implementation for NavX. */
+public class GyroIONavX implements GyroIO {
+  private final AHRS navX;
 
-  public GyroIOSim(GyroSimulation gyroSimulation) {
-    this.gyroSimulation = gyroSimulation;
+  public GyroIONavX(NavXUpdateRate updateRate) {
+    navX = new AHRS(NavXComType.kMXP_SPI, updateRate);
   }
 
   @Override
-  public void updateRecords(GyroIORecords records) {
-    records.connected = true;
-    records.yawPosition = gyroSimulation.getGyroReading();
-    records.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
-    records.pitchPosition = Rotation2d.kZero;
-    records.pitchVelocityRadPerSec = 0.0;
-    records.rollPosition = Rotation2d.kZero;
-    records.rollVelocityRadPerSec = 0.0;
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.setConnected(navX.isConnected());
 
-    records.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
-    records.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
+    // values are flipped because navX axes are opposite direction of those used by WPILib
+    inputs.setYawPosition(Degrees.of(-navX.getYaw()));
+    inputs.setYawVelocity(DegreesPerSecond.of(-navX.getRawGyroZ()));
+    inputs.setPitchPosition(Degrees.of(-navX.getPitch()));
+    inputs.setPitchVelocity(DegreesPerSecond.of(-navX.getRawGyroX()));
+    inputs.setRollPosition(Degrees.of(-navX.getRoll()));
+    inputs.setRollVelocity(DegreesPerSecond.of(-navX.getRawGyroY()));
   }
 
   @Override

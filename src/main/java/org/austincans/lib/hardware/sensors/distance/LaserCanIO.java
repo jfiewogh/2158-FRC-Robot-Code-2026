@@ -1,4 +1,4 @@
-package org.austincans.lib.sensors.distance;
+package org.austincans.lib.hardware.sensors.distance;
 import static edu.wpi.first.units.Units.Millimeters;
 
 import au.grapplerobotics.ConfigurationFailedException;
@@ -23,6 +23,6 @@ public class LaserCanIO implements DistanceSensorIO {
 
     @Override
     public void updateInputs(DistanceSensorIOInputs inputs) {
-        inputs.distance = Millimeters.of(laserCan.getMeasurement().distance_mm);
+        inputs.setDistance(Millimeters.of(laserCan.getMeasurement().distance_mm));
     } 
 }

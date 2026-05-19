@@ -1,4 +1,4 @@
-package org.austincans.lib.sensors.encoders;
+package org.austincans.lib.hardware.sensors.encoders;
 
 import org.austincans.lib.configs.AbsoluteEncoderConfig;
 

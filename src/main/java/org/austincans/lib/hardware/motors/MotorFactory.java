@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 import org.austincans.lib.configs.FFConfig;
 import org.austincans.lib.configs.MotorConfigSpark;

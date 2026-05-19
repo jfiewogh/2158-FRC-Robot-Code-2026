@@ -1,4 +1,4 @@
-package org.austincans.lib.sensors.gyros;
+package org.austincans.lib.hardware.sensors.gyros;
 
 import org.austincans.lib.configs.GyroConfigPigeon2;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;

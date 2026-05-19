@@ -13,36 +13,28 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.sensors.gyros;
+package org.austincans.lib.hardware.sensors.gyros;
 
 import static edu.wpi.first.units.Units.Hertz;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.Queue;
-import org.austincans.frc2026.generated.TunerConstants;
+import edu.wpi.first.units.measure.Frequency;
+import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon =
-      new Pigeon2(
-          TunerConstants.DrivetrainConstants.Pigeon2Id,
-          new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
+  private final Pigeon2 pigeon;
 
   private final StatusSignal<Angle> yaw;
   private final StatusSignal<Angle> pitch;
   private final StatusSignal<Angle> roll;
-  private final Queue<Double> yawPositionQueue;
-  private final Queue<Double> yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity;
   private final StatusSignal<AngularVelocity> pitchVelocity;
   private final StatusSignal<AngularVelocity> rollVelocity;
@@ -63,28 +55,21 @@ public class GyroIOPigeon2 implements GyroIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
-
-    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(yaw);
-
+    
     PhoenixUtil.registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
     PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(0.0, 0.25));
   }
 
   @Override
-  public void updateRecords(GyroIORecords records) {
-    records.connected =
-        BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.setConnected(BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity).isOK());
 
-    records.yawPosition = Rotation2d.fromRadians(yaw.getValue().in(Radians));
-    records.yawVelocityRadPerSec = yawVelocity.getValue().in(RadiansPerSecond);
-    records.pitchPosition = Rotation2d.fromRadians(pitch.getValue().in(Radians));
-    records.pitchVelocityRadPerSec = pitchVelocity.getValue().in(RadiansPerSecond);
-    records.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
-    records.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
-
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
+    inputs.setYawPosition(yaw.getValue());
+    inputs.setYawVelocity(yawVelocity.getValue());
+    inputs.setPitchPosition(pitch.getValue());
+    inputs.setPitchVelocity(pitchVelocity.getValue());
+    inputs.setRollPosition(roll.getValue());
+    inputs.setRollVelocity(rollVelocity.getValue());
   }
 
   @Override

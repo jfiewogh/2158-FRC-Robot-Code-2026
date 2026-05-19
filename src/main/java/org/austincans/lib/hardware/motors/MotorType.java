@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 public enum MotorType {
     // TODO: Maybe create supplier for creating an instance of class with specific parameters

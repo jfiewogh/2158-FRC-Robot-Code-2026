@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Voltage;
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends SparkBaseConfig> extends MotorIOReal<MotorIOInputs> {
+public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends SparkBaseConfig> extends MotorIOReal<MotorIO.MotorIOInputs> {
     protected final SparkType motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
@@ -51,10 +51,10 @@ public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends Sp
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
-        switch (outputs.mode) {
-            case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocity);
-            case POSITION -> setPosition(outputs.position);
+        switch (outputs.getMode()) {
+            case VOLTAGE -> setVoltage(outputs.getVoltage());
+            case VELOCITY -> setVelocity(outputs.getVelocity());
+            case POSITION -> setPosition(outputs.getPosition());
         }
     }
 

@@ -1,4 +1,4 @@
-package org.austincans.lib.sensors.encoders;
+package org.austincans.lib.hardware.sensors.encoders;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;

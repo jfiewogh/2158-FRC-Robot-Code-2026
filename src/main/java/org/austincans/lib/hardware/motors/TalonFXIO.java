@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -13,7 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
-public class TalonFXIO extends MotorIOReal<TalonIOInputs> {
+public class TalonFXIO extends TalonIO {
     private final TalonFX motor;
 
     private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0);
@@ -39,10 +39,10 @@ public class TalonFXIO extends MotorIOReal<TalonIOInputs> {
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
-        switch (outputs.mode) {
-            case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocity);
-            case POSITION -> setPosition(outputs.position);
+        switch (outputs.getMode()) {
+            case VOLTAGE -> setVoltage(outputs.getVoltage());
+            case VELOCITY -> setVelocity(outputs.getVelocity());
+            case POSITION -> setPosition(outputs.getPosition());
         }
     }
 

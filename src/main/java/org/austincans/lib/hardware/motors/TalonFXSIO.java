@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXSIO extends MotorIOReal<TalonIOInputs> {
+public class TalonFXSIO extends TalonIO {
     private final TalonFXS motor;
     private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
     private PositionVoltage positionVoltage = new PositionVoltage(0);
@@ -36,10 +36,10 @@ public class TalonFXSIO extends MotorIOReal<TalonIOInputs> {
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
-        switch (outputs.mode) {
-            case VOLTAGE -> setVoltage(outputs.voltage);
-            case VELOCITY -> setVelocity(outputs.velocity);
-            case POSITION -> setPosition(outputs.position);
+        switch (outputs.getMode()) {
+            case VOLTAGE -> setVoltage(outputs.getVoltage());
+            case VELOCITY -> setVelocity(outputs.getVelocity());
+            case POSITION -> setPosition(outputs.getPosition());
         }
     }
 

@@ -1,4 +1,4 @@
-package org.austincans.lib.motors;
+package org.austincans.lib.hardware.motors;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -7,7 +7,7 @@ import edu.wpi.first.units.measure.Voltage;
 /**
  * This class is currently unused. It will probably be replaced or modified when sim is implemented.
  */
-public class MotorIOFake implements MotorIO<MotorIOInputs> {
+public class MotorIOFake implements MotorIO<MotorIO.MotorIOInputs> {
     private Angle position;
     private AngularVelocity velocity;
     private Voltage appliedVolts;
@@ -21,8 +21,8 @@ public class MotorIOFake implements MotorIO<MotorIOInputs> {
 
     @Override
     public void applyOutputs(MotorIOOutputs outputs) {
-        appliedVolts = outputs.voltage;
-        velocity = outputs.velocity;
-        position = outputs.position;
+        appliedVolts = outputs.getVoltage();
+        velocity = outputs.getVelocity();
+        position = outputs.getPosition();
     }
 }
