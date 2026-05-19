@@ -1,7 +1,7 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.motors.MotorIO;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO;
 
 public abstract class ModuleIOBase<T extends MotorIO, U extends MotorIO, V extends AbsoluteEncoderIO> implements ModuleIO {
     private final T driveMotorIO;

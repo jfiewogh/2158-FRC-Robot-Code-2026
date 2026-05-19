@@ -1,8 +1,8 @@
 package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIORecords;
 import org.austincans.lib.motors.MotorIO.MotorIORequests;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 

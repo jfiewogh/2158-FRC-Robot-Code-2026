@@ -1,29 +1,27 @@
 package org.austincans.lib.motors;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface MotorIO {
     /** 
      * Includes values that are common for all motors. 
-     * Values that are not common should be separated into other records, such as SensorIORecords. 
+     * Values that are not common should be separated into other classes. 
      */
     public class MotorIOInputs {
         public boolean connected = false;
         public Angle position;
         public AngularVelocity velocity;
         public Voltage voltage;
-        public double supplyCurrentAmps;
-        public double statorCurrentAmps;
-        public double torqueCurrentAmps;
-        public double temperatureCelsius;
+        public Current supplyCurrent;
+        public Current statorCurrent;
+        public Current torqueCurrent;
+        public Temperature temperature;
         
         public double getVelocity(AngularVelocityUnit unit){
             return this.velocity.in(unit);

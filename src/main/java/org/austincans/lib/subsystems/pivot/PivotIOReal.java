@@ -1,7 +1,7 @@
 package org.austincans.lib.subsystems.pivot;
 
-import org.austincans.lib.encoders.AbsoluteEncoderIO;
 import org.austincans.lib.motors.MotorIOReal;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO;
 
 public abstract class PivotIOReal<T extends MotorIOReal, U extends AbsoluteEncoderIO> implements PivotIO {
     protected final T motorIO;

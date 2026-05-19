@@ -16,9 +16,10 @@
 package org.austincans.lib.subsystems.pivot;
 
 import java.util.List;
-import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
+
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;

@@ -18,10 +18,11 @@ package org.austincans.lib.subsystems.hood;
 
 import com.revrobotics.RelativeEncoder;
 import static edu.wpi.first.units.Units.Rotations;
-import org.austincans.lib.encoders.AbsoluteEncoderFactory;
-import org.austincans.lib.encoders.CANcoderIO;
+
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.sensors.encoders.CANcoderIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOSparkFlex implements HoodIO {

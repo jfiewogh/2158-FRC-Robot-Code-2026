@@ -15,8 +15,9 @@
 
 package org.austincans.lib.subsystems.turret;
 import org.austincans.lib.configs.AbsoluteEncoderConfig;
-import org.austincans.lib.encoders.AbsoluteEncoderFactory;
-import org.austincans.lib.encoders.CANcoderIO;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.sensors.encoders.CANcoderIO;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;

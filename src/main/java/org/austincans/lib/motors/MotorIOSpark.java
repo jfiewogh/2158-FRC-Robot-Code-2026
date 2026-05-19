@@ -1,11 +1,10 @@
 package org.austincans.lib.motors;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -13,9 +12,6 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
-
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -43,8 +39,8 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
         inputs.position = Rotations.of(encoder.getPosition());
         inputs.velocity = RPM.of(encoder.getVelocity());
         inputs.voltage = Volts.of(motor.getBusVoltage());
-        inputs.statorCurrentAmps = motor.getOutputCurrent();
-        inputs.temperatureCelsius = motor.getMotorTemperature();
+        inputs.statorCurrent = Amps.of(motor.getOutputCurrent());
+        inputs.temperature = Celsius.of(motor.getMotorTemperature());
     }
 
     public Mtr getMotor() {
@@ -61,7 +57,7 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
     }
 
     private void setVoltage(Voltage voltage) {
-        controller.setSetpoint(voltage.baseUnitMagnitude(), ControlType.kVoltage);
+        controller.setSetpoint(voltage.in(Volts), ControlType.kVoltage);
     }
 
     private void setVelocity(AngularVelocity velocity) {

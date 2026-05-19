@@ -17,10 +17,10 @@ package org.austincans.lib.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Rotations;
 import org.austincans.lib.util.KalmanFilter1D;
-import org.austincans.lib.encoders.AbsoluteEncoderFactory;
-import org.austincans.lib.encoders.CANcoderIO;
 import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.MotorIOTalonFXS;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
+import org.austincans.lib.sensors.encoders.CANcoderIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class PivotIOTalonFXSCANcoder extends PivotIOReal<MotorIOTalonFXS, CANcoderIO> {

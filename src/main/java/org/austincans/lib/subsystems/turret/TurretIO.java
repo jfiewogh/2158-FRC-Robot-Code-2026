@@ -16,9 +16,10 @@
 package org.austincans.lib.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import org.austincans.lib.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
+
 import org.austincans.lib.motors.MotorIO.MotorIOInputs;
 import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public interface TurretIO {

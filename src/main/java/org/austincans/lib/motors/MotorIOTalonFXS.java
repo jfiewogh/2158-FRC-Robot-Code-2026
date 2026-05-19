@@ -5,13 +5,6 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -30,13 +23,13 @@ public class MotorIOTalonFXS extends MotorIOReal {
     @Override
     public void updateInputs(MotorIOInputs inputs) {
         inputs.connected = motor.isConnected();
-        inputs.position = Rotations.of(motor.getPosition().getValueAsDouble());
-        inputs.velocity = RotationsPerSecond.of(motor.getVelocity().getValueAsDouble());
-        inputs.voltage = Volts.of(motor.getMotorVoltage().getValueAsDouble());
-        inputs.supplyCurrentAmps = motor.getSupplyCurrent().getValueAsDouble();
-        inputs.statorCurrentAmps = motor.getStatorCurrent().getValueAsDouble();
-        inputs.torqueCurrentAmps = motor.getTorqueCurrent().getValueAsDouble();
-        inputs.temperatureCelsius = motor.getDeviceTemp().getValueAsDouble();
+        inputs.position = motor.getPosition().getValue();
+        inputs.velocity = motor.getVelocity().getValue();
+        inputs.voltage = motor.getMotorVoltage().getValue();
+        inputs.supplyCurrent = motor.getSupplyCurrent().getValue();
+        inputs.statorCurrent = motor.getStatorCurrent().getValue();
+        inputs.torqueCurrent = motor.getTorqueCurrent().getValue();
+        inputs.temperature = motor.getDeviceTemp().getValue();
     }
 
     @Override
