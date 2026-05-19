@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
@@ -12,7 +12,7 @@ import org.austincans.lib.subsystems.selfcheck.SelfCheckingSparkFlex;
 import edu.wpi.first.math.util.Units;
 
 public class RollerIOSparkFlex implements RollerIO {
-    public MotorIOSparkFlex motorIO;
+    public SparkFlexIO motorIO;
     private SelfCheckingSparkFlex rollerMotorCheck;
 
     public RollerIOSparkFlex(RollerConfig rollerConfig) {

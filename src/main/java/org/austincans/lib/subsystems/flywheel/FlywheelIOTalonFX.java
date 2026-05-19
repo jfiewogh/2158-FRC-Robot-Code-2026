@@ -16,11 +16,11 @@
 package org.austincans.lib.subsystems.flywheel;
 
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
-  private final MotorIOTalonFX motorIO;
+  private final TalonFXIO motorIO;
 
   public FlywheelIOTalonFX(FlywheelConfig flywheelConfig) {
     motorIO = MotorFactory.createTalonFX(flywheelConfig.motorTalonConfig, flywheelConfig.talonFXConfig);

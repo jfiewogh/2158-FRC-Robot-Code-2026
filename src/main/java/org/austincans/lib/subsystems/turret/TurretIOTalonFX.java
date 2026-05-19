@@ -21,11 +21,11 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOTalonFX extends TurretIOReal {
-  private final MotorIOTalonFX motorIO;
+  private final TalonFXIO motorIO;
 
   public TurretIOTalonFX(TurretConfig turretConfig) {
     super(turretConfig.encoderConfig);

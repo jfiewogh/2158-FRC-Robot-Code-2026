@@ -4,33 +4,9 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO {
-    /** 
-     * Includes values that are common for all motors. 
-     * Values that are not common should be separated into other classes. 
-     */
-    public class MotorIOInputs {
-        public boolean connected = false;
-        public Angle position;
-        public AngularVelocity velocity;
-        public Voltage voltage;
-        public Current supplyCurrent;
-        public Current statorCurrent;
-        public Current torqueCurrent;
-        public Temperature temperature;
-        
-        public double getVelocity(AngularVelocityUnit unit){
-            return this.velocity.in(unit);
-        }
-        public double getPosition(AngleUnit unit){
-            return this.position.in(unit);
-        }
-    }    
-
+public interface MotorIO<InputsType extends MotorIOInputs> {
     /**
      * It is plausible not all motors have a neutral/idle mode.
      * If true, then MotorIORequests should not have a NeutralMode.
@@ -79,7 +55,7 @@ public interface MotorIO {
         }
     }
 
-    public void updateInputs(MotorIOInputs inputs);
+    public void updateInputs(InputsType inputs);
 
     public void applyOutputs(MotorIOOutputs outputs);
 }

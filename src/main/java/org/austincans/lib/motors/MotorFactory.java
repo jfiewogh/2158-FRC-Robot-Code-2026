@@ -50,35 +50,35 @@ public class MotorFactory {
     return config;
   }
 
-  public static MotorIOSparkFlex createSparkFlex(MotorConfigSpark motorConfig, SparkFlexConfig sparkFlexConfig) {
-    return new MotorIOSparkFlex(
+  public static SparkFlexIO createSparkFlex(MotorConfigSpark motorConfig, SparkFlexConfig sparkFlexConfig) {
+    return new SparkFlexIO(
         motorConfig.deviceId,
         motorConfig.isBrushless ? MotorType.kBrushless : MotorType.kBrushed,
         applyMotorConfigToSparkConfig(sparkFlexConfig, motorConfig));
   }
 
-  public static MotorIOSparkFlex createSparkFlex(MotorConfigSpark motorConfig) {
+  public static SparkFlexIO createSparkFlex(MotorConfigSpark motorConfig) {
     return createSparkFlex(motorConfig, new SparkFlexConfig());
   }
 
-  public static MotorIOSparkFlex createSparkFlexFollower(MotorConfigSpark motorConfig, int leaderCanId) {
+  public static SparkFlexIO createSparkFlexFollower(MotorConfigSpark motorConfig, int leaderCanId) {
     SparkFlexConfig config = new SparkFlexConfig();
     config.follow(leaderCanId);
     return createSparkFlex(motorConfig, config);
   }
 
-  private static MotorIOSparkMax createSparkMax(MotorConfigSpark motorConfig, SparkMaxConfig sparkMaxConfig) {
-    return new MotorIOSparkMax(
+  private static SparkMaxIO createSparkMax(MotorConfigSpark motorConfig, SparkMaxConfig sparkMaxConfig) {
+    return new SparkMaxIO(
         motorConfig.deviceId,
         motorConfig.isBrushless ? MotorType.kBrushless : MotorType.kBrushed,
         applyMotorConfigToSparkConfig(sparkMaxConfig, motorConfig));
   }
 
-  public static MotorIOSparkMax createSparkMax(MotorConfigSpark motorConfig) {
+  public static SparkMaxIO createSparkMax(MotorConfigSpark motorConfig) {
     return createSparkMax(motorConfig, new SparkMaxConfig());
   }
 
-  public static MotorIOSparkMax createSparkMaxFollower(MotorConfigSpark motorConfig, int leaderCanId) {
+  public static SparkMaxIO createSparkMaxFollower(MotorConfigSpark motorConfig, int leaderCanId) {
     SparkMaxConfig config = new SparkMaxConfig();
     config.follow(leaderCanId);
     return createSparkMax(motorConfig, config);
@@ -86,7 +86,7 @@ public class MotorFactory {
 
   /* CTRE */
 
-  public static MotorIOTalonFX createTalonFX(MotorConfigTalon motorConfig, TalonFXConfiguration config) {
+  public static TalonFXIO createTalonFX(MotorConfigTalon motorConfig, TalonFXConfiguration config) {
     config.MotionMagic.MotionMagicCruiseVelocity = motorConfig.maxSpeedRotationsPerSec;
     config.MotionMagic.MotionMagicAcceleration = motorConfig.maxAccelerationRotationsPerSecSq;
     PIDConfig pidConfig = motorConfig.pidConfig;
@@ -107,11 +107,11 @@ public class MotorFactory {
     config.MotorOutput.Inverted = motorConfig.isInverted ? InvertedValue.Clockwise_Positive
         : InvertedValue.CounterClockwise_Positive;
     config.CurrentLimits.StatorCurrentLimit = motorConfig.statorCurrentLimitAmps;
-    return new MotorIOTalonFX(motorConfig.deviceId, new CANBus(motorConfig.canbus), config);
+    return new TalonFXIO(motorConfig.deviceId, new CANBus(motorConfig.canbus), config);
   }
 
   /** Create a TalonFX motor using its internal sensor. */
-  public static MotorIOTalonFX createTalonFX(MotorConfigTalon motorConfig) {
+  public static TalonFXIO createTalonFX(MotorConfigTalon motorConfig) {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
     config.Feedback.SensorToMechanismRatio = motorConfig.gearRatio;
@@ -119,14 +119,14 @@ public class MotorFactory {
   }
 
   /** Motor and CANcoder must be on same bus. */
-  public static MotorIOTalonFX createTalonFXWithRemoteCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
+  public static TalonFXIO createTalonFXWithRemoteCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.Feedback.FeedbackRemoteSensorID = cancoderId;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     return createTalonFX(motorConfig, config);
   }
 
-  public static MotorIOTalonFXS createTalonFXS(MotorConfigTalon motorConfig, TalonFXSConfiguration config) {
+  public static TalonFXSIO createTalonFXS(MotorConfigTalon motorConfig, TalonFXSConfiguration config) {
     config.MotionMagic.MotionMagicCruiseVelocity = motorConfig.maxSpeedRotationsPerSec;
     config.MotionMagic.MotionMagicAcceleration = motorConfig.maxAccelerationRotationsPerSecSq;
     PIDConfig pidConfig = motorConfig.pidConfig;
@@ -147,28 +147,28 @@ public class MotorFactory {
     config.MotorOutput.Inverted = motorConfig.isInverted ? InvertedValue.Clockwise_Positive
         : InvertedValue.CounterClockwise_Positive;
     config.CurrentLimits.StatorCurrentLimit = motorConfig.statorCurrentLimitAmps;
-    return new MotorIOTalonFXS(motorConfig.deviceId, new CANBus(motorConfig.canbus), config);
+    return new TalonFXSIO(motorConfig.deviceId, new CANBus(motorConfig.canbus), config);
   }
 
-  public static MotorIOTalonFXS createTalonFXS(MotorConfigTalon motorConfig) {
+  public static TalonFXSIO createTalonFXS(MotorConfigTalon motorConfig) {
     TalonFXSConfiguration config = new TalonFXSConfiguration();
     config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
     config.ExternalFeedback.SensorToMechanismRatio = motorConfig.gearRatio;
     return createTalonFXS(motorConfig, config);
   }
 
-  private static MotorIOTalonFXS createTalonFXSWithCANcoder(MotorConfigTalon motorConfig, int cancoderId, ExternalFeedbackSensorSourceValue sensorSource) {
+  private static TalonFXSIO createTalonFXSWithCANcoder(MotorConfigTalon motorConfig, int cancoderId, ExternalFeedbackSensorSourceValue sensorSource) {
     TalonFXSConfiguration config = new TalonFXSConfiguration();
     config.ExternalFeedback.ExternalFeedbackSensorSource = sensorSource;
     config.ExternalFeedback.FeedbackRemoteSensorID = cancoderId;
     return createTalonFXS(motorConfig, config);
   }
 
-  public static MotorIOTalonFXS createTalonFXSWithRemoteCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
+  public static TalonFXSIO createTalonFXSWithRemoteCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
     return createTalonFXSWithCANcoder(motorConfig, cancoderId, ExternalFeedbackSensorSourceValue.RemoteCANcoder);
   }
 
-  public static MotorIOTalonFXS createTalonFXSWithFusedCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
+  public static TalonFXSIO createTalonFXSWithFusedCANcoder(MotorConfigTalon motorConfig, int cancoderId) {
     return createTalonFXSWithCANcoder(motorConfig, cancoderId, ExternalFeedbackSensorSourceValue.FusedCANcoder);
   }
 }

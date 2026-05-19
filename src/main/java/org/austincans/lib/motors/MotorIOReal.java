@@ -1,6 +1,6 @@
 package org.austincans.lib.motors;
 
-public abstract class MotorIOReal implements MotorIO {
+public abstract class MotorIOReal<InputsType extends MotorIOInputs> implements SelfCheckingMotorIO<InputsType> {
     protected final int deviceId;
 
     protected MotorIOReal(int deviceId) {

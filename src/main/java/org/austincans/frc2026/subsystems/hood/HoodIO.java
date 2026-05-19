@@ -19,7 +19,7 @@ import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 /* This is specifically for the linear actuator */
-public abstract interface HoodIO {
+public interface HoodIO {
   @AutoLog
   public class HoodIOInputs {
     public int pulseWidth;

@@ -20,13 +20,13 @@ import com.revrobotics.RelativeEncoder;
 import static edu.wpi.first.units.Units.Rotations;
 
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.sensors.encoders.CANcoderIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOSparkFlex implements HoodIO {
-  private MotorIOSparkFlex motorIO;
+  private SparkFlexIO motorIO;
   private RelativeEncoder encoder;
   private CANcoderIO absoluteEncoderIO;
 

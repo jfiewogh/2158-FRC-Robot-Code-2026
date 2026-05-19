@@ -6,33 +6,35 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
+import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
-public class MotorIOTalonFX extends MotorIOReal {
+public class TalonFXIO extends MotorIOReal<TalonIOInputs> {
     private final TalonFX motor;
 
     private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0);
     private final MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
 
-    protected MotorIOTalonFX(int deviceId, CANBus canbus, TalonFXConfiguration motorConfig) {
+    protected TalonFXIO(int deviceId, CANBus canbus, TalonFXConfiguration motorConfig) {
         super(deviceId);
         motor = new TalonFX(deviceId, canbus);
         motor.getConfigurator().apply(motorConfig);
     }
 
     @Override
-    public void updateInputs(MotorIOInputs inputs) {
-        inputs.connected = motor.isConnected();
-        inputs.position = motor.getPosition().getValue();
-        inputs.velocity = motor.getVelocity().getValue();
-        inputs.voltage = motor.getMotorVoltage().getValue();
-        inputs.supplyCurrent = motor.getSupplyCurrent().getValue();
-        inputs.statorCurrent = motor.getStatorCurrent().getValue();
-        inputs.torqueCurrent = motor.getTorqueCurrent().getValue();
-        inputs.temperature = motor.getDeviceTemp().getValue();
+    public void updateInputs(TalonIOInputs inputs) {
+        inputs.setConnected(motor.isConnected());
+        inputs.setPosition(motor.getPosition().getValue());
+        inputs.setVelocity(motor.getVelocity().getValue());
+        inputs.setVoltage(motor.getMotorVoltage().getValue());
+        inputs.setSupplyCurrent(motor.getSupplyCurrent().getValue());
+        inputs.setStatorCurrent(motor.getStatorCurrent().getValue());
+        inputs.setTorqueCurrent(motor.getTorqueCurrent().getValue());
+        inputs.setTemperature(motor.getDeviceTemp().getValue());
     }
 
     @Override
@@ -62,5 +64,10 @@ public class MotorIOTalonFX extends MotorIOReal {
 
     public void setEncoderPosition(double positionRotations) {
         motor.setPosition(positionRotations);
+    }
+
+    @Override
+    public void registerSelfCheckHardware(AdvancedSubsystem subsystem, String label) {
+        subsystem.registerHardware(label, motor);
     }
 }

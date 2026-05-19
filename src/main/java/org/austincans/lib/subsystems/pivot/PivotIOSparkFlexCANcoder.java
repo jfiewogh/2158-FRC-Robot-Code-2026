@@ -18,12 +18,12 @@ package org.austincans.lib.subsystems.pivot;
 import static edu.wpi.first.units.Units.Rotations;
 import org.austincans.lib.util.KalmanFilter1D;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.sensors.encoders.AbsoluteEncoderFactory;
 import org.austincans.lib.sensors.encoders.CANcoderIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
-public class PivotIOSparkFlexCANcoder extends PivotIOReal<MotorIOSparkFlex, CANcoderIO> {
+public class PivotIOSparkFlexCANcoder extends PivotIOReal<SparkFlexIO, CANcoderIO> {
   @SuppressWarnings("unused")
   private KalmanFilter1D filter1d = new KalmanFilter1D(0, 0, 0);
 

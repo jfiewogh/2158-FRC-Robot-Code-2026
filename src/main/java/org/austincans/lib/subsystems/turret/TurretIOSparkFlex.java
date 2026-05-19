@@ -20,11 +20,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class TurretIOSparkFlex extends TurretIOReal {
-  private final MotorIOSparkFlex motorIO;
+  private final SparkFlexIO motorIO;
   private final RelativeEncoder relativeEncoder;
 
   public TurretIOSparkFlex(TurretConfig turretConfig) {

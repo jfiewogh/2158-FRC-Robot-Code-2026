@@ -1,10 +1,10 @@
 package org.austincans.lib.subsystems.hood;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class HoodIOTalonFX implements HoodIO {
-    private MotorIOTalonFX motorIO;
+    private TalonFXIO motorIO;
 
     public HoodIOTalonFX(HoodConfig hoodConfig) {
         motorIO = MotorFactory.createTalonFX(hoodConfig.motorConfigTalon, hoodConfig.talonConfig);

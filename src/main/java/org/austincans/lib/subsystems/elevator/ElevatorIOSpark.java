@@ -21,13 +21,13 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class ElevatorIOSpark implements ElevatorIO {
   private final boolean brakeMode = true;
 
-  private final MotorIOSparkFlex motorIO;
+  private final SparkFlexIO motorIO;
   private final RelativeEncoder encoder;
   private SparkFlexConfig config;
 

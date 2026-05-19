@@ -3,14 +3,14 @@ package org.austincans.lib.subsystems.roller;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.subsystems.selfcheck.HardwareFault;
 import org.austincans.lib.subsystems.selfcheck.SelfChecking;
 import org.austincans.lib.subsystems.selfcheck.SelfCheckingTalonFXPro;
 import edu.wpi.first.math.util.Units;
 
 public class RollerIOTalonFX implements RollerIO {
-    private MotorIOTalonFX motorIO;
+    private TalonFXIO motorIO;
     private SelfCheckingTalonFXPro rollerMotorCheck;
 
     public RollerIOTalonFX(RollerConfig rollerConfig) {

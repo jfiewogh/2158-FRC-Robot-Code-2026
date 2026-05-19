@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -20,12 +21,12 @@ import edu.wpi.first.units.measure.Voltage;
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBaseConfig> extends MotorIOReal {
-    protected final Mtr motor;
+public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends SparkBaseConfig> extends MotorIOReal<MotorIOInputs> {
+    protected final SparkType motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    protected MotorIOSpark(Mtr motor, Cnfg config) {
+    protected SparkIO(SparkType motor, ConfigType config) {
         super(motor.getDeviceId());
         this.motor = motor;
         encoder = motor.getEncoder();
@@ -35,15 +36,16 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.connected = true; // TODO: make this based on some property of the motor
-        inputs.position = Rotations.of(encoder.getPosition());
-        inputs.velocity = RPM.of(encoder.getVelocity());
-        inputs.voltage = Volts.of(motor.getBusVoltage());
-        inputs.statorCurrent = Amps.of(motor.getOutputCurrent());
-        inputs.temperature = Celsius.of(motor.getMotorTemperature());
+        inputs.setConnected(true); // TODO: make this based on some property of the motor
+        inputs.setPosition(Rotations.of(encoder.getPosition()));
+        inputs.setVelocity(RPM.of(encoder.getVelocity()));
+        inputs.setVoltage(Volts.of(motor.getBusVoltage()));
+        inputs.setStatorCurrent(Amps.of(motor.getOutputCurrent()));
+        inputs.setTemperature(Celsius.of(motor.getMotorTemperature()));
     }
 
-    public Mtr getMotor() {
+    /** TODO: This should be removed. The only use  */
+    public SparkType getMotor() {
         return motor;
     }
 
@@ -71,6 +73,7 @@ public abstract class MotorIOSpark<Mtr extends SparkBase, Cnfg extends SparkBase
             position.in(Rotations), ControlType.kMAXMotionVelocityControl);
     }
 
+    /** TODO: This should probably be updated as part of outputs, or have a different method for updating configs */
     public void setEncoderPosition(double positionRotations) {
         encoder.setPosition(positionRotations);
     }

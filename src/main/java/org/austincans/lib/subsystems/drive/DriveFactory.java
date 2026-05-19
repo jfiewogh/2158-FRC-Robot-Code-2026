@@ -11,8 +11,8 @@ import org.austincans.lib.configs.GyroConfigPigeon2;
 import org.austincans.lib.configs.SwerveModuleConfig;
 import org.austincans.lib.configs.SwerveConfig;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkMax;
-import org.austincans.lib.motors.MotorIOTalonFX;
+import org.austincans.lib.motors.SparkMaxIO;
+import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.sensors.gyros.GyroFactory;
 
 import com.pathplanner.lib.config.RobotConfig;

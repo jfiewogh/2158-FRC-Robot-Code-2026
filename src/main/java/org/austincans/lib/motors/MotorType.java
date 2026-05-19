@@ -2,9 +2,9 @@ package org.austincans.lib.motors;
 
 public enum MotorType {
     // TODO: Maybe create supplier for creating an instance of class with specific parameters
-    NEO_550(MotorIOSparkMax.class),
-    NEO_VORTEX(MotorIOSparkFlex.class),
-    KRAKEN(MotorIOTalonFX.class);
+    NEO_550(SparkMaxIO.class),
+    NEO_VORTEX(SparkFlexIO.class),
+    KRAKEN(TalonFXIO.class);
 
     public final Class<?> motorClass;
 

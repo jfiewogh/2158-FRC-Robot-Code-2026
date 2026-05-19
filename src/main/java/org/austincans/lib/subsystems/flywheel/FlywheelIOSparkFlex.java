@@ -15,11 +15,11 @@
 
 package org.austincans.lib.subsystems.flywheel;
 import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.MotorIOSparkFlex;
+import org.austincans.lib.motors.SparkFlexIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOSparkFlex implements FlywheelIO{
-  private final MotorIOSparkFlex motorIO;
+  private final SparkFlexIO motorIO;
 
   public FlywheelIOSparkFlex(FlywheelConfig flywheelConfig) {
     motorIO = MotorFactory.createSparkFlex(flywheelConfig.motorSparkConfig);
