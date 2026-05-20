@@ -8,7 +8,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 /** You can extend or update this class to add config */
 public class SparkFlexIO extends SparkIO<SparkFlex, SparkFlexConfig> {
-    protected SparkFlexIO(int deviceId, MotorType motorType, SparkFlexConfig config) {
+    SparkFlexIO(int deviceId, MotorType motorType, SparkFlexConfig config) {
         super(new SparkFlex(deviceId, motorType), config);
     }
 

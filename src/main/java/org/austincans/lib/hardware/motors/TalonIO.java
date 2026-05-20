@@ -5,7 +5,7 @@ import org.austincans.lib.hardware.motors.MotorIO.MotorIOInputs;
 import edu.wpi.first.units.measure.Current;
 
 public abstract class TalonIO extends MotorIOReal<TalonIO.TalonIOInputs> {
-    protected TalonIO(int deviceId) {
+    TalonIO(int deviceId) {
         super(deviceId);
     }
 

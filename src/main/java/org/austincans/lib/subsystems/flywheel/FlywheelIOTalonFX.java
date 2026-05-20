@@ -15,8 +15,8 @@
 
 package org.austincans.lib.subsystems.flywheel;
 
-import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.TalonFXIO;
+import org.austincans.lib.hardware.motors.MotorFactory;
+import org.austincans.lib.hardware.motors.TalonFXIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOTalonFX implements FlywheelIO {

@@ -22,11 +22,11 @@ import edu.wpi.first.units.measure.Voltage;
  * so that you can configure only specific values while keeping existing ones.
  */
 public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends SparkBaseConfig> extends MotorIOReal<MotorIO.MotorIOInputs> {
-    protected final SparkType motor;
-    protected final RelativeEncoder encoder;
-    protected final SparkClosedLoopController controller;
+    final SparkType motor;
+    final RelativeEncoder encoder;
+    final SparkClosedLoopController controller;
 
-    protected SparkIO(SparkType motor, ConfigType config) {
+    SparkIO(SparkType motor, ConfigType config) {
         super(motor.getDeviceId());
         this.motor = motor;
         encoder = motor.getEncoder();

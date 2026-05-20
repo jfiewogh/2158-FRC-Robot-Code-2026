@@ -1,4 +1,4 @@
-package org.austincans.lib.hardware.motors.configs;
+package org.austincans.lib.hardware.motors;
 
 public class SparkConfig extends MotorConfig {
    public double allowedClosedLoopErrorRad; // after gearing

@@ -14,8 +14,8 @@
 // at the root directory of this project.
 
 package org.austincans.lib.subsystems.flywheel;
-import org.austincans.lib.motors.MotorFactory;
-import org.austincans.lib.motors.SparkFlexIO;
+import org.austincans.lib.hardware.motors.MotorFactory;
+import org.austincans.lib.hardware.motors.SparkFlexIO;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public class FlywheelIOSparkFlex implements FlywheelIO{

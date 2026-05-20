@@ -24,7 +24,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.frc2026.Robot;
-import org.austincans.lib.motors.MotorIO.MotorIOOutputMode;
+import org.austincans.lib.hardware.motors.MotorIO.MotorIOOutputMode;
 import org.austincans.lib.subsystems.flywheel.FlywheelIO.FlywheelIOInputs;
 import org.austincans.lib.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;

@@ -19,7 +19,7 @@ public class TalonFXIO extends TalonIO {
     private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0);
     private final MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0);
 
-    protected TalonFXIO(int deviceId, CANBus canbus, TalonFXConfiguration motorConfig) {
+    TalonFXIO(int deviceId, CANBus canbus, TalonFXConfiguration motorConfig) {
         super(deviceId);
         motor = new TalonFX(deviceId, canbus);
         motor.getConfigurator().apply(motorConfig);
