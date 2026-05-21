@@ -35,7 +35,6 @@ public class RootMeanSquare {
   }
 
   public RootMeanSquare() {}
-  ;
 
   public void storeValue(double val) {
     values.add(val);

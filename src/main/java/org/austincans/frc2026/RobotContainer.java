@@ -41,7 +41,7 @@ import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.subsystems.vision.ObjectDetection;
 import org.austincans.frc2026.subsystems.vision.Vision;
 import org.austincans.frc2026.superstructure.*;
-import org.austincans.lib.util.HubShiftUtil;
+import org.austincans.frc2026.util.HubShiftUtil;
 import org.austincans.lib.util.LoggedTunableNumber;
 
 /**

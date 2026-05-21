@@ -1,6 +1,8 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.subsystems.drive;
 
-public class DifferentialDriveConfig<MotorCnfg extends MotorConfig> extends DriveConfig {
-    public MotorCnfg leftLeaderMotorConfig;
-    public MotorCnfg rightLeaderMotorConfig;
+import org.austincans.lib.hardware.motors.MotorConfig;
+
+public class DifferentialDriveConfig<MotorConfigType extends MotorConfig> extends DriveConfig {
+    public MotorConfigType leftLeaderMotorConfig;
+    public MotorConfigType rightLeaderMotorConfig;
 }

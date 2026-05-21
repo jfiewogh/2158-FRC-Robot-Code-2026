@@ -13,7 +13,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.lib.util;
+package org.austincans.frc2026.util;
 
 public class ShooterMath {
   private static final double GRAVITY = 9.80665;
