@@ -28,7 +28,6 @@ public class TalonFXIO extends TalonIO {
 
     @Override
     public void updateInputs(TalonIOInputs inputs) {
-        inputs.setConnected(motor.isConnected());
         inputs.setPosition(motor.getPosition().getValue());
         inputs.setVelocity(motor.getVelocity().getValue());
         inputs.setVoltage(motor.getMotorVoltage().getValue());

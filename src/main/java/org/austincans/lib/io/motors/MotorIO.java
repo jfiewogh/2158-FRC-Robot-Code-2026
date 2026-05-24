@@ -1,7 +1,6 @@
 package org.austincans.lib.io.motors;
 
 import org.austincans.lib.io.ActuatorIO;
-import org.austincans.lib.io.DeviceIO;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -13,7 +12,7 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
      */
-    public class MotorIOInputs extends DeviceIO.DeviceIOInputs {
+    public class MotorIOInputs {
         private Angle position;
         private AngularVelocity velocity;
         private Voltage voltage;

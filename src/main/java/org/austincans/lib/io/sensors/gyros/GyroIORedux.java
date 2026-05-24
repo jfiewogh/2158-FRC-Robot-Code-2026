@@ -37,7 +37,7 @@ public class GyroIORedux implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.setConnected(gyro.isConnected());
+    // inputs.setConnected(gyro.isConnected());
     inputs.setYawPosition(Rotations.of(gyro.getYaw()));
     inputs.setYawVelocity(RotationsPerSecond.of(gyro.getAngularVelocityYaw()));
     inputs.setPitchPosition(Rotations.of(gyro.getPitch()));

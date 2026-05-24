@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface GyroIO extends DeviceIO<GyroIO.GyroIOInputs> {
-  public class GyroIOInputs extends DeviceIO.DeviceIOInputs {
+  public class GyroIOInputs {
     private Angle yawPosition;
     private Angle pitchPosition;
     private Angle rollPosition;

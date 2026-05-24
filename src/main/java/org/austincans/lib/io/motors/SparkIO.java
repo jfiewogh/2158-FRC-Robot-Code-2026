@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase;
@@ -36,7 +35,6 @@ public abstract class SparkIO<SparkType extends SparkBase, ConfigType extends Sp
 
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.setConnected(motor.getLastError() == REVLibError.kCANDisconnected);
         inputs.setPosition(Rotations.of(encoder.getPosition()));
         inputs.setVelocity(RPM.of(encoder.getVelocity()));
         inputs.setVoltage(Volts.of(motor.getBusVoltage()));

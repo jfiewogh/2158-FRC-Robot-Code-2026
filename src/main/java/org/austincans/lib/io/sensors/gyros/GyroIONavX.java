@@ -32,7 +32,7 @@ public class GyroIONavX implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.setConnected(navX.isConnected());
+    // inputs.setConnected(navX.isConnected());
 
     // values are flipped because navX axes are opposite direction of those used by WPILib
     inputs.setYawPosition(Degrees.of(-navX.getYaw()));
