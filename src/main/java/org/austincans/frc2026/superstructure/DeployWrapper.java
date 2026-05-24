@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import org.austincans.frc2026.subsystems.intake.deploy.Deploy;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 
 public class DeployWrapper extends SubsystemWrapper<Deploy> {
   public DeployWrapper(Optional<Deploy> subsystem) {

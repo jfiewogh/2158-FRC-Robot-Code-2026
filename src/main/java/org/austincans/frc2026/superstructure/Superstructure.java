@@ -31,6 +31,7 @@ import org.austincans.frc2026.commands.RebuiltFieldUtils;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.superstructure.shooter.ShotCalculator.ShotParameters;
 import org.austincans.frc2026.superstructure.shooter.ShotUtil;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 /** This is season specific */

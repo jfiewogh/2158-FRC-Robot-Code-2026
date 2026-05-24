@@ -30,6 +30,7 @@ import org.austincans.frc2026.subsystems.turret.Turret;
 import org.austincans.frc2026.subsystems.turret.TurretConstants;
 import org.austincans.frc2026.superstructure.shooter.TargetUtil;
 import org.austincans.frc2026.superstructure.shooter.TargetUtil.TrackingTarget;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretWrapper extends SubsystemWrapper<Turret> {

@@ -40,7 +40,8 @@ import java.util.function.DoubleSupplier;
 import org.austincans.frc2026.RobotState;
 import org.austincans.frc2026.subsystems.drive.Drive;
 import org.austincans.frc2026.subsystems.drive.DriveConstants;
-import org.austincans.frc2026.util.LoggedTunableNumber;
+import org.austincans.lib.superstructure.SubsystemWrapper;
+import org.austincans.lib.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 // TODO: in the future, update this to use RobotState methods instead of getting them from drive

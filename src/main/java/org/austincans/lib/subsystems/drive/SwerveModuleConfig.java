@@ -1,18 +1,12 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.subsystems.drive;
 
-import org.austincans.lib.util.swerve.ModuleLimits;
+import org.austincans.lib.io.motors.MotorConfig;
+import org.austincans.lib.io.sensors.encoders.AbsoluteEncoderConfig;
 
-public class SwerveModuleConfig<DriveMotorCfg extends MotorConfig, SteerMotorCfg extends MotorConfig> {
-    public DriveMotorCfg driveMotorConfig;
-    public SteerMotorCfg steerMotorConfig;
-    public AbsoluteEncoderConfig absoluteEncoderConfig;
+public class SwerveModuleConfig<DriveMotorConfigType extends MotorConfig, SteerMotorConfigType extends MotorConfig, AbsoluteEncoderConfigType extends AbsoluteEncoderConfig> {
+    public DriveMotorConfigType driveMotorConfig;
+    public SteerMotorConfigType steerMotorConfig;
+    public AbsoluteEncoderConfigType absoluteEncoderConfig;
     /** The drive speed multiplier on initialization */
     public double driveSpeedMultiplier;
-
-    public ModuleLimits getModuleLimitsFree() {
-        return new ModuleLimits(
-            driveMotorConfig.maxSpeedRotationsPerSec,
-            driveMotorConfig.maxAccelerationRotationsPerSecSq,
-            steerMotorConfig.maxAccelerationRotationsPerSecSq);
-    }
 }

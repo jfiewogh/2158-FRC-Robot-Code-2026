@@ -15,15 +15,10 @@
 
 package org.austincans.lib.subsystems.pivot;
 
-import java.util.List;
-
-import org.austincans.lib.motors.MotorIO.MotorIOInputs;
-import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
-import org.austincans.lib.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.io.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOInputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.lib.subsystems.selfcheck.HardwareFault;
-import org.austincans.lib.subsystems.selfcheck.SelfChecking;
-import org.littletonrobotics.junction.AutoLog;
 
 /** PivotIO */
 public interface PivotIO {
@@ -41,6 +36,4 @@ public interface PivotIO {
   public void applyOutputs(PivotIOOutputs outputs);
 
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
-
-  public void stop();
 }

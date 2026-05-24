@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.austincans.lib.input.REVDigitController;
+import org.austincans.lib.io.hid.REVDigitController;
 import org.austincans.lib.util.FullSubsystem;
 
 public abstract class AdvancedSubsystem extends FullSubsystem {

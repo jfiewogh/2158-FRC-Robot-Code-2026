@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import org.austincans.frc2026.subsystems.hood.Hood;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 
 public class HoodWrapper extends SubsystemWrapper<Hood> {
   public HoodWrapper(Optional<Hood> subsystem) {

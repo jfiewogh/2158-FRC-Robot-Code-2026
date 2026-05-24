@@ -17,22 +17,22 @@ package org.austincans.lib.subsystems.pivot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 
 import org.austincans.lib.subsystems.pivot.PivotIO.PivotIOInputs;
 import org.austincans.lib.subsystems.pivot.PivotIO.PivotIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends AdvancedSubsystem {
   private final PivotIO io;
@@ -47,19 +47,30 @@ public class Pivot extends AdvancedSubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    // Logger.processInputs(getName(), inputs);
+  }
+
+  public void setAngle(Angle angle) {
+    outputs.motorOutputs.setPosition(angle);
   }
 
   public void setAngle(Rotation2d angle) {
-    outputs.motorOutputs.setPosition(Radians.of(angle.getRadians()));
+    setAngle(angle.getMeasure());
+  }
+
+  private void setVelocity(AngularVelocity velocity) {
+    outputs.motorOutputs.setVelocity(velocity);
+  }
+
+  private void setVoltage(Voltage voltage) {
+    outputs.motorOutputs.setVoltage(voltage);
   }
 
   public double getPositionRad() {
-    return inputs.motorInputs.getPosition(Radians);
+    return inputs.motorInputs.getPosition().in(Radians);
   }
 
   public double getVelocityRadPerSec() {
-    return inputs.motorInputs.getVelocity(RadiansPerSecond);
+    return inputs.motorInputs.getVelocity().in(RadiansPerSecond);
   }
 
   public Command setAngleCommand(Rotation2d rotation) {
@@ -72,17 +83,17 @@ public class Pivot extends AdvancedSubsystem {
   }
 
   public Command stopCommand() {
-    return new InstantCommand(() -> outputs.motorOutputs.setVoltage(Volt.of(0)));
+    return new InstantCommand(() -> setVoltage(Volt.of(0)));
   }
 
   public Command moveAtVelocityCommand(double velocityDegPerSec) {
-    return new InstantCommand(() -> outputs.motorOutputs.setVelocity(DegreesPerSecond.of(velocityDegPerSec)));
+    return new InstantCommand(() -> setVelocity(DegreesPerSecond.of(velocityDegPerSec)));
   }
 
   @Override
   protected Command systemCheckCommand() {
     return Commands.sequence(
-            Commands.runOnce(() -> outputs.motorOutputs.setVelocity(RPM.of(2))),
+            Commands.runOnce(() -> setVelocity(RPM.of(2))),
             Commands.waitSeconds(0.5),
             Commands.runOnce(
                 () -> {
@@ -117,9 +128,7 @@ public class Pivot extends AdvancedSubsystem {
                 this))
         .andThen(
             Commands.runOnce(
-                () -> {
-                  outputs.motorOutputs.setVelocity(RPM.of(0));
-                },
+                () -> setVelocity(RPM.of(0)),
                 this));
   }
 

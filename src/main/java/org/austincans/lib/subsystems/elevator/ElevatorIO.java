@@ -13,8 +13,8 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 package org.austincans.lib.subsystems.elevator;
-import org.austincans.lib.motors.MotorIO.MotorIOInputs;
-import org.austincans.lib.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public interface ElevatorIO {

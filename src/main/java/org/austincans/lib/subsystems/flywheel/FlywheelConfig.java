@@ -1,7 +1,7 @@
 package org.austincans.lib.subsystems.flywheel;
 
-import org.austincans.lib.hardware.configs.MotorConfigSpark;
-import org.austincans.lib.hardware.configs.MotorConfigTalon;
+import org.austincans.lib.io.configs.MotorConfigSpark;
+import org.austincans.lib.io.configs.MotorConfigTalon;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;

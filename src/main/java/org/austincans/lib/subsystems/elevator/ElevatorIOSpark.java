@@ -66,7 +66,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
-    subsystem.registerHardware("Flywheel", motorIO.getMotor());
+    subsystem.registerHardware("Elevator", motorIO.getMotor());
   }
 
 }

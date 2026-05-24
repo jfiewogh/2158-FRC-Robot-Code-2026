@@ -1,4 +1,4 @@
-package org.austincans.lib.configs;
+package org.austincans.lib.subsystems.drive;
 
 public class DriveConfig {
     public double robotMassKg;

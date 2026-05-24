@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import org.austincans.frc2026.subsystems.intake.roller.Roller;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 
 public class RollerWrapper extends SubsystemWrapper<Roller> {
   public RollerWrapper(Optional<Roller> subsystem) {

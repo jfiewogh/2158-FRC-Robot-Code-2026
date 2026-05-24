@@ -15,7 +15,7 @@
 
 package org.austincans.lib.controllers;
 
-import org.austincans.lib.math.CANMath;
+import org.austincans.lib.util.math.CANMath;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 

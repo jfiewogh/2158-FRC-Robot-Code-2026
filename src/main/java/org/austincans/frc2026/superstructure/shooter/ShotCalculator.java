@@ -26,7 +26,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.function.Function;
-import org.austincans.frc2026.util.GeomUtil;
+import org.austincans.lib.util.GeomUtil;
 import org.littletonrobotics.junction.Logger;
 
 // TODO: Move into lib

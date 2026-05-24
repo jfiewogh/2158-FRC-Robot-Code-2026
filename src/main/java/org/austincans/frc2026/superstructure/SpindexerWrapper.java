@@ -13,16 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-<<<<<<<< HEAD:src/main/java/org/austincans/lib/lidar/api/Error.java
-package org.austincans.lib.lidar.api;
-========
 package org.austincans.frc2026.superstructure;
->>>>>>>> develop:src/main/java/org/austincans/frc2026/superstructure/SpindexerWrapper.java
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Optional;
 import org.austincans.frc2026.subsystems.feeder.Spindexer;
+import org.austincans.lib.superstructure.SubsystemWrapper;
 
 public class SpindexerWrapper extends SubsystemWrapper<Spindexer> {
   public SpindexerWrapper(Optional<Spindexer> subsystem) {

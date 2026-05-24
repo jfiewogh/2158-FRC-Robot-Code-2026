@@ -15,8 +15,8 @@
 
 package org.austincans.lib.subsystems.flywheel;
 
-import org.austincans.lib.hardware.motors.MotorIO.MotorIOInputs;
-import org.austincans.lib.hardware.motors.MotorIO.MotorIOOutputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOInputs;
+import org.austincans.lib.io.motors.MotorIO.MotorIOOutputs;
 import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 
 public interface FlywheelIO {
