@@ -9,12 +9,12 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ControlSlotType extends MotorIO.ControlSlot> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
+public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
      */
-    public class MotorIOInputs {
+    public static class MotorIOInputs {
         private Angle position;
         private AngularVelocity velocity;
         private Voltage voltage;
@@ -60,30 +60,27 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ControlSlotTy
      * If true, then MotorIORequests should not have a NeutralMode.
      * You have a class that extends MotorIORequests for motors that have neutral/idle mode.
      */
-    public enum NeutralMode {
+    public static enum NeutralMode {
         BRAKE,
         COAST
     }
 
-    public enum MotorIOOutputMode {
+    public static enum MotorIOOutputMode {
         VOLTAGE,
         VELOCITY,
         POSITION
     }
 
-    public class MotorIOOutputs {
+    public static class MotorIOOutputs {
         private MotorIOOutputMode mode;
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
-        private ControlSlot slot;
+        private ControlSlot controlSlot;
 
         public void setVoltage(Voltage voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
             this.voltage = voltage;
-        }
-        public void setControlSlot(ControlSlot slot) {
-            this.slot = slot;
         }
         public void setVelocity(AngularVelocity velocity) {
             mode = MotorIOOutputMode.VELOCITY;
@@ -92,6 +89,9 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ControlSlotTy
         public void setPosition(Angle position) {
             mode = MotorIOOutputMode.POSITION;
             this.position = position;
+        }
+        public void setControlSlot(ControlSlot controlSlot) {
+            this.controlSlot = controlSlot;
         }
 
         /* Getter methods should only be called by IO */
@@ -107,12 +107,17 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ControlSlotTy
         Angle getPosition() {
             return position;
         } 
-        ControlSlot getSlot() {
-            return slot;
+        ControlSlot getControlSlot() {
+            return controlSlot;
         }
     }
 
-    public static interface ControlSlot {}
+    public static interface Control {}
 
-    public void updateGains(ControlConfig config, ControlSlotType slot);
+    public static interface ControlSlot {
+        int getIndex();
+    }
+
+    /** TODO: Update this to work with all configs (single motor config instance, instead of part of it)*/
+    public void updateGains(ControlConfig config, ControlSlot slot);
 }

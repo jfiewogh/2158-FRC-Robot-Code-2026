@@ -23,15 +23,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
  */
 public class MotorFactory {
   
-  public static SparkFlexIO createSparkFlex(SparkConfig motorConfig, SparkFlexConfig sparkFlexConfig) {
-    return new SparkFlexIO(
-        motorConfig.deviceId,
-        motorConfig.isBrushless ? MotorType.kBrushless : MotorType.kBrushed,
-        applyMotorConfigToSparkConfig(sparkFlexConfig, motorConfig));
-  }
-
-  public static SparkFlexIO createSparkFlex(SparkConfig motorConfig) {
-    return createSparkFlex(motorConfig, new SparkFlexConfig());
+  public static SparkFlexIO createSparkFlex(SparkConfig config) {
+    return new SparkFlexIO(config);
   }
 
   public static SparkFlexIO createSparkFlexFollower(SparkConfig motorConfig, int leaderCanId) {
@@ -40,17 +33,10 @@ public class MotorFactory {
     return createSparkFlex(motorConfig, config);
   }
 
-  private static SparkMaxIO createSparkMax(SparkConfig motorConfig, SparkMaxConfig sparkMaxConfig) {
-    return new SparkMaxIO(
-        motorConfig.deviceId,
-        motorConfig.isBrushless ? MotorType.kBrushless : MotorType.kBrushed,
-        applyMotorConfigToSparkConfig(sparkMaxConfig, motorConfig));
+  private static SparkMaxIO createSparkMax(SparkConfig config) {
+    return new SparkMaxIO(config);
   }
-
-  public static SparkMaxIO createSparkMax(SparkConfig motorConfig) {
-    return createSparkMax(motorConfig, new SparkMaxConfig());
-  }
-
+  
   public static SparkMaxIO createSparkMaxFollower(SparkConfig motorConfig, int leaderCanId) {
     SparkMaxConfig config = new SparkMaxConfig();
     config.follow(leaderCanId);

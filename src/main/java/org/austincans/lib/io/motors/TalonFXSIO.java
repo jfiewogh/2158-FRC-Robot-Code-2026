@@ -96,9 +96,9 @@ public class TalonFXSIO extends TalonIO {
     }
 
     @Override
-    public void updateGains(ControlConfig controlConfig, TalonControlSlot slot) {
-        switch (slot) {
-            case SLOT_0 -> {
+    public void updateGains(ControlConfig controlConfig, ControlSlot slot) {
+        switch (slot.getIndex()) {
+            case 0 -> {
                 Slot0Configs slot0 = new Slot0Configs();
                 slot0.kP = controlConfig.pidConfig.kP;
                 slot0.kI = controlConfig.pidConfig.kI;
@@ -110,7 +110,7 @@ public class TalonFXSIO extends TalonIO {
                 motor.getConfigurator().apply(slot0);
                 return;
             }
-            case SLOT_1 -> {
+            case 1 -> {
                 Slot1Configs slot1 = new Slot1Configs();
                 slot1.kP = controlConfig.pidConfig.kP;
                 slot1.kI = controlConfig.pidConfig.kI;
@@ -122,7 +122,7 @@ public class TalonFXSIO extends TalonIO {
                 motor.getConfigurator().apply(slot1);
                 return;
             }
-            case SLOT_2 -> {
+            case 2 -> {
                 Slot2Configs slot2 = new Slot2Configs();
                 slot2.kP = controlConfig.pidConfig.kP;
                 slot2.kI = controlConfig.pidConfig.kI;
@@ -143,13 +143,13 @@ public class TalonFXSIO extends TalonIO {
     }
 
     @Override
-    void setVelocity(AngularVelocity velocity) {
-        motor.setControl(velocityVoltage.withVelocity(velocity).withSlot(0)); 
+    void setVelocity(AngularVelocity velocity, ControlSlot slot) {
+        motor.setControl(velocityVoltage.withVelocity(velocity).withSlot(slot.getIndex())); 
     }
 
     @Override
-    void setPosition(Angle position) {
-        motor.setControl(positionVoltage.withPosition(position));
+    void setPosition(Angle position, ControlSlot slot) {
+        motor.setControl(positionVoltage.withPosition(position).withSlot(slot.getIndex()));
     }
 
     @Override

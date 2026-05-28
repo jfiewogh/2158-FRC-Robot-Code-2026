@@ -1,12 +1,9 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.MotorIO.ControlSlot;
-import org.austincans.lib.io.motors.MotorIO.MotorIOInputs;
-
 import edu.wpi.first.units.measure.Current;
 
-public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs, TalonIO.TalonControlSlot> {
-    public static class TalonIOInputs extends MotorIOInputs {
+public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs> {
+    public static class TalonIOInputs extends MotorIO.MotorIOInputs {
         private Current supplyCurrent;
         private Current torqueCurrent;
 
@@ -37,18 +34,12 @@ public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs, TalonIO
     abstract Current getTorqueCurrent();
 
     public static enum TalonControlSlot implements ControlSlot {
-        SLOT_0(0),
-        SLOT_1(1),
-        SLOT_2(2);
+        SLOT_0,
+        SLOT_1,
+        SLOT_2;
 
-        private final int slot;
-
-        private TalonControlSlot(int slot) {
-            this.slot = slot;
-        }
-        
-        int get() {
-            return slot;
+        public int getIndex() {
+            return this.ordinal();
         }
     }
 }

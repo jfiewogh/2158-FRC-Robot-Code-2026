@@ -11,7 +11,6 @@ import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfig.FFConfig;
 import org.austincans.lib.io.motors.MotorConfig.PIDConfig;
 import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
-import org.austincans.lib.io.motors.MotorIO.ControlSlot;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -34,7 +33,9 @@ import edu.wpi.first.units.measure.Voltage;
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public class SparkIO<MotorType extends SparkBase, VendorConfigType extends SparkBaseConfig> extends BaseMotorIO<MotorIO.MotorIOInputs, SparkIO.SparkControlSlot> {
+public class SparkIO<MotorType extends SparkBase, VendorConfigType extends SparkBaseConfig> extends BaseMotorIO<MotorIO.MotorIOInputs> {
+    private static final ClosedLoopSlot[] slots = ClosedLoopSlot.values();
+
     final MotorType motor;
     final RelativeEncoder encoder;
     final SparkClosedLoopController controller;
@@ -88,16 +89,13 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     @Override
-    void setVelocity(AngularVelocity velocity) {
-        controller.setSetpoint(
-            velocity.in(RPM), 
-            ControlType.kMAXMotionVelocityControl);
+    void setVelocity(AngularVelocity velocity, ControlSlot slot) {
+        controller.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl, slots[slot.getIndex()]);
     }
 
     @Override
-    void setPosition(Angle position) {
-        controller.setSetpoint(
-            position.in(Rotations), ControlType.kMAXMotionVelocityControl);
+    void setPosition(Angle position, ControlSlot slot) {
+        controller.setSetpoint(position.in(Rotations), ControlType.kMAXMotionVelocityControl, slots[slot.getIndex()]);
     }
 
     @Override
@@ -126,8 +124,8 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     @Override
-    public void updateGains(ControlConfig config, SparkControlSlot slot) {
-        configureClosedLoopSlot(vendorConfig, config, slot.get(), this.config);
+    public void updateGains(ControlConfig config, ControlSlot slot) {
+        configureClosedLoopSlot(vendorConfig, config, slots[slot.getIndex()], this.config);
         motor.configureAsync(vendorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
@@ -137,19 +135,13 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     public static enum SparkControlSlot implements ControlSlot {
-        SLOT_0(ClosedLoopSlot.kSlot0), 
-        SLOT_1(ClosedLoopSlot.kSlot1), 
-        SLOT_2(ClosedLoopSlot.kSlot2), 
-        SLOT_3(ClosedLoopSlot.kSlot3);
+        SLOT_0, 
+        SLOT_1, 
+        SLOT_2, 
+        SLOT_3;
 
-        private final ClosedLoopSlot slot;
-
-        private SparkControlSlot(ClosedLoopSlot slot) {
-            this.slot = slot;
-        }
-
-        ClosedLoopSlot get() {
-            return slot;
+        public int getIndex() {
+            return this.ordinal();
         }
     }
 }
