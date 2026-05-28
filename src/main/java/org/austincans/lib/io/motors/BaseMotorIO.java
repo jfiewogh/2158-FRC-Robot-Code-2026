@@ -23,13 +23,17 @@ public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs> impl
         }
     }
 
+    /* Position */
     abstract Angle getPosition();
-    abstract AngularVelocity getVelocity();
-    abstract Voltage getVoltage();
-    abstract Current getStatorCurrent();
-    abstract Temperature getTemperature();
-
-    abstract void setVoltage(Voltage voltage);
-    abstract void setVelocity(AngularVelocity velocity, ControlSlot slot);
     abstract void setPosition(Angle position, ControlSlot slot);
+
+    abstract AngularVelocity getVelocity();
+    abstract void setVelocity(AngularVelocity velocity, ControlSlot slot);
+
+    abstract Voltage getVoltage();
+    abstract void setVoltage(Voltage voltage);
+
+    abstract Current getStatorCurrent();
+
+    abstract Temperature getTemperature();
 }
