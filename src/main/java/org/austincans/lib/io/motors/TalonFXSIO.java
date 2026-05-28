@@ -27,6 +27,8 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXSIO extends TalonIO {
+    private final TalonConfig config;
+
     private final TalonFXS motor;
 
     private final VoltageOut voltageOut = new VoltageOut(0);
@@ -42,6 +44,8 @@ public class TalonFXSIO extends TalonIO {
     private final StatusSignal<Temperature> temperature;
 
     TalonFXSIO(TalonConfig config) {
+        this.config = config;
+
         motor = new TalonFXS(config.deviceId, config.canBus);
 
         TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
@@ -185,5 +189,10 @@ public class TalonFXSIO extends TalonIO {
     @Override
     Temperature getTemperature() {
         return temperature.getValue();
+    }
+
+    @Override
+    public void initializeOutputs(MotorIOOutputs outputs) {
+        outputs.setControlSlot(config.initialSlot);
     }
 }

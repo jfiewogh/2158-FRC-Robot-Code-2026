@@ -25,8 +25,7 @@ public abstract class MotorConfig<ControlSlotType extends ControlSlot> {
     public AngularVelocity maxSpeed;
     public AngularAcceleration maxAcceleration;
 
-    public ControlSlotType initialPositionSlot;
-    public ControlSlotType initialVelocitySlot; 
+    public ControlSlotType initialSlot; 
     public ControlConfig slot0Config = new ControlConfig();
     public ControlConfig slot1Config = new ControlConfig();
     public ControlConfig slot2Config = new ControlConfig();

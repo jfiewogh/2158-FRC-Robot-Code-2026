@@ -27,6 +27,8 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXIO extends TalonIO {
+    private final TalonConfig config;
+
     private final TalonFX motor;
 
     /** 
@@ -46,6 +48,8 @@ public class TalonFXIO extends TalonIO {
     private final StatusSignal<Temperature> temperature;
 
     TalonFXIO(TalonConfig config) {
+        this.config = config;
+
         motor = new TalonFX(config.deviceId, config.canBus);
 
         TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
@@ -53,6 +57,7 @@ public class TalonFXIO extends TalonIO {
         vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.maxSpeed.in(RotationsPerSecond);
         vendorConfig.MotionMagic.MotionMagicAcceleration = config.maxAcceleration.in(RotationsPerSecondPerSecond);
 
+        /** Figure out a better way to do this if you can. It is long */
         vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
         vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
         vendorConfig.Slot0.kD = config.slot0Config.pidConfig.kD;
@@ -99,6 +104,7 @@ public class TalonFXIO extends TalonIO {
         temperature = motor.getDeviceTemp();
     }
 
+    /** TODO: Figure out a better way to do this if you can. It seems too long */
     @Override
     public void updateGains(ControlConfig controlConfig, ControlSlot slot) {
         switch (slot.getIndex()) {
@@ -189,5 +195,10 @@ public class TalonFXIO extends TalonIO {
     @Override
     Temperature getTemperature() {
         return temperature.getValue();
+    }
+
+    @Override
+    public void initializeOutputs(MotorIOOutputs outputs) {
+        outputs.setControlSlot(config.initialSlot);
     }
 }

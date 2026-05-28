@@ -144,4 +144,9 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
             return this.ordinal();
         }
     }
+
+    @Override
+    public void initializeOutputs(MotorIOOutputs outputs) {
+        outputs.setControlSlot(config.initialSlot);
+    }
 }

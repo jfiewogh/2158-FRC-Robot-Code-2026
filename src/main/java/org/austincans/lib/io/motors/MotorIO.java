@@ -112,12 +112,19 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
         }
     }
 
+    /** TODO: Implement this. Should represent ControlType. Different for Talon and Spark motors */
     public static interface Control {}
 
     public static interface ControlSlot {
         int getIndex();
     }
 
-    /** TODO: Update this to work with all configs (single motor config instance, instead of part of it)*/
+    /** This should be called in the constructor of the subsystem using this IO */
+    public void initializeOutputs(MotorIOOutputs outputs);
+
+    /** TODO: Update this to work with all configs (single motor config instance, instead of part of it) */
+
+    /** TODO: Maybe create a config class containing only values that are tuned/changed
+     * (this could possibly be derived from the motor config class) */
     public void updateGains(ControlConfig config, ControlSlot slot);
 }
