@@ -1,7 +1,13 @@
 package org.austincans.lib.io.motors;
 
-public class SparkConfig extends MotorConfig {
-   public double allowedClosedLoopErrorRad; // after gearing
-   public boolean isBrushless;
-   public int smartCurrentStallLimitAmps;
+import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.units.measure.Current;
+
+public class SparkConfig extends MotorConfig<SparkControlSlot> {
+   public ControlConfig slot3Config = new ControlConfig();
+   public MotorType type;
+   public Current smartCurrentStallLimit;
 }

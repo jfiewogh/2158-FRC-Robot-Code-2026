@@ -1,13 +1,15 @@
 package org.austincans.lib.io.motors;
 
 import org.austincans.lib.io.ActuatorIO;
+import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
+public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ControlSlotType extends MotorIO.ControlSlot> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
@@ -74,11 +76,14 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
-        private NeutralMode neutralMode; // TODO: maybe this should be part of an updateConfig method
+        private ControlSlot slot;
 
         public void setVoltage(Voltage voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
             this.voltage = voltage;
+        }
+        public void setControlSlot(ControlSlot slot) {
+            this.slot = slot;
         }
         public void setVelocity(AngularVelocity velocity) {
             mode = MotorIOOutputMode.VELOCITY;
@@ -87,9 +92,6 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
         public void setPosition(Angle position) {
             mode = MotorIOOutputMode.POSITION;
             this.position = position;
-        }
-        public void setNeutralMode(NeutralMode neutralMode) {
-            this.neutralMode = neutralMode;
         }
 
         /* Getter methods should only be called by IO */
@@ -104,9 +106,13 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
         }
         Angle getPosition() {
             return position;
-        }
-        NeutralMode getNeutralMode() {
-            return neutralMode;
+        } 
+        ControlSlot getSlot() {
+            return slot;
         }
     }
+
+    public static interface ControlSlot {}
+
+    public void updateGains(ControlConfig config, ControlSlotType slot);
 }

@@ -1,22 +1,42 @@
 package org.austincans.lib.io.motors;
 
+import org.austincans.lib.io.motors.MotorIO.ControlSlot;
+import org.austincans.lib.io.motors.MotorIO.NeutralMode;
 import org.austincans.lib.util.math.physical.Gearbox;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-/** Values are based on the motor, not the mechanism. */
-public abstract class MotorConfig {
+/** 
+ * These values define the motor's initial state and behavior in response to outputs.
+ */
+public abstract class MotorConfig<ControlSlotType extends ControlSlot> {
+    /* Physical properties */
     public int deviceId;
+    public Gearbox gearbox;
+
+    /* Software properties */
+    public boolean inverted;
+
     public NeutralMode neutralMode;
-    public boolean isInverted;
-    public PIDConfig pidConfig;
-    public FFConfig ffConfig;
+
     public SoftLimitConfig softLimitConfig;
     public AngularVelocity maxSpeed;
     public AngularAcceleration maxAcceleration;
-    public Gearbox gearbox;
+
+    public ControlSlotType initialPositionSlot;
+    public ControlSlotType initialVelocitySlot; 
+    public ControlConfig slot0Config = new ControlConfig();
+    public ControlConfig slot1Config = new ControlConfig();
+    public ControlConfig slot2Config = new ControlConfig();
+
+    /** Closed-Loop Control Config */
+    public static class ControlConfig {
+        public PIDConfig pidConfig = new PIDConfig();
+        public FFConfig ffConfig = new FFConfig();
+        public Angle allowedMechanismClosedLoopError;
+    }
 
     /** Proportional-Integral-Derivative Config */
     public static class PIDConfig {
@@ -39,9 +59,5 @@ public abstract class MotorConfig {
         public Angle forwardSoftLimit;
         public boolean reverseSoftLimitEnabled;
         public Angle reverseSoftLimit;
-    }
-
-    public static enum NeutralMode {
-        BRAKE, COAST
     }
 }

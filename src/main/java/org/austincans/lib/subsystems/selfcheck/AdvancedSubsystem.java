@@ -26,9 +26,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.austincans.lib.io.hid.REVDigitController;
 import org.austincans.lib.util.FullSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public abstract class AdvancedSubsystem extends FullSubsystem {
   public enum SystemStatus {
@@ -39,7 +38,6 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
 
   public enum FaultCodes {}
 
-  private static final List<SubsystemFault> subsystemFaults = new ArrayList<>();
   private final List<HardwareFault> hardwareFaults = new ArrayList<>();
   private final List<SelfChecking> hardware = new ArrayList<>();
   private static final List<Command> checkCommands = new ArrayList<>();
@@ -113,24 +111,10 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
     //    BatteryUsage.reportUsage(this.getName(), device, amps, volts);
   }
 
-  protected void addSubsystemFault(SubsystemFault fault) {
-    if (!AdvancedSubsystem.subsystemFaults.contains(fault)) {
-      AdvancedSubsystem.subsystemFaults.add(fault);
-    }
-  }
-
   protected void addHardwareFault(HardwareFault fault) {
     if (!this.hardwareFaults.contains(fault)) {
       this.hardwareFaults.add(fault);
     }
-  }
-
-  protected void addSubsystemFault(String code, String description, boolean isWarning) {
-    this.addSubsystemFault(new SubsystemFault(code, description, isWarning));
-  }
-
-  protected void addSubsystemFault(String code, String description) {
-    this.addSubsystemFault(code, description, false);
   }
 
   protected void addHardwareFault(
@@ -146,12 +130,7 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
     this.addHardwareFault(code, description, false);
   }
 
-  public List<SubsystemFault> getSubsystemFaults() {
-    return AdvancedSubsystem.subsystemFaults;
-  }
-
   public void clearFaults() {
-    AdvancedSubsystem.subsystemFaults.clear();
     this.hardwareFaults.clear();
   }
 
@@ -160,18 +139,6 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
 
     for (HardwareFault f : this.hardwareFaults) {
       if (f.sticky || f.timestamp > Timer.getFPGATimestamp() - 10) {
-        if (f.isWarning) {
-          if (worstStatus != SystemStatus.ERROR) {
-            worstStatus = SystemStatus.WARNING;
-          }
-        } else {
-          worstStatus = SystemStatus.ERROR;
-        }
-      }
-    }
-
-    for (SubsystemFault f : AdvancedSubsystem.subsystemFaults) {
-      if (f.timestamp > Timer.getFPGATimestamp() - 10) {
         if (f.isWarning) {
           if (worstStatus != SystemStatus.ERROR) {
             worstStatus = SystemStatus.WARNING;
@@ -225,7 +192,7 @@ public abstract class AdvancedSubsystem extends FullSubsystem {
 
   public static Command sequentialCheck() {
     return Commands.sequence(checkCommands.toArray(Command[]::new))
-        .onlyWhile(() -> subsystemFaults.size() == 0)
+        .onlyWhile(() -> hardwareFaults.size() == 0)
         .handleInterrupt(
             () ->
                 REVDigitController.getInstance()
