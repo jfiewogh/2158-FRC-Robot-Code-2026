@@ -9,40 +9,40 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
+public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<?>> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
      */
     public static class MotorIOInputs {
-        private Angle position;
-        private AngularVelocity velocity;
+        private Angle mechanismPosition;
+        private AngularVelocity mechanismVelocity;
         private Voltage voltage;
         private Current statorCurrent;
         private Temperature temperature;
 
         /* Setter methods should only be called by IO */
-        void setPosition(Angle position) {
-            this.position = position;
+        protected void setPosition(Angle position) {
+            mechanismPosition = position;
         }
-        void setVelocity(AngularVelocity velocity) {
-            this.velocity = velocity;
+        protected void setVelocity(AngularVelocity velocity) {
+            mechanismVelocity = velocity;
         }
-        void setVoltage(Voltage voltage) {
+        protected void setVoltage(Voltage voltage) {
             this.voltage = voltage;
         }
-        void setStatorCurrent(Current statorCurrent) {
+        protected void setStatorCurrent(Current statorCurrent) {
             this.statorCurrent = statorCurrent;
         }
-        void setTemperature(Temperature temperature) {
+        protected void setTemperature(Temperature temperature) {
             this.temperature = temperature;
         }
 
         public Angle getPosition() {
-            return position;
+            return mechanismPosition;
         }
         public AngularVelocity getVelocity() {
-            return velocity;
+            return mechanismVelocity;
         }
         public Voltage getVoltage() {
             return voltage;
@@ -95,29 +95,42 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs> extends Actua
         }
 
         /* Getter methods should only be called by IO */
-        MotorIOOutputMode getMode() {
+        protected MotorIOOutputMode getMode() {
             return mode;
         }
-        Voltage getVoltage() {
+        protected Voltage getVoltage() {
             return voltage;
         }
-        AngularVelocity getVelocity() {
+        protected AngularVelocity getVelocity() {
             return velocity;
         }
-        Angle getPosition() {
+        protected Angle getPosition() {
             return position;
         } 
-        ControlSlot getControlSlot() {
+        protected ControlSlot getControlSlot() {
             return controlSlot;
         }
     }
 
-    /** TODO: Implement this. Should represent ControlType. Different for Talon and Spark motors */
-    public static interface Control {}
+    // TODO: 1. Complete this method and implementation for SparkIO and TalonIO subclasses
+    public static interface PositionControlType {}
 
+    // TODO: 2. Complete this method and implementation for SparkIO and TalonIO subclasses
+    public static interface VelocityControlType {}
+
+    /** A control slot represents a possible choice of control gains. */
     public static interface ControlSlot {
         int getIndex();
     }
+
+    public void applyConfigRequests(ConfigType desiredConfig);
+
+
+
+
+
+
+    // TODO: 4. Figure out a better way to initialize outputs + clean up code
 
     /** This should be called in the constructor of the subsystem using this IO */
     public void initializeOutputs(MotorIOOutputs outputs);

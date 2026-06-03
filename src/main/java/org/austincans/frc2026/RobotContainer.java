@@ -73,7 +73,7 @@ public class RobotContainer {
   private final DriveWrapper drive = new DriveWrapper(SubsystemFactory.buildDrive());
 
   @SuppressWarnings("unused")
-  private final Optional<Vision> vision = SubsystemFactory.buildVision(drive.getSubsystem());
+  private final Optional<Vision> vision = SubsystemFactory.buildVision(drive);
 
   @SuppressWarnings("unused")
   private final Optional<ObjectDetection> objectDetection = SubsystemFactory.buildObjectDetection();

@@ -17,6 +17,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -27,8 +28,6 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXSIO extends TalonIO {
-    private final TalonConfig config;
-
     private final TalonFXS motor;
 
     private final VoltageOut voltageOut = new VoltageOut(0);
@@ -43,12 +42,34 @@ public class TalonFXSIO extends TalonIO {
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXSIO(TalonConfig config) {
-        this.config = config;
+    TalonFXSIO(TalonFXSConfig config) {
+        super(config);
 
         motor = new TalonFXS(config.deviceId, config.canBus);
 
         TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
+
+        /** 
+         * IMPORTANT NOTE: We have not worked with an encoder for the TalonFXS yet, so be careful. 
+         * You can remove this note when tested and good.
+         */
+        switch (config.feedbackSensorSource) {
+            /** Be careful with this. I don't know what this is or how it works. */
+            case COMMUTATION -> {
+                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
+                vendorConfig.ExternalFeedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
+            }
+            case REMOTE_CANCODER -> {
+                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
+                vendorConfig.ExternalFeedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.ExternalFeedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+            }
+            case FUSED_CANCODER -> {
+                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.FusedCANcoder;
+                vendorConfig.ExternalFeedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.ExternalFeedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+            }
+        }
 
         vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.maxSpeed.in(RotationsPerSecond);
         vendorConfig.MotionMagic.MotionMagicAcceleration = config.maxAcceleration.in(RotationsPerSecondPerSecond);
@@ -142,52 +163,52 @@ public class TalonFXSIO extends TalonIO {
     }
 
     @Override
-    void setVoltage(Voltage voltage) {
+    protected void setVoltage(Voltage voltage) {
         motor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
-    void setVelocity(AngularVelocity velocity, ControlSlot slot) {
+    protected void setVelocity(AngularVelocity velocity, ControlSlot slot) {
         motor.setControl(velocityVoltage.withVelocity(velocity).withSlot(slot.getIndex())); 
     }
 
     @Override
-    void setPosition(Angle position, ControlSlot slot) {
+    protected void setPosition(Angle position, ControlSlot slot) {
         motor.setControl(positionVoltage.withPosition(position).withSlot(slot.getIndex()));
     }
 
     @Override
-    Angle getPosition() {
+    protected Angle getPosition() {
         return position.getValue();
     }
 
     @Override
-    AngularVelocity getVelocity() {
+    protected AngularVelocity getVelocity() {
         return velocity.getValue();
     }
 
     @Override
-    Voltage getVoltage() {
+    protected Voltage getVoltage() {
         return voltage.getValue();
     }
 
     @Override
-    Current getStatorCurrent() {
+    protected Current getStatorCurrent() {
         return statorCurrent.getValue();
     }
 
     @Override
-    Current getSupplyCurrent() {
+    protected Current getSupplyCurrent() {
         return supplyCurrent.getValue();
     }
 
     @Override
-    Current getTorqueCurrent() {
+    protected Current getTorqueCurrent() {
         return torqueCurrent.getValue();
     }
 
     @Override
-    Temperature getTemperature() {
+    protected Temperature getTemperature() {
         return temperature.getValue();
     }
 
