@@ -2,7 +2,11 @@ package org.austincans.lib.io.motors;
 
 import edu.wpi.first.units.measure.Current;
 
-public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs> {
+public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs, TalonConfig> {
+    protected TalonIO(TalonConfig config) {
+        super(config);
+    }
+
     public static class TalonIOInputs extends MotorIO.MotorIOInputs {
         private Current supplyCurrent;
         private Current torqueCurrent;
@@ -29,11 +33,11 @@ public abstract class TalonIO extends BaseMotorIO<TalonIO.TalonIOInputs> {
         inputs.setTorqueCurrent(getTorqueCurrent());
     }
 
-    abstract Current getSupplyCurrent();
+    protected abstract Current getSupplyCurrent();
 
-    abstract Current getTorqueCurrent();
+    protected abstract Current getTorqueCurrent();
 
-    public static enum TalonControlSlot implements ControlSlot {
+    public static enum TalonControlSlot implements MotorIO.ControlSlot {
         SLOT_0,
         SLOT_1,
         SLOT_2;

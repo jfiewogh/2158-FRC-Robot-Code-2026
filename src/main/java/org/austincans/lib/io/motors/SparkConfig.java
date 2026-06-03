@@ -10,4 +10,10 @@ public class SparkConfig extends MotorConfig<SparkControlSlot> {
    public ControlConfig slot3Config = new ControlConfig();
    public MotorType type;
    public Current smartCurrentStallLimit;
+
+   /** If true, follower should move in same direction as leader. */
+   public boolean isFollower;
+   public int leaderCanId; 
+   /** If true, follower should move in opposite direction of leader. */
+   public boolean invertFollowerOutput;
 }

@@ -17,26 +17,33 @@ package org.austincans.lib.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Optional;
 
 public abstract class SubsystemWrapper<Subsystem extends SubsystemBase> {
-  protected final Optional<Subsystem> subsystem;
-  public final boolean isPresent;
-  public final Subsystem s;
+  protected final boolean isPresent;
+  protected final Subsystem subsystem;
 
-  public SubsystemWrapper(Optional<Subsystem> subsystem) {
+  public SubsystemWrapper(boolean isPresent, Subsystem subsystem) {
+    this.isPresent = isPresent;
     this.subsystem = subsystem;
-    isPresent = subsystem.isPresent();
-    s = isPresent ? subsystem.get() : null;
   }
 
   public void setDefaultCommand(Command command) {
     if (isPresent) {
-      s.setDefaultCommand(command);
+      subsystem.setDefaultCommand(command);
     }
   }
 
-  public Optional<Subsystem> getSubsystem() {
+  /** Returns whether subsystem is non-null  */
+  public boolean isPresent() {
+    return isPresent;
+  }
+  /** Returns whether subsystem is null  */
+  public boolean isEmpty() {
+    return !isPresent;
+  }
+
+  /** Return instance of subsystem, could be null */
+  public Subsystem getSubsystem() {
     return subsystem;
   }
 }

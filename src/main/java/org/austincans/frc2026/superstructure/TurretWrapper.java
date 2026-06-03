@@ -40,24 +40,24 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
   private Rotation2d setpointJoystickTurretAngle = Rotation2d.k180deg;
 
   public TurretWrapper(Optional<Turret> subsystem) {
-    super(subsystem);
+    super(subsystem.isPresent(), subsystem);
   }
 
   public void setAngle(Rotation2d angle) {
     if (isPresent) {
-      s.setDesiredAngle(angle);
+      subsystem.setDesiredAngle(angle);
     }
   }
 
   public void setRobotRelAngle(Rotation2d robotRelAngle) {
     if (isPresent) {
-      s.setDesiredAngleRobotRelative(robotRelAngle);
+      subsystem.setDesiredAngleRobotRelative(robotRelAngle);
     }
   }
 
   public void setFieldRelAngle(Rotation2d fieldRelAngle, Rotation2d robotFieldRelAngle) {
     if (isPresent) {
-      s.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle);
+      subsystem.setDesiredAngleFieldRelative(fieldRelAngle, robotFieldRelAngle);
     }
   }
 
@@ -78,7 +78,7 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
           turretTranslation.toTranslation2d().getDistance(targetTranslation.toTranslation2d()));
     }
 
-    s.setDesiredAngleFieldRelative(fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
+    subsystem.setDesiredAngleFieldRelative(fieldRelAngle, fieldRelRobotPose.getRotation().toRotation2d());
   }
 
   private void pointToHub(Pose3d fieldRelRobotPose) {
@@ -110,7 +110,7 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
     if (Math.abs(rotationX) > deadband && Math.abs(rotationY) > deadband) {
       setpointJoystickTurretAngle = new Translation2d(rotationX, rotationY).getAngle();
     }
-    s.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
+    subsystem.setDesiredAngleRobotRelative(setpointJoystickTurretAngle);
   }
 
   public Command joystickRobotRelAngleCommand(
@@ -121,10 +121,10 @@ public class TurretWrapper extends SubsystemWrapper<Turret> {
     return Commands.run(
         () ->
             joystickRobotRelAngle(rotationXSupplier.getAsDouble(), rotationYSupplier.getAsDouble()),
-        s);
+        subsystem);
   }
 
   public Command resetAngleCommand() {
-    return isPresent ? s.resetAngle() : Commands.none();
+    return isPresent ? subsystem.resetAngle() : Commands.none();
   }
 }

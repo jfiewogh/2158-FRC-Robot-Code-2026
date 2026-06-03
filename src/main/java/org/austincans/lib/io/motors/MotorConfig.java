@@ -12,9 +12,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
  * These values define the motor's initial state and behavior in response to outputs.
  */
 public abstract class MotorConfig<ControlSlotType extends ControlSlot> {
-    /* Physical properties */
     public int deviceId;
-    public Gearbox gearbox;
+    /** Sensor can be rotor or external, depending on which is chosen */
+    public Gearbox sensorToMechanismGearbox;
 
     /* Software properties */
     public boolean inverted;

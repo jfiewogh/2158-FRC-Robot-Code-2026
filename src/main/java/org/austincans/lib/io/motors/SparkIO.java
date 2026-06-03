@@ -33,30 +33,31 @@ import edu.wpi.first.units.measure.Voltage;
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public class SparkIO<MotorType extends SparkBase, VendorConfigType extends SparkBaseConfig> extends BaseMotorIO<MotorIO.MotorIOInputs> {
+public class SparkIO<MotorType extends SparkBase, VendorConfigType extends SparkBaseConfig> extends BaseMotorIO<MotorIO.MotorIOInputs, SparkConfig> {
     private static final ClosedLoopSlot[] slots = ClosedLoopSlot.values();
 
-    final MotorType motor;
-    final RelativeEncoder encoder;
-    final SparkClosedLoopController controller;
-    final VendorConfigType vendorConfig;
+    protected final MotorType motor;
+    protected final RelativeEncoder encoder;
+    protected final SparkClosedLoopController controller;
 
-    final SparkConfig config;
+    protected final VendorConfigType vendorConfig;
 
-    SparkIO(MotorType motor, VendorConfigType vendorConfig, SparkConfig config) {
+    protected SparkIO(MotorType motor, VendorConfigType vendorConfig, SparkConfig config) {
+        super(config);
+
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
 
         /* Config */
-        this.config = config;
+
         this.vendorConfig = vendorConfig;
 
         vendorConfig.inverted(config.inverted);
         vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
         vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
 
-        SoftLimitConfig softLimitConfig = config.softLimitConfig;
+        final SoftLimitConfig softLimitConfig = config.softLimitConfig;
         vendorConfig.softLimit.forwardSoftLimitEnabled(softLimitConfig.forwardSoftLimitEnabled);
         vendorConfig.softLimit.forwardSoftLimit(softLimitConfig.forwardSoftLimit.in(Rotations));
         vendorConfig.softLimit.reverseSoftLimitEnabled(softLimitConfig.reverseSoftLimitEnabled);
@@ -67,6 +68,10 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         configureClosedLoopSlot(vendorConfig, config.slot2Config, ClosedLoopSlot.kSlot2, config);
         configureClosedLoopSlot(vendorConfig, config.slot3Config, ClosedLoopSlot.kSlot3, config);
 
+        if (config.isFollower) {
+            vendorConfig.follow(config.leaderCanId, config.invertFollowerOutput);
+        }
+        
         motor.configure(vendorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -84,42 +89,42 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     @Override
-    void setVoltage(Voltage voltage) {
+    protected void setVoltage(Voltage voltage) {
         controller.setSetpoint(voltage.in(Volts), ControlType.kVoltage);
     }
 
     @Override
-    void setVelocity(AngularVelocity velocity, ControlSlot slot) {
-        controller.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl, slots[slot.getIndex()]);
+    protected void setVelocity(AngularVelocity velocity, ControlSlot slot) {
+        controller.setSetpoint(velocity.in(RPM), ControlType.kVelocity, slots[slot.getIndex()]);
     }
 
     @Override
-    void setPosition(Angle position, ControlSlot slot) {
-        controller.setSetpoint(position.in(Rotations), ControlType.kMAXMotionVelocityControl, slots[slot.getIndex()]);
+    protected void setPosition(Angle position, ControlSlot slot) {
+        controller.setSetpoint(position.in(Rotations), ControlType.kPosition, slots[slot.getIndex()]);
     }
 
     @Override
-    Angle getPosition() {
+    protected Angle getPosition() {
         return Rotations.of(encoder.getPosition());
     }
 
     @Override
-    AngularVelocity getVelocity() {
+    protected AngularVelocity getVelocity() {
         return RPM.of(encoder.getVelocity());
     }
 
     @Override
-    Voltage getVoltage() {
+    protected Voltage getVoltage() {
         return Volts.of(motor.getBusVoltage());
     }
 
     @Override
-    Current getStatorCurrent() {
+    protected Current getStatorCurrent() {
         return Amps.of(motor.getOutputCurrent());
     }
 
     @Override
-    Temperature getTemperature() {
+    protected Temperature getTemperature() {
         return Celsius.of(motor.getMotorTemperature());
     }
 
@@ -134,7 +139,7 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         encoder.setPosition(positionRotations);
     }
 
-    public static enum SparkControlSlot implements ControlSlot {
+    public static enum SparkControlSlot implements MotorIO.ControlSlot {
         SLOT_0, 
         SLOT_1, 
         SLOT_2, 
@@ -148,5 +153,9 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     @Override
     public void initializeOutputs(MotorIOOutputs outputs) {
         outputs.setControlSlot(config.initialSlot);
+    }
+
+    public enum SparkVelocityControlType implements VelocityControlType {
+
     }
 }

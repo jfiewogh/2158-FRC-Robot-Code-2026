@@ -6,7 +6,14 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs> implements MotorIO<InputsType> {
+public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<?>> implements MotorIO<InputsType, ConfigType> {
+    protected final ConfigType config;
+    
+    public BaseMotorIO(ConfigType config) {
+        this.config = config;
+    }
+    
+    /** Updates inputs with newer values from motor */
     public void updateInputs(InputsType inputs) {
         inputs.setPosition(getPosition());
         inputs.setVelocity(getVelocity());
@@ -15,6 +22,7 @@ public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs> impl
         inputs.setTemperature(getTemperature());
     }
 
+    /** Applies output to motor based on the output mode */
     public final void applyOutputs(MotorIOOutputs outputs) {
         switch (outputs.getMode()) {
             case VOLTAGE -> setVoltage(outputs.getVoltage());
@@ -23,17 +31,24 @@ public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs> impl
         }
     }
 
+    // TODO: 3. Complete this method
+    public void applyConfigRequests(ConfigType desiredConfig) {
+        if (desiredConfig.slot0Config.equals(config.slot0Config)) {
+
+        }
+    }
+
     /* Position */
-    abstract Angle getPosition();
-    abstract void setPosition(Angle position, ControlSlot slot);
+    protected abstract Angle getPosition();
+    protected abstract void setPosition(Angle position, ControlSlot slot);
 
-    abstract AngularVelocity getVelocity();
-    abstract void setVelocity(AngularVelocity velocity, ControlSlot slot);
+    protected abstract AngularVelocity getVelocity();
+    protected abstract void setVelocity(AngularVelocity velocity, ControlSlot slot);
 
-    abstract Voltage getVoltage();
-    abstract void setVoltage(Voltage voltage);
+    protected abstract Voltage getVoltage();
+    protected abstract void setVoltage(Voltage voltage);
 
-    abstract Current getStatorCurrent();
+    protected abstract Current getStatorCurrent();
 
-    abstract Temperature getTemperature();
+    protected abstract Temperature getTemperature();
 }

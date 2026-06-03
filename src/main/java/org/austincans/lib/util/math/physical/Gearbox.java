@@ -12,16 +12,21 @@ public class Gearbox {
         totalReduction = reduction;
     }
 
-    public double toMechanism(double motorValue) {
-        return motorValue / totalReduction;
+    public double inputToOutput(double input) {
+        return input / totalReduction;
     }
 
-    public double toMotor(double mechanismValue) {
-        return mechanismValue * totalReduction;
+    public double outputToInput(double output) {
+        return output * totalReduction;
+    }
+
+    public double getReduction() {
+        return totalReduction;
     }
 
     /** Represents two meshed gears */
     public static record GearStage(int drivingGearTeeth, int drivenGearTeeth) {
+        /** Positive value means increase in torque and decrease in speed */
         public double getReduction() {
             return (double) drivenGearTeeth / drivingGearTeeth;
         }

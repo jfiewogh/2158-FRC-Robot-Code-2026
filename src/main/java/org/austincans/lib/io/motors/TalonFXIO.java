@@ -17,6 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -27,8 +28,6 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXIO extends TalonIO {
-    private final TalonConfig config;
-
     private final TalonFX motor;
 
     /** 
@@ -47,12 +46,33 @@ public class TalonFXIO extends TalonIO {
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXIO(TalonConfig config) {
-        this.config = config;
+    TalonFXIO(TalonFXConfig config) {
+        super(config);
 
         motor = new TalonFX(config.deviceId, config.canBus);
 
         TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
+
+        /** 
+         * See this page for more details on configuration
+         * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
+         */
+        switch (config.feedbackSensorSource) {
+            case ROTOR -> {
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
+            }
+            case REMOTE_CANCODER -> {
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+            }
+            case FUSED_CANCODER -> {
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+            }
+        }
 
         vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.maxSpeed.in(RotationsPerSecond);
         vendorConfig.MotionMagic.MotionMagicAcceleration = config.maxAcceleration.in(RotationsPerSecondPerSecond);
@@ -148,52 +168,52 @@ public class TalonFXIO extends TalonIO {
     }
 
     @Override
-    void setVoltage(Voltage voltage) {
+    protected void setVoltage(Voltage voltage) {
         motor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override
-    void setVelocity(AngularVelocity velocity, ControlSlot slot) {
+    protected void setVelocity(AngularVelocity velocity, ControlSlot slot) {
         motor.setControl(velocityVoltage.withVelocity(velocity).withSlot(slot.getIndex())); 
     }
 
     @Override
-    void setPosition(Angle position, ControlSlot slot) {
+    protected void setPosition(Angle position, ControlSlot slot) {
         motor.setControl(positionVoltage.withPosition(position).withSlot(slot.getIndex()));
     }
 
     @Override
-    Angle getPosition() {
+    protected Angle getPosition() {
         return position.getValue();
     }
 
     @Override
-    AngularVelocity getVelocity() {
+    protected AngularVelocity getVelocity() {
         return velocity.getValue();
     }
 
     @Override
-    Voltage getVoltage() {
+    protected Voltage getVoltage() {
         return voltage.getValue();
     }
 
     @Override
-    Current getStatorCurrent() {
+    protected Current getStatorCurrent() {
         return statorCurrent.getValue();
     }
 
     @Override
-    Current getSupplyCurrent() {
+    protected Current getSupplyCurrent() {
         return supplyCurrent.getValue();
     }
 
     @Override
-    Current getTorqueCurrent() {
+    protected Current getTorqueCurrent() {
         return torqueCurrent.getValue();
     }
 
     @Override
-    Temperature getTemperature() {
+    protected Temperature getTemperature() {
         return temperature.getValue();
     }
 
