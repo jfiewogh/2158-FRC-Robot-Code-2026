@@ -9,7 +9,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<?>> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs> {
+// Very long header
+public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<ControlSlotType>, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
@@ -71,12 +72,14 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         POSITION
     }
 
-    public static class MotorIOOutputs {
+    public static class MotorIOOutputs<ControlSlotType extends ControlSlot, VelocityControlTypeType extends VelocityControlType, PositionControlTypeType extends PositionControlType> {
         private MotorIOOutputMode mode;
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
-        private ControlSlot controlSlot;
+        private ControlSlotType controlSlot;
+        private VelocityControlTypeType velocityControlType;
+        private PositionControlTypeType positionControlType;
 
         public void setVoltage(Voltage voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
@@ -90,8 +93,14 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
             mode = MotorIOOutputMode.POSITION;
             this.position = position;
         }
-        public void setControlSlot(ControlSlot controlSlot) {
+        public void setControlSlot(ControlSlotType controlSlot) {
             this.controlSlot = controlSlot;
+        }
+        public void setVelocityControlType(VelocityControlTypeType velocityControlType) {
+            this.velocityControlType = velocityControlType;
+        }
+        public void setPositionControlType(PositionControlTypeType positionControlType) {
+            this.positionControlType = positionControlType;
         }
 
         /* Getter methods should only be called by IO */
@@ -107,21 +116,23 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         protected Angle getPosition() {
             return position;
         } 
-        protected ControlSlot getControlSlot() {
+        protected ControlSlotType getControlSlot() {
             return controlSlot;
+        }
+        protected VelocityControlTypeType getVelocityControlType() {
+            return velocityControlType;
+        }
+        protected PositionControlTypeType getPositionControlType() {
+            return positionControlType;
         }
     }
 
-    // TODO: 1. Complete this method and implementation for SparkIO and TalonIO subclasses
     public static interface PositionControlType {}
 
-    // TODO: 2. Complete this method and implementation for SparkIO and TalonIO subclasses
     public static interface VelocityControlType {}
 
     /** A control slot represents a possible choice of control gains. */
-    public static interface ControlSlot {
-        int getIndex();
-    }
+    public static interface ControlSlot {}
 
     public void applyConfigRequests(ConfigType desiredConfig);
 
@@ -133,11 +144,11 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
     // TODO: 4. Figure out a better way to initialize outputs + clean up code
 
     /** This should be called in the constructor of the subsystem using this IO */
-    public void initializeOutputs(MotorIOOutputs outputs);
+    public void initializeOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs);
 
     /** TODO: Update this to work with all configs (single motor config instance, instead of part of it) */
 
     /** TODO: Maybe create a config class containing only values that are tuned/changed
      * (this could possibly be derived from the motor config class) */
-    public void updateGains(ControlConfig config, ControlSlot slot);
+    public void updateGains(ControlConfig config, ControlSlotType slot);
 }

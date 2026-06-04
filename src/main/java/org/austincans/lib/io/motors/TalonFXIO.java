@@ -13,9 +13,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.Slot2Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -27,16 +24,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXIO extends TalonIO {
+public class TalonFXIO extends TalonIO<TalonFXConfig> {
     private final TalonFX motor;
-
-    /** 
-     * TODO: Config should decide which to used 
-     * TODO: Handle PID values for multiple controls (ex. config should include slot such as Slot0, Slot1, etc.)
-     */
-    private final VoltageOut voltageOut = new VoltageOut(0);
-    private final MotionMagicVoltage positionVoltage = new MotionMagicVoltage(0).withSlot(0);
-    private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0).withSlot(1);
 
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
@@ -124,10 +113,9 @@ public class TalonFXIO extends TalonIO {
         temperature = motor.getDeviceTemp();
     }
 
-    /** TODO: Figure out a better way to do this if you can. It seems too long */
     @Override
-    public void updateGains(ControlConfig controlConfig, ControlSlot slot) {
-        switch (slot.getIndex()) {
+    public void updateGains(ControlConfig controlConfig, TalonControlSlot slot) {
+        switch (slot.get()) {
             case 0 -> {
                 Slot0Configs slot0 = new Slot0Configs();
                 slot0.kP = controlConfig.pidConfig.kP;
@@ -173,13 +161,13 @@ public class TalonFXIO extends TalonIO {
     }
 
     @Override
-    protected void setVelocity(AngularVelocity velocity, ControlSlot slot) {
-        motor.setControl(velocityVoltage.withVelocity(velocity).withSlot(slot.getIndex())); 
+    protected void setVelocity(AngularVelocity velocity, TalonControlSlot slot, TalonVelocityControlType velocityControlType) {
+        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot)); 
     }
 
     @Override
-    protected void setPosition(Angle position, ControlSlot slot) {
-        motor.setControl(positionVoltage.withPosition(position).withSlot(slot.getIndex()));
+    protected void setPosition(Angle position, TalonControlSlot slot, TalonPositionControlType positionControlType) {
+        motor.setControl(getPositionControlRequest(positionControlType, position, slot));
     }
 
     @Override
@@ -215,10 +203,5 @@ public class TalonFXIO extends TalonIO {
     @Override
     protected Temperature getTemperature() {
         return temperature.getValue();
-    }
-
-    @Override
-    public void initializeOutputs(MotorIOOutputs outputs) {
-        outputs.setControlSlot(config.initialSlot);
     }
 }

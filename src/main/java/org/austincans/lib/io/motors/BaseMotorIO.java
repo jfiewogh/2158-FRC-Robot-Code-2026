@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<?>> implements MotorIO<InputsType, ConfigType> {
+public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<ControlSlotType>, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> implements MotorIO<InputsType, ConfigType, ControlSlotType, VelocityControlTypeType, PositionControlTypeType> {
     protected final ConfigType config;
     
     public BaseMotorIO(ConfigType config) {
@@ -23,11 +23,11 @@ public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, Conf
     }
 
     /** Applies output to motor based on the output mode */
-    public final void applyOutputs(MotorIOOutputs outputs) {
+    public final void applyOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs) {
         switch (outputs.getMode()) {
             case VOLTAGE -> setVoltage(outputs.getVoltage());
-            case VELOCITY -> setVelocity(outputs.getVelocity(), outputs.getControlSlot());
-            case POSITION -> setPosition(outputs.getPosition(), outputs.getControlSlot());
+            case VELOCITY -> setVelocity(outputs.getVelocity(), outputs.getControlSlot(), outputs.getVelocityControlType());
+            case POSITION -> setPosition(outputs.getPosition(), outputs.getControlSlot(), outputs.getPositionControlType());
         }
     }
 
@@ -40,10 +40,10 @@ public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, Conf
 
     /* Position */
     protected abstract Angle getPosition();
-    protected abstract void setPosition(Angle position, ControlSlot slot);
+    protected abstract void setPosition(Angle position, ControlSlotType slot, PositionControlTypeType positionControlType);
 
     protected abstract AngularVelocity getVelocity();
-    protected abstract void setVelocity(AngularVelocity velocity, ControlSlot slot);
+    protected abstract void setVelocity(AngularVelocity velocity, ControlSlotType slot, VelocityControlTypeType velocityControlType);
 
     protected abstract Voltage getVoltage();
     protected abstract void setVoltage(Voltage voltage);
