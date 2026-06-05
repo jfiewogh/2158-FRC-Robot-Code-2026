@@ -1,7 +1,9 @@
 package org.austincans.lib.io.motors;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import org.austincans.lib.io.ActuatorIO;
-import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -9,8 +11,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-// Very long header
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig<ControlSlotType>, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>> {
+public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
@@ -77,6 +78,7 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
+
         private ControlSlotType controlSlot;
         private VelocityControlTypeType velocityControlType;
         private PositionControlTypeType positionControlType;
@@ -85,22 +87,31 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
             mode = MotorIOOutputMode.VOLTAGE;
             this.voltage = voltage;
         }
-        public void setVelocity(AngularVelocity velocity) {
+
+        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, Voltage arbitraryFeedforward) {
             mode = MotorIOOutputMode.VELOCITY;
             this.velocity = velocity;
-        }
-        public void setPosition(Angle position) {
-            mode = MotorIOOutputMode.POSITION;
-            this.position = position;
-        }
-        public void setControlSlot(ControlSlotType controlSlot) {
+            voltage = arbitraryFeedforward;
             this.controlSlot = controlSlot;
-        }
-        public void setVelocityControlType(VelocityControlTypeType velocityControlType) {
             this.velocityControlType = velocityControlType;
         }
-        public void setPositionControlType(PositionControlTypeType positionControlType) {
+        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot) {
+            setVelocity(velocity, velocityControlType, controlSlot, Volts.of(0));
+        }
+
+        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, Voltage arbitraryFeedforward) {
+            mode = MotorIOOutputMode.POSITION;
+            this.position = position;
+            this.velocity = velocity;
+            voltage = arbitraryFeedforward;
+            this.controlSlot = controlSlot;
             this.positionControlType = positionControlType;
+        }
+        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity) {
+            setPosition(position, positionControlType, controlSlot, velocity, Volts.of(0));
+        }
+        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot) {
+            setPosition(position, positionControlType, controlSlot, RadiansPerSecond.of(0));
         }
 
         /* Getter methods should only be called by IO */
@@ -127,6 +138,21 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         }
     }
 
+
+    public static class MotorIOConfigRequests<ConfigType extends MotorConfig> {
+        protected ConfigType config;
+        protected boolean configChanged;
+
+        public void setConfig(ConfigType config) {
+            configChanged = true;
+            this.config = config;
+        }
+    }
+
+    /** Applies new config values to motor  */
+    public void applyConfigRequests(MotorIOConfigRequests<ConfigType> configRequests);
+
+
     public static interface PositionControlType {}
 
     public static interface VelocityControlType {}
@@ -134,21 +160,5 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
     /** A control slot represents a possible choice of control gains. */
     public static interface ControlSlot {}
 
-    public void applyConfigRequests(ConfigType desiredConfig);
-
-
-
-
-
-
-    // TODO: 4. Figure out a better way to initialize outputs + clean up code
-
-    /** This should be called in the constructor of the subsystem using this IO */
-    public void initializeOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs);
-
-    /** TODO: Update this to work with all configs (single motor config instance, instead of part of it) */
-
-    /** TODO: Maybe create a config class containing only values that are tuned/changed
-     * (this could possibly be derived from the motor config class) */
-    public void updateGains(ControlConfig config, ControlSlotType slot);
+    public void setEncoderPosition(Angle position);
 }

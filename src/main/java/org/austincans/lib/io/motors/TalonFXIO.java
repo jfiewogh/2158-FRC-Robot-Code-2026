@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
@@ -17,6 +18,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -35,15 +38,15 @@ public class TalonFXIO extends TalonIO<TalonFXConfig> {
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXIO(TalonFXConfig config) {
+    TalonFXIO(int deviceId, CANBus canBus, TalonFXConfig config) {
         super(config);
 
-        motor = new TalonFX(config.deviceId, config.canBus);
+        motor = new TalonFX(deviceId, canBus);
 
         TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
 
         /** 
-         * See this page for more details on configuration
+         * See this page for more details on remote sensors
          * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
          */
         switch (config.feedbackSensorSource) {
@@ -63,10 +66,11 @@ public class TalonFXIO extends TalonIO<TalonFXConfig> {
             }
         }
 
-        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.maxSpeed.in(RotationsPerSecond);
-        vendorConfig.MotionMagic.MotionMagicAcceleration = config.maxAcceleration.in(RotationsPerSecondPerSecond);
+        vendorConfig.ClosedLoopGeneral.ContinuousWrap = config.positionContinuousWrap;
 
-        /** Figure out a better way to do this if you can. It is long */
+        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.motionMagicMechanismCruiseVelocity.in(RotationsPerSecond);
+        vendorConfig.MotionMagic.MotionMagicAcceleration = config.motionMagicMechanismMaxAcceleration.in(RotationsPerSecondPerSecond);
+
         vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
         vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
         vendorConfig.Slot0.kD = config.slot0Config.pidConfig.kD;
@@ -91,15 +95,14 @@ public class TalonFXIO extends TalonIO<TalonFXConfig> {
         vendorConfig.Slot2.kV = config.slot2Config.ffConfig.kV;
         vendorConfig.Slot2.kA = config.slot2Config.ffConfig.kA;
         
-        SoftLimitConfig softLimitConfig = config.softLimitConfig;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
+        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = config.mechanismSoftLimitConfig.forwardSoftLimitEnabled;
+        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = config.mechanismSoftLimitConfig.forwardSoftLimit.in(Rotations);
+        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = config.mechanismSoftLimitConfig.reverseSoftLimitEnabled;
+        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = config.mechanismSoftLimitConfig.reverseSoftLimit.in(Rotations);
 
         vendorConfig.MotorOutput.NeutralMode = config.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        
         vendorConfig.MotorOutput.Inverted = config.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+
         vendorConfig.CurrentLimits.StatorCurrentLimit = config.statorCurrentLimit.in(Amps);
 
         motor.getConfigurator().apply(vendorConfig);
@@ -111,6 +114,25 @@ public class TalonFXIO extends TalonIO<TalonFXConfig> {
         statorCurrent = motor.getStatorCurrent();
         torqueCurrent = motor.getTorqueCurrent();
         temperature = motor.getDeviceTemp();
+    }
+
+    @Override
+    public void applyConfigRequests(TalonFXConfig desiredConfig) {
+        boolean slot0ConfigChanged = desiredConfig.slot0Config.equals(config.slot0Config);
+        boolean slot1ConfigChanged = desiredConfig.slot1Config.equals(config.slot1Config);
+
+        if (!desiredConfig.slot0Config.equals(config.slot0Config)) {
+            Slot0Configs slot0 = new Slot0Configs();
+            slot0.kP = desiredConfig.slot0Config.pidConfig.kP;
+            slot0.kI = desiredConfig.slot0Config.pidConfig.kI;
+            slot0.kD = desiredConfig.slot0Config.pidConfig.kD;
+            slot0.kS = desiredConfig.slot0Config.ffConfig.kS;
+            slot0.kG = desiredConfig.slot0Config.ffConfig.kG;
+            slot0.kV = desiredConfig.slot0Config.ffConfig.kV;
+            slot0.kA = desiredConfig.slot0Config.ffConfig.kA;
+        }
+
+        motor.getConfigurator().apply(desiredConfig);
     }
 
     @Override

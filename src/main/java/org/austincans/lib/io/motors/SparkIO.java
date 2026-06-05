@@ -8,11 +8,10 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfig.FFConfig;
-import org.austincans.lib.io.motors.MotorConfig.PIDConfig;
 import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
 import org.austincans.lib.io.motors.MotorIO.PositionControlType;
 import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
+import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
 import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
@@ -23,8 +22,8 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -43,52 +42,17 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    protected final VendorConfigType vendorConfig;
+    private final VendorConfigType vendorConfig;
+    private boolean initialConfigApplied = false;
 
-    protected SparkIO(MotorType motor, VendorConfigType vendorConfig, SparkConfig config) {
-        super(config);
+    private ControlConfig[] slotControlConfigs = new ControlConfig[4];
+
+    protected SparkIO(MotorType motor, VendorConfigType vendorConfig) {
+        this.vendorConfig = vendorConfig;
 
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
-
-        /* Config */
-
-        this.vendorConfig = vendorConfig;
-
-        vendorConfig.inverted(config.inverted);
-        vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
-        vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
-
-        final SoftLimitConfig softLimitConfig = config.softLimitConfig;
-        vendorConfig.softLimit.forwardSoftLimitEnabled(softLimitConfig.forwardSoftLimitEnabled);
-        vendorConfig.softLimit.forwardSoftLimit(softLimitConfig.forwardSoftLimit.in(Rotations));
-        vendorConfig.softLimit.reverseSoftLimitEnabled(softLimitConfig.reverseSoftLimitEnabled);
-        vendorConfig.softLimit.reverseSoftLimit(softLimitConfig.reverseSoftLimit.in(Rotations));
-
-        configureClosedLoopSlot(vendorConfig, config.slot0Config, ClosedLoopSlot.kSlot0, config);
-        configureClosedLoopSlot(vendorConfig, config.slot1Config, ClosedLoopSlot.kSlot1, config);
-        configureClosedLoopSlot(vendorConfig, config.slot2Config, ClosedLoopSlot.kSlot2, config);
-        configureClosedLoopSlot(vendorConfig, config.slot3Config, ClosedLoopSlot.kSlot3, config);
-
-        if (config.isFollower) {
-            vendorConfig.follow(config.leaderCanId, config.invertFollowerOutput);
-        }
-        
-        motor.configure(vendorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
-
-    private void configureClosedLoopSlot(VendorConfigType vendorConfig, ControlConfig controlConfig, ClosedLoopSlot slot, SparkConfig config) {
-        PIDConfig pid = controlConfig.pidConfig;
-        FFConfig ff = controlConfig.ffConfig;
-
-        ClosedLoopConfig closedLoop = vendorConfig.closedLoop;
-        closedLoop.pid(pid.kP, pid.kI, pid.kD, slot);
-        closedLoop.feedForward.svag(ff.kS, ff.kV, ff.kA, ff.kG, slot);
-        closedLoop.allowedClosedLoopError(controlConfig.allowedMechanismClosedLoopError.in(Rotations), slot);
-
-        closedLoop.maxMotion.cruiseVelocity(config.maxSpeed.in(RPM), slot);
-        closedLoop.maxMotion.maxAcceleration(config.maxAcceleration.in(RPM.per(Second)), slot);
     }
 
     @Override
@@ -96,14 +60,19 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         controller.setSetpoint(voltage.in(Volts), ControlType.kVoltage);
     }
 
+    /** 
+     * Helpful page that explains feedforward control:
+     * https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control 
+     */
     @Override
-    protected void setVelocity(AngularVelocity velocity, SparkControlSlot controlSlot, SparkVelocityControlType velocityControlType) {
-        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot);
+    protected void setVelocity(AngularVelocity velocity, SparkVelocityControlType velocityControlType, SparkControlSlot controlSlot, Voltage arbitraryFeedforward) {
+        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.in(Volts));
     }
 
     @Override
-    protected void setPosition(Angle position, SparkControlSlot controlSlot, SparkPositionControlType positionControlType) {
-        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot);
+    protected void setPosition(Angle position, SparkPositionControlType positionControlType, SparkControlSlot controlSlot, AngularVelocity velocity, Voltage arbitraryFeedforward) {
+        double kV = velocity.in(RPM) * slotControlConfigs[controlSlot.getIndex()].ffConfig.kV;
+        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.in(Volts));
     }
 
     @Override
@@ -132,26 +101,100 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     @Override
-    public void updateGains(ControlConfig config, SparkControlSlot slot) {
-        configureClosedLoopSlot(vendorConfig, config, slot.get(), this.config);
-        motor.configureAsync(vendorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    public void applyConfigRequests(MotorIOConfigRequests<SparkConfig> configRequests) {
+        if (!configRequests.configChanged) {
+            return;
+        }
+        configRequests.configChanged = false;
+
+        SparkConfig config = configRequests.config;
+
+        slotControlConfigs[0] = config.slot0Config.controlConfig;
+        slotControlConfigs[1] = config.slot1Config.controlConfig;
+        slotControlConfigs[2] = config.slot2Config.controlConfig;
+        slotControlConfigs[3] = config.slot3Config.controlConfig;
+
+        /* Vendor Config */
+
+        vendorConfig.inverted(config.inverted);
+
+        vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
+
+        vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
+
+        vendorConfig.encoder.positionConversionFactor(1.0 / config.sensorToMechanismGearbox.getReduction());
+        vendorConfig.encoder.velocityConversionFactor(1.0 / config.sensorToMechanismGearbox.getReduction());
+
+        /* Soft Limit */
+        vendorConfig.softLimit.forwardSoftLimitEnabled(config.mechanismSoftLimitConfig.forwardSoftLimitEnabled);
+        vendorConfig.softLimit.forwardSoftLimit(config.mechanismSoftLimitConfig.forwardSoftLimit.in(Rotations));
+        vendorConfig.softLimit.reverseSoftLimitEnabled(config.mechanismSoftLimitConfig.reverseSoftLimitEnabled);
+        vendorConfig.softLimit.reverseSoftLimit(config.mechanismSoftLimitConfig.reverseSoftLimit.in(Rotations));
+
+        /* Closed Loop */
+        vendorConfig.closedLoop.positionWrappingEnabled(config.positionContinuousWrap);
+        vendorConfig.closedLoop.positionWrappingInputRange(0, 0);
+        configureClosedLoopSlot(config.slot0Config);
+        configureClosedLoopSlot(config.slot1Config);
+        configureClosedLoopSlot(config.slot2Config);
+        configureClosedLoopSlot(config.slot3Config);
+
+        if (config.isFollower) {
+            vendorConfig.follow(config.leaderCanId, config.invertFollowerOutput);
+        }
+
+        if (!initialConfigApplied) {
+            motor.configure(vendorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        } else {
+            motor.configureAsync(vendorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        }
     }
 
-    /** TODO: This should probably be updated as part of outputs, or have a different method for updating configs */
-    public void setEncoderPosition(double positionRotations) {
-        encoder.setPosition(positionRotations);
+    private void configureClosedLoopSlot(SlotConfig slotConfig) {
+        ClosedLoopSlot slot = slotConfig.controlSlot.get();
+
+        vendorConfig.closedLoop.p(slotConfig.controlConfig.pidConfig.kP, slot);
+        vendorConfig.closedLoop.i(slotConfig.controlConfig.pidConfig.kP, slot);
+        vendorConfig.closedLoop.d(slotConfig.controlConfig.pidConfig.kP, slot);
+
+        vendorConfig.closedLoop.feedForward.kS(slotConfig.controlConfig.ffConfig.kS, slot);
+        vendorConfig.closedLoop.feedForward.kV(slotConfig.controlConfig.ffConfig.kV, slot);
+        vendorConfig.closedLoop.feedForward.kA(slotConfig.controlConfig.ffConfig.kA, slot);
+        vendorConfig.closedLoop.feedForward.kG(slotConfig.controlConfig.ffConfig.kG, slot);
+
+        vendorConfig.closedLoop.allowedClosedLoopError(slotConfig.allowedMechanismClosedLoopError.in(Rotations), slot);
+
+        vendorConfig.closedLoop.maxMotion.cruiseVelocity(slotConfig.maxMotionMechanismCruiseVelocity.in(RPM), slot);
+        vendorConfig.closedLoop.maxMotion.maxAcceleration(slotConfig.maxMotionMechanismMaxAcceleration.in(RPM.per(Second)), slot);
     }
+
 
     @Override
-    public void initializeOutputs(MotorIOOutputs<SparkControlSlot, SparkVelocityControlType, SparkPositionControlType> outputs) {
-        outputs.setControlSlot(config.initialSlot);
+    public void setEncoderPosition(Angle position) {
+        encoder.setPosition(position.in(Rotations));
+    }
+    
+    /** 
+     * Feedforward unit can be voltage or percent out, but currently, this method only works for voltage.
+     * If you need percent out for whatever reason, you can modify the parameter(s) or create another method.
+     */
+    private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot controlSlot, double feedforwardVolts) {
+        controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
     }
 
-
-    
-    /** Used to setpoint based on controlType and slot. Works for both position and velocity. */
-    private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot slot) {
-        controller.setSetpoint(setpoint, controlType, slot.get());
+    public static class SparkIOConfigRequests extends MotorIOConfigRequests<SparkConfig> {
+        public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
+            configChanged |= !config.mechanismSoftLimitConfig.equals(softLimitConfig);
+            config.mechanismSoftLimitConfig = softLimitConfig;
+        }
+        public void setNeutralMode(NeutralMode neutralMode) {
+            configChanged |= config.neutralMode != neutralMode;
+            config.neutralMode = neutralMode;
+        }
+        public void setInverted(boolean inverted) {
+            configChanged |= config.inverted != inverted;
+            config.inverted = inverted;
+        }
     }
 
     public static enum SparkPositionControlType implements PositionControlType {
@@ -198,6 +241,9 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
 
         public ClosedLoopSlot get() {
             return slot;
+        }
+        public int getIndex() {
+            return ordinal();
         }
     }
 }

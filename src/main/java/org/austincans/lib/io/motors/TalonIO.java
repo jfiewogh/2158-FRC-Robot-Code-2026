@@ -73,11 +73,6 @@ public abstract class TalonIO<TalonConfigType extends TalonConfig> extends BaseM
         inputs.setTorqueCurrent(getTorqueCurrent());
     }
 
-    @Override
-    public void initializeOutputs(MotorIOOutputs<TalonControlSlot, TalonVelocityControlType, TalonPositionControlType> outputs) {
-        outputs.setControlSlot(config.initialSlot);
-    }
-
     protected abstract Current getSupplyCurrent();
 
     protected abstract Current getTorqueCurrent();

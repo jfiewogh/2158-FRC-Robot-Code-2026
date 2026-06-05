@@ -1,45 +1,35 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.MotorIO.ControlSlot;
 import org.austincans.lib.io.motors.MotorIO.NeutralMode;
 import org.austincans.lib.util.math.physical.Gearbox;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 
-/** 
- * These values define the motor's initial state and behavior in response to outputs.
- */
-public abstract class MotorConfig<ControlSlotType extends ControlSlot> {
-    public int deviceId;
-    /** Sensor can be rotor or external, depending on which is chosen */
+/** Only values part of vendor config should be included. */
+public abstract class MotorConfig {
+    /**
+     * Sensor can be rotor or external, depending on which is chosen. Mechanism
+     * represents the final output.
+     */
     public Gearbox sensorToMechanismGearbox;
-
-    /* Software properties */
     public boolean inverted;
-
     public NeutralMode neutralMode;
-
-    public SoftLimitConfig softLimitConfig;
-    public AngularVelocity maxSpeed;
-    public AngularAcceleration maxAcceleration;
-
-    public ControlSlotType initialSlot; 
-    public ControlConfig slot0Config = new ControlConfig();
-    public ControlConfig slot1Config = new ControlConfig();
-    public ControlConfig slot2Config = new ControlConfig();
+    public SoftLimitConfig mechanismSoftLimitConfig;
+    public boolean positionContinuousWrap;
 
     /** Closed-Loop Control Config */
     public static class ControlConfig {
         public PIDConfig pidConfig = new PIDConfig();
         public FFConfig ffConfig = new FFConfig();
-        public Angle allowedMechanismClosedLoopError;
     }
 
-    /** Proportional-Integral-Derivative Config */
+    /**
+     * Proportional-Integral-Derivative Config
+     * TODO: This should be moved since subsystems and other devices can also use
+     * PID control, not just motors
+     */
     public static class PIDConfig {
-        public double kP; 
+        public double kP;
         public double kI;
         public double kD;
     }
@@ -53,10 +43,17 @@ public abstract class MotorConfig<ControlSlotType extends ControlSlot> {
         public double kT;
     }
 
-    public static class SoftLimitConfig {
+    public static class SoftLimitConfig extends Object {
         public boolean forwardSoftLimitEnabled;
         public Angle forwardSoftLimit;
         public boolean reverseSoftLimitEnabled;
         public Angle reverseSoftLimit;
+
+        public boolean equals(SoftLimitConfig other) {
+            return forwardSoftLimitEnabled == other.forwardSoftLimitEnabled
+                    && forwardSoftLimit.isEquivalent(other.forwardSoftLimit)
+                    && reverseSoftLimitEnabled == other.reverseSoftLimitEnabled
+                    && reverseSoftLimit.isEquivalent(other.reverseSoftLimit);
+        }
     }
 }

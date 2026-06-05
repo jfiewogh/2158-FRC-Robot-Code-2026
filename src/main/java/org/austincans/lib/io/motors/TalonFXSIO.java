@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
@@ -35,10 +36,10 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXSIO(TalonFXSConfig config) {
+    TalonFXSIO(int deviceId, CANBus canBus, TalonFXSConfig config) {
         super(config);
 
-        motor = new TalonFXS(config.deviceId, config.canBus);
+        motor = new TalonFXS(deviceId, canBus);
 
         TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
 
@@ -64,8 +65,8 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
             }
         }
 
-        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.maxSpeed.in(RotationsPerSecond);
-        vendorConfig.MotionMagic.MotionMagicAcceleration = config.maxAcceleration.in(RotationsPerSecondPerSecond);
+        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.mechanismSpeedLimit.in(RotationsPerSecond);
+        vendorConfig.MotionMagic.MotionMagicAcceleration = config.mechanismAccelerationLimit.in(RotationsPerSecondPerSecond);
 
         vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
         vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
@@ -91,7 +92,7 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
         vendorConfig.Slot2.kV = config.slot2Config.ffConfig.kV;
         vendorConfig.Slot2.kA = config.slot2Config.ffConfig.kA;
         
-        SoftLimitConfig softLimitConfig = config.softLimitConfig;
+        SoftLimitConfig softLimitConfig = config.mechanismPositionLimits;
         vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
         vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
         vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
