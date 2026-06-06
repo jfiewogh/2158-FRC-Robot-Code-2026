@@ -7,15 +7,20 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
+import org.austincans.lib.io.motors.TalonFXConfig.TalonFXFeedbackSensorSource;
+import org.austincans.lib.io.motors.TalonFXSConfig.TalonFXSFeedbackSensorSource;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.Slot2Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -25,8 +30,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
+public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSource> {
     private final TalonFXS motor;
+
+    private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
 
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
@@ -36,74 +43,8 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXSIO(int deviceId, CANBus canBus, TalonFXSConfig config) {
-        super(config);
-
+    TalonFXSIO(int deviceId, CANBus canBus, TalonFXConfig config) {
         motor = new TalonFXS(deviceId, canBus);
-
-        TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
-
-        /** 
-         * IMPORTANT NOTE: We have not worked with an encoder for the TalonFXS yet, so be careful. 
-         * You can remove this note when tested and good.
-         */
-        switch (config.feedbackSensorSource) {
-            /** Be careful with this. I don't know what this is or how it works. */
-            case COMMUTATION -> {
-                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
-                vendorConfig.ExternalFeedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
-            }
-            case REMOTE_CANCODER -> {
-                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
-                vendorConfig.ExternalFeedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
-                vendorConfig.ExternalFeedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
-            }
-            case FUSED_CANCODER -> {
-                vendorConfig.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.FusedCANcoder;
-                vendorConfig.ExternalFeedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
-                vendorConfig.ExternalFeedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
-            }
-        }
-
-        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.mechanismSpeedLimit.in(RotationsPerSecond);
-        vendorConfig.MotionMagic.MotionMagicAcceleration = config.mechanismAccelerationLimit.in(RotationsPerSecondPerSecond);
-
-        vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
-        vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
-        vendorConfig.Slot0.kD = config.slot0Config.pidConfig.kD;
-        vendorConfig.Slot0.kS = config.slot0Config.ffConfig.kS;
-        vendorConfig.Slot0.kG = config.slot0Config.ffConfig.kG;
-        vendorConfig.Slot0.kV = config.slot0Config.ffConfig.kV;
-        vendorConfig.Slot0.kA = config.slot0Config.ffConfig.kA;
-
-        vendorConfig.Slot1.kP = config.slot1Config.pidConfig.kP;
-        vendorConfig.Slot1.kI = config.slot1Config.pidConfig.kI;
-        vendorConfig.Slot1.kD = config.slot1Config.pidConfig.kD;
-        vendorConfig.Slot1.kS = config.slot1Config.ffConfig.kS;
-        vendorConfig.Slot1.kG = config.slot1Config.ffConfig.kG;
-        vendorConfig.Slot1.kV = config.slot1Config.ffConfig.kV;
-        vendorConfig.Slot1.kA = config.slot1Config.ffConfig.kA;
-
-        vendorConfig.Slot2.kP = config.slot2Config.pidConfig.kP;
-        vendorConfig.Slot2.kI = config.slot2Config.pidConfig.kI;
-        vendorConfig.Slot2.kD = config.slot2Config.pidConfig.kD;
-        vendorConfig.Slot2.kS = config.slot2Config.ffConfig.kS;
-        vendorConfig.Slot2.kG = config.slot2Config.ffConfig.kG;
-        vendorConfig.Slot2.kV = config.slot2Config.ffConfig.kV;
-        vendorConfig.Slot2.kA = config.slot2Config.ffConfig.kA;
-        
-        SoftLimitConfig softLimitConfig = config.mechanismPositionLimits;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
-
-        vendorConfig.MotorOutput.NeutralMode = config.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        
-        vendorConfig.MotorOutput.Inverted = config.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        vendorConfig.CurrentLimits.StatorCurrentLimit = config.statorCurrentLimit.in(Amps);
-
-        motor.getConfigurator().apply(vendorConfig);
 
         position = motor.getPosition();
         velocity = motor.getVelocity();
@@ -115,46 +56,197 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
     }
 
     @Override
-    public void updateGains(ControlConfig controlConfig, TalonControlSlot slot) {
-        switch (slot.get()) {
-            case 0 -> {
-                Slot0Configs slot0 = new Slot0Configs();
-                slot0.kP = controlConfig.pidConfig.kP;
-                slot0.kI = controlConfig.pidConfig.kI;
-                slot0.kD = controlConfig.pidConfig.kD;
-                slot0.kS = controlConfig.ffConfig.kS;
-                slot0.kG = controlConfig.ffConfig.kG;
-                slot0.kV = controlConfig.ffConfig.kV;
-                slot0.kA = controlConfig.ffConfig.kA;
-                motor.getConfigurator().apply(slot0);
-                return;
+    public void applyConfigRequests(TalonIOConfigRequests<TalonFXSConfig, TalonFXSFeedbackSensorSource> configRequests) {
+        if (!configRequests.configChanged) {
+            return;
+        }
+        configRequests.configChanged = false;
+
+        TalonFXSConfig config = configRequests.config;
+
+        int changeCount = getTrueCount(
+            configRequests.motorOutputConfigChanged, 
+            configRequests.softLimitConfigChanged,
+            configRequests.slot0ConfigChanged,
+            configRequests.slot1ConfigChanged,
+            configRequests.slot2ConfigChanged,
+            configRequests.feedbackConfigChanged,
+            configRequests.closedLoopGeneralConfigChanged,
+            configRequests.motionMagicConfigChanged,
+            configRequests.currentLimitsConfigChanged
+        );
+
+        /* Multiple Configs */
+        if (changeCount > 1) {
+            configRequests.motorOutputConfigChanged = false;
+            updateMotorOutputConfigs(config);
+
+            configRequests.softLimitConfigChanged = false;
+            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+
+            configRequests.slot0ConfigChanged = false;
+            updateSlot0Configs(config);
+
+            configRequests.slot1ConfigChanged = false;
+            updateSlot1Configs(config);
+
+            configRequests.slot2ConfigChanged = false;
+            updateSlot2Configs(config);
+
+            configRequests.feedbackConfigChanged = false;
+            updateFeedbackConfig(config);
+
+            configRequests.closedLoopGeneralConfigChanged = false;
+            updateClosedLoopGeneralConfig(config);
+
+            configRequests.motionMagicConfigChanged = false;
+            updateMotionMagicConfig(config);
+
+            configRequests.currentLimitsConfigChanged = false;
+            updateCurrentLimitsConfig(config);
+
+            motor.getConfigurator().apply(vendorConfig);
+            return;
+        }
+
+        /* Individual Configs */
+        if (configRequests.motorOutputConfigChanged) {
+            configRequests.motorOutputConfigChanged = false;
+            updateMotorOutputConfigs(config);
+            motor.getConfigurator().apply(vendorConfig.MotorOutput);
+            return;
+        }
+        if (configRequests.softLimitConfigChanged) {
+            configRequests.softLimitConfigChanged = false;
+            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+            motor.getConfigurator().apply(vendorConfig.SoftwareLimitSwitch);
+            return;
+        }
+        if (configRequests.slot0ConfigChanged) {
+            configRequests.slot0ConfigChanged = false;
+            updateSlot0Configs(config);
+            motor.getConfigurator().apply(vendorConfig.Slot0);
+            return;
+        }
+        if (configRequests.slot1ConfigChanged) {
+            configRequests.slot1ConfigChanged = false;
+            updateSlot1Configs(config);
+            motor.getConfigurator().apply(vendorConfig.Slot1);
+            return;
+        }
+        if (configRequests.slot2ConfigChanged) {
+            configRequests.slot2ConfigChanged = false;
+            updateSlot2Configs(config);
+            motor.getConfigurator().apply(vendorConfig.Slot2);
+            return;
+        }
+        if (configRequests.feedbackConfigChanged) {
+            configRequests.feedbackConfigChanged = false;
+            updateFeedbackConfig(config);
+            motor.getConfigurator().apply(vendorConfig.Feedback);
+            return;
+        }
+        if (configRequests.closedLoopGeneralConfigChanged) {
+            configRequests.closedLoopGeneralConfigChanged = false;
+            updateClosedLoopGeneralConfig(config);
+            motor.getConfigurator().apply(vendorConfig.ClosedLoopGeneral);
+            return;
+        }
+        if (configRequests.motionMagicConfigChanged) {
+            configRequests.motionMagicConfigChanged = false;
+            updateMotionMagicConfig(config);
+            motor.getConfigurator().apply(vendorConfig.MotionMagic);
+            return;
+        }
+        if (configRequests.currentLimitsConfigChanged) {
+            configRequests.currentLimitsConfigChanged = false;
+            updateCurrentLimitsConfig(config);
+            motor.getConfigurator().apply(vendorConfig.CurrentLimits);
+            return;
+        }
+    }
+
+    private void updateMotorOutputConfigs(TalonFXSConfig config) {
+        vendorConfig.MotorOutput.Inverted = config.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        vendorConfig.MotorOutput.NeutralMode = config.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    }
+
+    private void updateSoftLimitSwitchConfigs(SoftLimitConfig softLimitConfig) {
+        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
+        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
+        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
+        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
+    }
+
+    private void updateSlot0Configs(TalonFXSConfig config) {
+        vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
+        vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
+        vendorConfig.Slot0.kD = config.slot0Config.pidConfig.kD;
+        vendorConfig.Slot0.kS = config.slot0Config.ffConfig.kS;
+        vendorConfig.Slot0.kG = config.slot0Config.ffConfig.kG;
+        vendorConfig.Slot0.kV = config.slot0Config.ffConfig.kV;
+        vendorConfig.Slot0.kA = config.slot0Config.ffConfig.kA;
+    }
+    private void updateSlot1Configs(TalonFXSConfig config) {
+        vendorConfig.Slot1.kP = config.slot1Config.pidConfig.kP;
+        vendorConfig.Slot1.kI = config.slot1Config.pidConfig.kI;
+        vendorConfig.Slot1.kD = config.slot1Config.pidConfig.kD;
+        vendorConfig.Slot1.kS = config.slot1Config.ffConfig.kS;
+        vendorConfig.Slot1.kG = config.slot1Config.ffConfig.kG;
+        vendorConfig.Slot1.kV = config.slot1Config.ffConfig.kV;
+        vendorConfig.Slot1.kA = config.slot1Config.ffConfig.kA;
+    }
+    private void updateSlot2Configs(TalonFXSConfig config) {
+        vendorConfig.Slot2.kP = config.slot2Config.pidConfig.kP;
+        vendorConfig.Slot2.kI = config.slot2Config.pidConfig.kI;
+        vendorConfig.Slot2.kD = config.slot2Config.pidConfig.kD;
+        vendorConfig.Slot2.kS = config.slot2Config.ffConfig.kS;
+        vendorConfig.Slot2.kG = config.slot2Config.ffConfig.kG;
+        vendorConfig.Slot2.kV = config.slot2Config.ffConfig.kV;
+        vendorConfig.Slot2.kA = config.slot2Config.ffConfig.kA;
+    }
+
+    /** 
+     * See this page for more details on remote sensors
+     * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
+     */
+    private void updateFeedbackConfig(TalonFXSConfig config) {
+        switch (config.feedbackConfig.feedbackSensorSource) {
+            case COMMUTATION -> {
+                // TODO: Commutation should not be like this. Check AdvantageKit's swerve template with TalonFXS
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
-            case 1 -> {
-                Slot1Configs slot1 = new Slot1Configs();
-                slot1.kP = controlConfig.pidConfig.kP;
-                slot1.kI = controlConfig.pidConfig.kI;
-                slot1.kD = controlConfig.pidConfig.kD;
-                slot1.kS = controlConfig.ffConfig.kS;
-                slot1.kG = controlConfig.ffConfig.kG;
-                slot1.kV = controlConfig.ffConfig.kV;
-                slot1.kA = controlConfig.ffConfig.kA;
-                motor.getConfigurator().apply(slot1);
-                return;
+            case REMOTE_CANCODER -> {
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
+                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
-            case 2 -> {
-                Slot2Configs slot2 = new Slot2Configs();
-                slot2.kP = controlConfig.pidConfig.kP;
-                slot2.kI = controlConfig.pidConfig.kI;
-                slot2.kD = controlConfig.pidConfig.kD;
-                slot2.kS = controlConfig.ffConfig.kS;
-                slot2.kG = controlConfig.ffConfig.kG;
-                slot2.kV = controlConfig.ffConfig.kV;
-                slot2.kA = controlConfig.ffConfig.kA;
-                motor.getConfigurator().apply(slot2);
-                return;
+            case FUSED_CANCODER -> {
+                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
+                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
+                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
         }
     }
+
+    private void updateClosedLoopGeneralConfig(TalonFXSConfig config) {
+        vendorConfig.ClosedLoopGeneral.ContinuousWrap = config.positionContinuousWrap;
+    }
+    private void updateMotionMagicConfig(TalonFXSConfig config) {
+        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.motionMagicMechanismCruiseVelocity.in(RotationsPerSecond);
+        vendorConfig.MotionMagic.MotionMagicAcceleration = config.motionMagicMechanismAcceleration.in(RotationsPerSecondPerSecond);
+        vendorConfig.MotionMagic.MotionMagicJerk = config.motionMagicMechanismJerkRotationsPerSecCubed;
+    }
+    private void updateCurrentLimitsConfig(TalonFXSConfig config) {
+        vendorConfig.CurrentLimits.StatorCurrentLimitEnable = config.currentLimitsConfig.statorCurrentLimitEnabled;
+        vendorConfig.CurrentLimits.StatorCurrentLimit = config.currentLimitsConfig.statorCurrentLimit.in(Amps);
+        vendorConfig.CurrentLimits.SupplyCurrentLimitEnable = config.currentLimitsConfig.supplyCurrentLimitEnabled;
+        vendorConfig.CurrentLimits.SupplyCurrentLimit = config.currentLimitsConfig.supplyCurrentLimit.in(Amps);
+    }
+
 
     @Override
     protected void setVoltage(Voltage voltage) {
@@ -162,13 +254,13 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
     }
 
     @Override
-    protected void setVelocity(AngularVelocity velocity, TalonControlSlot slot, TalonVelocityControlType velocityControlType) {
-        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot)); 
+    protected void setPosition(Angle position, TalonPositionControlType positionControlType, TalonControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(getPositionControlRequest(positionControlType, position, slot, velocity, arbitraryFeedforward));
     }
 
     @Override
-    protected void setPosition(Angle position, TalonControlSlot slot, TalonPositionControlType positionControlType) {
-        motor.setControl(getPositionControlRequest(positionControlType, position, slot));
+    protected void setVelocity(AngularVelocity velocity, TalonVelocityControlType velocityControlType, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot, arbitraryFeedforward)); 
     }
 
     @Override
@@ -204,5 +296,10 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig> {
     @Override
     protected Temperature getTemperature() {
         return temperature.getValue();
+    }
+
+    @Override
+    public void setEncoderPosition(Angle position) {
+        motor.setPosition(position);
     }
 }

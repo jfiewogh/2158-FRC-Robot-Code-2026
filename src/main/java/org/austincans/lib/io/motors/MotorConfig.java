@@ -5,15 +5,21 @@ import org.austincans.lib.util.math.physical.Gearbox;
 
 import edu.wpi.first.units.measure.Angle;
 
-/** Only values part of vendor config should be included. */
+/** 
+ * Only values part of vendor config should be included. 
+ * TODO: I feel like this class is unnecessary and that SparkConfig and TalonConfig should not be sibling classes.
+ */
 public abstract class MotorConfig {
     /**
-     * Sensor can be rotor or external, depending on which is chosen. Mechanism
-     * represents the final output.
+     * Sensor can be rotor or external, depending on which is chosen. 
+     * Mechanism represents the final output.
+     * This should be part of FeedbackConfig for TalonConfig.
      */
     public Gearbox sensorToMechanismGearbox;
+    
     public boolean inverted;
     public NeutralMode neutralMode;
+
     public SoftLimitConfig mechanismSoftLimitConfig;
     public boolean positionContinuousWrap;
 

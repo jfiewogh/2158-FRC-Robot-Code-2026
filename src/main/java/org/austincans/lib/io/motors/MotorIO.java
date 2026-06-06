@@ -88,13 +88,13 @@ public interface MotorIO<
     public static class MotorIOOutputs<
         ControlSlotType extends ControlSlot, 
         VelocityControlTypeType extends VelocityControlType, 
-        PositionControlTypeType extends PositionControlType
-    > {
+        PositionControlTypeType extends PositionControlType> {
+
         private MotorIOOutputMode mode;
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
-        private ArbitraryFeedforward
+        protected ArbitraryFeedforward arbitraryFeedforward;
 
         private ControlSlotType controlSlot;
         private VelocityControlTypeType velocityControlType;
@@ -105,30 +105,24 @@ public interface MotorIO<
             this.voltage = voltage;
         }
 
-        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, Voltage arbitraryFeedforward) {
+        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
             mode = MotorIOOutputMode.VELOCITY;
             this.velocity = velocity;
-            voltage = arbitraryFeedforward;
+            this.arbitraryFeedforward = arbitraryFeedforward;
             this.controlSlot = controlSlot;
             this.velocityControlType = velocityControlType;
         }
-        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot) {
-            setVelocity(velocity, velocityControlType, controlSlot, Volts.of(0));
-        }
 
-        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, Voltage arbitraryFeedforward) {
+        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
             mode = MotorIOOutputMode.POSITION;
             this.position = position;
             this.velocity = velocity;
-            voltage = arbitraryFeedforward;
+            this.arbitraryFeedforward = arbitraryFeedforward;
             this.controlSlot = controlSlot;
             this.positionControlType = positionControlType;
         }
-        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity) {
-            setPosition(position, positionControlType, controlSlot, velocity, Volts.of(0));
-        }
-        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot) {
-            setPosition(position, positionControlType, controlSlot, RadiansPerSecond.of(0));
+        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+            setPosition(position, positionControlType, controlSlot, RadiansPerSecond.of(0.0), arbitraryFeedforward);
         }
 
         /* Getter methods should only be called by IO */
@@ -155,8 +149,14 @@ public interface MotorIO<
         }
     }
 
+    /** 
+     * If motor requires different feedforward unit than what was set, feedforward will be zero.
+     * For example, if the motor requires torque current and you call setVoltage instead of setTorqueCurrent, feedforward will be zero. 
+     * TODO: Make a better way of handling this. It should be based on the PositionControlType or VelocityControlType.
+     */
     public static class ArbitraryFeedforward {
         public static enum FeedforwardType {
+            NONE,
             DUTY_CYCLE,
             VOLTAGE,
             TORQUE_CURRENT,
@@ -164,20 +164,32 @@ public interface MotorIO<
 
         protected FeedforwardType feedforwardType;
         protected double dutyCycle;
-        protected double voltage;
+        protected double volts;
         protected double currentAmps;
 
         public void setDutyCycle(double dutyCycle) {
             feedforwardType = FeedforwardType.DUTY_CYCLE;
-            dutyCycle = MathUtil.clamp(dutyCycle, -1.0, 1.0);
+            this.dutyCycle = MathUtil.clamp(dutyCycle, -1.0, 1.0);
+            volts = 0.0;
+            currentAmps = 0.0;
         }
         public void setVoltage(Voltage voltage) {
             feedforwardType = FeedforwardType.VOLTAGE;
-            this.voltage = voltage.in(Volts);
+            dutyCycle = 0.0;
+            volts = voltage.in(Volts);
+            currentAmps = 0.0;
         }
         public void setTorqueCurrent(Current current) {
             feedforwardType = FeedforwardType.TORQUE_CURRENT;
+            dutyCycle = 0.0;
+            volts = 0.0;
             currentAmps = current.in(Amps);
+        }
+        public void none() {
+            feedforwardType = FeedforwardType.NONE;
+            dutyCycle = 0.0;
+            volts = 0.0;
+            currentAmps = 0.0;
         }
     }
 

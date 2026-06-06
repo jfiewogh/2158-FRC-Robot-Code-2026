@@ -21,9 +21,7 @@ public abstract class TalonConfig<FeedbackSensorSourceType extends TalonConfig.F
     /* Gearbox */
     public Gearbox rotorToRemoteSensor;
 
-    /* Feedback Sensor */
-    public int feedbackSensorSourceId; 
-    public FeedbackSensorSourceType feedbackSensorSource;
+    public FeedbackConfig<FeedbackSensorSourceType> feedbackConfig;
 
     /** 
      * TODO: Maybe figure out a way to combine the enabled boolean with its respective value.
@@ -35,6 +33,16 @@ public abstract class TalonConfig<FeedbackSensorSourceType extends TalonConfig.F
         public Current statorCurrentLimit;
         public boolean supplyCurrentLimitEnabled;
         public Current supplyCurrentLimit;
+    }
+
+    public static class FeedbackConfig<FeedbackSensorSourceType extends FeedbackSensorSource> {
+        public int feedbackSensorSourceId;
+        public FeedbackSensorSourceType feedbackSensorSource;
+
+        public boolean equals(FeedbackConfig<FeedbackSensorSourceType> other) {
+            return feedbackSensorSourceId == other.feedbackSensorSourceId 
+                && feedbackSensorSource == other.feedbackSensorSource;
+        }
     }
 
     public static interface FeedbackSensorSource {};

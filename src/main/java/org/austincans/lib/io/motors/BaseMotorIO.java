@@ -34,17 +34,17 @@ public abstract class BaseMotorIO<
     public final void applyOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs) {
         switch (outputs.getMode()) {
             case VOLTAGE -> setVoltage(outputs.getVoltage());
-            case VELOCITY -> setVelocity(outputs.getVelocity(), outputs.getVelocityControlType(), outputs.getControlSlot(), outputs.getVoltage());
-            case POSITION -> setPosition(outputs.getPosition(), outputs.getPositionControlType(), outputs.getControlSlot(), outputs.getVelocity(), outputs.getVoltage());
+            case VELOCITY -> setVelocity(outputs.getVelocity(), outputs.getVelocityControlType(), outputs.getControlSlot(), outputs.arbitraryFeedforward);
+            case POSITION -> setPosition(outputs.getPosition(), outputs.getPositionControlType(), outputs.getControlSlot(), outputs.getVelocity(), outputs.arbitraryFeedforward);
         }
     }
 
     /* Position */
     protected abstract Angle getPosition();
-    protected abstract void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType slot, AngularVelocity velocity, Voltage arbitraryFeedforward);
+    protected abstract void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward);
 
     protected abstract AngularVelocity getVelocity();
-    protected abstract void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType slot, Voltage arbitraryFeedforward);
+    protected abstract void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType slot, ArbitraryFeedforward arbitraryFeedforward);
 
     protected abstract Voltage getVoltage();
     protected abstract void setVoltage(Voltage voltage);

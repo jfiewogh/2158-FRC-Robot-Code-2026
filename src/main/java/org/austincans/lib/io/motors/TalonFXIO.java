@@ -1,19 +1,16 @@
 package org.austincans.lib.io.motors;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
-import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
+import org.austincans.lib.io.motors.TalonFXConfig.TalonFXFeedbackSensorSource;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -21,7 +18,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSensorSource> {
+public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXFeedbackSensorSource> {
     private final TalonFX motor;
 
     private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
@@ -47,7 +44,7 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
     }
 
     @Override
-    public void applyConfigRequests(TalonIOConfigRequests<TalonFXConfig> configRequests) {
+    public void applyConfigRequests(TalonIOConfigRequests<TalonFXConfig, TalonFXFeedbackSensorSource> configRequests) {
         if (!configRequests.configChanged) {
             return;
         }
@@ -70,10 +67,10 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
         /* Multiple Configs */
         if (changeCount > 1) {
             configRequests.motorOutputConfigChanged = false;
-            updateMotorOutputConfigs(config);
+            updateMotorOutputConfigs(vendorConfig.MotorOutput, config.inverted, config.neutralMode);
 
             configRequests.softLimitConfigChanged = false;
-            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+            updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.mechanismSoftLimitConfig);
 
             configRequests.slot0ConfigChanged = false;
             updateSlot0Configs(config);
@@ -103,13 +100,13 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
         /* Individual Configs */
         if (configRequests.motorOutputConfigChanged) {
             configRequests.motorOutputConfigChanged = false;
-            updateMotorOutputConfigs(config);
+            updateMotorOutputConfigs(vendorConfig.MotorOutput, config.inverted, config.neutralMode);
             motor.getConfigurator().apply(vendorConfig.MotorOutput);
             return;
         }
         if (configRequests.softLimitConfigChanged) {
             configRequests.softLimitConfigChanged = false;
-            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+            updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.mechanismSoftLimitConfig);
             motor.getConfigurator().apply(vendorConfig.SoftwareLimitSwitch);
             return;
         }
@@ -157,18 +154,6 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
         }
     }
 
-    private void updateMotorOutputConfigs(TalonFXConfig config) {
-        vendorConfig.MotorOutput.Inverted = config.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        vendorConfig.MotorOutput.NeutralMode = config.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    }
-
-    private void updateSoftLimitSwitchConfigs(SoftLimitConfig softLimitConfig) {
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
-    }
-
     private void updateSlot0Configs(TalonFXConfig config) {
         vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
         vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
@@ -202,20 +187,20 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
      * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
      */
     private void updateFeedbackConfig(TalonFXConfig config) {
-        switch (config.feedbackSensorSource) {
+        switch (config.feedbackConfig.feedbackSensorSource) {
             case ROTOR -> {
                 vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
                 vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
             case REMOTE_CANCODER -> {
                 vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
                 vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
                 vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
             case FUSED_CANCODER -> {
                 vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackSensorSourceId;
+                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
                 vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
                 vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
             }
@@ -244,13 +229,13 @@ public class TalonFXIO extends TalonIO<TalonFXConfig, TalonFXConfig.FeedbackSens
     }
 
     @Override
-    protected void setPosition(Angle position, TalonPositionControlType positionControlType, TalonControlSlot slot, AngularVelocity velocity, Voltage arbitraryFeedforward) {
-        motor.setControl(getPositionControlRequest(positionControlType, position, slot));
+    protected void setPosition(Angle position, TalonPositionControlType positionControlType, TalonControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(getPositionControlRequest(positionControlType, position, slot, velocity, arbitraryFeedforward));
     }
 
     @Override
-    protected void setVelocity(AngularVelocity velocity, TalonVelocityControlType velocityControlType, TalonControlSlot slot, Voltage arbitraryFeedforward) {
-        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot)); 
+    protected void setVelocity(AngularVelocity velocity, TalonVelocityControlType velocityControlType, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot, arbitraryFeedforward)); 
     }
 
     @Override

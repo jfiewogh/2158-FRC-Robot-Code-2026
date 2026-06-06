@@ -75,14 +75,14 @@ public class SparkIO<
      * https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control 
      */
     @Override
-    protected void setVelocity(AngularVelocity velocity, SparkVelocityControlType velocityControlType, SparkControlSlot controlSlot, Voltage arbitraryFeedforward) {
-        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.in(Volts));
+    protected void setVelocity(AngularVelocity velocity, SparkVelocityControlType velocityControlType, SparkControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.volts);
     }
 
     @Override
-    protected void setPosition(Angle position, SparkPositionControlType positionControlType, SparkControlSlot controlSlot, AngularVelocity velocity, Voltage arbitraryFeedforward) {
+    protected void setPosition(Angle position, SparkPositionControlType positionControlType, SparkControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
         double kV = velocity.in(RPM) * slotControlConfigs[controlSlot.getIndex()].ffConfig.kV;
-        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.in(Volts));
+        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.volts);
     }
 
     @Override
