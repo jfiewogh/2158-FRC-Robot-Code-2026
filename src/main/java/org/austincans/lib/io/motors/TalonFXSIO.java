@@ -1,28 +1,14 @@
 package org.austincans.lib.io.motors;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-
-import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
-import org.austincans.lib.io.motors.TalonFXConfig.TalonFXFeedbackSensorSource;
-import org.austincans.lib.io.motors.TalonFXSConfig.TalonFXSFeedbackSensorSource;
+import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
+import org.austincans.lib.util.math.physical.Gearbox;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
-import com.ctre.phoenix6.configs.Slot2Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,10 +16,10 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSource> {
+public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, TalonFXSConfig> {
     private final TalonFXS motor;
 
-    private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
+    private final TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
 
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
@@ -56,7 +42,7 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSo
     }
 
     @Override
-    public void applyConfigRequests(TalonIOConfigRequests<TalonFXSConfig, TalonFXSFeedbackSensorSource> configRequests) {
+    public void applyConfigRequests(TalonFXSIOConfigRequests configRequests) {
         if (!configRequests.configChanged) {
             return;
         }
@@ -70,40 +56,42 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSo
             configRequests.slot0ConfigChanged,
             configRequests.slot1ConfigChanged,
             configRequests.slot2ConfigChanged,
-            configRequests.feedbackConfigChanged,
+            configRequests.externalFeedbackConfigChanged,
             configRequests.closedLoopGeneralConfigChanged,
             configRequests.motionMagicConfigChanged,
             configRequests.currentLimitsConfigChanged
         );
 
+        /* TODO: There are definitely some commonalities between TalonFXIO and TalonFXSIO. Separate common parts into shared methods */
+
         /* Multiple Configs */
         if (changeCount > 1) {
             configRequests.motorOutputConfigChanged = false;
-            updateMotorOutputConfigs(config);
+            updateMotorOutputConfigs(vendorConfig.MotorOutput, config.inverted, config.neutralMode);
 
             configRequests.softLimitConfigChanged = false;
-            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+            updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.mechanismSoftLimitConfig);
 
             configRequests.slot0ConfigChanged = false;
-            updateSlot0Configs(config);
+            mapSlot0Config(vendorConfig.Slot0, config.slot0Config);
 
             configRequests.slot1ConfigChanged = false;
-            updateSlot1Configs(config);
+            mapSlot1Config(vendorConfig.Slot1, config.slot1Config);
 
             configRequests.slot2ConfigChanged = false;
-            updateSlot2Configs(config);
+            mapSlot2Config(vendorConfig.Slot2, config.slot2Config);
 
-            configRequests.feedbackConfigChanged = false;
-            updateFeedbackConfig(config);
+            configRequests.externalFeedbackConfigChanged = false;
+            updateExternalFeedbackConfig(vendorConfig.ExternalFeedback, config.externalFeedbackConfig, config.sensorToMechanismGearbox, config.rotorToRemoteSensor);
 
             configRequests.closedLoopGeneralConfigChanged = false;
-            updateClosedLoopGeneralConfig(config);
+            updateClosedLoopGeneralConfig(vendorConfig.ClosedLoopGeneral, config.positionContinuousWrap);
 
             configRequests.motionMagicConfigChanged = false;
-            updateMotionMagicConfig(config);
+            updateMotionMagicConfig(vendorConfig.MotionMagic, config.motionMagicMechanismCruiseVelocity, config.motionMagicMechanismAcceleration, config.motionMagicMechanismJerkRotationsPerSecCubed);
 
             configRequests.currentLimitsConfigChanged = false;
-            updateCurrentLimitsConfig(config);
+            updateCurrentLimitsConfig(vendorConfig.CurrentLimits, config.currentLimitsConfig);
 
             motor.getConfigurator().apply(vendorConfig);
             return;
@@ -112,141 +100,81 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSo
         /* Individual Configs */
         if (configRequests.motorOutputConfigChanged) {
             configRequests.motorOutputConfigChanged = false;
-            updateMotorOutputConfigs(config);
+            updateMotorOutputConfigs(vendorConfig.MotorOutput, config.inverted, config.neutralMode);
             motor.getConfigurator().apply(vendorConfig.MotorOutput);
             return;
         }
         if (configRequests.softLimitConfigChanged) {
             configRequests.softLimitConfigChanged = false;
-            updateSoftLimitSwitchConfigs(config.mechanismSoftLimitConfig);
+            updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.mechanismSoftLimitConfig);
             motor.getConfigurator().apply(vendorConfig.SoftwareLimitSwitch);
             return;
         }
         if (configRequests.slot0ConfigChanged) {
             configRequests.slot0ConfigChanged = false;
-            updateSlot0Configs(config);
+            mapSlot0Config(vendorConfig.Slot0, config.slot0Config);
             motor.getConfigurator().apply(vendorConfig.Slot0);
             return;
         }
         if (configRequests.slot1ConfigChanged) {
             configRequests.slot1ConfigChanged = false;
-            updateSlot1Configs(config);
+            mapSlot1Config(vendorConfig.Slot1, config.slot1Config);
             motor.getConfigurator().apply(vendorConfig.Slot1);
             return;
         }
         if (configRequests.slot2ConfigChanged) {
             configRequests.slot2ConfigChanged = false;
-            updateSlot2Configs(config);
+            mapSlot2Config(vendorConfig.Slot2, config.slot2Config);
             motor.getConfigurator().apply(vendorConfig.Slot2);
             return;
         }
-        if (configRequests.feedbackConfigChanged) {
-            configRequests.feedbackConfigChanged = false;
-            updateFeedbackConfig(config);
-            motor.getConfigurator().apply(vendorConfig.Feedback);
+        if (configRequests.externalFeedbackConfigChanged) {
+            configRequests.externalFeedbackConfigChanged = false;
+            updateExternalFeedbackConfig(vendorConfig.ExternalFeedback, config.externalFeedbackConfig, config.sensorToMechanismGearbox, config.rotorToRemoteSensor);
+            motor.getConfigurator().apply(vendorConfig.ExternalFeedback);
             return;
         }
         if (configRequests.closedLoopGeneralConfigChanged) {
             configRequests.closedLoopGeneralConfigChanged = false;
-            updateClosedLoopGeneralConfig(config);
+            updateClosedLoopGeneralConfig(vendorConfig.ClosedLoopGeneral, config.positionContinuousWrap);
             motor.getConfigurator().apply(vendorConfig.ClosedLoopGeneral);
             return;
         }
         if (configRequests.motionMagicConfigChanged) {
             configRequests.motionMagicConfigChanged = false;
-            updateMotionMagicConfig(config);
+            updateMotionMagicConfig(vendorConfig.MotionMagic, config.motionMagicMechanismCruiseVelocity, config.motionMagicMechanismAcceleration, config.motionMagicMechanismJerkRotationsPerSecCubed);
             motor.getConfigurator().apply(vendorConfig.MotionMagic);
             return;
         }
         if (configRequests.currentLimitsConfigChanged) {
             configRequests.currentLimitsConfigChanged = false;
-            updateCurrentLimitsConfig(config);
+            updateCurrentLimitsConfig(vendorConfig.CurrentLimits, config.currentLimitsConfig);
             motor.getConfigurator().apply(vendorConfig.CurrentLimits);
             return;
         }
     }
 
-    private void updateMotorOutputConfigs(TalonFXSConfig config) {
-        vendorConfig.MotorOutput.Inverted = config.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        vendorConfig.MotorOutput.NeutralMode = config.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    }
-
-    private void updateSoftLimitSwitchConfigs(SoftLimitConfig softLimitConfig) {
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
-        vendorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
-    }
-
-    private void updateSlot0Configs(TalonFXSConfig config) {
-        vendorConfig.Slot0.kP = config.slot0Config.pidConfig.kP;
-        vendorConfig.Slot0.kI = config.slot0Config.pidConfig.kI;
-        vendorConfig.Slot0.kD = config.slot0Config.pidConfig.kD;
-        vendorConfig.Slot0.kS = config.slot0Config.ffConfig.kS;
-        vendorConfig.Slot0.kG = config.slot0Config.ffConfig.kG;
-        vendorConfig.Slot0.kV = config.slot0Config.ffConfig.kV;
-        vendorConfig.Slot0.kA = config.slot0Config.ffConfig.kA;
-    }
-    private void updateSlot1Configs(TalonFXSConfig config) {
-        vendorConfig.Slot1.kP = config.slot1Config.pidConfig.kP;
-        vendorConfig.Slot1.kI = config.slot1Config.pidConfig.kI;
-        vendorConfig.Slot1.kD = config.slot1Config.pidConfig.kD;
-        vendorConfig.Slot1.kS = config.slot1Config.ffConfig.kS;
-        vendorConfig.Slot1.kG = config.slot1Config.ffConfig.kG;
-        vendorConfig.Slot1.kV = config.slot1Config.ffConfig.kV;
-        vendorConfig.Slot1.kA = config.slot1Config.ffConfig.kA;
-    }
-    private void updateSlot2Configs(TalonFXSConfig config) {
-        vendorConfig.Slot2.kP = config.slot2Config.pidConfig.kP;
-        vendorConfig.Slot2.kI = config.slot2Config.pidConfig.kI;
-        vendorConfig.Slot2.kD = config.slot2Config.pidConfig.kD;
-        vendorConfig.Slot2.kS = config.slot2Config.ffConfig.kS;
-        vendorConfig.Slot2.kG = config.slot2Config.ffConfig.kG;
-        vendorConfig.Slot2.kV = config.slot2Config.ffConfig.kV;
-        vendorConfig.Slot2.kA = config.slot2Config.ffConfig.kA;
-    }
-
-    /** 
-     * See this page for more details on remote sensors
-     * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
-     */
-    private void updateFeedbackConfig(TalonFXSConfig config) {
-        switch (config.feedbackConfig.feedbackSensorSource) {
+    protected void updateExternalFeedbackConfig(ExternalFeedbackConfigs externalFeedback, ExternalFeedbackConfig externalFeedbackConfig, Gearbox sensorToMechanismGearbox, Gearbox rotorToRemoteSensor) {
+        switch (externalFeedbackConfig.externalFeedbackSensorSource) {
             case COMMUTATION -> {
-                // TODO: Commutation should not be like this. Check AdvantageKit's swerve template with TalonFXS
-                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
+                // TODO: Check AdvantageKit's swerve template with TalonFXS to see how they handled Commutation
+                externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
+                externalFeedback.SensorToMechanismRatio = sensorToMechanismGearbox.getReduction();
             }
             case REMOTE_CANCODER -> {
-                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
-                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
-                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
+                externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
+                externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
+                externalFeedback.RotorToSensorRatio = rotorToRemoteSensor.getReduction();
+                externalFeedback.SensorToMechanismRatio = sensorToMechanismGearbox.getReduction();
             }
             case FUSED_CANCODER -> {
-                vendorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-                vendorConfig.Feedback.FeedbackRemoteSensorID = config.feedbackConfig.feedbackSensorSourceId;
-                vendorConfig.Feedback.RotorToSensorRatio = config.rotorToRemoteSensor.getReduction();
-                vendorConfig.Feedback.SensorToMechanismRatio = config.sensorToMechanismGearbox.getReduction();
+                externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.FusedCANcoder;
+                externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
+                externalFeedback.RotorToSensorRatio = rotorToRemoteSensor.getReduction();
+                externalFeedback.SensorToMechanismRatio = sensorToMechanismGearbox.getReduction();
             }
         }
     }
-
-    private void updateClosedLoopGeneralConfig(TalonFXSConfig config) {
-        vendorConfig.ClosedLoopGeneral.ContinuousWrap = config.positionContinuousWrap;
-    }
-    private void updateMotionMagicConfig(TalonFXSConfig config) {
-        vendorConfig.MotionMagic.MotionMagicCruiseVelocity = config.motionMagicMechanismCruiseVelocity.in(RotationsPerSecond);
-        vendorConfig.MotionMagic.MotionMagicAcceleration = config.motionMagicMechanismAcceleration.in(RotationsPerSecondPerSecond);
-        vendorConfig.MotionMagic.MotionMagicJerk = config.motionMagicMechanismJerkRotationsPerSecCubed;
-    }
-    private void updateCurrentLimitsConfig(TalonFXSConfig config) {
-        vendorConfig.CurrentLimits.StatorCurrentLimitEnable = config.currentLimitsConfig.statorCurrentLimitEnabled;
-        vendorConfig.CurrentLimits.StatorCurrentLimit = config.currentLimitsConfig.statorCurrentLimit.in(Amps);
-        vendorConfig.CurrentLimits.SupplyCurrentLimitEnable = config.currentLimitsConfig.supplyCurrentLimitEnabled;
-        vendorConfig.CurrentLimits.SupplyCurrentLimit = config.currentLimitsConfig.supplyCurrentLimit.in(Amps);
-    }
-
 
     @Override
     protected void setVoltage(Voltage voltage) {
@@ -301,5 +229,14 @@ public class TalonFXSIO extends TalonIO<TalonFXSConfig, TalonFXSFeedbackSensorSo
     @Override
     public void setEncoderPosition(Angle position) {
         motor.setPosition(position);
+    }
+
+    public static class TalonFXSIOConfigRequests extends TalonIO.TalonIOConfigRequests<TalonFXSConfig> {
+        protected boolean externalFeedbackConfigChanged;
+
+        public void setExternalFeedbackConfig(ExternalFeedbackConfig externalFeedbackConfig) {
+			configChanged |= externalFeedbackConfigChanged = config.externalFeedbackConfig.equals(externalFeedbackConfig);
+			config.externalFeedbackConfig = externalFeedbackConfig;
+		}
     }
 }

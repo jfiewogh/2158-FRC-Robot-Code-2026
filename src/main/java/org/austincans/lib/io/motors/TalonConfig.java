@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
-public abstract class TalonConfig<FeedbackSensorSourceType extends TalonConfig.FeedbackSensorSource> extends MotorConfig {
+public abstract class TalonConfig extends MotorConfig {
     public ControlConfig slot0Config = new ControlConfig();
     public ControlConfig slot2Config = new ControlConfig();
     public ControlConfig slot1Config = new ControlConfig();
@@ -21,8 +21,6 @@ public abstract class TalonConfig<FeedbackSensorSourceType extends TalonConfig.F
     /* Gearbox */
     public Gearbox rotorToRemoteSensor;
 
-    public FeedbackConfig<FeedbackSensorSourceType> feedbackConfig;
-
     /** 
      * TODO: Maybe figure out a way to combine the enabled boolean with its respective value.
      * For example, statorCurrentLimitEnabled is paired with statorCurrentLimit.
@@ -34,16 +32,4 @@ public abstract class TalonConfig<FeedbackSensorSourceType extends TalonConfig.F
         public boolean supplyCurrentLimitEnabled;
         public Current supplyCurrentLimit;
     }
-
-    public static class FeedbackConfig<FeedbackSensorSourceType extends FeedbackSensorSource> {
-        public int feedbackSensorSourceId;
-        public FeedbackSensorSourceType feedbackSensorSource;
-
-        public boolean equals(FeedbackConfig<FeedbackSensorSourceType> other) {
-            return feedbackSensorSourceId == other.feedbackSensorSourceId 
-                && feedbackSensorSource == other.feedbackSensorSource;
-        }
-    }
-
-    public static interface FeedbackSensorSource {};
 }
