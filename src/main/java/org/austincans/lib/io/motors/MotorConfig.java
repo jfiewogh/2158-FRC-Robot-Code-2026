@@ -40,6 +40,7 @@ public abstract class MotorConfig {
         public double kG;
         public double kV;
         public double kA;
+        public double kCos;
         public double kT;
     }
 

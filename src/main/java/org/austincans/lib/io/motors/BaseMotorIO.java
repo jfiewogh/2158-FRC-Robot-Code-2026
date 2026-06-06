@@ -6,7 +6,21 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class BaseMotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> implements MotorIO<InputsType, ConfigType, ControlSlotType, VelocityControlTypeType, PositionControlTypeType> {
+public abstract class BaseMotorIO<
+    InputsType extends MotorIO.MotorIOInputs, 
+    ControlSlotType extends MotorIO.ControlSlot, 
+    VelocityControlTypeType extends MotorIO.VelocityControlType, 
+    PositionControlTypeType extends MotorIO.PositionControlType, 
+    ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
+    ConfigType extends MotorConfig
+> implements MotorIO<
+    InputsType, 
+    ControlSlotType,
+    VelocityControlTypeType, 
+    PositionControlTypeType,
+    ConfigRequestsType, 
+    ConfigType
+> {
     /** Updates inputs with newer values from motor */
     public void updateInputs(InputsType inputs) {
         inputs.setPosition(getPosition());

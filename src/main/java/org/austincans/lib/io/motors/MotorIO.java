@@ -1,17 +1,29 @@
 package org.austincans.lib.io.motors;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.ActuatorIO;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType extends MotorConfig, ControlSlotType extends MotorIO.ControlSlot, VelocityControlTypeType extends MotorIO.VelocityControlType, PositionControlTypeType extends MotorIO.PositionControlType> extends ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>> {
+public interface MotorIO<
+    InputsType extends MotorIO.MotorIOInputs, 
+    ControlSlotType extends MotorIO.ControlSlot,
+    VelocityControlTypeType extends MotorIO.VelocityControlType,
+    PositionControlTypeType extends MotorIO.PositionControlType,
+    ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
+    ConfigType extends MotorConfig
+> extends ActuatorIO<
+    InputsType, 
+    MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>
+> {
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
@@ -73,11 +85,16 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         POSITION
     }
 
-    public static class MotorIOOutputs<ControlSlotType extends ControlSlot, VelocityControlTypeType extends VelocityControlType, PositionControlTypeType extends PositionControlType> {
+    public static class MotorIOOutputs<
+        ControlSlotType extends ControlSlot, 
+        VelocityControlTypeType extends VelocityControlType, 
+        PositionControlTypeType extends PositionControlType
+    > {
         private MotorIOOutputMode mode;
         private Voltage voltage;
         private AngularVelocity velocity;
         private Angle position;
+        private ArbitraryFeedforward
 
         private ControlSlotType controlSlot;
         private VelocityControlTypeType velocityControlType;
@@ -138,6 +155,32 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
         }
     }
 
+    public static class ArbitraryFeedforward {
+        public static enum FeedforwardType {
+            DUTY_CYCLE,
+            VOLTAGE,
+            TORQUE_CURRENT,
+        }
+
+        protected FeedforwardType feedforwardType;
+        protected double dutyCycle;
+        protected double voltage;
+        protected double currentAmps;
+
+        public void setDutyCycle(double dutyCycle) {
+            feedforwardType = FeedforwardType.DUTY_CYCLE;
+            dutyCycle = MathUtil.clamp(dutyCycle, -1.0, 1.0);
+        }
+        public void setVoltage(Voltage voltage) {
+            feedforwardType = FeedforwardType.VOLTAGE;
+            this.voltage = voltage.in(Volts);
+        }
+        public void setTorqueCurrent(Current current) {
+            feedforwardType = FeedforwardType.TORQUE_CURRENT;
+            currentAmps = current.in(Amps);
+        }
+    }
+
 
     public static class MotorIOConfigRequests<ConfigType extends MotorConfig> {
         protected ConfigType config;
@@ -150,7 +193,7 @@ public interface MotorIO<InputsType extends MotorIO.MotorIOInputs, ConfigType ex
     }
 
     /** Applies new config values to motor  */
-    public void applyConfigRequests(MotorIOConfigRequests<ConfigType> configRequests);
+    public void applyConfigRequests(ConfigRequestsType configRequests);
 
 
     public static interface PositionControlType {}

@@ -37,7 +37,17 @@ import edu.wpi.first.units.measure.Voltage;
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public class SparkIO<MotorType extends SparkBase, VendorConfigType extends SparkBaseConfig> extends BaseMotorIO<MotorIO.MotorIOInputs, SparkConfig, SparkControlSlot, SparkVelocityControlType, SparkPositionControlType> {
+public class SparkIO<
+    MotorType extends SparkBase, 
+    VendorConfigType extends SparkBaseConfig
+> extends BaseMotorIO<
+    MotorIO.MotorIOInputs, 
+    SparkControlSlot, 
+    SparkVelocityControlType, 
+    SparkPositionControlType, 
+    SparkIO.SparkIOConfigRequests,
+    SparkConfig
+> {
     protected final MotorType motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
@@ -101,7 +111,7 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
     }
 
     @Override
-    public void applyConfigRequests(MotorIOConfigRequests<SparkConfig> configRequests) {
+    public void applyConfigRequests(SparkIOConfigRequests configRequests) {
         if (!configRequests.configChanged) {
             return;
         }
@@ -114,16 +124,14 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         slotControlConfigs[2] = config.slot2Config.controlConfig;
         slotControlConfigs[3] = config.slot3Config.controlConfig;
 
-        /* Vendor Config */
-
         vendorConfig.inverted(config.inverted);
-
         vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
-
         vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
 
-        vendorConfig.encoder.positionConversionFactor(1.0 / config.sensorToMechanismGearbox.getReduction());
-        vendorConfig.encoder.velocityConversionFactor(1.0 / config.sensorToMechanismGearbox.getReduction());
+        /* Encoder */
+        double conversionFactor = 1.0 / config.sensorToMechanismGearbox.getReduction();
+        vendorConfig.encoder.positionConversionFactor(conversionFactor);
+        vendorConfig.encoder.velocityConversionFactor(conversionFactor);
 
         /* Soft Limit */
         vendorConfig.softLimit.forwardSoftLimitEnabled(config.mechanismSoftLimitConfig.forwardSoftLimitEnabled);
@@ -133,18 +141,24 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
 
         /* Closed Loop */
         vendorConfig.closedLoop.positionWrappingEnabled(config.positionContinuousWrap);
-        vendorConfig.closedLoop.positionWrappingInputRange(0, 0);
+        vendorConfig.closedLoop.positionWrappingMinInput(config.positionWrappingMinInput.in(Rotations));
+        vendorConfig.closedLoop.positionWrappingMaxInput(config.positionWrappingMaxInput.in(Rotations));
         configureClosedLoopSlot(config.slot0Config);
         configureClosedLoopSlot(config.slot1Config);
         configureClosedLoopSlot(config.slot2Config);
         configureClosedLoopSlot(config.slot3Config);
 
-        if (config.isFollower) {
-            vendorConfig.follow(config.leaderCanId, config.invertFollowerOutput);
+        /* Follower */
+        if (config.followerConfig.isFollower) {
+            vendorConfig.follow(config.followerConfig.leaderCanId, config.followerConfig.invertFollowerOutput);
+        } else {
+            vendorConfig.disableFollowerMode();
         }
 
+        /* Apply Config */
         if (!initialConfigApplied) {
             motor.configure(vendorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+            initialConfigApplied = true;
         } else {
             motor.configureAsync(vendorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
         }
@@ -161,6 +175,7 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         vendorConfig.closedLoop.feedForward.kV(slotConfig.controlConfig.ffConfig.kV, slot);
         vendorConfig.closedLoop.feedForward.kA(slotConfig.controlConfig.ffConfig.kA, slot);
         vendorConfig.closedLoop.feedForward.kG(slotConfig.controlConfig.ffConfig.kG, slot);
+        vendorConfig.closedLoop.feedForward.kCos(slotConfig.controlConfig.ffConfig.kCos, slot);
 
         vendorConfig.closedLoop.allowedClosedLoopError(slotConfig.allowedMechanismClosedLoopError.in(Rotations), slot);
 
@@ -182,7 +197,7 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
         controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
     }
 
-    public static class SparkIOConfigRequests extends MotorIOConfigRequests<SparkConfig> {
+    public static class SparkIOConfigRequests extends MotorIO.MotorIOConfigRequests<SparkConfig> {
         public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
             configChanged |= !config.mechanismSoftLimitConfig.equals(softLimitConfig);
             config.mechanismSoftLimitConfig = softLimitConfig;
@@ -195,8 +210,10 @@ public class SparkIO<MotorType extends SparkBase, VendorConfigType extends Spark
             configChanged |= config.inverted != inverted;
             config.inverted = inverted;
         }
-    }
 
+        /** TODO: Add more methods for the other configs */
+    }
+    
     public static enum SparkPositionControlType implements PositionControlType {
         STANDARD(ControlType.kPosition),
         MAXMOTION(ControlType.kMAXMotionPositionControl);
