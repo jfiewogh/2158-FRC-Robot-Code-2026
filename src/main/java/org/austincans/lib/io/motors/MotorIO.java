@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.ActuatorIO;
+import org.austincans.lib.io.ConfigurableIO;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
@@ -19,11 +20,11 @@ public interface MotorIO<
     VelocityControlTypeType extends MotorIO.VelocityControlType,
     PositionControlTypeType extends MotorIO.PositionControlType,
     ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
-    ConfigType
-> extends ActuatorIO<
-    InputsType, 
-    MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>
-> {
+    ConfigType> 
+extends 
+    ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>>, 
+    ConfigurableIO<ConfigRequestsType> 
+{
     /**
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
@@ -193,7 +194,6 @@ public interface MotorIO<
         }
     }
 
-
     public static class MotorIOConfigRequests<ConfigType> {
         protected ConfigType config;
         protected boolean configChanged;
@@ -203,17 +203,18 @@ public interface MotorIO<
             this.config = config;
         }
     }
-
-    /** Applies new config values to motor  */
-    public void applyConfigRequests(ConfigRequestsType configRequests);
-
-
+    
     public static interface PositionControlType {}
 
     public static interface VelocityControlType {}
 
     /** A control slot represents a possible choice of control gains. */
     public static interface ControlSlot {}
+
+
+
+
+
 
     public void setEncoderPosition(Angle position);
 }

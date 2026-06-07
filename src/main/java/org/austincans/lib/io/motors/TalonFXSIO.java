@@ -4,10 +4,13 @@ import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.BrushedMotorWiringValue;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -153,7 +156,15 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
         }
     }
 
-    protected void updateExternalFeedbackConfig(ExternalFeedbackConfigs externalFeedback, ExternalFeedbackConfig externalFeedbackConfig) {
+    /** TODO: Complete */
+    private void updateCommutationConfig(CommutationConfigs commutation) {
+        commutation.MotorArrangement = MotorArrangementValue.Brushed_DC;
+        commutation.BrushedMotorWiring = BrushedMotorWiringValue.Leads_A_and_B;
+
+        
+    }
+
+    private void updateExternalFeedbackConfig(ExternalFeedbackConfigs externalFeedback, ExternalFeedbackConfig externalFeedbackConfig) {
         switch (externalFeedbackConfig.externalFeedbackSensorSource) {
             case COMMUTATION -> {
                 // TODO: Check AdvantageKit's swerve template with TalonFXS to see how they handled Commutation
@@ -234,7 +245,7 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
         protected boolean externalFeedbackConfigChanged;
 
         public void setExternalFeedbackConfig(ExternalFeedbackConfig externalFeedbackConfig) {
-			configChanged |= externalFeedbackConfigChanged = config.externalFeedbackConfig.equals(externalFeedbackConfig);
+			configChanged |= externalFeedbackConfigChanged = !config.externalFeedbackConfig.equals(externalFeedbackConfig);
 			config.externalFeedbackConfig = externalFeedbackConfig;
 		}
     }

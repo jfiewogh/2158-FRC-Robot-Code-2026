@@ -159,7 +159,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
      * https://v6.docs.ctr-electronics.com/en/2025/docs/api-reference/device-specific/talonfx/remote-sensors.html 
      * TODO: Gearbox parameters are temporary. They should become fields of FeedbackConfig.
      */
-    protected void updateFeedbackConfig(FeedbackConfigs feedback, FeedbackConfig feedbackConfig) {
+    private void updateFeedbackConfig(FeedbackConfigs feedback, FeedbackConfig feedbackConfig) {
         switch (feedbackConfig.feedbackSensorSource) {
             case ROTOR -> {
                 feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
@@ -239,7 +239,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
         protected boolean feedbackConfigChanged;
 
         public void setFeedbackConfig(FeedbackConfig feedbackConfig) {
-			configChanged |= feedbackConfigChanged = config.feedbackConfig.equals(feedbackConfig);
+			configChanged |= feedbackConfigChanged = !config.feedbackConfig.equals(feedbackConfig);
 			config.feedbackConfig = feedbackConfig;
 		}
     }
