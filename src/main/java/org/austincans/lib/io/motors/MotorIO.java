@@ -30,42 +30,25 @@ extends
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
      */
     public static class MotorIOInputs {
-        private Angle mechanismPosition;
-        private AngularVelocity mechanismVelocity;
-        private Voltage voltage;
-        private Current statorCurrent;
-        private Temperature temperature;
+        protected Angle position;
+        protected AngularVelocity velocity;
+        protected Voltage voltage;
+        protected Current statorCurrent;
+        protected Temperature temperature;
 
-        /* Setter methods should only be called by IO */
-        protected void setPosition(Angle position) {
-            mechanismPosition = position;
+        public Angle position() {
+            return position;
         }
-        protected void setVelocity(AngularVelocity velocity) {
-            mechanismVelocity = velocity;
+        public AngularVelocity velocity() {
+            return velocity;
         }
-        protected void setVoltage(Voltage voltage) {
-            this.voltage = voltage;
-        }
-        protected void setStatorCurrent(Current statorCurrent) {
-            this.statorCurrent = statorCurrent;
-        }
-        protected void setTemperature(Temperature temperature) {
-            this.temperature = temperature;
-        }
-
-        public Angle getPosition() {
-            return mechanismPosition;
-        }
-        public AngularVelocity getVelocity() {
-            return mechanismVelocity;
-        }
-        public Voltage getVoltage() {
+        public Voltage voltage() {
             return voltage;
         }
-        public Current getStatorCurrent() {
+        public Current statorCurrent() {
             return statorCurrent;
         }
-        public Temperature getTemperature() {
+        public Temperature temperature() {
             return temperature;
         }
     }     
@@ -91,22 +74,22 @@ extends
         VelocityControlTypeType extends VelocityControlType, 
         PositionControlTypeType extends PositionControlType> {
 
-        private MotorIOOutputMode mode;
-        private Voltage voltage;
-        private AngularVelocity velocity;
-        private Angle position;
+        protected MotorIOOutputMode mode;
+        protected Voltage voltage;
+        protected AngularVelocity velocity;
+        protected Angle position;
         protected ArbitraryFeedforward arbitraryFeedforward;
 
-        private ControlSlotType controlSlot;
-        private VelocityControlTypeType velocityControlType;
-        private PositionControlTypeType positionControlType;
+        protected ControlSlotType controlSlot;
+        protected VelocityControlTypeType velocityControlType;
+        protected PositionControlTypeType positionControlType;
 
-        public void setVoltage(Voltage voltage) {
+        public void voltage(Voltage voltage) {
             mode = MotorIOOutputMode.VOLTAGE;
             this.voltage = voltage;
         }
 
-        public void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+        public void velocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
             mode = MotorIOOutputMode.VELOCITY;
             this.velocity = velocity;
             this.arbitraryFeedforward = arbitraryFeedforward;
@@ -114,7 +97,7 @@ extends
             this.velocityControlType = velocityControlType;
         }
 
-        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+        public void position(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
             mode = MotorIOOutputMode.POSITION;
             this.position = position;
             this.velocity = velocity;
@@ -122,31 +105,8 @@ extends
             this.controlSlot = controlSlot;
             this.positionControlType = positionControlType;
         }
-        public void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
-            setPosition(position, positionControlType, controlSlot, RadiansPerSecond.of(0.0), arbitraryFeedforward);
-        }
-
-        /* Getter methods should only be called by IO */
-        protected MotorIOOutputMode getMode() {
-            return mode;
-        }
-        protected Voltage getVoltage() {
-            return voltage;
-        }
-        protected AngularVelocity getVelocity() {
-            return velocity;
-        }
-        protected Angle getPosition() {
-            return position;
-        } 
-        protected ControlSlotType getControlSlot() {
-            return controlSlot;
-        }
-        protected VelocityControlTypeType getVelocityControlType() {
-            return velocityControlType;
-        }
-        protected PositionControlTypeType getPositionControlType() {
-            return positionControlType;
+        public void position(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+            position(position, positionControlType, controlSlot, RadiansPerSecond.of(0.0), arbitraryFeedforward);
         }
     }
 
@@ -168,19 +128,19 @@ extends
         protected double volts;
         protected double currentAmps;
 
-        public void setDutyCycle(double dutyCycle) {
+        public void dutyCycle(double dutyCycle) {
             feedforwardType = FeedforwardType.DUTY_CYCLE;
             this.dutyCycle = MathUtil.clamp(dutyCycle, -1.0, 1.0);
             volts = 0.0;
             currentAmps = 0.0;
         }
-        public void setVoltage(Voltage voltage) {
+        public void voltage(Voltage voltage) {
             feedforwardType = FeedforwardType.VOLTAGE;
             dutyCycle = 0.0;
             volts = voltage.in(Volts);
             currentAmps = 0.0;
         }
-        public void setTorqueCurrent(Current current) {
+        public void torqueCurrent(Current current) {
             feedforwardType = FeedforwardType.TORQUE_CURRENT;
             dutyCycle = 0.0;
             volts = 0.0;
@@ -198,7 +158,7 @@ extends
         protected ConfigType config;
         protected boolean configChanged;
 
-        public void setConfig(ConfigType config) {
+        public void config(ConfigType config) {
             configChanged = true;
             this.config = config;
         }

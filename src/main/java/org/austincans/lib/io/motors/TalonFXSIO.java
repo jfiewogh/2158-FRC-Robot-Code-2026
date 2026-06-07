@@ -159,9 +159,7 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
     /** TODO: Complete */
     private void updateCommutationConfig(CommutationConfigs commutation) {
         commutation.MotorArrangement = MotorArrangementValue.Brushed_DC;
-        commutation.BrushedMotorWiring = BrushedMotorWiringValue.Leads_A_and_B;
-
-        
+        commutation.BrushedMotorWiring = BrushedMotorWiringValue.Leads_A_and_B;     
     }
 
     private void updateExternalFeedbackConfig(ExternalFeedbackConfigs externalFeedback, ExternalFeedbackConfig externalFeedbackConfig) {

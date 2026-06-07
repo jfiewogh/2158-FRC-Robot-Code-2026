@@ -78,21 +78,12 @@ extends BaseMotorIO<
 			0);
 
 	public static class TalonIOInputs extends MotorIO.MotorIOInputs {
-		private Current supplyCurrent;
-		private Current torqueCurrent;
-
-		void setSupplyCurrent(Current supplyCurrent) {
-			this.supplyCurrent = supplyCurrent;
-		}
-
-		void setTorqueCurrent(Current torqueCurrent) {
-			this.torqueCurrent = torqueCurrent;
-		}
+		protected Current supplyCurrent;
+		protected Current torqueCurrent;
 
 		public Current getSupplyCurrent() {
 			return supplyCurrent;
 		}
-
 		public Current getTorqueCurrent() {
 			return torqueCurrent;
 		}
@@ -101,8 +92,8 @@ extends BaseMotorIO<
 	@Override
 	public void updateInputs(TalonIOInputs inputs) {
 		super.updateInputs(inputs);
-		inputs.setSupplyCurrent(getSupplyCurrent());
-		inputs.setTorqueCurrent(getTorqueCurrent());
+		inputs.supplyCurrent = getSupplyCurrent();
+		inputs.torqueCurrent = getTorqueCurrent();
 	}
 
 	protected abstract Current getSupplyCurrent();

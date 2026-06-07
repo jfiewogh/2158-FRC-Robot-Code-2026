@@ -7,6 +7,11 @@ public final class MotorConfigs {
     public static class ControlConfig {
         public PIDConfig pidConfig = new PIDConfig();
         public FFConfig ffConfig = new FFConfig();
+
+        public boolean equals(ControlConfig other) {
+            return pidConfig.equals(other.pidConfig)
+                && ffConfig.equals(other.ffConfig);
+        }
     }
 
     /** Proportional-Integral-Derivative Config */
@@ -14,6 +19,10 @@ public final class MotorConfigs {
         public double kP;
         public double kI;
         public double kD;
+
+        public boolean equals(PIDConfig other) {
+            return kP == other.kP && kI == other.kI && kD == other.kD;
+        }
     }
 
     /** Feedforward Config */
@@ -23,6 +32,10 @@ public final class MotorConfigs {
         public double kV;
         public double kA;
         public double kCos;
+
+        public boolean equals(FFConfig other) {
+            return kS == other.kS && kG == other.kG && kV == other.kV && kA == other.kA && kCos == other.kCos;
+        }
     }
 
     /** Soft limits should be in mechanism values. */

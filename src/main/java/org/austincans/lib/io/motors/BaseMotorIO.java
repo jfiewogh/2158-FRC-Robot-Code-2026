@@ -23,19 +23,19 @@ public abstract class BaseMotorIO<
 > {
     /** Updates inputs with newer values from motor */
     public void updateInputs(InputsType inputs) {
-        inputs.setPosition(getPosition());
-        inputs.setVelocity(getVelocity());
-        inputs.setVoltage(getVoltage());
-        inputs.setStatorCurrent(getStatorCurrent());
-        inputs.setTemperature(getTemperature());
+        inputs.position = getPosition();
+        inputs.velocity = getVelocity();
+        inputs.voltage = getVoltage();
+        inputs.statorCurrent = getStatorCurrent();
+        inputs.temperature = getTemperature();
     }
 
     /** Applies output to motor based on the output mode */
     public final void applyOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs) {
-        switch (outputs.getMode()) {
-            case VOLTAGE -> setVoltage(outputs.getVoltage());
-            case VELOCITY -> setVelocity(outputs.getVelocity(), outputs.getVelocityControlType(), outputs.getControlSlot(), outputs.arbitraryFeedforward);
-            case POSITION -> setPosition(outputs.getPosition(), outputs.getPositionControlType(), outputs.getControlSlot(), outputs.getVelocity(), outputs.arbitraryFeedforward);
+        switch (outputs.mode) {
+            case VOLTAGE -> setVoltage(outputs.voltage);
+            case VELOCITY -> setVelocity(outputs.velocity, outputs.velocityControlType, outputs.controlSlot, outputs.arbitraryFeedforward);
+            case POSITION -> setPosition(outputs.position, outputs.positionControlType, outputs.controlSlot, outputs.velocity, outputs.arbitraryFeedforward);
         }
     }
 

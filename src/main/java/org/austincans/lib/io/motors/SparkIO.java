@@ -9,6 +9,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.motors.MotorIO.PositionControlType;
 import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
+import org.austincans.lib.io.motors.SparkConfig.ClosedLoopConfig;
+import org.austincans.lib.io.motors.SparkConfig.EncoderConfig;
+import org.austincans.lib.io.motors.SparkConfig.FollowerConfig;
 import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
@@ -198,20 +201,34 @@ public class SparkIO<
     }
 
     public static class SparkIOConfigRequests extends MotorIO.MotorIOConfigRequests<SparkConfig> {
-        public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
+        public void softLimitConfig(SoftLimitConfig softLimitConfig) {
             configChanged |= !config.softLimitConfig.equals(softLimitConfig);
             config.softLimitConfig = softLimitConfig;
         }
-        public void setNeutralMode(NeutralMode neutralMode) {
+        public void neutralMode(NeutralMode neutralMode) {
             configChanged |= config.neutralMode != neutralMode;
             config.neutralMode = neutralMode;
         }
-        public void setInverted(boolean inverted) {
+        public void inverted(boolean inverted) {
             configChanged |= config.inverted != inverted;
             config.inverted = inverted;
         }
-
-        /** TODO: Add more methods for the other configs */
+        public void smartCurrentStallLimit(Current smartCurrentStallLimit) {
+            configChanged |= config.smartCurrentStallLimit != smartCurrentStallLimit;
+            config.smartCurrentStallLimit = smartCurrentStallLimit;
+        }
+        public void encoderConfig(EncoderConfig encoderConfig) {
+            configChanged |= !config.encoderConfig.equals(encoderConfig);
+            config.encoderConfig = encoderConfig;
+        }
+        public void closedLoopConfig(ClosedLoopConfig closedLoopConfig) {
+            configChanged |= !config.closedLoopConfig.equals(closedLoopConfig);
+            config.closedLoopConfig = closedLoopConfig;
+        }
+        public void followerConfig(FollowerConfig followerConfig) {
+            configChanged |= !config.followerConfig.equals(followerConfig);
+            config.followerConfig = followerConfig;
+        }
     }
     
     public static enum SparkPositionControlType implements PositionControlType {
