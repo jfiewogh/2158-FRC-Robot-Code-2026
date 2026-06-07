@@ -1,39 +1,15 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.MotorIO.NeutralMode;
-import org.austincans.lib.util.math.physical.Gearbox;
-
 import edu.wpi.first.units.measure.Angle;
 
-/** 
- * Only values part of vendor config should be included. 
- * TODO: I feel like this class is unnecessary and that SparkConfig and TalonConfig should not be sibling classes.
- */
-public abstract class MotorConfig {
-    /**
-     * Sensor can be rotor or external, depending on which is chosen. 
-     * Mechanism represents the final output.
-     * This should be part of FeedbackConfig for TalonConfig.
-     */
-    public Gearbox sensorToMechanismGearbox;
-    
-    public boolean inverted;
-    public NeutralMode neutralMode;
-
-    public SoftLimitConfig mechanismSoftLimitConfig;
-    public boolean positionContinuousWrap;
-
+public final class MotorConfigs {
     /** Closed-Loop Control Config */
     public static class ControlConfig {
         public PIDConfig pidConfig = new PIDConfig();
         public FFConfig ffConfig = new FFConfig();
     }
 
-    /**
-     * Proportional-Integral-Derivative Config
-     * TODO: This should be moved since subsystems and other devices can also use
-     * PID control, not just motors
-     */
+    /** Proportional-Integral-Derivative Config */
     public static class PIDConfig {
         public double kP;
         public double kI;
@@ -47,9 +23,9 @@ public abstract class MotorConfig {
         public double kV;
         public double kA;
         public double kCos;
-        public double kT;
     }
 
+    /** Soft limits should be in mechanism values. */
     public static class SoftLimitConfig extends Object {
         public boolean forwardSoftLimitEnabled;
         public Angle forwardSoftLimit;

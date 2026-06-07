@@ -7,14 +7,14 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
 import org.austincans.lib.io.motors.MotorIO.PositionControlType;
 import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
 import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
 import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
+import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
+import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -119,34 +119,34 @@ public class SparkIO<
 
         SparkConfig config = configRequests.config;
 
-        slotControlConfigs[0] = config.slot0Config.controlConfig;
-        slotControlConfigs[1] = config.slot1Config.controlConfig;
-        slotControlConfigs[2] = config.slot2Config.controlConfig;
-        slotControlConfigs[3] = config.slot3Config.controlConfig;
+        slotControlConfigs[0] = config.closedLoopConfig.slot0Config.controlConfig;
+        slotControlConfigs[1] = config.closedLoopConfig.slot1Config.controlConfig;
+        slotControlConfigs[2] = config.closedLoopConfig.slot2Config.controlConfig;
+        slotControlConfigs[3] = config.closedLoopConfig.slot3Config.controlConfig;
 
         vendorConfig.inverted(config.inverted);
         vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
         vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
 
         /* Encoder */
-        double conversionFactor = 1.0 / config.sensorToMechanismGearbox.getReduction();
+        double conversionFactor = 1.0 / config.encoderConfig.sensorToMechanismGearbox.getReduction();
         vendorConfig.encoder.positionConversionFactor(conversionFactor);
         vendorConfig.encoder.velocityConversionFactor(conversionFactor);
 
         /* Soft Limit */
-        vendorConfig.softLimit.forwardSoftLimitEnabled(config.mechanismSoftLimitConfig.forwardSoftLimitEnabled);
-        vendorConfig.softLimit.forwardSoftLimit(config.mechanismSoftLimitConfig.forwardSoftLimit.in(Rotations));
-        vendorConfig.softLimit.reverseSoftLimitEnabled(config.mechanismSoftLimitConfig.reverseSoftLimitEnabled);
-        vendorConfig.softLimit.reverseSoftLimit(config.mechanismSoftLimitConfig.reverseSoftLimit.in(Rotations));
+        vendorConfig.softLimit.forwardSoftLimitEnabled(config.softLimitConfig.forwardSoftLimitEnabled);
+        vendorConfig.softLimit.forwardSoftLimit(config.softLimitConfig.forwardSoftLimit.in(Rotations));
+        vendorConfig.softLimit.reverseSoftLimitEnabled(config.softLimitConfig.reverseSoftLimitEnabled);
+        vendorConfig.softLimit.reverseSoftLimit(config.softLimitConfig.reverseSoftLimit.in(Rotations));
 
         /* Closed Loop */
-        vendorConfig.closedLoop.positionWrappingEnabled(config.positionContinuousWrap);
-        vendorConfig.closedLoop.positionWrappingMinInput(config.positionWrappingMinInput.in(Rotations));
-        vendorConfig.closedLoop.positionWrappingMaxInput(config.positionWrappingMaxInput.in(Rotations));
-        configureClosedLoopSlot(config.slot0Config);
-        configureClosedLoopSlot(config.slot1Config);
-        configureClosedLoopSlot(config.slot2Config);
-        configureClosedLoopSlot(config.slot3Config);
+        vendorConfig.closedLoop.positionWrappingEnabled(config.closedLoopConfig.positionContinuousWrap);
+        vendorConfig.closedLoop.positionWrappingMinInput(config.closedLoopConfig.positionWrappingMinInput.in(Rotations));
+        vendorConfig.closedLoop.positionWrappingMaxInput(config.closedLoopConfig.positionWrappingMaxInput.in(Rotations));
+        configureClosedLoopSlot(config.closedLoopConfig.slot0Config);
+        configureClosedLoopSlot(config.closedLoopConfig.slot1Config);
+        configureClosedLoopSlot(config.closedLoopConfig.slot2Config);
+        configureClosedLoopSlot(config.closedLoopConfig.slot3Config);
 
         /* Follower */
         if (config.followerConfig.isFollower) {
@@ -199,8 +199,8 @@ public class SparkIO<
 
     public static class SparkIOConfigRequests extends MotorIO.MotorIOConfigRequests<SparkConfig> {
         public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
-            configChanged |= !config.mechanismSoftLimitConfig.equals(softLimitConfig);
-            config.mechanismSoftLimitConfig = softLimitConfig;
+            configChanged |= !config.softLimitConfig.equals(softLimitConfig);
+            config.softLimitConfig = softLimitConfig;
         }
         public void setNeutralMode(NeutralMode neutralMode) {
             configChanged |= config.neutralMode != neutralMode;

@@ -5,9 +5,12 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
-import org.austincans.lib.io.motors.MotorConfig.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfig.SoftLimitConfig;
+import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
+import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
+import org.austincans.lib.io.motors.TalonConfig.ClosedLoopGeneralConfig;
 import org.austincans.lib.io.motors.TalonConfig.CurrentLimitsConfig;
+import org.austincans.lib.io.motors.TalonConfig.MotionMagicConfig;
+import org.austincans.lib.io.motors.TalonConfig.MotorOutputConfig;
 
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -38,7 +41,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
@@ -182,20 +184,18 @@ extends BaseMotorIO<
 		return trueCount;
 	}
 
-
-
 	/*===================== Configs =====================*/
 
-	protected void updateMotorOutputConfigs(MotorOutputConfigs motorOutput, boolean inverted, NeutralMode neutralMode) {
-        motorOutput.Inverted = inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        motorOutput.NeutralMode = neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+	protected void updateMotorOutputConfigs(MotorOutputConfigs motorOutput, MotorOutputConfig motorOutputConfig) {
+        motorOutput.Inverted = motorOutputConfig.inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        motorOutput.NeutralMode = motorOutputConfig.neutralMode == NeutralMode.BRAKE ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     }
     protected void updateSoftLimitSwitchConfigs(SoftwareLimitSwitchConfigs softLimit, SoftLimitConfig softLimitConfig) {
         softLimit.ForwardSoftLimitEnable = softLimitConfig.forwardSoftLimitEnabled;
         softLimit.ForwardSoftLimitThreshold = softLimitConfig.forwardSoftLimit.in(Rotations);
         softLimit.ReverseSoftLimitEnable = softLimitConfig.reverseSoftLimitEnabled;
         softLimit.ReverseSoftLimitThreshold = softLimitConfig.reverseSoftLimit.in(Rotations);
-    }
+	}
     protected void mapSlot0Config(Slot0Configs slot0, ControlConfig slot0Config) {
         slot0.kP = slot0Config.pidConfig.kP;
         slot0.kI = slot0Config.pidConfig.kI;
@@ -223,16 +223,13 @@ extends BaseMotorIO<
         slot2.kV = slot2Config.ffConfig.kV;
         slot2.kA = slot2Config.ffConfig.kA;
     }
-	
-	/** TODO: continuousWrap should be part of yet-to-made ClosedLoopGeneralConfig class  */
-    protected void updateClosedLoopGeneralConfig(ClosedLoopGeneralConfigs closedLoopGeneral, boolean continuousWrap) {
-        closedLoopGeneral.ContinuousWrap = continuousWrap;
+	protected void updateClosedLoopGeneralConfig(ClosedLoopGeneralConfigs closedLoopGeneral, ClosedLoopGeneralConfig closedLoopGeneralConfig) {
+        closedLoopGeneral.ContinuousWrap = closedLoopGeneralConfig.continuousWrap;
     }
-	/** TODO: velocity, acceleration, and jerk should be part of yet-to-made MotionMagicConfig class */
-    protected void updateMotionMagicConfig(MotionMagicConfigs motionMagic, AngularVelocity velocity, AngularAcceleration acceleration, double jerk) {
-        motionMagic.MotionMagicCruiseVelocity = velocity.in(RotationsPerSecond);
-        motionMagic.MotionMagicAcceleration = acceleration.in(RotationsPerSecondPerSecond);
-        motionMagic.MotionMagicJerk = jerk;
+    protected void updateMotionMagicConfig(MotionMagicConfigs motionMagic, MotionMagicConfig motionMagicConfig) {
+        motionMagic.MotionMagicCruiseVelocity = motionMagicConfig.cruiseVelocity.in(RotationsPerSecond);
+        motionMagic.MotionMagicAcceleration = motionMagicConfig.acceleration.in(RotationsPerSecondPerSecond);
+        motionMagic.MotionMagicJerk = motionMagicConfig.jerkRotationsPerSecCubed;
     }
     protected void updateCurrentLimitsConfig(CurrentLimitsConfigs currentLimits, CurrentLimitsConfig currentLimitsConfig) {
         currentLimits.StatorCurrentLimitEnable = currentLimitsConfig.statorCurrentLimitEnabled;
@@ -240,8 +237,6 @@ extends BaseMotorIO<
         currentLimits.SupplyCurrentLimitEnable = currentLimitsConfig.supplyCurrentLimitEnabled;
         currentLimits.SupplyCurrentLimit = currentLimitsConfig.supplyCurrentLimit.in(Amps);
     }
-
-
 
 	/*===================== Classes =====================*/
 
@@ -256,66 +251,36 @@ extends BaseMotorIO<
 		protected boolean currentLimitsConfigChanged;
 
 		public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
-			configChanged |= softLimitConfigChanged = !config.mechanismSoftLimitConfig.equals(softLimitConfig);
-			config.mechanismSoftLimitConfig = softLimitConfig;
+			configChanged |= softLimitConfigChanged = !config.softLimitConfig.equals(softLimitConfig);
+			config.softLimitConfig = softLimitConfig;
 		}
-
-		/* TODO: Merge setNeutralMode and setInverted into setMotorOutputConfig */
-		public void setNeutralMode(NeutralMode neutralMode) {
-			configChanged |= motorOutputConfigChanged |= config.neutralMode != neutralMode;
-			config.neutralMode = neutralMode;
+		public void setMotorOutputConfig(MotorOutputConfig motorOutputConfig) {
+			configChanged |= motorOutputConfigChanged = !config.motorOutputConfig.equals(motorOutputConfig);
+			config.motorOutputConfig = motorOutputConfig;
 		}
-		public void setInverted(boolean inverted) {
-			configChanged |= motorOutputConfigChanged |= config.inverted != inverted;
-			config.inverted = inverted;
-		}
-
 		public void setSlot0Config(ControlConfig slotConfig) {
 			configChanged |= slot0ConfigChanged = !config.slot0Config.equals(slotConfig);
 			config.slot0Config = slotConfig;
 		}
-
 		public void setSlot1Config(ControlConfig slotConfig) {
 			configChanged |= slot1ConfigChanged = !config.slot1Config.equals(slotConfig);
 			config.slot1Config = slotConfig;
 		}
-
 		public void setSlot2Config(ControlConfig slotConfig) {
 			configChanged |= slot2ConfigChanged = !config.slot2Config.equals(slotConfig);
 			config.slot2Config = slotConfig;
 		}
-
-		public void setPositionContinuousWrap(boolean continuousWrap) {
-			configChanged |= closedLoopGeneralConfigChanged |= config.positionContinuousWrap != continuousWrap;
-			config.positionContinuousWrap = continuousWrap;
+		public void setClosedLoopGeneralConfig(ClosedLoopGeneralConfig closedLoopGeneralConfig) {
+			configChanged |= closedLoopGeneralConfigChanged = !config.closedLoopGeneralConfig.equals(config.closedLoopGeneralConfig);
+			config.closedLoopGeneralConfig = closedLoopGeneralConfig;
 		}
-
-		/* TODO: Merge into setMotionMagicConfig */
-		public void setMotionMagicCruiseVelocity(AngularVelocity velocity) {
-			configChanged |= motionMagicConfigChanged |= !config.motionMagicMechanismCruiseVelocity.isEquivalent(velocity);
-			config.motionMagicMechanismCruiseVelocity = velocity;
+		public void setMotionMagicConfig(MotionMagicConfig motionMagicConfig) {
+			configChanged |= motionMagicConfigChanged = !config.motionMagicConfig.equals(motionMagicConfig);
+			config.motionMagicConfig = motionMagicConfig;
 		}
-		public void setMotionMagicAcceleration(AngularAcceleration acceleration) {
-			configChanged |= motionMagicConfigChanged |= !config.motionMagicMechanismAcceleration.isEquivalent(acceleration);
-			config.motionMagicMechanismAcceleration = acceleration;
-		}
-		public void setMotionMagicJerk(double jerkRotationsPerSecCubed) {
-			configChanged |= motionMagicConfigChanged |= config.motionMagicMechanismJerkRotationsPerSecCubed != jerkRotationsPerSecCubed;
-			config.motionMagicMechanismJerkRotationsPerSecCubed = jerkRotationsPerSecCubed;
-		}
-
-		/* TODO: Merge into setCurrentLimitsConfig */
-		public void setStatorCurrentLimit(boolean enabled, Current current) {
-			configChanged |= currentLimitsConfigChanged |= (config.currentLimitsConfig.statorCurrentLimitEnabled != enabled
-					|| !config.currentLimitsConfig.statorCurrentLimit.isEquivalent(current));
-			config.currentLimitsConfig.statorCurrentLimitEnabled = enabled;
-			config.currentLimitsConfig.statorCurrentLimit = current;
-		}
-		public void setSupplyCurrentLimit(boolean enabled, Current current) {
-			configChanged |= currentLimitsConfigChanged |= (config.currentLimitsConfig.supplyCurrentLimitEnabled != enabled
-					|| !config.currentLimitsConfig.supplyCurrentLimit.isEquivalent(current));
-			config.currentLimitsConfig.supplyCurrentLimitEnabled = enabled;
-			config.currentLimitsConfig.supplyCurrentLimit = current;
+		public void setCurrentLimitsConfig(CurrentLimitsConfig currentLimitsConfig) {
+			configChanged |= currentLimitsConfigChanged |= !config.currentLimitsConfig.equals(currentLimitsConfig);
+			config.currentLimitsConfig = currentLimitsConfig;
 		}
 	}
 

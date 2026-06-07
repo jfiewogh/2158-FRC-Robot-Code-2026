@@ -12,13 +12,13 @@ public abstract class BaseMotorIO<
     VelocityControlTypeType extends MotorIO.VelocityControlType, 
     PositionControlTypeType extends MotorIO.PositionControlType, 
     ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
-    ConfigType extends MotorConfig
+    ConfigType
 > implements MotorIO<
     InputsType, 
     ControlSlotType,
     VelocityControlTypeType, 
     PositionControlTypeType,
-    ConfigRequestsType, 
+    ConfigRequestsType,
     ConfigType
 > {
     /** Updates inputs with newer values from motor */

@@ -19,7 +19,7 @@ public interface MotorIO<
     VelocityControlTypeType extends MotorIO.VelocityControlType,
     PositionControlTypeType extends MotorIO.PositionControlType,
     ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
-    ConfigType extends MotorConfig
+    ConfigType
 > extends ActuatorIO<
     InputsType, 
     MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>
@@ -194,7 +194,7 @@ public interface MotorIO<
     }
 
 
-    public static class MotorIOConfigRequests<ConfigType extends MotorConfig> {
+    public static class MotorIOConfigRequests<ConfigType> {
         protected ConfigType config;
         protected boolean configChanged;
 

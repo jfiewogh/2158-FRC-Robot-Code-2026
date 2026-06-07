@@ -3,7 +3,7 @@ package org.austincans.lib.io.motors;
 public class TalonFXConfig extends TalonConfig {
     public FeedbackConfig feedbackConfig;
 
-    public static class FeedbackConfig {
+    public static class FeedbackConfig extends BaseFeedbackConfig {
         public int feedbackSensorSourceId;
         public FeedbackSensorSource feedbackSensorSource;
 

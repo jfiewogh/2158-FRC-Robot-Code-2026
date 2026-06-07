@@ -3,7 +3,7 @@ package org.austincans.lib.io.motors;
 public class TalonFXSConfig extends TalonConfig {
     public ExternalFeedbackConfig externalFeedbackConfig;
 
-    public static class ExternalFeedbackConfig {
+    public static class ExternalFeedbackConfig extends BaseFeedbackConfig {
         public int externalFeedbackSensorSourceId;
         public ExternalFeedbackSensorSource externalFeedbackSensorSource;
 

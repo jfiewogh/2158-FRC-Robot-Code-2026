@@ -1,25 +1,59 @@
 package org.austincans.lib.io.motors;
 
+import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
+import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
+import org.austincans.lib.io.motors.MotorIO.NeutralMode;
 import org.austincans.lib.util.math.physical.Gearbox;
 
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
-public abstract class TalonConfig extends MotorConfig {
+public abstract class TalonConfig {
+    public MotorOutputConfig motorOutputConfig = new MotorOutputConfig();
+    public SoftLimitConfig softLimitConfig = new SoftLimitConfig();
     public ControlConfig slot0Config = new ControlConfig();
-    public ControlConfig slot2Config = new ControlConfig();
     public ControlConfig slot1Config = new ControlConfig();
+    public ControlConfig slot2Config = new ControlConfig();
+    public ClosedLoopGeneralConfig closedLoopGeneralConfig = new ClosedLoopGeneralConfig();
+    public MotionMagicConfig motionMagicConfig = new MotionMagicConfig();
+    public CurrentLimitsConfig currentLimitsConfig = new CurrentLimitsConfig();
 
-    public AngularVelocity motionMagicMechanismCruiseVelocity;
-    public AngularAcceleration motionMagicMechanismAcceleration;
-    public double motionMagicMechanismJerkRotationsPerSecCubed;
+    public abstract static class BaseFeedbackConfig {
+        public Gearbox sensorToMechanismGearbox;
+        public Gearbox rotorToRemoteSensor;
+    } 
 
-    /* Current Limits */
-    public CurrentLimitsConfig currentLimitsConfig;
+    public static class MotorOutputConfig {
+        public boolean inverted;
+        public NeutralMode neutralMode;
 
-    /* Gearbox */
-    public Gearbox rotorToRemoteSensor;
+        public boolean equals(MotorOutputConfig other) {
+            return inverted == other.inverted
+                && neutralMode == other.neutralMode;
+        }
+    } 
+
+    public static class ClosedLoopGeneralConfig {
+        public boolean continuousWrap;
+
+        public boolean equals(ClosedLoopGeneralConfig other) {
+            return continuousWrap == other.continuousWrap;
+        }
+    }
+
+    /** In mechanism values */
+    public static class MotionMagicConfig {
+        public AngularVelocity cruiseVelocity;
+        public AngularAcceleration acceleration;
+        public double jerkRotationsPerSecCubed; 
+
+        public boolean equals(MotionMagicConfig other) {
+            return cruiseVelocity.isEquivalent(other.cruiseVelocity)
+                && acceleration.isEquivalent(other.acceleration)
+                && jerkRotationsPerSecCubed == other.jerkRotationsPerSecCubed;
+        }
+    }
 
     /** 
      * TODO: Maybe figure out a way to combine the enabled boolean with its respective value.
@@ -31,5 +65,13 @@ public abstract class TalonConfig extends MotorConfig {
         public Current statorCurrentLimit;
         public boolean supplyCurrentLimitEnabled;
         public Current supplyCurrentLimit;
+
+        /** TODO: I feel like there are some logical flaws here */
+        public boolean equals(CurrentLimitsConfig other) {
+            return statorCurrentLimitEnabled == other.statorCurrentLimitEnabled
+                && statorCurrentLimit.isEquivalent(other.statorCurrentLimit)
+                && supplyCurrentLimitEnabled == other.supplyCurrentLimitEnabled
+                && supplyCurrentLimit.isEquivalent(other.supplyCurrentLimit);
+        }
     }
 }
