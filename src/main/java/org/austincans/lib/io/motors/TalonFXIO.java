@@ -61,7 +61,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
             configRequests.motionMagicConfigChanged,
             configRequests.currentLimitsConfigChanged
         );
-        
+
         /* Multiple Configs */
         if (changeCount > 1) {
             configRequests.motorOutputConfigChanged = false;
@@ -166,13 +166,13 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
             case REMOTE_CANCODER -> {
                 feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
                 feedback.FeedbackRemoteSensorID = feedbackConfig.feedbackSensorSourceId;
-                feedback.RotorToSensorRatio = feedbackConfig.rotorToRemoteSensor.getReduction();
+                feedback.RotorToSensorRatio = feedbackConfig.rotorToRemoteSensorGearbox.getReduction();
                 feedback.SensorToMechanismRatio = feedbackConfig.sensorToMechanismGearbox.getReduction();
             }
             case FUSED_CANCODER -> {
                 feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
                 feedback.FeedbackRemoteSensorID = feedbackConfig.feedbackSensorSourceId;
-                feedback.RotorToSensorRatio = feedbackConfig.rotorToRemoteSensor.getReduction();
+                feedback.RotorToSensorRatio = feedbackConfig.rotorToRemoteSensorGearbox.getReduction();
                 feedback.SensorToMechanismRatio = feedbackConfig.sensorToMechanismGearbox.getReduction();
             }
         }

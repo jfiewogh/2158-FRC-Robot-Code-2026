@@ -9,13 +9,16 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.motors.MotorIO.PositionControlType;
 import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
+import org.austincans.lib.io.motors.SparkConfig.AbsoluteEncoderConfig;
 import org.austincans.lib.io.motors.SparkConfig.ClosedLoopConfig;
 import org.austincans.lib.io.motors.SparkConfig.EncoderConfig;
 import org.austincans.lib.io.motors.SparkConfig.FollowerConfig;
+import org.austincans.lib.io.motors.SparkConfig.SignalsConfig;
 import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
 import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
+import org.austincans.lib.util.math.physical.Gearbox;
 import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
 
@@ -133,12 +136,9 @@ public class SparkIO<
         vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
         vendorConfig.voltageCompensation(config.voltageCompensation.in(Volts));
 
-        /* Encoder */
-        double conversionFactor = 1.0 / config.encoderConfig.sensorToMechanismGearbox.getReduction();
-        vendorConfig.encoder.positionConversionFactor(conversionFactor);
-        vendorConfig.encoder.velocityConversionFactor(conversionFactor);
-        vendorConfig.encoder.uvwMeasurementPeriod(0);
-        vendorConfig.encoder.uvwAverageDepth(0);
+        configureFeedbackSensor(config);
+
+        configureSignals(config.signalsConfig);
 
         /* Soft Limit */
         vendorConfig.softLimit.forwardSoftLimitEnabled(config.softLimitConfig.forwardSoftLimitEnabled);
@@ -147,10 +147,10 @@ public class SparkIO<
         vendorConfig.softLimit.reverseSoftLimit(config.softLimitConfig.reverseSoftLimit.in(Rotations));
 
         /* Closed Loop */
-        // TODO: Add more feedback options
         vendorConfig.closedLoop.feedbackSensor(
             switch (config.closedLoopConfig.feedbackSensor) {
                 case PRIMARY_ENCODER -> FeedbackSensor.kPrimaryEncoder;
+                case ABSOLUTE_ENCODER -> FeedbackSensor.kAbsoluteEncoder;
             }
         );
         vendorConfig.closedLoop.positionWrappingEnabled(config.closedLoopConfig.positionContinuousWrap);
@@ -196,6 +196,35 @@ public class SparkIO<
         vendorConfig.closedLoop.maxMotion.maxAcceleration(slotConfig.maxMotionMechanismMaxAcceleration.in(RPM.per(Second)), slot);
     }
 
+    private void configureFeedbackSensor(SparkConfig config) {
+        double conversionFactor = 1.0 / config.sensorToMechanismGearbox.getReduction();
+
+        vendorConfig.encoder.positionConversionFactor(conversionFactor);
+        vendorConfig.encoder.velocityConversionFactor(conversionFactor);
+        vendorConfig.encoder.uvwMeasurementPeriod(config.encoderConfig.uvwMeasurementPeriodMs);
+        vendorConfig.encoder.uvwAverageDepth(config.encoderConfig.uvwMeasurementPeriodMs);
+
+        vendorConfig.absoluteEncoder.inverted(config.inverted);
+        vendorConfig.absoluteEncoder.positionConversionFactor(conversionFactor);
+        vendorConfig.absoluteEncoder.velocityConversionFactor(conversionFactor);
+        vendorConfig.absoluteEncoder.averageDepth(config.absoluteEncoderConfig.averageDepth);
+    }
+
+    private void configureSignals(SignalsConfig signalsConfig) {
+        vendorConfig.signals.primaryEncoderPositionAlwaysOn(signalsConfig.primaryEncoderPositionAlwaysOn);
+        vendorConfig.signals.primaryEncoderPositionPeriodMs(signalsConfig.primaryEncoderPositionPeriodMs);
+        vendorConfig.signals.primaryEncoderVelocityAlwaysOn(signalsConfig.primaryEncoderVelocityAlwaysOn);
+        vendorConfig.signals.primaryEncoderVelocityPeriodMs(signalsConfig.primaryEncoderVelocityPeriodMs);
+
+        vendorConfig.signals.absoluteEncoderPositionAlwaysOn(signalsConfig.absoluteEncoderPositionAlwaysOn);
+        vendorConfig.signals.absoluteEncoderPositionPeriodMs(signalsConfig.absoluteEncoderPositionPeriodMs);
+        vendorConfig.signals.absoluteEncoderVelocityAlwaysOn(signalsConfig.absoluteEncoderVelocityAlwaysOn);
+        vendorConfig.signals.absoluteEncoderVelocityPeriodMs(signalsConfig.absoluteEncoderVelocityPeriodMs);
+
+        vendorConfig.signals.appliedOutputPeriodMs(signalsConfig.appliedOutputPeriodMs);
+        vendorConfig.signals.busVoltagePeriodMs(signalsConfig.busVoltagePeriodMs);
+        vendorConfig.signals.outputCurrentPeriodMs(signalsConfig.outputCurrentPeriodMs);
+    }
 
     @Override
     public void setEncoderPosition(Angle position) {
@@ -227,9 +256,21 @@ public class SparkIO<
             configChanged |= config.smartCurrentStallLimit != smartCurrentStallLimit;
             config.smartCurrentStallLimit = smartCurrentStallLimit;
         }
+        public void voltageCompensation(Voltage voltage) {
+            configChanged |= !config.voltageCompensation.isEquivalent(voltage);
+            config.voltageCompensation = voltage;
+        }
+        public void sensorToMechanismGearbox(Gearbox gearbox) {
+            configChanged |= !config.sensorToMechanismGearbox.equals(gearbox);
+            config.sensorToMechanismGearbox = gearbox;
+        }
         public void encoderConfig(EncoderConfig encoderConfig) {
             configChanged |= !config.encoderConfig.equals(encoderConfig);
             config.encoderConfig = encoderConfig;
+        }
+        public void absoluteEncoderConfig(AbsoluteEncoderConfig absoluteEncoderConfig) {
+            configChanged |= !config.absoluteEncoderConfig.equals(absoluteEncoderConfig);
+            config.absoluteEncoderConfig = absoluteEncoderConfig;
         }
         public void closedLoopConfig(ClosedLoopConfig closedLoopConfig) {
             configChanged |= !config.closedLoopConfig.equals(closedLoopConfig);
@@ -238,6 +279,10 @@ public class SparkIO<
         public void followerConfig(FollowerConfig followerConfig) {
             configChanged |= !config.followerConfig.equals(followerConfig);
             config.followerConfig = followerConfig;
+        }
+        public void signalsConfig(SignalsConfig signalsConfig) {
+            configChanged |= !config.signalsConfig.equals(signalsConfig);
+            config.signalsConfig = signalsConfig;
         }
     }
     

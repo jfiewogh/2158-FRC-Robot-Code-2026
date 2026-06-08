@@ -14,9 +14,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
 /** 
- * TODO: Add more feedback configs (ex. get it to work with absolute encoder, external sensor, etc.)
- * 
- * <p>Look at these:
+ * <p>Configs based on AdvantageKit's Spark templates:
  * <li>https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/spark_swerve/src/main/java/frc/robot/subsystems/drive/ModuleIOSpark.java
  * <li>https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/kitbot_2026/src/main/java/frc/robot/subsystems/drive/DriveIOSpark.java
  */
@@ -31,20 +29,33 @@ public class SparkConfig {
      */
     public Voltage voltageCompensation;
 
+    public Gearbox sensorToMechanismGearbox;
     public EncoderConfig encoderConfig;
+    public AbsoluteEncoderConfig absoluteEncoderConfig;
+    public SignalsConfig signalsConfig;
+
     public SoftLimitConfig softLimitConfig = new SoftLimitConfig();
     public ClosedLoopConfig closedLoopConfig = new ClosedLoopConfig();
     public FollowerConfig followerConfig = new FollowerConfig();
 
     public static class EncoderConfig {
-        public Gearbox sensorToMechanismGearbox;
         /** Must be an integer value in [8, 64]  */
-        public int uvwMeasurementPeriod = 32;
+        public int uvwMeasurementPeriodMs = 32;
         /** Must be value in {1, 2, 4, 8} */
         public int uvwAverageDepth = 8;
 
         public boolean equals(EncoderConfig other) {
-            return sensorToMechanismGearbox.getReduction() == other.sensorToMechanismGearbox.getReduction();
+            return uvwMeasurementPeriodMs == other.uvwMeasurementPeriodMs && uvwAverageDepth == other.uvwAverageDepth;
+        }
+    }
+
+    public static class AbsoluteEncoderConfig {
+        public boolean inverted;
+        /** Must be value in {1, 2, 4, 8, 16, 32, 64, 128} */
+        public int averageDepth;
+
+        public boolean equals(AbsoluteEncoderConfig other) {
+            return inverted == other.inverted && averageDepth == other.averageDepth;
         }
     }
 
@@ -61,7 +72,8 @@ public class SparkConfig {
         public Angle positionWrappingMaxInput;
 
         public boolean equals(ClosedLoopConfig other) {
-            return slot0Config.equals(other.slot0Config)
+            return feedbackSensor == other.feedbackSensor 
+                && slot0Config.equals(other.slot0Config)
                 && slot1Config.equals(other.slot1Config)
                 && slot2Config.equals(other.slot2Config)
                 && slot3Config.equals(other.slot3Config) 
@@ -72,7 +84,8 @@ public class SparkConfig {
     }
 
     public enum FeedbackSensor {
-        PRIMARY_ENCODER
+        PRIMARY_ENCODER,
+        ABSOLUTE_ENCODER
     }
 
     public static class SlotConfig {
@@ -103,6 +116,41 @@ public class SparkConfig {
             return FlaggedUtil.equals(
                 isFollower, other.isFollower,
                 leaderCanId == other.leaderCanId && invertFollowerOutput == other.invertFollowerOutput);
+        }
+    }
+
+    /** Default values are based on AdvantageKit's template */
+    public static class SignalsConfig {
+        public boolean primaryEncoderPositionAlwaysOn;
+        public int primaryEncoderPositionPeriodMs;
+        public boolean primaryEncoderVelocityAlwaysOn;
+        public int primaryEncoderVelocityPeriodMs = 20;
+
+        public boolean absoluteEncoderPositionAlwaysOn;
+        public int absoluteEncoderPositionPeriodMs;
+        public boolean absoluteEncoderVelocityAlwaysOn;
+        public int absoluteEncoderVelocityPeriodMs = 20;
+
+        public int appliedOutputPeriodMs = 20;
+        public int busVoltagePeriodMs = 20;
+        public int outputCurrentPeriodMs = 20;
+
+        public boolean equals(SignalsConfig other) {
+            return FlaggedUtil.equals(
+                primaryEncoderPositionAlwaysOn, other.primaryEncoderPositionAlwaysOn,
+                primaryEncoderPositionPeriodMs, other.primaryEncoderPositionPeriodMs)
+            && FlaggedUtil.equals(
+                primaryEncoderVelocityAlwaysOn, other.primaryEncoderVelocityAlwaysOn,
+                primaryEncoderVelocityPeriodMs, other.primaryEncoderVelocityPeriodMs)
+            && FlaggedUtil.equals(
+                absoluteEncoderPositionAlwaysOn, other.absoluteEncoderPositionAlwaysOn,
+                absoluteEncoderPositionPeriodMs, other.absoluteEncoderPositionPeriodMs)
+            && FlaggedUtil.equals(
+                absoluteEncoderVelocityAlwaysOn, other.absoluteEncoderVelocityAlwaysOn,
+                absoluteEncoderVelocityPeriodMs, other.absoluteEncoderVelocityPeriodMs)
+            && appliedOutputPeriodMs == other.appliedOutputPeriodMs
+            && busVoltagePeriodMs == other.busVoltagePeriodMs
+            && outputCurrentPeriodMs == other.outputCurrentPeriodMs;
         }
     }
 }

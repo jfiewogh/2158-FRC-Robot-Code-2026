@@ -22,7 +22,12 @@ public abstract class TalonConfig {
 
     public abstract static class BaseFeedbackConfig {
         public Gearbox sensorToMechanismGearbox;
-        public Gearbox rotorToRemoteSensor;
+        public Gearbox rotorToRemoteSensorGearbox;
+
+        public boolean equals(BaseFeedbackConfig other) {
+            return sensorToMechanismGearbox.equals(other.sensorToMechanismGearbox)
+                && rotorToRemoteSensorGearbox.equals(other.rotorToRemoteSensorGearbox);
+        }
     } 
 
     public static class MotorOutputConfig {
@@ -61,8 +66,8 @@ public abstract class TalonConfig {
     }
 
     public static class CurrentLimitsConfig {
-        public boolean statorCurrentLimitEnabled; // A B
-        public Current statorCurrentLimit; // X Y
+        public boolean statorCurrentLimitEnabled;
+        public Current statorCurrentLimit;
 
         public boolean supplyCurrentLimitEnabled;
         public Current supplyCurrentLimit;

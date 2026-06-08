@@ -181,19 +181,19 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
             case COMMUTATION -> {
                 externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
                 externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
-                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensor.getReduction();
+                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensorGearbox.getReduction();
                 externalFeedback.SensorToMechanismRatio = externalFeedbackConfig.sensorToMechanismGearbox.getReduction();
             }
             case REMOTE_CANCODER -> {
                 externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
                 externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
-                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensor.getReduction();
+                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensorGearbox.getReduction();
                 externalFeedback.SensorToMechanismRatio = externalFeedbackConfig.sensorToMechanismGearbox.getReduction();
             }
             case FUSED_CANCODER -> {
                 externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.FusedCANcoder;
                 externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
-                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensor.getReduction();
+                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensorGearbox.getReduction();
                 externalFeedback.SensorToMechanismRatio = externalFeedbackConfig.sensorToMechanismGearbox.getReduction();
             }
         }

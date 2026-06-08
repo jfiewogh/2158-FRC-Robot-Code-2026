@@ -10,7 +10,8 @@ public class TalonFXSConfig extends TalonConfig {
         public ExternalFeedbackSensorSource externalFeedbackSensorSource;
 
         public boolean equals(ExternalFeedbackConfig other) {
-            return externalFeedbackSensorSourceId == other.externalFeedbackSensorSourceId 
+            return super.equals(other)
+                && externalFeedbackSensorSourceId == other.externalFeedbackSensorSourceId 
                 && externalFeedbackSensorSource == other.externalFeedbackSensorSource;
         }
     }

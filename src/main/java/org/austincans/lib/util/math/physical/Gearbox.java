@@ -24,6 +24,10 @@ public class Gearbox {
         return totalReduction;
     }
 
+    public boolean equals(Gearbox other) {
+        return totalReduction == other.getReduction();
+    }
+
     /** Represents two meshed gears */
     public static record GearStage(int drivingGearTeeth, int drivenGearTeeth) {
         /** Positive value means increase in torque and decrease in speed */

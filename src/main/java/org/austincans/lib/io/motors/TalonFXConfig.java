@@ -9,7 +9,8 @@ public class TalonFXConfig extends TalonConfig {
         public FeedbackSensorSource feedbackSensorSource;
 
         public boolean equals(FeedbackConfig other) {
-            return feedbackSensorSourceId == other.feedbackSensorSourceId 
+            return super.equals(other)
+                && feedbackSensorSourceId == other.feedbackSensorSourceId 
                 && feedbackSensorSource == other.feedbackSensorSource;
         }
     }
