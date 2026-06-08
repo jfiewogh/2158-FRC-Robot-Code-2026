@@ -22,48 +22,33 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface GyroIO extends DeviceIO<GyroIO.GyroIOInputs> {
   public class GyroIOInputs {
-    private Angle yawPosition;
-    private Angle pitchPosition;
-    private Angle rollPosition;
-    private AngularVelocity yawVelocity;
-    private AngularVelocity pitchVelocity;
-    private AngularVelocity rollVelocity;
+    protected boolean connected;
+    protected Angle yawPosition;
+    protected Angle pitchPosition;
+    protected Angle rollPosition;
+    protected AngularVelocity yawVelocity;
+    protected AngularVelocity pitchVelocity;
+    protected AngularVelocity rollVelocity;
 
-    public void setYawPosition(Angle yawPosition) {
-      this.yawPosition = yawPosition;
+    public boolean connected() {
+      return connected;
     }
-    public void setPitchPosition(Angle pitchPosition) {
-      this.pitchPosition = pitchPosition;
-    }
-    public void setRollPosition(Angle rollPosition) {
-      this.rollPosition = rollPosition;
-    }
-    public void setYawVelocity(AngularVelocity yawVelocity) {
-      this.yawVelocity = yawVelocity;
-    }
-    public void setPitchVelocity(AngularVelocity pitchVelocity) {
-      this.pitchVelocity = pitchVelocity;
-    }
-    public void setRollVelocity(AngularVelocity rollVelocity) {
-      this.rollVelocity = rollVelocity;
-    }
-
-    public Angle getYawPosition() {
+    public Angle yawPosition() {
       return yawPosition;
     }
-    public Angle getPitchPosition() {
+    public Angle pitchPosition() {
       return pitchPosition;
     }
-    public Angle getRollPosition() {
+    public Angle rollPosition() {
       return rollPosition;
     }
-    public AngularVelocity getYawVelocity() {
+    public AngularVelocity yawVelocity() {
       return yawVelocity;
     }
-    public AngularVelocity getPitchVelocity() {
+    public AngularVelocity pitchVelocity() {
       return pitchVelocity;
     }
-    public AngularVelocity getRollVelocity() {
+    public AngularVelocity rollVelocity() {
       return rollVelocity;
     }
   }

@@ -15,7 +15,6 @@
 
 package org.austincans.lib.io.sensors.gyros;
 
-import static edu.wpi.first.units.Units.Hertz;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
@@ -37,8 +36,10 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<AngularVelocity> pitchVelocity;
   private final StatusSignal<AngularVelocity> rollVelocity;
 
-  public GyroIOPigeon2(GyroConfigPigeon2 gyroConfig, Pigeon2Configuration config) {
-    pigeon = new Pigeon2(gyroConfig.deviceId, new CANBus(gyroConfig.canbus));
+  protected GyroIOPigeon2(int deviceId, CANBus canBus, Frequency updateFrequency) {
+    pigeon = new Pigeon2(deviceId, canBus);
+
+    Pigeon2Configuration config = new Pigeon2Configuration();
     pigeon.getConfigurator().apply(config);
     pigeon.getConfigurator().setYaw(0.0);
 
@@ -49,7 +50,7 @@ public class GyroIOPigeon2 implements GyroIO {
     pitchVelocity = pigeon.getAngularVelocityXWorld();
     rollVelocity = pigeon.getAngularVelocityYWorld();
 
-    yaw.setUpdateFrequency(Frequency.ofBaseUnits(gyroConfig.updateFrequencyHz, Hertz));
+    yaw.setUpdateFrequency(updateFrequency);
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
@@ -60,13 +61,12 @@ public class GyroIOPigeon2 implements GyroIO {
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    // inputs.setConnected(BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity).isOK());
-
-    inputs.setYawPosition(yaw.getValue());
-    inputs.setYawVelocity(yawVelocity.getValue());
-    inputs.setPitchPosition(pitch.getValue());
-    inputs.setPitchVelocity(pitchVelocity.getValue());
-    inputs.setRollPosition(roll.getValue());
-    inputs.setRollVelocity(rollVelocity.getValue());
+    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity).isOK();
+    inputs.yawPosition = yaw.getValue();
+    inputs.yawVelocity = yawVelocity.getValue();
+    inputs.pitchPosition = pitch.getValue();
+    inputs.pitchVelocity  = pitchVelocity.getValue();
+    inputs.rollPosition = roll.getValue();
+    inputs.rollVelocity = rollVelocity.getValue();
   }
 }

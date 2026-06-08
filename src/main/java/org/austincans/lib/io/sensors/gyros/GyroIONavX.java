@@ -26,20 +26,19 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 public class GyroIONavX implements GyroIO {
   private final AHRS navX;
 
-  public GyroIONavX(NavXUpdateRate updateRate) {
-    navX = new AHRS(NavXComType.kMXP_SPI, updateRate);
+  protected GyroIONavX(NavXComType comType, NavXUpdateRate updateRate) {
+    navX = new AHRS(comType, updateRate);
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    // inputs.setConnected(navX.isConnected());
-
+    inputs.connected = navX.isConnected();
     // values are flipped because navX axes are opposite direction of those used by WPILib
-    inputs.setYawPosition(Degrees.of(-navX.getYaw()));
-    inputs.setYawVelocity(DegreesPerSecond.of(-navX.getRawGyroZ()));
-    inputs.setPitchPosition(Degrees.of(-navX.getPitch()));
-    inputs.setPitchVelocity(DegreesPerSecond.of(-navX.getRawGyroX()));
-    inputs.setRollPosition(Degrees.of(-navX.getRoll()));
-    inputs.setRollVelocity(DegreesPerSecond.of(-navX.getRawGyroY()));
+    inputs.yawPosition = Degrees.of(-navX.getYaw());
+    inputs.yawVelocity = DegreesPerSecond.of(-navX.getRawGyroZ());
+    inputs.pitchPosition = Degrees.of(-navX.getPitch());
+    inputs.pitchVelocity = DegreesPerSecond.of(-navX.getRawGyroX());
+    inputs.rollPosition = Degrees.of(-navX.getRoll());
+    inputs.rollVelocity = DegreesPerSecond.of(-navX.getRawGyroY());
   }
 }

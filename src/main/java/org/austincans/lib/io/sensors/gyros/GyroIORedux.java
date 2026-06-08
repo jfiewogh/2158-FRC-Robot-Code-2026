@@ -17,32 +17,37 @@ package org.austincans.lib.io.sensors.gyros;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
+
+import edu.wpi.first.units.measure.Frequency;
+
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 public class GyroIORedux implements GyroIO {
-  private final Canandgyro gyro = new Canandgyro(30);
+  private final Canandgyro gyro;
 
-  public GyroIORedux(double odometryFrequencyHz) {
+  protected GyroIORedux(int deviceId, Frequency odometryFrequency) {
+    gyro = new Canandgyro(deviceId);
     // Configure the gyro
     CanandgyroSettings settings =
         new CanandgyroSettings()
-            .setYawFramePeriod(1.0 / odometryFrequencyHz)
+            .setYawFramePeriod(1.0 / odometryFrequency.in(Hertz))
             .setAngularPositionFramePeriod(0.01)
             .setAngularVelocityFramePeriod(0.01);
     gyro.setSettings(settings, 0.25, 5);
-    gyro.setYaw(0.0); // gyro.setYaw(0.0, 0.1);
+    gyro.setYaw(0.0);
     gyro.clearStickyFaults();
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    // inputs.setConnected(gyro.isConnected());
-    inputs.setYawPosition(Rotations.of(gyro.getYaw()));
-    inputs.setYawVelocity(RotationsPerSecond.of(gyro.getAngularVelocityYaw()));
-    inputs.setPitchPosition(Rotations.of(gyro.getPitch()));
-    inputs.setPitchVelocity(RotationsPerSecond.of(gyro.getAngularVelocityPitch()));
-    inputs.setRollPosition(Rotations.of(gyro.getRoll()));
-    inputs.setRollVelocity(RotationsPerSecond.of(gyro.getAngularVelocityRoll()));
+    inputs.connected = gyro.isConnected();
+    inputs.yawPosition = Rotations.of(gyro.getYaw());
+    inputs.yawVelocity = RotationsPerSecond.of(gyro.getAngularVelocityYaw());
+    inputs.pitchPosition = Rotations.of(gyro.getPitch());
+    inputs.pitchVelocity = (RotationsPerSecond.of(gyro.getAngularVelocityPitch()));
+    inputs.rollPosition = Rotations.of(gyro.getRoll());
+    inputs.rollVelocity = RotationsPerSecond.of(gyro.getAngularVelocityRoll());
   }
 }
