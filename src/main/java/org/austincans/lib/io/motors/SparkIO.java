@@ -23,6 +23,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
@@ -130,11 +131,14 @@ public class SparkIO<
         vendorConfig.inverted(config.inverted);
         vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
         vendorConfig.idleMode(config.neutralMode == NeutralMode.BRAKE ? IdleMode.kBrake : IdleMode.kCoast);
+        vendorConfig.voltageCompensation(config.voltageCompensation.in(Volts));
 
         /* Encoder */
         double conversionFactor = 1.0 / config.encoderConfig.sensorToMechanismGearbox.getReduction();
         vendorConfig.encoder.positionConversionFactor(conversionFactor);
         vendorConfig.encoder.velocityConversionFactor(conversionFactor);
+        vendorConfig.encoder.uvwMeasurementPeriod(0);
+        vendorConfig.encoder.uvwAverageDepth(0);
 
         /* Soft Limit */
         vendorConfig.softLimit.forwardSoftLimitEnabled(config.softLimitConfig.forwardSoftLimitEnabled);
@@ -143,6 +147,12 @@ public class SparkIO<
         vendorConfig.softLimit.reverseSoftLimit(config.softLimitConfig.reverseSoftLimit.in(Rotations));
 
         /* Closed Loop */
+        // TODO: Add more feedback options
+        vendorConfig.closedLoop.feedbackSensor(
+            switch (config.closedLoopConfig.feedbackSensor) {
+                case PRIMARY_ENCODER -> FeedbackSensor.kPrimaryEncoder;
+            }
+        );
         vendorConfig.closedLoop.positionWrappingEnabled(config.closedLoopConfig.positionContinuousWrap);
         vendorConfig.closedLoop.positionWrappingMinInput(config.closedLoopConfig.positionWrappingMinInput.in(Rotations));
         vendorConfig.closedLoop.positionWrappingMaxInput(config.closedLoopConfig.positionWrappingMaxInput.in(Rotations));

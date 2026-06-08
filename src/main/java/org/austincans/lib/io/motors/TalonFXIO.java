@@ -61,9 +61,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
             configRequests.motionMagicConfigChanged,
             configRequests.currentLimitsConfigChanged
         );
-
-        /* TODO: There are definitely some commonalities between TalonFXIO and TalonFXSIO. Separate common parts into shared methods */
-
+        
         /* Multiple Configs */
         if (changeCount > 1) {
             configRequests.motorOutputConfigChanged = false;

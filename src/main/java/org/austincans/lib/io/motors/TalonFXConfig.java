@@ -1,6 +1,7 @@
 package org.austincans.lib.io.motors;
 
 public class TalonFXConfig extends TalonConfig {
+    /** You still need to configure the remote feedback sensor by making an IO instance of it. */
     public FeedbackConfig feedbackConfig;
 
     public static class FeedbackConfig extends BaseFeedbackConfig {

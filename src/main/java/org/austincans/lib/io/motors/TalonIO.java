@@ -221,6 +221,8 @@ extends BaseMotorIO<
         motionMagic.MotionMagicCruiseVelocity = motionMagicConfig.cruiseVelocity.in(RotationsPerSecond);
         motionMagic.MotionMagicAcceleration = motionMagicConfig.acceleration.in(RotationsPerSecondPerSecond);
         motionMagic.MotionMagicJerk = motionMagicConfig.jerkRotationsPerSecCubed;
+		motionMagic.MotionMagicExpo_kV = motionMagicConfig.expoKV;
+		motionMagic.MotionMagicExpo_kA = motionMagicConfig.expoKA;
     }
     protected void updateCurrentLimitsConfig(CurrentLimitsConfigs currentLimits, CurrentLimitsConfig currentLimitsConfig) {
         currentLimits.StatorCurrentLimitEnable = currentLimitsConfig.statorCurrentLimitEnabled;

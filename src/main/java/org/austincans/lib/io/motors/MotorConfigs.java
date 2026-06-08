@@ -1,5 +1,7 @@
 package org.austincans.lib.io.motors;
 
+import org.austincans.lib.util.math.FlaggedUtil;
+
 import edu.wpi.first.units.measure.Angle;
 
 public final class MotorConfigs {
@@ -46,10 +48,12 @@ public final class MotorConfigs {
         public Angle reverseSoftLimit;
 
         public boolean equals(SoftLimitConfig other) {
-            return forwardSoftLimitEnabled == other.forwardSoftLimitEnabled
-                    && forwardSoftLimit.isEquivalent(other.forwardSoftLimit)
-                    && reverseSoftLimitEnabled == other.reverseSoftLimitEnabled
-                    && reverseSoftLimit.isEquivalent(other.reverseSoftLimit);
+            return FlaggedUtil.equals(
+                    forwardSoftLimitEnabled, other.forwardSoftLimitEnabled, 
+                    forwardSoftLimit, other.forwardSoftLimit)
+                && FlaggedUtil.equals(
+                    reverseSoftLimitEnabled, other.reverseSoftLimitEnabled, 
+                    reverseSoftLimit, other.reverseSoftLimit);
         }
     }
 }

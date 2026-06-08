@@ -3,6 +3,7 @@ package org.austincans.lib.io.motors;
 import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
 import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
 import org.austincans.lib.io.motors.MotorIO.NeutralMode;
+import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;
 
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -47,31 +48,32 @@ public abstract class TalonConfig {
         public AngularVelocity cruiseVelocity;
         public AngularAcceleration acceleration;
         public double jerkRotationsPerSecCubed; 
+        public double expoKV;
+        public double expoKA;
 
         public boolean equals(MotionMagicConfig other) {
             return cruiseVelocity.isEquivalent(other.cruiseVelocity)
                 && acceleration.isEquivalent(other.acceleration)
-                && jerkRotationsPerSecCubed == other.jerkRotationsPerSecCubed;
+                && jerkRotationsPerSecCubed == other.jerkRotationsPerSecCubed
+                && expoKV == other.expoKV
+                && expoKA == other.expoKA;
         }
     }
 
-    /** 
-     * TODO: Maybe figure out a way to combine the enabled boolean with its respective value.
-     * For example, statorCurrentLimitEnabled is paired with statorCurrentLimit.
-     * Possibly use optional or make a monad like optional.
-     */
     public static class CurrentLimitsConfig {
-        public boolean statorCurrentLimitEnabled;
-        public Current statorCurrentLimit;
+        public boolean statorCurrentLimitEnabled; // A B
+        public Current statorCurrentLimit; // X Y
+
         public boolean supplyCurrentLimitEnabled;
         public Current supplyCurrentLimit;
 
-        /** TODO: I feel like there are some logical flaws here */
         public boolean equals(CurrentLimitsConfig other) {
-            return statorCurrentLimitEnabled == other.statorCurrentLimitEnabled
-                && statorCurrentLimit.isEquivalent(other.statorCurrentLimit)
-                && supplyCurrentLimitEnabled == other.supplyCurrentLimitEnabled
-                && supplyCurrentLimit.isEquivalent(other.supplyCurrentLimit);
+            return FlaggedUtil.equals(
+                    statorCurrentLimitEnabled, other.statorCurrentLimitEnabled, 
+                    statorCurrentLimit, other.statorCurrentLimit)
+                && FlaggedUtil.equals(
+                    supplyCurrentLimitEnabled, other.supplyCurrentLimitEnabled, 
+                    supplyCurrentLimit, other.supplyCurrentLimit);
         }
     }
 }

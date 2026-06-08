@@ -1,6 +1,7 @@
 package org.austincans.lib.io.motors;
 
 import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
+import org.austincans.lib.io.motors.TalonFXSConfig.MotorArrangement;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
@@ -64,8 +65,6 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
             configRequests.currentLimitsConfigChanged
         );
 
-        /* TODO: There are definitely some commonalities between TalonFXIO and TalonFXSIO. Separate common parts into shared methods */
-
         /* Multiple Configs */
         if (changeCount > 1) {
             configRequests.motorOutputConfigChanged = false;
@@ -94,6 +93,9 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
 
             configRequests.currentLimitsConfigChanged = false;
             updateCurrentLimitsConfig(vendorConfig.CurrentLimits, config.currentLimitsConfig);
+
+            configRequests.commutationConfigChanged = false;
+            updateCommutationConfig(vendorConfig.Commutation, config.motorArrangement);
 
             motor.getConfigurator().apply(vendorConfig);
             return;
@@ -156,17 +158,30 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
         }
     }
 
-    /** TODO: Complete */
-    private void updateCommutationConfig(CommutationConfigs commutation) {
-        commutation.MotorArrangement = MotorArrangementValue.Brushed_DC;
-        commutation.BrushedMotorWiring = BrushedMotorWiringValue.Leads_A_and_B;     
+    /** https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/subsystems/drive/ModuleIOTalonFXS.java */
+    private void updateCommutationConfig(CommutationConfigs commutation, MotorArrangement motorArrangement) {
+        commutation.MotorArrangement = switch (motorArrangement) {
+            case MINION_JST -> MotorArrangementValue.Minion_JST;
+            case NEO_JST -> MotorArrangementValue.NEO_JST;
+            case VORTEX_JST -> MotorArrangementValue.VORTEX_JST;
+            case NEO550_JST -> MotorArrangementValue.NEO550_JST;
+            case BRUSHED_AB, BRUSHED_AC, BRUSHED_BC -> MotorArrangementValue.Brushed_DC;
+            case DISABLED -> MotorArrangementValue.Disabled;
+        };
+        commutation.BrushedMotorWiring = switch (motorArrangement) {
+            case BRUSHED_AC -> BrushedMotorWiringValue.Leads_A_and_C;
+            case BRUSHED_BC ->BrushedMotorWiringValue.Leads_B_and_C;
+            default -> BrushedMotorWiringValue.Leads_A_and_B;
+        };     
     }
 
     private void updateExternalFeedbackConfig(ExternalFeedbackConfigs externalFeedback, ExternalFeedbackConfig externalFeedbackConfig) {
         switch (externalFeedbackConfig.externalFeedbackSensorSource) {
+            /** Commutation is what is driven/controlled by the motor controller (TalonFXS) */
             case COMMUTATION -> {
-                // TODO: Check AdvantageKit's swerve template with TalonFXS to see how they handled Commutation
                 externalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.Commutation;
+                externalFeedback.FeedbackRemoteSensorID = externalFeedbackConfig.externalFeedbackSensorSourceId;
+                externalFeedback.RotorToSensorRatio = externalFeedbackConfig.rotorToRemoteSensor.getReduction();
                 externalFeedback.SensorToMechanismRatio = externalFeedbackConfig.sensorToMechanismGearbox.getReduction();
             }
             case REMOTE_CANCODER -> {
@@ -241,10 +256,15 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
 
     public static class TalonFXSIOConfigRequests extends TalonIO.TalonIOConfigRequests<TalonFXSConfig> {
         protected boolean externalFeedbackConfigChanged;
+        protected boolean commutationConfigChanged;
 
         public void setExternalFeedbackConfig(ExternalFeedbackConfig externalFeedbackConfig) {
 			configChanged |= externalFeedbackConfigChanged = !config.externalFeedbackConfig.equals(externalFeedbackConfig);
 			config.externalFeedbackConfig = externalFeedbackConfig;
 		}
+        public void setCommutationConfig(MotorArrangement motorArrangement) {
+            configChanged |= commutationConfigChanged = config.motorArrangement != motorArrangement;
+            config.motorArrangement = motorArrangement;
+        }
     }
 }
