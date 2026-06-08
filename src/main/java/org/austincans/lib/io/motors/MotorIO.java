@@ -174,7 +174,5 @@ extends
 
 
 
-
-
     public void setEncoderPosition(Angle position);
 }

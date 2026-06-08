@@ -1,5 +1,6 @@
 package org.austincans.lib.io.motors;
 
+import com.ctre.phoenix6.CANBus;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 /** 
@@ -17,12 +18,12 @@ public class MotorFactory {
   }
 
   /** Create a TalonFX motor */
-  public static TalonFXIO createTalonFX(TalonFXConfig config) {
-    return createTalonFX(config);
+  public static TalonFXIO createTalonFX(int deviceId, CANBus canBus) {
+    return new TalonFXIO(deviceId, canBus);
   }
 
   /** Create a TalonFXS motor */
-  public static TalonFXSIO createTalonFXS(TalonFXSConfig config) {
-    return createTalonFXS(config);
+  public static TalonFXSIO createTalonFXS(int deviceId, CANBus canBus) {
+    return new TalonFXSIO(deviceId, canBus);
   }
 }

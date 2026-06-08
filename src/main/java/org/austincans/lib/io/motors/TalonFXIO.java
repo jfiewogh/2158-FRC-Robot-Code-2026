@@ -29,7 +29,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
 
-    TalonFXIO(int deviceId, CANBus canBus, TalonFXConfig config) {
+    protected TalonFXIO(int deviceId, CANBus canBus) {
         motor = new TalonFX(deviceId, canBus);
 
         position = motor.getPosition();

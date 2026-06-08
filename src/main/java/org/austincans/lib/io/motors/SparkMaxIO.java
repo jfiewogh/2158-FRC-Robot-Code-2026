@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class SparkMaxIO extends SparkIO<SparkMax, SparkMaxConfig> {
-    SparkMaxIO(int deviceId, MotorType motorType) {
+    protected SparkMaxIO(int deviceId, MotorType motorType) {
         super(new SparkMax(deviceId, motorType), new SparkMaxConfig());
     }
 }
