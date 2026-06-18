@@ -12,7 +12,7 @@ public interface AbsoluteEncoderIO<
 extends DeviceIO<
     AbsoluteEncoderIO.AbsoluteEncoderIOInputs>, ConfigurableIO<ConfigRequestsType> {
 
-    public static class AbsoluteEncoderIOInputs {
+    public static class AbsoluteEncoderIOInputs extends DeviceIO.DeviceIOInputs {
         public boolean connected;
         public Angle absolutePosition;
         public Angle position;
