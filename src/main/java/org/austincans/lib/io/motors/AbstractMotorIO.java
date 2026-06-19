@@ -1,5 +1,7 @@
 package org.austincans.lib.io.motors;
 
+import org.austincans.lib.io.AbstractDeviceIO;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -12,15 +14,16 @@ public abstract class AbstractMotorIO<
     VelocityControlTypeType extends MotorIO.VelocityControlType, 
     PositionControlTypeType extends MotorIO.PositionControlType, 
     ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
-    ConfigType
-> implements MotorIO<
+    ConfigType> 
+extends AbstractDeviceIO<InputsType>
+implements MotorIO<
     InputsType, 
     ControlSlotType,
     VelocityControlTypeType, 
     PositionControlTypeType,
     ConfigRequestsType,
-    ConfigType
-> {
+    ConfigType> 
+{
     /** Updates inputs with newer values from motor */
     public void updateInputs(InputsType inputs) {
         inputs.position = getPosition();
