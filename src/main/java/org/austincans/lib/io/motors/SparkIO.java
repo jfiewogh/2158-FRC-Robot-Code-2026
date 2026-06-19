@@ -47,7 +47,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class SparkIO<
     MotorType extends SparkBase, 
     VendorConfigType extends SparkBaseConfig
-> extends BaseMotorIO<
+> extends AbstractMotorIO<
     MotorIO.MotorIOInputs, 
     SparkControlSlot, 
     SparkVelocityControlType, 
@@ -62,7 +62,7 @@ public class SparkIO<
     private final VendorConfigType vendorConfig;
     private boolean initialConfigApplied = false;
 
-    private ControlConfig[] slotControlConfigs = new ControlConfig[4];
+    private final ControlConfig[] slotControlConfigs = new ControlConfig[4];
 
     protected SparkIO(MotorType motor, VendorConfigType vendorConfig) {
         this.vendorConfig = vendorConfig;
@@ -115,6 +115,15 @@ public class SparkIO<
     @Override
     protected Temperature getTemperature() {
         return Celsius.of(motor.getMotorTemperature());
+    }
+
+    @Override
+    protected String[] getActiveFaults() {
+        motor.clearFaults();
+
+        motor.getFaults();
+
+        return;
     }
 
     @Override

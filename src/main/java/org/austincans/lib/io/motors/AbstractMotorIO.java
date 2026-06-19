@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class BaseMotorIO<
+public abstract class AbstractMotorIO<
     InputsType extends MotorIO.MotorIOInputs, 
     ControlSlotType extends MotorIO.ControlSlot, 
     VelocityControlTypeType extends MotorIO.VelocityControlType, 
@@ -28,6 +28,7 @@ public abstract class BaseMotorIO<
         inputs.voltage = getVoltage();
         inputs.statorCurrent = getStatorCurrent();
         inputs.temperature = getTemperature();
+        inputs.activeFaults = getActiveFaults();
     }
 
     /** Applies output to motor based on the output mode */
@@ -52,4 +53,6 @@ public abstract class BaseMotorIO<
     protected abstract Current getStatorCurrent();
 
     protected abstract Temperature getTemperature();
+
+    protected abstract String[] getActiveFaults();
 }

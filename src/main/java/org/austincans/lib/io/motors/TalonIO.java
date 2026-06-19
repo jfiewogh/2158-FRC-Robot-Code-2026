@@ -47,7 +47,7 @@ import edu.wpi.first.units.measure.Current;
 public abstract class TalonIO<
 	TalonConfigRequestsType extends TalonIO.TalonIOConfigRequests<TalonConfigType>,
 	TalonConfigType extends TalonConfig>
-extends BaseMotorIO<
+extends AbstractMotorIO<
 	TalonIO.TalonIOInputs, 
 	TalonIO.TalonControlSlot, 
 	TalonIO.TalonVelocityControlType, 

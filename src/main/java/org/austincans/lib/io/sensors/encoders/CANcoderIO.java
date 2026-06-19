@@ -2,6 +2,8 @@ package org.austincans.lib.io.sensors.encoders;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import java.util.ArrayList;
+
 import org.austincans.lib.io.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOConfigRequests;
 
 import com.ctre.phoenix6.CANBus;
@@ -22,6 +24,13 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOConfig
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
 
+    private final StatusSignal<Boolean> hardwareFault;
+    private final StatusSignal<Boolean> bootDuringEnabled;
+    private final StatusSignal<Boolean> badMagnet;
+    private final StatusSignal<Boolean> undervoltage;
+
+    private final ArrayList<String> faults = new ArrayList<>();
+
     protected CANcoderIO(int deviceId, CANBus canbus) {
         encoder = new CANcoder(deviceId, canbus);
 
@@ -30,6 +39,11 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOConfig
         absolutePosition = encoder.getAbsolutePosition();
         position = encoder.getPosition(); // relative to start
         velocity = encoder.getVelocity();
+
+        hardwareFault = encoder.getFault_Hardware();
+        bootDuringEnabled = encoder.getFault_BootDuringEnable();
+        badMagnet = encoder.getFault_BadMagnet();
+        undervoltage = encoder.getFault_Undervoltage();
     }
 
     @Override
@@ -38,6 +52,26 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOConfig
         inputs.absolutePosition = absolutePosition.getValue();
         inputs.position = position.getValue();
         inputs.velocity = velocity.getValue();
+        inputs.activeFaults = getActiveFaults();
+    }
+
+    // TODO: Move this into new AbstractAbsoluteEncoderIO class and change to protected, similarly to AbstractMotorIO
+    private String[] getActiveFaults() {
+        faults.clear();
+        StatusSignal.refreshAll(hardwareFault, bootDuringEnabled, badMagnet, undervoltage);
+        if (hardwareFault.getValue()) {
+            faults.add("Hardware fault detected");
+        }
+        if (bootDuringEnabled.getValue()) {
+            faults.add("Device booted while enabled");
+        }
+        if (badMagnet.getValue()) {
+            faults.add("Magnet too weak");
+        }
+        if (undervoltage.getValue()) {
+            faults.add("Under voltage");
+        }
+        return faults.toArray(new String[0]);
     }
 
     @Override

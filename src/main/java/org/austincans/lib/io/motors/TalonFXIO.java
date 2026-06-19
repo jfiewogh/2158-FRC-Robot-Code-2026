@@ -21,6 +21,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
 
     private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
 
+    // TODO: Is there a way to get StatusSignal to be in TalonIO since both TalonFX and TalonFXS use it?
     private final StatusSignal<Angle> position;
     private final StatusSignal<AngularVelocity> velocity;
     private final StatusSignal<Voltage> voltage;
@@ -28,7 +29,7 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     private final StatusSignal<Current> statorCurrent;
     private final StatusSignal<Current> torqueCurrent;
     private final StatusSignal<Temperature> temperature;
-
+    
     protected TalonFXIO(int deviceId, CANBus canBus) {
         motor = new TalonFX(deviceId, canBus);
 
@@ -39,6 +40,12 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
         statorCurrent = motor.getStatorCurrent();
         torqueCurrent = motor.getTorqueCurrent();
         temperature = motor.getDeviceTemp();
+    }
+
+    @Override
+    protected String[] getActiveFaults() {
+        StatusSignal.refreshAll(null);
+        return;
     }
 
     @Override
