@@ -48,7 +48,7 @@ public class SparkIO<
     MotorType extends SparkBase, 
     VendorConfigType extends SparkBaseConfig
 > extends AbstractMotorIO<
-    MotorIO.MotorIOInputs, 
+    SparkIO.SparkIOInputs, 
     SparkControlSlot, 
     SparkVelocityControlType, 
     SparkPositionControlType, 
@@ -70,6 +70,19 @@ public class SparkIO<
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
+    }
+
+    public static class SparkIOInputs extends MotorIO.MotorIOInputs {
+        // TODO: Add faults
+    }
+
+    @Override
+    public void updateInputs(SparkIOInputs inputs) {
+        super.updateInputs(inputs);
+
+        Faults activeFaults = motor.getFaults();
+
+        Faults stickyFaults = motor.getStickyFaults();
     }
 
     @Override
@@ -115,15 +128,6 @@ public class SparkIO<
     @Override
     protected Temperature getTemperature() {
         return Celsius.of(motor.getMotorTemperature());
-    }
-
-    @Override
-    protected String[] getActiveFaults() {
-        motor.clearFaults();
-
-        motor.getFaults();
-
-        return;
     }
 
     @Override
@@ -238,6 +242,11 @@ public class SparkIO<
     @Override
     public void setEncoderPosition(Angle position) {
         encoder.setPosition(position.in(Rotations));
+    }
+
+    @Override
+    public void clearStickyFaults() {
+        motor.clearFaults();
     }
     
     /** 

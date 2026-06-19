@@ -24,7 +24,7 @@ import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-public class GyroIORedux implements GyroIO {
+public class GyroIORedux implements GyroIO<GyroIO.GyroIOInputs> {
   private final Canandgyro gyro;
 
   protected GyroIORedux(int deviceId, Frequency odometryFrequency) {

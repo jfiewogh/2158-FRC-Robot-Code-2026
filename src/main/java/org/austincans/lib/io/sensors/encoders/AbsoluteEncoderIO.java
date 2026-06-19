@@ -7,12 +7,15 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public interface AbsoluteEncoderIO<
+    InputsType extends AbsoluteEncoderIO.AbsoluteEncoderIOInputs,
     ConfigRequestsType extends AbsoluteEncoderIO.AbsoluteEncoderIOConfigRequests<ConfigType>,
     ConfigType>
-extends DeviceIO<
-    AbsoluteEncoderIO.AbsoluteEncoderIOInputs>, ConfigurableIO<ConfigRequestsType> {
+extends 
+    DeviceIO<InputsType>, 
+    ConfigurableIO<ConfigRequestsType> 
+{
 
-    public static class AbsoluteEncoderIOInputs extends DeviceIO.DeviceIOInputs {
+    public static class AbsoluteEncoderIOInputs {
         public boolean connected;
         public Angle absolutePosition;
         public Angle position;

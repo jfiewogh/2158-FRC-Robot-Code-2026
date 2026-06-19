@@ -29,7 +29,7 @@ extends
      * Values universal for all motors
      * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
      */
-    public static class MotorIOInputs extends DeviceIOInputs {
+    public static class MotorIOInputs {
         protected Angle position;
         protected AngularVelocity velocity;
         protected Voltage voltage;
@@ -175,4 +175,6 @@ extends
 
 
     public void setEncoderPosition(Angle position);
+
+    public void clearStickyFaults();
 }

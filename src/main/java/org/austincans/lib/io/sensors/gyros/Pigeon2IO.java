@@ -17,16 +17,18 @@ package org.austincans.lib.io.sensors.gyros;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
+
 import org.austincans.lib.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
-public class GyroIOPigeon2 implements GyroIO {
+public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
   private final Pigeon2 pigeon;
 
   private final StatusSignal<Angle> yaw;
@@ -36,7 +38,17 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<AngularVelocity> pitchVelocity;
   private final StatusSignal<AngularVelocity> rollVelocity;
 
-  protected GyroIOPigeon2(int deviceId, CANBus canBus, Frequency updateFrequency) {
+  // Based on https://github.com/3015RangerRobotics/2024Public/blob/main/RobotCode2024/src/main/java/frc/lib/subsystem/selfcheck/SelfCheckingPigeon2.java
+  private final StatusSignal<Integer> firmwareVersion;
+  private final StatusSignal<Boolean> hardwareFault;
+  private final StatusSignal<Boolean> bootDuringEnable;
+  private final StatusSignal<Boolean> bootIntoMotion;
+  private final StatusSignal<Boolean> bootupAccelerometer;
+  private final StatusSignal<Boolean> bootupGyroscope;
+
+  private final BaseStatusSignal[] signals;
+
+  protected Pigeon2IO(int deviceId, CANBus canBus, Frequency updateFrequency) {
     pigeon = new Pigeon2(deviceId, canBus);
 
     Pigeon2Configuration config = new Pigeon2Configuration();
@@ -55,18 +67,48 @@ public class GyroIOPigeon2 implements GyroIO {
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
     
+    // TODO: Is this needed? Check AdvantageKit
     PhoenixUtil.registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
     PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(0.0, 0.25));
+
+    firmwareVersion = pigeon.getVersion();
+    hardwareFault = pigeon.getFault_Hardware();
+    bootDuringEnable = pigeon.getFault_BootDuringEnable();
+    bootIntoMotion = pigeon.getFault_BootIntoMotion();
+    bootupAccelerometer = pigeon.getFault_BootupAccelerometer();
+    bootupGyroscope = pigeon.getFault_BootupGyroscope();
+
+    signals = new BaseStatusSignal[] {
+      yaw, pitch, roll, yawVelocity, pitchVelocity, rollVelocity,
+      firmwareVersion, hardwareFault, bootDuringEnable, bootIntoMotion, bootupAccelerometer, bootupGyroscope
+    };
+  }
+
+  public class Pigeon2IOInputs extends GyroIO.GyroIOInputs {
+    public boolean hasCommunication;
+		public boolean faultHardware;
+		public boolean faultBootDuringEnable;
+    public boolean faultBootIntoMotion;
+		public boolean faultBootupAccelerometer;
+		public boolean faultBootupGyroscope;
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity).isOK();
+  public void updateInputs(Pigeon2IOInputs inputs) {
+    inputs.connected = BaseStatusSignal.refreshAll(signals).isOK();
+
     inputs.yawPosition = yaw.getValue();
     inputs.yawVelocity = yawVelocity.getValue();
     inputs.pitchPosition = pitch.getValue();
     inputs.pitchVelocity  = pitchVelocity.getValue();
     inputs.rollPosition = roll.getValue();
     inputs.rollVelocity = rollVelocity.getValue();
+
+    inputs.hasCommunication = firmwareVersion.getStatus() == StatusCode.OK;
+    inputs.faultHardware = hardwareFault.getValue();
+    inputs.faultBootDuringEnable = bootDuringEnable.getValue();
+    inputs.faultBootIntoMotion = bootIntoMotion.getValue();
+    inputs.faultBootupAccelerometer = bootupAccelerometer.getValue();
+    inputs.faultBootupGyroscope = bootupGyroscope.getValue();
   }
 }

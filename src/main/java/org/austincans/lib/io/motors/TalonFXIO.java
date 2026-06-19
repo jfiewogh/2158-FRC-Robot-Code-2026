@@ -1,9 +1,12 @@
 package org.austincans.lib.io.motors;
 
+import java.util.ArrayList;
+
 import org.austincans.lib.io.motors.TalonFXConfig.FeedbackConfig;
 import org.austincans.lib.io.motors.TalonIO.TalonIOConfigRequests;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -20,32 +23,24 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     private final TalonFX motor;
 
     private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
-
-    // TODO: Is there a way to get StatusSignal to be in TalonIO since both TalonFX and TalonFXS use it?
-    private final StatusSignal<Angle> position;
-    private final StatusSignal<AngularVelocity> velocity;
-    private final StatusSignal<Voltage> voltage;
-    private final StatusSignal<Current> supplyCurrent;
-    private final StatusSignal<Current> statorCurrent;
-    private final StatusSignal<Current> torqueCurrent;
-    private final StatusSignal<Temperature> temperature;
     
     protected TalonFXIO(int deviceId, CANBus canBus) {
         motor = new TalonFX(deviceId, canBus);
 
-        position = motor.getPosition();
-        velocity = motor.getVelocity();
-        voltage = motor.getMotorVoltage();
-        supplyCurrent = motor.getSupplyCurrent();
-        statorCurrent = motor.getStatorCurrent();
-        torqueCurrent = motor.getTorqueCurrent();
-        temperature = motor.getDeviceTemp();
-    }
-
-    @Override
-    protected String[] getActiveFaults() {
-        StatusSignal.refreshAll(null);
-        return;
+        super(new TalonSignals(
+            motor.getPosition(),
+            motor.getVelocity(),
+            motor.getMotorVoltage(),
+            motor.getSupplyCurrent(),
+            motor.getStatorCurrent(),
+            motor.getTorqueCurrent(),
+            motor.getDeviceTemp(),
+            motor.getVersion(),
+            motor.getFault_Hardware(),
+            motor.getFault_BootDuringEnable(),
+            motor.getFault_DeviceTemp(),
+            motor.getFault_ProcTemp()
+        ));
     }
 
     @Override
@@ -201,43 +196,13 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     }
 
     @Override
-    protected Angle getPosition() {
-        return position.getValue();
-    }
-
-    @Override
-    protected AngularVelocity getVelocity() {
-        return velocity.getValue();
-    }
-
-    @Override
-    protected Voltage getVoltage() {
-        return voltage.getValue();
-    }
-
-    @Override
-    protected Current getStatorCurrent() {
-        return statorCurrent.getValue();
-    }
-
-    @Override
-    protected Current getSupplyCurrent() {
-        return supplyCurrent.getValue();
-    }
-
-    @Override
-    protected Current getTorqueCurrent() {
-        return torqueCurrent.getValue();
-    }
-
-    @Override
-    protected Temperature getTemperature() {
-        return temperature.getValue();
-    }
-
-    @Override
     public void setEncoderPosition(Angle position) {
         motor.setPosition(position);
+    }
+
+    @Override
+    public void clearStickyFaults() {
+        motor.clearStickyFaults();
     }
 
     public static class TalonFXIOConfigRequests extends TalonIOConfigRequests<TalonFXConfig> {

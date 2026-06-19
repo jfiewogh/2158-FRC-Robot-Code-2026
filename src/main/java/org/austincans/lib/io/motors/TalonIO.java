@@ -12,6 +12,8 @@ import org.austincans.lib.io.motors.TalonConfig.CurrentLimitsConfig;
 import org.austincans.lib.io.motors.TalonConfig.MotionMagicConfig;
 import org.austincans.lib.io.motors.TalonConfig.MotorOutputConfig;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -43,6 +45,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 
 public abstract class TalonIO<
 	TalonConfigRequestsType extends TalonIO.TalonIOConfigRequests<TalonConfigType>,
@@ -77,9 +81,23 @@ extends AbstractMotorIO<
 	private final MotionMagicVelocityTorqueCurrentFOC velocityMotionMagicTorqueCurrentFOC = new MotionMagicVelocityTorqueCurrentFOC(
 			0);
 
+	private final TalonSignals signals;
+	private final BaseStatusSignal[] signalsArray;
+
+	public TalonIO(TalonSignals signals) {
+		this.signals = signals;
+		signalsArray = signals.asArray();
+	}
+
 	public static class TalonIOInputs extends MotorIO.MotorIOInputs {
 		protected Current supplyCurrent;
 		protected Current torqueCurrent;
+
+		public boolean hasCommunication;
+		public boolean faultHardware;
+		public boolean faultBootDuringEnable;
+		public boolean faultDeviceTemp;
+		public boolean faultProcessorTemp;
 
 		public Current getSupplyCurrent() {
 			return supplyCurrent;
@@ -91,14 +109,51 @@ extends AbstractMotorIO<
 
 	@Override
 	public void updateInputs(TalonIOInputs inputs) {
+		BaseStatusSignal.refreshAll(signalsArray);
+
 		super.updateInputs(inputs);
 		inputs.supplyCurrent = getSupplyCurrent();
 		inputs.torqueCurrent = getTorqueCurrent();
+
+		inputs.hasCommunication = signals.firmwareVersion().getStatus() == StatusCode.OK;
+		inputs.faultHardware = signals.hardwareFault().getValue();
+		inputs.faultBootDuringEnable = signals.bootDuringEnable().getValue();
+		inputs.faultDeviceTemp = signals.deviceTemp().getValue();
+		inputs.faultProcessorTemp = signals.procTemp().getValue();
 	}
 
-	protected abstract Current getSupplyCurrent();
+	@Override
+    protected final Angle getPosition() {
+        return signals.position().getValue();
+    }
 
-	protected abstract Current getTorqueCurrent();
+    @Override
+    protected final AngularVelocity getVelocity() {
+        return signals.velocity().getValue();
+    }
+
+    @Override
+    protected final Voltage getVoltage() {
+        return signals.voltage().getValue();
+    }
+
+    @Override
+    protected final Current getStatorCurrent() {
+        return signals.statorCurrent().getValue();
+    }
+
+	@Override
+    protected final Temperature getTemperature() {
+        return signals.temperature().getValue();
+    }
+
+    protected final Current getSupplyCurrent() {
+        return signals.supplyCurrent().getValue();
+    }
+
+    protected final Current getTorqueCurrent() {
+        return signals.torqueCurrent().getValue();
+    }
 
 	protected final ControlRequest getVelocityControlRequest(TalonVelocityControlType velocityControlType,
 			AngularVelocity velocity, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {

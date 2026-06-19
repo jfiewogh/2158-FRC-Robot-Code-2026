@@ -20,8 +20,8 @@ import org.austincans.lib.io.DeviceIO;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public interface GyroIO extends DeviceIO<GyroIO.GyroIOInputs> {
-  public class GyroIOInputs extends DeviceIO.DeviceIOInputs {
+public interface GyroIO<InputsType extends GyroIO.GyroIOInputs> extends DeviceIO<InputsType> {
+  public class GyroIOInputs {
     protected boolean connected;
     protected Angle yawPosition;
     protected Angle pitchPosition;
