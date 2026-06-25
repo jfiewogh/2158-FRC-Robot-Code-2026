@@ -1,8 +1,8 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
-import org.austincans.lib.io.motors.MotorIO.NeutralMode;
+import org.austincans.lib.io.motors.configs.ControlConfig;
+import org.austincans.lib.io.motors.configs.SoftLimitConfig;
+import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;

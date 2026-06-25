@@ -3,7 +3,7 @@ package org.austincans.lib.io.motors;
 import java.util.ArrayList;
 
 import org.austincans.lib.io.motors.TalonFXConfig.FeedbackConfig;
-import org.austincans.lib.io.motors.TalonIO.TalonIOConfigRequests;
+import org.austincans.lib.io.motors.configrequests.TalonFXIOConfigRequests;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonFXConfig> {
+public class TalonFXIO extends TalonIO<TalonFXIOConfigRequests, TalonFXConfig> {
     private final TalonFX motor;
 
     private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
@@ -212,14 +212,5 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     @Override
     public void clearStickyFaults() {
         motor.clearStickyFaults();
-    }
-
-    public static class TalonFXIOConfigRequests extends TalonIOConfigRequests<TalonFXConfig> {
-        protected boolean feedbackConfigChanged;
-
-        public void setFeedbackConfig(FeedbackConfig feedbackConfig) {
-			configChanged |= feedbackConfigChanged = !config.feedbackConfig.equals(feedbackConfig);
-			config.feedbackConfig = feedbackConfig;
-		}
     }
 }

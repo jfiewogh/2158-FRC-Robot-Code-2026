@@ -6,63 +6,26 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.ActuatorIO;
 import org.austincans.lib.io.ConfigurableIO;
+import org.austincans.lib.io.motors.configrequests.MotorIOConfigRequests;
+import org.austincans.lib.io.motors.inputs.MotorIOInputs;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface MotorIO<
-    InputsType extends MotorIO.MotorIOInputs, 
+    InputsType extends MotorIOInputs, 
     ControlSlotType extends MotorIO.ControlSlot,
     VelocityControlTypeType extends MotorIO.VelocityControlType,
     PositionControlTypeType extends MotorIO.PositionControlType,
-    ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
+    ConfigRequestsType extends MotorIOConfigRequests<ConfigType>,
     ConfigType> 
 extends 
     ActuatorIO<InputsType, MotorIO.MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType>>, 
     ConfigurableIO<ConfigRequestsType> 
 {
-    /**
-     * Values universal for all motors
-     * TODO: Current values are universal only for real motors. Eventually, update to be universal for real and sim.  
-     */
-    public static class MotorIOInputs {
-        protected Angle position;
-        protected AngularVelocity velocity;
-        protected Voltage voltage;
-        protected Current statorCurrent;
-        protected Temperature temperature;
-
-        public Angle position() {
-            return position;
-        }
-        public AngularVelocity velocity() {
-            return velocity;
-        }
-        public Voltage voltage() {
-            return voltage;
-        }
-        public Current statorCurrent() {
-            return statorCurrent;
-        }
-        public Temperature temperature() {
-            return temperature;
-        }
-    }     
-    
-    /**
-     * It is plausible not all motors have a neutral/idle mode.
-     * If true, then MotorIORequests should not have a NeutralMode.
-     * You have a class that extends MotorIORequests for motors that have neutral/idle mode.
-     */
-    public static enum NeutralMode {
-        BRAKE,
-        COAST
-    }
-
     public static enum MotorIOOutputMode {
         VOLTAGE,
         VELOCITY,
@@ -153,16 +116,6 @@ extends
             currentAmps = 0.0;
         }
     }
-
-    public static class MotorIOConfigRequests<ConfigType> {
-        protected ConfigType config;
-        protected boolean configChanged;
-
-        public void config(ConfigType config) {
-            configChanged = true;
-            this.config = config;
-        }
-    }
     
     public static interface PositionControlType {}
 
@@ -170,8 +123,6 @@ extends
 
     /** A control slot represents a possible choice of control gains. */
     public static interface ControlSlot {}
-
-
 
 
     public void setEncoderPosition(Angle position);

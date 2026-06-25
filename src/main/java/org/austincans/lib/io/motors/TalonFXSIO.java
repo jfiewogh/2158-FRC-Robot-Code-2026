@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
 import org.austincans.lib.io.motors.TalonFXSConfig.MotorArrangement;
+import org.austincans.lib.io.motors.configrequests.TalonFXSIOConfigRequests;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
@@ -22,7 +23,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, TalonFXSConfig> {
+public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig> {
     private final TalonFXS motor;
 
     private final TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
@@ -57,12 +58,12 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
 
     @Override
     public void applyConfigRequests(TalonFXSIOConfigRequests configRequests) {
-        if (!configRequests.configChanged) {
+        if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.configChanged = false;
+        configRequests.setConfigChanged(false);
 
-        TalonFXSConfig config = configRequests.config;
+        TalonFXSConfig config = configRequests.getConfig();
 
         int changeCount = getTrueCount(
             configRequests.motorOutputConfigChanged, 
@@ -233,19 +234,5 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
     @Override
     public void clearStickyFaults() {
         motor.clearStickyFaults();
-    }
-
-    public static class TalonFXSIOConfigRequests extends TalonIO.TalonIOConfigRequests<TalonFXSConfig> {
-        protected boolean externalFeedbackConfigChanged;
-        protected boolean commutationConfigChanged;
-
-        public void setExternalFeedbackConfig(ExternalFeedbackConfig externalFeedbackConfig) {
-			configChanged |= externalFeedbackConfigChanged = !config.externalFeedbackConfig.equals(externalFeedbackConfig);
-			config.externalFeedbackConfig = externalFeedbackConfig;
-		}
-        public void setCommutationConfig(MotorArrangement motorArrangement) {
-            configChanged |= commutationConfigChanged = config.motorArrangement != motorArrangement;
-            config.motorArrangement = motorArrangement;
-        }
     }
 }
