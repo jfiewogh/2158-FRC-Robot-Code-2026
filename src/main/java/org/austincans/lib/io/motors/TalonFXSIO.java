@@ -29,7 +29,7 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
 
     protected TalonFXSIO(int deviceId, CANBus canBus) {
         motor = new TalonFXS(deviceId, canBus);
-        
+
         super(new TalonSignals(
             motor.getPosition(),
             motor.getVelocity(),
@@ -38,11 +38,20 @@ public class TalonFXSIO extends TalonIO<TalonFXSIO.TalonFXSIOConfigRequests, Tal
             motor.getStatorCurrent(),
             motor.getTorqueCurrent(),
             motor.getDeviceTemp(),
+            
             motor.getVersion(),
             motor.getFault_Hardware(),
             motor.getFault_BootDuringEnable(),
             motor.getFault_DeviceTemp(),
-            motor.getFault_ProcTemp()
+            motor.getFault_ProcTemp(),
+
+            motor.getStickyFault_Hardware(),
+            motor.getStickyFault_BootDuringEnable(),
+            motor.getStickyFault_Undervoltage(),
+            motor.getStickyFault_DeviceTemp(),
+            motor.getStickyFault_ProcTemp(),
+            motor.getStickyFault_StatorCurrLimit(),
+            motor.getStickyFault_SupplyCurrLimit()
         ));
     }
 

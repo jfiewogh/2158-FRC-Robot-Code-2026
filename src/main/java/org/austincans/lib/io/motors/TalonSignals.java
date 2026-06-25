@@ -18,16 +18,30 @@ public record TalonSignals(
     StatusSignal<Current> torqueCurrent,
     StatusSignal<Temperature> temperature,
 
+    /** Active Faults */
     StatusSignal<Integer> firmwareVersion,
     StatusSignal<Boolean> hardwareFault,
     StatusSignal<Boolean> bootDuringEnable,
     StatusSignal<Boolean> deviceTemp,
-    StatusSignal<Boolean> procTemp
+    StatusSignal<Boolean> procTemp,
+
+    /** Sticky Faults */
+    StatusSignal<Boolean> stickyFaultHardware,
+    StatusSignal<Boolean> stickyFaultBootDuringEnable,
+    StatusSignal<Boolean> stickyFaultUndervoltage,
+    StatusSignal<Boolean> stickyFaultDeviceTemp,
+    StatusSignal<Boolean> stickyFaultProcTemp,
+    StatusSignal<Boolean> stickyFaultStatorCurrLimit,
+    StatusSignal<Boolean> stickyFaultSupplyCurrLimit
 ) {
     public BaseStatusSignal[] asArray() {
         return new BaseStatusSignal[] {
             position, velocity, voltage, supplyCurrent, statorCurrent, torqueCurrent, temperature,
-            firmwareVersion, hardwareFault, bootDuringEnable, deviceTemp, procTemp
+            
+            firmwareVersion, hardwareFault, bootDuringEnable, deviceTemp, procTemp,
+            
+            stickyFaultHardware, stickyFaultBootDuringEnable, stickyFaultUndervoltage, stickyFaultDeviceTemp, 
+            stickyFaultProcTemp, stickyFaultStatorCurrLimit, stickyFaultSupplyCurrLimit
         };
     }
 }

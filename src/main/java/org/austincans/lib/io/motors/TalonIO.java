@@ -59,6 +59,9 @@ extends AbstractMotorIO<
 	TalonConfigRequestsType, 
 	TalonConfigType> {
 
+	private final TalonSignals signals;
+	private final BaseStatusSignal[] signalsArray;
+
 	/* Control Requests */
 	protected final VoltageOut voltageOut = new VoltageOut(0);
 
@@ -81,14 +84,12 @@ extends AbstractMotorIO<
 	private final MotionMagicVelocityTorqueCurrentFOC velocityMotionMagicTorqueCurrentFOC = new MotionMagicVelocityTorqueCurrentFOC(
 			0);
 
-	private final TalonSignals signals;
-	private final BaseStatusSignal[] signalsArray;
-
 	public TalonIO(TalonSignals signals) {
 		this.signals = signals;
 		signalsArray = signals.asArray();
 	}
 
+	/** Add more fields (ex. faults) if needed */
 	public static class TalonIOInputs extends MotorIO.MotorIOInputs {
 		protected Current supplyCurrent;
 		protected Current torqueCurrent;
@@ -98,6 +99,14 @@ extends AbstractMotorIO<
 		public boolean faultBootDuringEnable;
 		public boolean faultDeviceTemp;
 		public boolean faultProcessorTemp;
+
+		public boolean stickyFaultHardware;
+		public boolean stickyFaultBootDuringEnable;
+		public boolean stickyFaultUndervoltage;
+		public boolean stickyFaultDeviceTemp;
+		public boolean stickyFaultProcTemp;
+		public boolean stickyFaultStatorCurrLimit;
+		public boolean stickyFaultSupplyCurrLimit;
 
 		public Current getSupplyCurrent() {
 			return supplyCurrent;
@@ -120,6 +129,14 @@ extends AbstractMotorIO<
 		inputs.faultBootDuringEnable = signals.bootDuringEnable().getValue();
 		inputs.faultDeviceTemp = signals.deviceTemp().getValue();
 		inputs.faultProcessorTemp = signals.procTemp().getValue();
+
+		inputs.stickyFaultHardware = signals.stickyFaultHardware().getValue();
+		inputs.stickyFaultBootDuringEnable = signals.stickyFaultBootDuringEnable().getValue();
+		inputs.stickyFaultUndervoltage = signals.stickyFaultUndervoltage().getValue();
+		inputs.stickyFaultDeviceTemp = signals.stickyFaultDeviceTemp().getValue();
+		inputs.stickyFaultProcTemp = signals.stickyFaultProcTemp().getValue();
+		inputs.stickyFaultStatorCurrLimit = signals.stickyFaultStatorCurrLimit().getValue();
+		inputs.stickyFaultSupplyCurrLimit = signals.stickyFaultSupplyCurrLimit().getValue();
 	}
 
 	@Override

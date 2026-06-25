@@ -29,6 +29,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -73,7 +74,22 @@ public class SparkIO<
     }
 
     public static class SparkIOInputs extends MotorIO.MotorIOInputs {
-        // TODO: Add faults
+        public boolean activeFaultMotorType;
+        public boolean activeFaultSensor;
+        public boolean activeFaultCan;
+        public boolean activeFaultTemperature;
+        public boolean activeFaultGateDriver;
+        public boolean activeFaultEscEeprom;
+        public boolean activeFaultFirmware;
+
+        public boolean stickyFaultMotorType;
+        public boolean stickyFaultSensor;
+        public boolean stickyFaultCan;
+        public boolean stickyFaultTemperature;
+        public boolean stickyFaultGateDriver;
+        public boolean stickyFaultEscEeprom;
+        public boolean stickyFaultFirmware;
+        public boolean stickyFaultOther;
     }
 
     @Override
@@ -81,8 +97,21 @@ public class SparkIO<
         super.updateInputs(inputs);
 
         Faults activeFaults = motor.getFaults();
+        inputs.activeFaultMotorType = activeFaults.motorType;
+        inputs.activeFaultCan = activeFaults.can;
+        inputs.activeFaultTemperature = activeFaults.temperature;
+        inputs.activeFaultGateDriver = activeFaults.gateDriver;
+        inputs.activeFaultEscEeprom = activeFaults.escEeprom;
+        inputs.activeFaultFirmware = activeFaults.firmware;
 
         Faults stickyFaults = motor.getStickyFaults();
+        inputs.stickyFaultMotorType = stickyFaults.motorType;
+        inputs.stickyFaultCan = stickyFaults.can;
+        inputs.stickyFaultTemperature = stickyFaults.temperature;
+        inputs.stickyFaultGateDriver = stickyFaults.gateDriver;
+        inputs.stickyFaultEscEeprom = stickyFaults.escEeprom;
+        inputs.stickyFaultFirmware = stickyFaults.firmware;
+        inputs.stickyFaultOther = stickyFaults.other;
     }
 
     @Override

@@ -35,11 +35,20 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
             motor.getStatorCurrent(),
             motor.getTorqueCurrent(),
             motor.getDeviceTemp(),
+
             motor.getVersion(),
             motor.getFault_Hardware(),
             motor.getFault_BootDuringEnable(),
             motor.getFault_DeviceTemp(),
-            motor.getFault_ProcTemp()
+            motor.getFault_ProcTemp(),
+
+            motor.getStickyFault_Hardware(),
+            motor.getStickyFault_BootDuringEnable(),
+            motor.getStickyFault_Undervoltage(),
+            motor.getStickyFault_DeviceTemp(),
+            motor.getStickyFault_ProcTemp(),
+            motor.getStickyFault_StatorCurrLimit(),
+            motor.getStickyFault_SupplyCurrLimit()
         ));
     }
 
