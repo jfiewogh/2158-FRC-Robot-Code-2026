@@ -5,7 +5,7 @@ public class TrackedValue<T> {
     private boolean changed;
 
     public void set(T newValue) {
-        changed = value.equals(newValue);
+        changed = !value.equals(newValue);
         value = newValue;
     }
 
