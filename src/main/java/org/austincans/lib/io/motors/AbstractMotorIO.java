@@ -1,27 +1,31 @@
 package org.austincans.lib.io.motors;
 
+import org.austincans.lib.io.motors.configrequests.MotorIOConfigRequests;
+import org.austincans.lib.io.motors.inputs.MotorIOInputs;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class BaseMotorIO<
-    InputsType extends MotorIO.MotorIOInputs, 
+public abstract class AbstractMotorIO<
+    InputsType extends MotorIOInputs, 
     ControlSlotType extends MotorIO.ControlSlot, 
     VelocityControlTypeType extends MotorIO.VelocityControlType, 
     PositionControlTypeType extends MotorIO.PositionControlType, 
-    ConfigRequestsType extends MotorIO.MotorIOConfigRequests<ConfigType>,
-    ConfigType
-> implements MotorIO<
+    ConfigRequestsType extends MotorIOConfigRequests<ConfigType>,
+    ConfigType> 
+implements MotorIO<
     InputsType, 
     ControlSlotType,
     VelocityControlTypeType, 
     PositionControlTypeType,
     ConfigRequestsType,
-    ConfigType
-> {
+    ConfigType> 
+{
     /** Updates inputs with newer values from motor */
+    @Override
     public void updateInputs(InputsType inputs) {
         inputs.position = getPosition();
         inputs.velocity = getVelocity();

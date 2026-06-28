@@ -23,10 +23,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 /** IO implementation for NavX. */
-public class GyroIONavX implements GyroIO {
+public class NavXIO implements GyroIO<GyroIO.GyroIOInputs> {
   private final AHRS navX;
 
-  protected GyroIONavX(NavXComType comType, NavXUpdateRate updateRate) {
+  protected NavXIO(NavXComType comType, NavXUpdateRate updateRate) {
     navX = new AHRS(comType, updateRate);
   }
 

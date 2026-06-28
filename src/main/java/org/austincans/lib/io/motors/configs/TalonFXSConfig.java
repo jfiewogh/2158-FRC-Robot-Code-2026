@@ -1,4 +1,4 @@
-package org.austincans.lib.io.motors;
+package org.austincans.lib.io.motors.configs;
 
 public class TalonFXSConfig extends TalonConfig {
     public ExternalFeedbackConfig externalFeedbackConfig;

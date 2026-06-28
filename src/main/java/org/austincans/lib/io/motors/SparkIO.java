@@ -7,20 +7,17 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.austincans.lib.io.motors.MotorIO.PositionControlType;
-import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
-import org.austincans.lib.io.motors.SparkConfig.AbsoluteEncoderConfig;
-import org.austincans.lib.io.motors.SparkConfig.ClosedLoopConfig;
-import org.austincans.lib.io.motors.SparkConfig.EncoderConfig;
-import org.austincans.lib.io.motors.SparkConfig.FollowerConfig;
-import org.austincans.lib.io.motors.SparkConfig.SignalsConfig;
-import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig.SignalsConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
 import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
-import org.austincans.lib.util.math.physical.Gearbox;
-import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
+import org.austincans.lib.io.motors.configrequests.SparkIOConfigRequests;
+import org.austincans.lib.io.motors.configs.ControlConfig;
+import org.austincans.lib.io.motors.configs.NeutralMode;
+import org.austincans.lib.io.motors.configs.SparkConfig;
+
+import org.austincans.lib.io.motors.inputs.SparkIOInputs;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -29,6 +26,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.Faults;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -47,12 +45,12 @@ import edu.wpi.first.units.measure.Voltage;
 public class SparkIO<
     MotorType extends SparkBase, 
     VendorConfigType extends SparkBaseConfig
-> extends BaseMotorIO<
-    MotorIO.MotorIOInputs, 
+> extends AbstractMotorIO<
+    SparkIOInputs, 
     SparkControlSlot, 
     SparkVelocityControlType, 
     SparkPositionControlType, 
-    SparkIO.SparkIOConfigRequests,
+    SparkIOConfigRequests,
     SparkConfig
 > {
     protected final MotorType motor;
@@ -62,7 +60,7 @@ public class SparkIO<
     private final VendorConfigType vendorConfig;
     private boolean initialConfigApplied = false;
 
-    private ControlConfig[] slotControlConfigs = new ControlConfig[4];
+    private final ControlConfig[] slotControlConfigs = new ControlConfig[4];
 
     protected SparkIO(MotorType motor, VendorConfigType vendorConfig) {
         this.vendorConfig = vendorConfig;
@@ -70,6 +68,28 @@ public class SparkIO<
         this.motor = motor;
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
+    }
+
+    @Override
+    public void updateInputs(SparkIOInputs inputs) {
+        super.updateInputs(inputs);
+
+        Faults activeFaults = motor.getFaults();
+        inputs.activeFaultMotorType = activeFaults.motorType;
+        inputs.activeFaultCan = activeFaults.can;
+        inputs.activeFaultTemperature = activeFaults.temperature;
+        inputs.activeFaultGateDriver = activeFaults.gateDriver;
+        inputs.activeFaultEscEeprom = activeFaults.escEeprom;
+        inputs.activeFaultFirmware = activeFaults.firmware;
+
+        Faults stickyFaults = motor.getStickyFaults();
+        inputs.stickyFaultMotorType = stickyFaults.motorType;
+        inputs.stickyFaultCan = stickyFaults.can;
+        inputs.stickyFaultTemperature = stickyFaults.temperature;
+        inputs.stickyFaultGateDriver = stickyFaults.gateDriver;
+        inputs.stickyFaultEscEeprom = stickyFaults.escEeprom;
+        inputs.stickyFaultFirmware = stickyFaults.firmware;
+        inputs.stickyFaultOther = stickyFaults.other;
     }
 
     @Override
@@ -119,12 +139,11 @@ public class SparkIO<
 
     @Override
     public void applyConfigRequests(SparkIOConfigRequests configRequests) {
-        if (!configRequests.configChanged) {
+        if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.configChanged = false;
 
-        SparkConfig config = configRequests.config;
+        SparkConfig config = configRequests.getConfig();
 
         slotControlConfigs[0] = config.closedLoopConfig.slot0Config.controlConfig;
         slotControlConfigs[1] = config.closedLoopConfig.slot1Config.controlConfig;
@@ -230,6 +249,11 @@ public class SparkIO<
     public void setEncoderPosition(Angle position) {
         encoder.setPosition(position.in(Rotations));
     }
+
+    @Override
+    public void clearStickyFaults() {
+        motor.clearFaults();
+    }
     
     /** 
      * Feedforward unit can be voltage or percent out, but currently, this method only works for voltage.
@@ -238,55 +262,8 @@ public class SparkIO<
     private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot controlSlot, double feedforwardVolts) {
         controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
     }
-
-    public static class SparkIOConfigRequests extends MotorIO.MotorIOConfigRequests<SparkConfig> {
-        public void softLimitConfig(SoftLimitConfig softLimitConfig) {
-            configChanged |= !config.softLimitConfig.equals(softLimitConfig);
-            config.softLimitConfig = softLimitConfig;
-        }
-        public void neutralMode(NeutralMode neutralMode) {
-            configChanged |= config.neutralMode != neutralMode;
-            config.neutralMode = neutralMode;
-        }
-        public void inverted(boolean inverted) {
-            configChanged |= config.inverted != inverted;
-            config.inverted = inverted;
-        }
-        public void smartCurrentStallLimit(Current smartCurrentStallLimit) {
-            configChanged |= config.smartCurrentStallLimit != smartCurrentStallLimit;
-            config.smartCurrentStallLimit = smartCurrentStallLimit;
-        }
-        public void voltageCompensation(Voltage voltage) {
-            configChanged |= !config.voltageCompensation.isEquivalent(voltage);
-            config.voltageCompensation = voltage;
-        }
-        public void sensorToMechanismGearbox(Gearbox gearbox) {
-            configChanged |= !config.sensorToMechanismGearbox.equals(gearbox);
-            config.sensorToMechanismGearbox = gearbox;
-        }
-        public void encoderConfig(EncoderConfig encoderConfig) {
-            configChanged |= !config.encoderConfig.equals(encoderConfig);
-            config.encoderConfig = encoderConfig;
-        }
-        public void absoluteEncoderConfig(AbsoluteEncoderConfig absoluteEncoderConfig) {
-            configChanged |= !config.absoluteEncoderConfig.equals(absoluteEncoderConfig);
-            config.absoluteEncoderConfig = absoluteEncoderConfig;
-        }
-        public void closedLoopConfig(ClosedLoopConfig closedLoopConfig) {
-            configChanged |= !config.closedLoopConfig.equals(closedLoopConfig);
-            config.closedLoopConfig = closedLoopConfig;
-        }
-        public void followerConfig(FollowerConfig followerConfig) {
-            configChanged |= !config.followerConfig.equals(followerConfig);
-            config.followerConfig = followerConfig;
-        }
-        public void signalsConfig(SignalsConfig signalsConfig) {
-            configChanged |= !config.signalsConfig.equals(signalsConfig);
-            config.signalsConfig = signalsConfig;
-        }
-    }
     
-    public static enum SparkPositionControlType implements PositionControlType {
+    public static enum SparkPositionControlType implements MotorIO.PositionControlType {
         STANDARD(ControlType.kPosition),
         MAXMOTION(ControlType.kMAXMotionPositionControl);
 
@@ -301,7 +278,7 @@ public class SparkIO<
         }
     }
 
-    public static enum SparkVelocityControlType implements VelocityControlType {
+    public static enum SparkVelocityControlType implements MotorIO.VelocityControlType {
         STANDARD(ControlType.kVelocity),
         MAXMOTION(ControlType.kMAXMotionVelocityControl);
 

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import org.austincans.frc2026.Constants;
+import org.austincans.lib.Constants;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**

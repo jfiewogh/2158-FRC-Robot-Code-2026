@@ -28,8 +28,17 @@ public class LaserCANIO implements DistanceSensorIO<LaserCANIO.LaserCanIOInputs>
   @Override
   public void updateInputs(LaserCanIOInputs inputs) {
     Measurement measurement = laserCan.getMeasurement();
-    inputs.setMeasurementStatus(measurement.status);
-    inputs.setDistance(Millimeters.of(measurement.distance_mm));
+
+    inputs.measurementStatus = switch (measurement.status) {
+      case 0 -> MeasurementStatus.VALID;
+      case 1 -> MeasurementStatus.NOISE_ISSUE;
+      case 2 -> MeasurementStatus.WEAK_SIGNAL;
+      case 4 -> MeasurementStatus.OUT_OF_BOUNDS;
+      case 7 -> MeasurementStatus.WRAPAROUND;
+      default -> MeasurementStatus.OUT_OF_BOUNDS;
+    };
+    
+    inputs.distance = Millimeters.of(measurement.distance_mm);
   }
 
   public enum MeasurementStatus {
@@ -37,24 +46,10 @@ public class LaserCANIO implements DistanceSensorIO<LaserCANIO.LaserCanIOInputs>
     NOISE_ISSUE,
     WEAK_SIGNAL,
     OUT_OF_BOUNDS,
-    WRAPAROUND
+    WRAPAROUND,
   }
 
   public class LaserCanIOInputs extends DistanceSensorIO.DistanceSensorIOInputs {
-    private MeasurementStatus measurementStatus;
-
-    void setMeasurementStatus(int status) {
-      switch (status) {
-        case 0 -> measurementStatus = MeasurementStatus.VALID;
-        case 1 -> measurementStatus = MeasurementStatus.NOISE_ISSUE;
-        case 2 -> measurementStatus = MeasurementStatus.WEAK_SIGNAL;
-        case 4 -> measurementStatus = MeasurementStatus.OUT_OF_BOUNDS;
-        case 7 -> measurementStatus = MeasurementStatus.WRAPAROUND;
-      }
-    }
-
-    public MeasurementStatus getMeasurementStatus() {
-      return measurementStatus;
-    }
+    public MeasurementStatus measurementStatus;
   }
 }
