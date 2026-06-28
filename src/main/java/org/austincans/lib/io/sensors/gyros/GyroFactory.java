@@ -11,11 +11,11 @@ public class GyroFactory {
         return new Pigeon2IO(deviceId, canBus, updateFrequency);
     }
 
-    public static GyroIONavX createNavX(NavXComType comType, NavXUpdateRate updateRate) {
-        return new GyroIONavX(comType, updateRate);
+    public static NavXIO createNavX(NavXComType comType, NavXUpdateRate updateRate) {
+        return new NavXIO(comType, updateRate);
     }
 
-    public static GyroIORedux createCanandgyro(int deviceId, Frequency odometryFrequency) {
-        return new GyroIORedux(deviceId, odometryFrequency);
+    public static CanandgyroIO createCanandgyro(int deviceId, Frequency odometryFrequency) {
+        return new CanandgyroIO(deviceId, odometryFrequency);
     }
 }
