@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import org.austincans.frc2026.RobotStateMap;
+
+import org.austincans.lib.RobotStateMap;
 
 /**
  * This is a single-file Java driver for the RPLidarA1. This driver supports starting and stopping

@@ -13,13 +13,13 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package org.austincans.frc2026;
+package org.austincans.lib;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import org.austincans.frc2026.util.Interpolable;
-import org.austincans.frc2026.util.InterpolatingDouble;
-import org.austincans.frc2026.util.InterpolatingTreeMap;
+import org.austincans.lib.util.Interpolable;
+import org.austincans.lib.util.InterpolatingDouble;
+import org.austincans.lib.util.InterpolatingTreeMap;
 
 /**
  * Container for time-indexed state estimates of a robot. Used to monitor robot state history and to
