@@ -1,15 +1,11 @@
 package org.austincans.lib.io.motors;
 
-import java.util.ArrayList;
-
 import org.austincans.lib.io.motors.configs.TalonFXSConfig.ExternalFeedbackConfig;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig.MotorArrangement;
 import org.austincans.lib.io.motors.configrequests.TalonFXSIOConfigRequests;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CommutationConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -20,8 +16,6 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig> {
@@ -30,8 +24,10 @@ public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig
     private final TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
 
     protected TalonFXSIO(int deviceId, CANBus canBus) {
-        motor = new TalonFXS(deviceId, canBus);
+        this(new TalonFXS(deviceId, canBus));
+    }
 
+    private TalonFXSIO(TalonFXS motor) {
         super(new TalonSignals(
             motor.getPosition(),
             motor.getVelocity(),
@@ -55,6 +51,8 @@ public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig
             motor.getStickyFault_StatorCurrLimit(),
             motor.getStickyFault_SupplyCurrLimit()
         ));
+
+        this.motor = motor;
     }
 
     @Override
