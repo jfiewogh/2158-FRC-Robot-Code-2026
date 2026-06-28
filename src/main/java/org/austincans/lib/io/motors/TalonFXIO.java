@@ -56,7 +56,6 @@ public class TalonFXIO extends TalonIO<TalonFXIOConfigRequests, TalonFXConfig> {
         if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.setConfigChanged(false);
 
         TalonFXConfig config = configRequests.getConfig();
 

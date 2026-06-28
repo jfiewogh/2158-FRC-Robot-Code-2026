@@ -142,7 +142,6 @@ public class SparkIO<
         if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.setConfigChanged(false);
 
         SparkConfig config = configRequests.getConfig();
 

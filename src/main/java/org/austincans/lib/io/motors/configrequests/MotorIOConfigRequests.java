@@ -8,14 +8,12 @@ public class MotorIOConfigRequests<ConfigType> {
         configChanged = true;
         this.config = config;
     }
+    /** Get config instance and set configChanged to false */
     public ConfigType getConfig() {
+        configChanged = false;
         return config;
     }
-
     public boolean configChanged() {
         return configChanged;
-    }
-    public void setConfigChanged(boolean configChanged) {
-        this.configChanged = configChanged;
     }
 }
