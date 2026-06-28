@@ -2,9 +2,10 @@ package org.austincans.lib.io.motors;
 
 import java.util.ArrayList;
 
-import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
-import org.austincans.lib.io.motors.TalonFXSConfig.MotorArrangement;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig.ExternalFeedbackConfig;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig.MotorArrangement;
 import org.austincans.lib.io.motors.configrequests.TalonFXSIOConfigRequests;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;

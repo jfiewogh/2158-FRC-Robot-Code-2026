@@ -2,7 +2,8 @@ package org.austincans.lib.io.sensors.encoders;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import org.austincans.lib.io.sensors.encoders.AbsoluteEncoderIO.AbsoluteEncoderIOConfigRequests;
+import org.austincans.lib.io.sensors.encoders.configrequests.CANcoderIOConfigRequests;
+import org.austincans.lib.io.sensors.encoders.inputs.CANcoderIOInputs;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
@@ -13,7 +14,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOInputs, CANcoderIO.CANcoderIOConfigRequests, CANcoderConfig> {
+public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIOInputs, CANcoderIOConfigRequests, CANcoderConfig> {
     private final CANcoder encoder;
 
     private final CANcoderConfiguration vendorConfig;
@@ -26,6 +27,11 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOInputs
     private final StatusSignal<Boolean> bootDuringEnable;
     private final StatusSignal<Boolean> badMagnet;
     private final StatusSignal<Boolean> undervoltage;
+
+    private final StatusSignal<Boolean> stickyFaultHardware;
+    private final StatusSignal<Boolean> stickyFaultBootDuringEnable;
+    private final StatusSignal<Boolean> stickyFaultBadMagnet;
+    private final StatusSignal<Boolean> stickyFaultUndervoltage;
 
     protected CANcoderIO(int deviceId, CANBus canbus) {
         encoder = new CANcoder(deviceId, canbus);
@@ -40,18 +46,19 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOInputs
         bootDuringEnable = encoder.getFault_BootDuringEnable();
         badMagnet = encoder.getFault_BadMagnet();
         undervoltage = encoder.getFault_Undervoltage();
-    }
 
-    public class CANcoderIOInputs extends AbsoluteEncoderIO.AbsoluteEncoderIOInputs {
-        public boolean faultHardware;
-        public boolean faultBootDuringEnable;
-        public boolean faultBadMagnet;
-        public boolean faultUndervoltage;
+        stickyFaultHardware = encoder.getStickyFault_Hardware();
+        stickyFaultBootDuringEnable = encoder.getStickyFault_BootDuringEnable();
+        stickyFaultBadMagnet = encoder.getStickyFault_BadMagnet();
+        stickyFaultUndervoltage = encoder.getStickyFault_Undervoltage();
     }
 
     @Override
     public void updateInputs(CANcoderIOInputs inputs) {
-        StatusSignal.refreshAll(absolutePosition, position, velocity, hardwareFault, bootDuringEnable, badMagnet, undervoltage);
+        StatusSignal.refreshAll(
+            absolutePosition, position, velocity, 
+            hardwareFault, bootDuringEnable, badMagnet, undervoltage,
+            stickyFaultHardware, stickyFaultBootDuringEnable, stickyFaultBadMagnet, stickyFaultUndervoltage);
 
         inputs.connected = encoder.isConnected();
         inputs.absolutePosition = absolutePosition.getValue();
@@ -62,6 +69,11 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOInputs
         inputs.faultBootDuringEnable = bootDuringEnable.getValue();
         inputs.faultBadMagnet = badMagnet.getValue();
         inputs.faultUndervoltage = undervoltage.getValue();
+
+        inputs.stickyFaultHardware = stickyFaultHardware.getValue();
+        inputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
+        inputs.stickyFaultBadMagnet = stickyFaultBadMagnet.getValue();
+        inputs.stickyFaultUndervoltage = stickyFaultUndervoltage.getValue();
     }
 
     @Override
@@ -78,22 +90,8 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIO.CANcoderIOInputs
         encoder.getConfigurator().apply(vendorConfig.MagnetSensor);
     }
 
-    public class CANcoderIOConfigRequests extends AbsoluteEncoderIOConfigRequests<CANcoderConfig> {
-        protected CANcoderConfig config;
-        protected boolean magnetSensorConfigChanged;
-
-        public void magnetOffset(Angle offset) {
-            magnetSensorConfigChanged |= !config.magnetOffset.isEquivalent(offset);
-            config.magnetOffset = offset;
-        }
-        public void absoluteSensorDiscontinuityPoint(Angle discontinuityPoint) {
-            magnetSensorConfigChanged |= 
-                !config.absoluteSensorDiscontinuityPoint.isEquivalent(discontinuityPoint);
-            config.absoluteSensorDiscontinuityPoint = discontinuityPoint;
-        }
-        public void sensorDirectionInverted(boolean inverted) {
-            magnetSensorConfigChanged |= config.sensorDirectionInverted != inverted;
-            config.sensorDirectionInverted = inverted;
-        }
+    @Override
+    public void clearStickyFaults() {
+        encoder.clearStickyFaults();
     }
 }

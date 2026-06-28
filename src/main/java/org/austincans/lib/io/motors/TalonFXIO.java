@@ -2,8 +2,10 @@ package org.austincans.lib.io.motors;
 
 import java.util.ArrayList;
 
-import org.austincans.lib.io.motors.TalonFXConfig.FeedbackConfig;
+import org.austincans.lib.io.motors.configs.TalonFXConfig.FeedbackConfig;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig;
 import org.austincans.lib.io.motors.configrequests.TalonFXIOConfigRequests;
+import org.austincans.lib.io.motors.configs.TalonFXConfig;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
@@ -40,7 +42,7 @@ public class TalonFXIO extends TalonIO<TalonFXIOConfigRequests, TalonFXConfig> {
             motor.getFault_Hardware(),
             motor.getFault_BootDuringEnable(),
             motor.getFault_DeviceTemp(),
-            motor.getFault_ProcTemp(),
+            motor.getFault_ProcTemp(), 
 
             motor.getStickyFault_Hardware(),
             motor.getStickyFault_BootDuringEnable(),
@@ -54,12 +56,12 @@ public class TalonFXIO extends TalonIO<TalonFXIOConfigRequests, TalonFXConfig> {
 
     @Override
     public void applyConfigRequests(TalonFXIOConfigRequests configRequests) {
-        if (!configRequests.configChanged) {
+        if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.configChanged = false;
+        configRequests.setConfigChanged(false);
 
-        TalonFXConfig config = configRequests.config;
+        TalonFXConfig config = configRequests.getConfig();
 
         int changeCount = getTrueCount(
             configRequests.motorOutputConfigChanged, 

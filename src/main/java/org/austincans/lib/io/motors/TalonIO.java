@@ -5,14 +5,12 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
-import org.austincans.lib.io.motors.TalonConfig.ClosedLoopGeneralConfig;
-import org.austincans.lib.io.motors.TalonConfig.CurrentLimitsConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotionMagicConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotorOutputConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig.*;
 import org.austincans.lib.io.motors.configrequests.TalonIOConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig;
 import org.austincans.lib.io.motors.inputs.TalonIOInputs;
 
 import com.ctre.phoenix6.BaseStatusSignal;

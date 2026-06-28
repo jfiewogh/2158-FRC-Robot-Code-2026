@@ -1,10 +1,7 @@
 package org.austincans.lib.io.motors.configrequests;
 
-import org.austincans.lib.io.motors.TalonConfig;
-import org.austincans.lib.io.motors.TalonConfig.ClosedLoopGeneralConfig;
-import org.austincans.lib.io.motors.TalonConfig.CurrentLimitsConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotionMagicConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotorOutputConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig.*;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 

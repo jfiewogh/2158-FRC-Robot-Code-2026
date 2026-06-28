@@ -46,6 +46,12 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
   private final StatusSignal<Boolean> bootupAccelerometer;
   private final StatusSignal<Boolean> bootupGyroscope;
 
+  private final StatusSignal<Boolean> stickyFaultHardware;
+  private final StatusSignal<Boolean> stickyFaultBootDuringEnable;
+  private final StatusSignal<Boolean> stickyFaultBootIntoMotion;
+  private final StatusSignal<Boolean> stickyFaultBootupAccelerometer;
+  private final StatusSignal<Boolean> stickyFaultBootupGyroscope;
+
   private final BaseStatusSignal[] signals;
 
   protected Pigeon2IO(int deviceId, CANBus canBus, Frequency updateFrequency) {
@@ -67,7 +73,6 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
         50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
     pigeon.optimizeBusUtilization();
     
-    // TODO: Is this needed? Check AdvantageKit
     PhoenixUtil.registerSignals(true, yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
     PhoenixUtil.tryUntilOk(5, () -> pigeon.setYaw(0.0, 0.25));
 
@@ -78,9 +83,19 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
     bootupAccelerometer = pigeon.getFault_BootupAccelerometer();
     bootupGyroscope = pigeon.getFault_BootupGyroscope();
 
+    stickyFaultHardware = pigeon.getStickyFault_Hardware();
+    stickyFaultBootDuringEnable = pigeon.getStickyFault_BootDuringEnable();
+    stickyFaultBootIntoMotion = pigeon.getStickyFault_BootIntoMotion();
+    stickyFaultBootupAccelerometer = pigeon.getStickyFault_BootupAccelerometer();
+    stickyFaultBootupGyroscope = pigeon.getStickyFault_BootupGyroscope();
+
     signals = new BaseStatusSignal[] {
       yaw, pitch, roll, yawVelocity, pitchVelocity, rollVelocity,
-      firmwareVersion, hardwareFault, bootDuringEnable, bootIntoMotion, bootupAccelerometer, bootupGyroscope
+
+      firmwareVersion, hardwareFault, bootDuringEnable, bootIntoMotion, bootupAccelerometer, bootupGyroscope,
+
+      stickyFaultHardware, stickyFaultBootDuringEnable, stickyFaultBootIntoMotion, 
+      stickyFaultBootupAccelerometer, stickyFaultBootupGyroscope
     };
   }
 
@@ -91,6 +106,12 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
     public boolean faultBootIntoMotion;
 		public boolean faultBootupAccelerometer;
 		public boolean faultBootupGyroscope;
+
+    public boolean stickyFaultHardware;
+    public boolean stickyFaultBootDuringEnable;
+    public boolean stickyFaultBootIntoMotion;
+    public boolean stickyFaultBootupAccelerometer;
+    public boolean stickyFaultBootupGyroscope;
   }
 
   @Override
@@ -110,5 +131,16 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
     inputs.faultBootIntoMotion = bootIntoMotion.getValue();
     inputs.faultBootupAccelerometer = bootupAccelerometer.getValue();
     inputs.faultBootupGyroscope = bootupGyroscope.getValue();
+
+    inputs.stickyFaultHardware = stickyFaultHardware.getValue();
+    inputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
+    inputs.stickyFaultBootIntoMotion = stickyFaultBootIntoMotion.getValue();
+    inputs.stickyFaultBootupAccelerometer = stickyFaultBootupAccelerometer.getValue();
+    inputs.stickyFaultBootupGyroscope = stickyFaultBootupGyroscope.getValue();
+  }
+
+  @Override
+  public void clearStickyFaults() {
+    pigeon.clearStickyFaults();
   }
 }

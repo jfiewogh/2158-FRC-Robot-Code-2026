@@ -7,16 +7,16 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.austincans.lib.io.motors.MotorIO.PositionControlType;
-import org.austincans.lib.io.motors.MotorIO.VelocityControlType;
-import org.austincans.lib.io.motors.SparkConfig.SignalsConfig;
-import org.austincans.lib.io.motors.SparkConfig.SlotConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig.SignalsConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig.SlotConfig;
 import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
 import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
 import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
 import org.austincans.lib.io.motors.configrequests.SparkIOConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
+import org.austincans.lib.io.motors.configs.SparkConfig;
+
 import org.austincans.lib.io.motors.inputs.SparkIOInputs;
 
 import com.revrobotics.PersistMode;
@@ -264,7 +264,7 @@ public class SparkIO<
         controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
     }
     
-    public static enum SparkPositionControlType implements PositionControlType {
+    public static enum SparkPositionControlType implements MotorIO.PositionControlType {
         STANDARD(ControlType.kPosition),
         MAXMOTION(ControlType.kMAXMotionPositionControl);
 
@@ -279,7 +279,7 @@ public class SparkIO<
         }
     }
 
-    public static enum SparkVelocityControlType implements VelocityControlType {
+    public static enum SparkVelocityControlType implements MotorIO.VelocityControlType {
         STANDARD(ControlType.kVelocity),
         MAXMOTION(ControlType.kMAXMotionVelocityControl);
 

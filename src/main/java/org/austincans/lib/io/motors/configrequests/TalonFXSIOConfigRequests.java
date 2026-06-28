@@ -1,8 +1,7 @@
 package org.austincans.lib.io.motors.configrequests;
 
-import org.austincans.lib.io.motors.TalonFXSConfig;
-import org.austincans.lib.io.motors.TalonFXSConfig.ExternalFeedbackConfig;
-import org.austincans.lib.io.motors.TalonFXSConfig.MotorArrangement;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig;
+import org.austincans.lib.io.motors.configs.TalonFXSConfig.*;
 
 public class TalonFXSIOConfigRequests extends TalonIOConfigRequests<TalonFXSConfig> {
     public boolean externalFeedbackConfigChanged;

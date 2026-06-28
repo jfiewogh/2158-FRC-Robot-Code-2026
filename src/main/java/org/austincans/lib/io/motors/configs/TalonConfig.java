@@ -1,8 +1,5 @@
-package org.austincans.lib.io.motors;
+package org.austincans.lib.io.motors.configs;
 
-import org.austincans.lib.io.motors.configs.ControlConfig;
-import org.austincans.lib.io.motors.configs.NeutralMode;
-import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;
 

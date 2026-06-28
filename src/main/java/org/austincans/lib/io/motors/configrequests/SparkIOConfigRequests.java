@@ -7,12 +7,8 @@ import org.austincans.lib.util.math.physical.Gearbox;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-import org.austincans.lib.io.motors.SparkConfig;
-import org.austincans.lib.io.motors.SparkConfig.AbsoluteEncoderConfig;
-import org.austincans.lib.io.motors.SparkConfig.ClosedLoopConfig;
-import org.austincans.lib.io.motors.SparkConfig.EncoderConfig;
-import org.austincans.lib.io.motors.SparkConfig.FollowerConfig;
-import org.austincans.lib.io.motors.SparkConfig.SignalsConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig;
+import org.austincans.lib.io.motors.configs.SparkConfig.*;
 
 public class SparkIOConfigRequests extends MotorIOConfigRequests<SparkConfig> {
     public void softLimitConfig(SoftLimitConfig softLimitConfig) {

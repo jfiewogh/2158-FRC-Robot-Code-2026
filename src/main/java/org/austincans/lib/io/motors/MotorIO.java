@@ -126,6 +126,4 @@ extends
 
 
     public void setEncoderPosition(Angle position);
-
-    public void clearStickyFaults();
 }
