@@ -1,0 +1,47 @@
+package org.austincans.lib.io.motors;
+
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
+
+public record TalonSignals(
+    StatusSignal<Angle> position,
+    StatusSignal<AngularVelocity> velocity,
+    StatusSignal<Voltage> voltage,
+    StatusSignal<Current> supplyCurrent,
+    StatusSignal<Current> statorCurrent,
+    StatusSignal<Current> torqueCurrent,
+    StatusSignal<Temperature> temperature,
+
+    /** Active Faults */
+    StatusSignal<Integer> firmwareVersion,
+    StatusSignal<Boolean> hardwareFault,
+    StatusSignal<Boolean> bootDuringEnable,
+    StatusSignal<Boolean> deviceTemp,
+    StatusSignal<Boolean> procTemp,
+
+    /** Sticky Faults */
+    StatusSignal<Boolean> stickyFaultHardware,
+    StatusSignal<Boolean> stickyFaultBootDuringEnable,
+    StatusSignal<Boolean> stickyFaultUndervoltage,
+    StatusSignal<Boolean> stickyFaultDeviceTemp,
+    StatusSignal<Boolean> stickyFaultProcTemp,
+    StatusSignal<Boolean> stickyFaultStatorCurrLimit,
+    StatusSignal<Boolean> stickyFaultSupplyCurrLimit
+) {
+    public BaseStatusSignal[] asArray() {
+        return new BaseStatusSignal[] {
+            position, velocity, voltage, supplyCurrent, statorCurrent, torqueCurrent, temperature,
+            
+            firmwareVersion, hardwareFault, bootDuringEnable, deviceTemp, procTemp,
+            
+            stickyFaultHardware, stickyFaultBootDuringEnable, stickyFaultUndervoltage, stickyFaultDeviceTemp, 
+            stickyFaultProcTemp, stickyFaultStatorCurrLimit, stickyFaultSupplyCurrLimit
+        };
+    }
+}

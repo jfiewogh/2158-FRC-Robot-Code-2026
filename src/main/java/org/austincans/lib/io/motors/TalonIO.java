@@ -5,13 +5,16 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
-import org.austincans.lib.io.motors.MotorConfigs.ControlConfig;
-import org.austincans.lib.io.motors.MotorConfigs.SoftLimitConfig;
-import org.austincans.lib.io.motors.TalonConfig.ClosedLoopGeneralConfig;
-import org.austincans.lib.io.motors.TalonConfig.CurrentLimitsConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotionMagicConfig;
-import org.austincans.lib.io.motors.TalonConfig.MotorOutputConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig.*;
+import org.austincans.lib.io.motors.configrequests.TalonIOConfigRequests;
+import org.austincans.lib.io.motors.configs.ControlConfig;
+import org.austincans.lib.io.motors.configs.NeutralMode;
+import org.austincans.lib.io.motors.configs.SoftLimitConfig;
+import org.austincans.lib.io.motors.configs.TalonConfig;
+import org.austincans.lib.io.motors.inputs.TalonIOInputs;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -43,17 +46,22 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 
 public abstract class TalonIO<
-	TalonConfigRequestsType extends TalonIO.TalonIOConfigRequests<TalonConfigType>,
+	TalonConfigRequestsType extends TalonIOConfigRequests<TalonConfigType>,
 	TalonConfigType extends TalonConfig>
-extends BaseMotorIO<
-	TalonIO.TalonIOInputs, 
+extends AbstractMotorIO<
+	TalonIOInputs, 
 	TalonIO.TalonControlSlot, 
 	TalonIO.TalonVelocityControlType, 
 	TalonIO.TalonPositionControlType, 
 	TalonConfigRequestsType, 
 	TalonConfigType> {
+
+	private final TalonSignals signals;
+	private final BaseStatusSignal[] signalsArray;
 
 	/* Control Requests */
 	protected final VoltageOut voltageOut = new VoltageOut(0);
@@ -77,28 +85,66 @@ extends BaseMotorIO<
 	private final MotionMagicVelocityTorqueCurrentFOC velocityMotionMagicTorqueCurrentFOC = new MotionMagicVelocityTorqueCurrentFOC(
 			0);
 
-	public static class TalonIOInputs extends MotorIO.MotorIOInputs {
-		protected Current supplyCurrent;
-		protected Current torqueCurrent;
-
-		public Current getSupplyCurrent() {
-			return supplyCurrent;
-		}
-		public Current getTorqueCurrent() {
-			return torqueCurrent;
-		}
+	public TalonIO(TalonSignals signals) {
+		this.signals = signals;
+		signalsArray = signals.asArray();
 	}
 
 	@Override
 	public void updateInputs(TalonIOInputs inputs) {
+		BaseStatusSignal.refreshAll(signalsArray);
+
 		super.updateInputs(inputs);
 		inputs.supplyCurrent = getSupplyCurrent();
 		inputs.torqueCurrent = getTorqueCurrent();
+
+		inputs.hasCommunication = signals.firmwareVersion().getStatus() == StatusCode.OK;
+		inputs.faultHardware = signals.hardwareFault().getValue();
+		inputs.faultBootDuringEnable = signals.bootDuringEnable().getValue();
+		inputs.faultDeviceTemp = signals.deviceTemp().getValue();
+		inputs.faultProcessorTemp = signals.procTemp().getValue();
+
+		inputs.stickyFaultHardware = signals.stickyFaultHardware().getValue();
+		inputs.stickyFaultBootDuringEnable = signals.stickyFaultBootDuringEnable().getValue();
+		inputs.stickyFaultUndervoltage = signals.stickyFaultUndervoltage().getValue();
+		inputs.stickyFaultDeviceTemp = signals.stickyFaultDeviceTemp().getValue();
+		inputs.stickyFaultProcTemp = signals.stickyFaultProcTemp().getValue();
+		inputs.stickyFaultStatorCurrLimit = signals.stickyFaultStatorCurrLimit().getValue();
+		inputs.stickyFaultSupplyCurrLimit = signals.stickyFaultSupplyCurrLimit().getValue();
 	}
 
-	protected abstract Current getSupplyCurrent();
+	@Override
+    protected final Angle getPosition() {
+        return signals.position().getValue();
+    }
 
-	protected abstract Current getTorqueCurrent();
+    @Override
+    protected final AngularVelocity getVelocity() {
+        return signals.velocity().getValue();
+    }
+
+    @Override
+    protected final Voltage getVoltage() {
+        return signals.voltage().getValue();
+    }
+
+    @Override
+    protected final Current getStatorCurrent() {
+        return signals.statorCurrent().getValue();
+    }
+
+	@Override
+    protected final Temperature getTemperature() {
+        return signals.temperature().getValue();
+    }
+
+    protected final Current getSupplyCurrent() {
+        return signals.supplyCurrent().getValue();
+    }
+
+    protected final Current getTorqueCurrent() {
+        return signals.torqueCurrent().getValue();
+    }
 
 	protected final ControlRequest getVelocityControlRequest(TalonVelocityControlType velocityControlType,
 			AngularVelocity velocity, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
@@ -232,50 +278,6 @@ extends BaseMotorIO<
     }
 
 	/*===================== Classes =====================*/
-
-	public static class TalonIOConfigRequests<TalonConfigType extends TalonConfig> extends MotorIO.MotorIOConfigRequests<TalonConfigType> {
-		protected boolean softLimitConfigChanged;
-		protected boolean motorOutputConfigChanged;
-		protected boolean slot0ConfigChanged;
-		protected boolean slot1ConfigChanged;
-		protected boolean slot2ConfigChanged;
-		protected boolean closedLoopGeneralConfigChanged;
-		protected boolean motionMagicConfigChanged;
-		protected boolean currentLimitsConfigChanged;
-
-		public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
-			configChanged |= softLimitConfigChanged = !config.softLimitConfig.equals(softLimitConfig);
-			config.softLimitConfig = softLimitConfig;
-		}
-		public void setMotorOutputConfig(MotorOutputConfig motorOutputConfig) {
-			configChanged |= motorOutputConfigChanged = !config.motorOutputConfig.equals(motorOutputConfig);
-			config.motorOutputConfig = motorOutputConfig;
-		}
-		public void setSlot0Config(ControlConfig slotConfig) {
-			configChanged |= slot0ConfigChanged = !config.slot0Config.equals(slotConfig);
-			config.slot0Config = slotConfig;
-		}
-		public void setSlot1Config(ControlConfig slotConfig) {
-			configChanged |= slot1ConfigChanged = !config.slot1Config.equals(slotConfig);
-			config.slot1Config = slotConfig;
-		}
-		public void setSlot2Config(ControlConfig slotConfig) {
-			configChanged |= slot2ConfigChanged = !config.slot2Config.equals(slotConfig);
-			config.slot2Config = slotConfig;
-		}
-		public void setClosedLoopGeneralConfig(ClosedLoopGeneralConfig closedLoopGeneralConfig) {
-			configChanged |= closedLoopGeneralConfigChanged = !config.closedLoopGeneralConfig.equals(config.closedLoopGeneralConfig);
-			config.closedLoopGeneralConfig = closedLoopGeneralConfig;
-		}
-		public void setMotionMagicConfig(MotionMagicConfig motionMagicConfig) {
-			configChanged |= motionMagicConfigChanged = !config.motionMagicConfig.equals(motionMagicConfig);
-			config.motionMagicConfig = motionMagicConfig;
-		}
-		public void setCurrentLimitsConfig(CurrentLimitsConfig currentLimitsConfig) {
-			configChanged |= currentLimitsConfigChanged |= !config.currentLimitsConfig.equals(currentLimitsConfig);
-			config.currentLimitsConfig = currentLimitsConfig;
-		}
-	}
 
 	public static enum TalonVelocityControlType implements MotorIO.VelocityControlType {
 		DUTY_CYCLE,

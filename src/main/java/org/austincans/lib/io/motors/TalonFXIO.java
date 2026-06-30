@@ -1,10 +1,10 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.TalonFXConfig.FeedbackConfig;
-import org.austincans.lib.io.motors.TalonIO.TalonIOConfigRequests;
+import org.austincans.lib.io.motors.configs.TalonFXConfig.FeedbackConfig;
+import org.austincans.lib.io.motors.configrequests.TalonFXIOConfigRequests;
+import org.austincans.lib.io.motors.configs.TalonFXConfig;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -12,43 +12,52 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonFXConfig> {
+public class TalonFXIO extends TalonIO<TalonFXIOConfigRequests, TalonFXConfig> {
     private final TalonFX motor;
 
     private final TalonFXConfiguration vendorConfig = new TalonFXConfiguration();
-
-    private final StatusSignal<Angle> position;
-    private final StatusSignal<AngularVelocity> velocity;
-    private final StatusSignal<Voltage> voltage;
-    private final StatusSignal<Current> supplyCurrent;
-    private final StatusSignal<Current> statorCurrent;
-    private final StatusSignal<Current> torqueCurrent;
-    private final StatusSignal<Temperature> temperature;
-
+    
     protected TalonFXIO(int deviceId, CANBus canBus) {
-        motor = new TalonFX(deviceId, canBus);
+        this(new TalonFX(deviceId, canBus));
+    }
 
-        position = motor.getPosition();
-        velocity = motor.getVelocity();
-        voltage = motor.getMotorVoltage();
-        supplyCurrent = motor.getSupplyCurrent();
-        statorCurrent = motor.getStatorCurrent();
-        torqueCurrent = motor.getTorqueCurrent();
-        temperature = motor.getDeviceTemp();
+    private TalonFXIO(TalonFX motor) {
+        super(new TalonSignals(
+            motor.getPosition(),
+            motor.getVelocity(),
+            motor.getMotorVoltage(),
+            motor.getSupplyCurrent(),
+            motor.getStatorCurrent(),
+            motor.getTorqueCurrent(),
+            motor.getDeviceTemp(),
+
+            motor.getVersion(),
+            motor.getFault_Hardware(),
+            motor.getFault_BootDuringEnable(),
+            motor.getFault_DeviceTemp(),
+            motor.getFault_ProcTemp(), 
+
+            motor.getStickyFault_Hardware(),
+            motor.getStickyFault_BootDuringEnable(),
+            motor.getStickyFault_Undervoltage(),
+            motor.getStickyFault_DeviceTemp(),
+            motor.getStickyFault_ProcTemp(),
+            motor.getStickyFault_StatorCurrLimit(),
+            motor.getStickyFault_SupplyCurrLimit()
+        ));
+
+        this.motor = motor;
     }
 
     @Override
     public void applyConfigRequests(TalonFXIOConfigRequests configRequests) {
-        if (!configRequests.configChanged) {
+        if (!configRequests.configChanged()) {
             return;
         }
-        configRequests.configChanged = false;
 
-        TalonFXConfig config = configRequests.config;
+        TalonFXConfig config = configRequests.getConfig();
 
         int changeCount = getTrueCount(
             configRequests.motorOutputConfigChanged, 
@@ -194,51 +203,12 @@ public class TalonFXIO extends TalonIO<TalonFXIO.TalonFXIOConfigRequests, TalonF
     }
 
     @Override
-    protected Angle getPosition() {
-        return position.getValue();
-    }
-
-    @Override
-    protected AngularVelocity getVelocity() {
-        return velocity.getValue();
-    }
-
-    @Override
-    protected Voltage getVoltage() {
-        return voltage.getValue();
-    }
-
-    @Override
-    protected Current getStatorCurrent() {
-        return statorCurrent.getValue();
-    }
-
-    @Override
-    protected Current getSupplyCurrent() {
-        return supplyCurrent.getValue();
-    }
-
-    @Override
-    protected Current getTorqueCurrent() {
-        return torqueCurrent.getValue();
-    }
-
-    @Override
-    protected Temperature getTemperature() {
-        return temperature.getValue();
-    }
-
-    @Override
     public void setEncoderPosition(Angle position) {
         motor.setPosition(position);
     }
 
-    public static class TalonFXIOConfigRequests extends TalonIOConfigRequests<TalonFXConfig> {
-        protected boolean feedbackConfigChanged;
-
-        public void setFeedbackConfig(FeedbackConfig feedbackConfig) {
-			configChanged |= feedbackConfigChanged = !config.feedbackConfig.equals(feedbackConfig);
-			config.feedbackConfig = feedbackConfig;
-		}
+    @Override
+    public void clearStickyFaults() {
+        motor.clearStickyFaults();
     }
 }
