@@ -6,12 +6,16 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import org.austincans.lib.io.motors.configs.TalonConfig.*;
-import org.austincans.lib.io.motors.configrequests.TalonIOConfigRequests;
+import org.austincans.lib.io.motors.configs.requests.TalonIOConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 import org.austincans.lib.io.motors.configs.TalonConfig;
 import org.austincans.lib.io.motors.inputs.TalonIOInputs;
+import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
+import org.austincans.lib.io.motors.outputs.control.TalonControlSlot;
+import org.austincans.lib.io.motors.outputs.control.TalonPositionControlType;
+import org.austincans.lib.io.motors.outputs.control.TalonVelocityControlType;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -54,9 +58,9 @@ public abstract class TalonIO<
 	TalonConfigType extends TalonConfig>
 extends AbstractMotorIO<
 	TalonIOInputs, 
-	TalonIO.TalonControlSlot, 
-	TalonIO.TalonVelocityControlType, 
-	TalonIO.TalonPositionControlType, 
+	TalonControlSlot, 
+	TalonVelocityControlType, 
+	TalonPositionControlType, 
 	TalonConfigRequestsType, 
 	TalonConfigType> {
 
@@ -149,20 +153,28 @@ extends AbstractMotorIO<
 	protected final ControlRequest getVelocityControlRequest(TalonVelocityControlType velocityControlType,
 			AngularVelocity velocity, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
 		return switch (velocityControlType) {
-			case DUTY_CYCLE -> velocityDutyCycle.withVelocity(velocity).withFeedForward(arbitraryFeedforward.dutyCycle).withSlot(slot.get());
-			case VOLTAGE -> velocityVoltage.withVelocity(velocity).withFeedForward(arbitraryFeedforward.volts).withSlot(slot.get());
-			case TORQUE_CURRENT_FOC -> velocityTorqueCurrentFOC.withVelocity(velocity).withFeedForward(arbitraryFeedforward.currentAmps).withSlot(slot.get());
+			case DUTY_CYCLE -> velocityDutyCycle
+				.withVelocity(velocity)
+				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withSlot(slot.get());
+			case VOLTAGE -> velocityVoltage.withVelocity(velocity)
+				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withSlot(slot.get());
+			case TORQUE_CURRENT_FOC -> velocityTorqueCurrentFOC
+				.withVelocity(velocity)
+				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withSlot(slot.get());
 			case MOTION_MAGIC_DUTY_CYCLE -> velocityMotionMagicDutyCycle
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.dutyCycle)
+				.withFeedForward(arbitraryFeedforward.getDutyCycle())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_VOLTAGE -> velocityMotionMagicVoltage
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.volts)
+				.withFeedForward(arbitraryFeedforward.getVolts())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_TORQUE_CURRENT_FOC -> velocityMotionMagicTorqueCurrentFOC
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.currentAmps)
+				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
 				.withSlot(slot.get());
 		};
 	}
@@ -173,41 +185,41 @@ extends AbstractMotorIO<
 			case DUTY_CYCLE -> positionDutyCycle
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.dutyCycle)
+				.withFeedForward(arbitraryFeedforward.getDutyCycle())
 				.withSlot(slot.get());
 			case VOLTAGE -> positionVoltage
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.volts)
+				.withFeedForward(arbitraryFeedforward.getVolts())
 				.withSlot(slot.get());
 			case TORQUE_CURRENT_FOC -> positionTorqueCurrentFOC
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.currentAmps)
+				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_DUTY_CYCLE -> positionMotionMagicDutyCycle
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.dutyCycle)
+				.withFeedForward(arbitraryFeedforward.getDutyCycle())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_VOLTAGE -> positionMotionMagicVoltage
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.volts)
+				.withFeedForward(arbitraryFeedforward.getVolts())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_TORQUE_CURRENT_FOC -> positionMotionMagicTorqueCurrentFOC
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.currentAmps)
+				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_DUTY_CYCLE -> positionMotionMagicExpoDutyCycle
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.dutyCycle)
+				.withFeedForward(arbitraryFeedforward.getDutyCycle())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_VOLTAGE -> positionMotionMagicExpoVoltage
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.volts)
+				.withFeedForward(arbitraryFeedforward.getVolts())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_TORQUE_CURRENT_FOC -> positionMotionMagicExpoTorqueCurrentFOC
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.currentAmps)
+				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
 				.withSlot(slot.get());
 		};
 	}
@@ -276,37 +288,4 @@ extends AbstractMotorIO<
         currentLimits.SupplyCurrentLimitEnable = currentLimitsConfig.supplyCurrentLimitEnabled;
         currentLimits.SupplyCurrentLimit = currentLimitsConfig.supplyCurrentLimit.in(Amps);
     }
-
-	/*===================== Classes =====================*/
-
-	public static enum TalonVelocityControlType implements MotorIO.VelocityControlType {
-		DUTY_CYCLE,
-		VOLTAGE,
-		TORQUE_CURRENT_FOC,
-		MOTION_MAGIC_DUTY_CYCLE,
-		MOTION_MAGIC_VOLTAGE,
-		MOTION_MAGIC_TORQUE_CURRENT_FOC,
-	}
-
-	public static enum TalonPositionControlType implements MotorIO.PositionControlType {
-		DUTY_CYCLE,
-		VOLTAGE,
-		TORQUE_CURRENT_FOC,
-		MOTION_MAGIC_DUTY_CYCLE,
-		MOTION_MAGIC_VOLTAGE,
-		MOTION_MAGIC_TORQUE_CURRENT_FOC,
-		MOTION_MAGIC_EXPO_DUTY_CYCLE,
-		MOTION_MAGIC_EXPO_VOLTAGE,
-		MOTION_MAGIC_EXPO_TORQUE_CURRENT_FOC;
-	}
-
-	public static enum TalonControlSlot implements MotorIO.ControlSlot {
-		SLOT_0,
-		SLOT_1,
-		SLOT_2;
-
-		public int get() {
-			return this.ordinal();
-		}
-	}
 }

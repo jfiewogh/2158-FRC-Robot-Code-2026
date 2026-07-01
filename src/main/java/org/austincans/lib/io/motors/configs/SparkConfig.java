@@ -1,6 +1,6 @@
 package org.austincans.lib.io.motors.configs;
 
-import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
+import org.austincans.lib.io.motors.outputs.control.SparkControlSlot;
 import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;
 

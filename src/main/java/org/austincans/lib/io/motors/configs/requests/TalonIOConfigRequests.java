@@ -1,4 +1,4 @@
-package org.austincans.lib.io.motors.configrequests;
+package org.austincans.lib.io.motors.configs.requests;
 
 import org.austincans.lib.io.motors.configs.TalonConfig;
 import org.austincans.lib.io.motors.configs.TalonConfig.*;

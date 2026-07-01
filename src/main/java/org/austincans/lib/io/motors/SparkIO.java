@@ -9,15 +9,16 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.austincans.lib.io.motors.configs.SparkConfig.SignalsConfig;
 import org.austincans.lib.io.motors.configs.SparkConfig.SlotConfig;
-import org.austincans.lib.io.motors.SparkIO.SparkControlSlot;
-import org.austincans.lib.io.motors.SparkIO.SparkPositionControlType;
-import org.austincans.lib.io.motors.SparkIO.SparkVelocityControlType;
-import org.austincans.lib.io.motors.configrequests.SparkIOConfigRequests;
+import org.austincans.lib.io.motors.configs.requests.SparkIOConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SparkConfig;
 
 import org.austincans.lib.io.motors.inputs.SparkIOInputs;
+import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
+import org.austincans.lib.io.motors.outputs.control.SparkControlSlot;
+import org.austincans.lib.io.motors.outputs.control.SparkPositionControlType;
+import org.austincans.lib.io.motors.outputs.control.SparkVelocityControlType;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -103,13 +104,13 @@ public class SparkIO<
      */
     @Override
     protected void setVelocity(AngularVelocity velocity, SparkVelocityControlType velocityControlType, SparkControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
-        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.volts);
+        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.getVolts());
     }
 
     @Override
     protected void setPosition(Angle position, SparkPositionControlType positionControlType, SparkControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
         double kV = velocity.in(RPM) * slotControlConfigs[controlSlot.getIndex()].ffConfig.kV;
-        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.volts);
+        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.getVolts());
     }
 
     @Override
@@ -261,55 +262,5 @@ public class SparkIO<
      */
     private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot controlSlot, double feedforwardVolts) {
         controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
-    }
-    
-    public static enum SparkPositionControlType implements MotorIO.PositionControlType {
-        STANDARD(ControlType.kPosition),
-        MAXMOTION(ControlType.kMAXMotionPositionControl);
-
-        private final ControlType controlType;
-
-        private SparkPositionControlType(ControlType controlType) {
-            this.controlType = controlType;
-        }
-
-        private ControlType get() {
-            return controlType;
-        }
-    }
-
-    public static enum SparkVelocityControlType implements MotorIO.VelocityControlType {
-        STANDARD(ControlType.kVelocity),
-        MAXMOTION(ControlType.kMAXMotionVelocityControl);
-
-        private final ControlType controlType;
-
-        private SparkVelocityControlType(ControlType controlType) {
-            this.controlType = controlType;
-        }
-
-        private ControlType get() {
-            return controlType;
-        }
-    }
-
-    public static enum SparkControlSlot implements MotorIO.ControlSlot {
-        SLOT_0(ClosedLoopSlot.kSlot0), 
-        SLOT_1(ClosedLoopSlot.kSlot1), 
-        SLOT_2(ClosedLoopSlot.kSlot2), 
-        SLOT_3(ClosedLoopSlot.kSlot3);
-
-        private final ClosedLoopSlot slot;
-
-        private SparkControlSlot(ClosedLoopSlot slot) {
-            this.slot = slot;
-        }
-
-        public ClosedLoopSlot get() {
-            return slot;
-        }
-        public int getIndex() {
-            return ordinal();
-        }
     }
 }

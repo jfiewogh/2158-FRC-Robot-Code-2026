@@ -1,5 +1,10 @@
-package org.austincans.lib.io.motors.configrequests;
+package org.austincans.lib.io.motors.configs.requests;
 
+/** 
+ * TODO: I feel like there is a better way to handle config requests 
+ * like merging the config and the config requests together into one class. 
+ * We can also try to use the TrackedValue class in util somehow
+ */
 public class MotorIOConfigRequests<ConfigType> {
     protected ConfigType config;
     protected boolean configChanged;

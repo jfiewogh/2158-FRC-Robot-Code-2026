@@ -1,7 +1,11 @@
 package org.austincans.lib.io.motors;
 
 import org.austincans.lib.io.motors.configs.TalonFXConfig.FeedbackConfig;
-import org.austincans.lib.io.motors.configrequests.TalonFXIOConfigRequests;
+import org.austincans.lib.io.motors.configs.requests.TalonFXIOConfigRequests;
+import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
+import org.austincans.lib.io.motors.outputs.control.TalonControlSlot;
+import org.austincans.lib.io.motors.outputs.control.TalonPositionControlType;
+import org.austincans.lib.io.motors.outputs.control.TalonVelocityControlType;
 import org.austincans.lib.io.motors.configs.TalonFXConfig;
 
 import com.ctre.phoenix6.CANBus;
