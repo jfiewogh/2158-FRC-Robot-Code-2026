@@ -2,7 +2,8 @@ package org.austincans.lib.io.sensors.encoders;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-import org.austincans.lib.io.sensors.encoders.configrequests.CANcoderIOConfigRequests;
+import org.austincans.lib.io.sensors.encoders.configs.CANcoderConfig;
+import org.austincans.lib.io.sensors.encoders.configs.requests.CANcoderIOConfigRequests;
 import org.austincans.lib.io.sensors.encoders.inputs.CANcoderIOInputs;
 
 import com.ctre.phoenix6.CANBus;

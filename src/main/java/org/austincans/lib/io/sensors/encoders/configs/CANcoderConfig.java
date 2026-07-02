@@ -1,4 +1,4 @@
-package org.austincans.lib.io.sensors.encoders;
+package org.austincans.lib.io.sensors.encoders.configs;
 
 import edu.wpi.first.units.measure.Angle;
 

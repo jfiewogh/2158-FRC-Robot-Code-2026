@@ -2,10 +2,11 @@ package org.austincans.lib.io.motors.configs.requests;
 
 import org.austincans.lib.io.motors.configs.TalonConfig;
 import org.austincans.lib.io.motors.configs.TalonConfig.*;
+import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 
-public class TalonIOConfigRequests<TalonConfigType extends TalonConfig> extends MotorIOConfigRequests<TalonConfigType> {
+public class TalonIOConfigRequests<TalonConfigType extends TalonConfig> extends ConfigRequests<TalonConfigType> {
     public boolean softLimitConfigChanged;
     public boolean motorOutputConfigChanged;
     public boolean slot0ConfigChanged;

@@ -1,10 +1,11 @@
-package org.austincans.lib.io.sensors.encoders.configrequests;
+package org.austincans.lib.io.sensors.encoders.configs.requests;
 
-import org.austincans.lib.io.sensors.encoders.CANcoderConfig;
+import org.austincans.lib.io.ConfigRequests;
+import org.austincans.lib.io.sensors.encoders.configs.CANcoderConfig;
 
 import edu.wpi.first.units.measure.Angle;
 
-public class CANcoderIOConfigRequests extends AbsoluteEncoderIOConfigRequests<CANcoderConfig> {
+public class CANcoderIOConfigRequests extends ConfigRequests<CANcoderConfig> {
     public CANcoderConfig config;
     public boolean magnetSensorConfigChanged;
 

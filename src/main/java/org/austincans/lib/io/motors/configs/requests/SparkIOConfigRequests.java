@@ -1,5 +1,6 @@
 package org.austincans.lib.io.motors.configs.requests;
 
+import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 import org.austincans.lib.util.math.physical.Gearbox;
@@ -10,7 +11,7 @@ import edu.wpi.first.units.measure.Voltage;
 import org.austincans.lib.io.motors.configs.SparkConfig;
 import org.austincans.lib.io.motors.configs.SparkConfig.*;
 
-public class SparkIOConfigRequests extends MotorIOConfigRequests<SparkConfig> {
+public class SparkIOConfigRequests extends ConfigRequests<SparkConfig> {
     public void softLimitConfig(SoftLimitConfig softLimitConfig) {
         configChanged |= !config.softLimitConfig.equals(softLimitConfig);
         config.softLimitConfig = softLimitConfig;

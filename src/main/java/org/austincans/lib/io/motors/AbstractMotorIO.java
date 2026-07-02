@@ -1,6 +1,6 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.motors.configs.requests.MotorIOConfigRequests;
+import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.inputs.MotorIOInputs;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
 import org.austincans.lib.io.motors.outputs.MotorIOOutputs;
@@ -19,7 +19,7 @@ public abstract class AbstractMotorIO<
     ControlSlotType extends ControlSlot, 
     VelocityControlTypeType extends VelocityControlType, 
     PositionControlTypeType extends PositionControlType, 
-    ConfigRequestsType extends MotorIOConfigRequests<ConfigType>,
+    ConfigRequestsType extends ConfigRequests<ConfigType>,
     ConfigType> 
 implements MotorIO<
     InputsType, 
