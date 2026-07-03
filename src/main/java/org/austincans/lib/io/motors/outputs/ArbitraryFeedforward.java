@@ -10,8 +10,8 @@ import edu.wpi.first.units.measure.Voltage;
 /** 
  * If motor requires different feedforward unit than what was set, feedforward will be zero.
  * For example, if the motor requires torque current and you call setVoltage instead of setTorqueCurrent, feedforward will be zero. 
- * TODO: Make a better way of handling this. It should be based on the PositionControlType or VelocityControlType.
  */
+// TODO: Make a better way of handling this. It should be based on the PositionControlType or VelocityControlType.
 public class ArbitraryFeedforward {
     public static enum FeedforwardType {
         NONE,

@@ -39,10 +39,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
  * https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/diff_drive/src/main/java/frc/robot/subsystems/drive/DriveConstants.java
  */
 
-/**
- * TODO: This is untested
- * TODO: This does not extend AdvancedSubsystem
- */
+// TODO: This is untested
+// TODO: This does not extend AdvancedSubsystem
 public class DifferentialDrive<MotorCnfg extends MotorConfig> extends SubsystemBase {
   private final DifferentialDriveIO io;
   private final DifferentialDriveIORecordsAutoLogged records = new DifferentialDriveIORecordsAutoLogged();

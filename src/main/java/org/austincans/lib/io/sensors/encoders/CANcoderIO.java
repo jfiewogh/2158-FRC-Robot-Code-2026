@@ -2,6 +2,8 @@ package org.austincans.lib.io.sensors.encoders;
 
 import static edu.wpi.first.units.Units.Rotations;
 
+import org.austincans.lib.io.ConfigRequests;
+import org.austincans.lib.io.Inputs;
 import org.austincans.lib.io.sensors.encoders.configs.CANcoderConfig;
 import org.austincans.lib.io.sensors.encoders.configs.requests.CANcoderIOConfigRequests;
 import org.austincans.lib.io.sensors.encoders.inputs.CANcoderIOInputs;
@@ -15,7 +17,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIOInputs, CANcoderIOConfigRequests, CANcoderConfig> {
+public class CANcoderIO implements AbsoluteEncoderIO {
     private final CANcoder encoder;
 
     private final CANcoderConfiguration vendorConfig;
@@ -55,36 +57,39 @@ public class CANcoderIO implements AbsoluteEncoderIO<CANcoderIOInputs, CANcoderI
     }
 
     @Override
-    public void updateInputs(CANcoderIOInputs inputs) {
+    public void updateInputs(Inputs inputs) {
+        CANcoderIOInputs canCoderInputs = (CANcoderIOInputs) inputs;
+
         StatusSignal.refreshAll(
             absolutePosition, position, velocity, 
             hardwareFault, bootDuringEnable, badMagnet, undervoltage,
             stickyFaultHardware, stickyFaultBootDuringEnable, stickyFaultBadMagnet, stickyFaultUndervoltage);
 
-        inputs.connected = encoder.isConnected();
-        inputs.absolutePosition = absolutePosition.getValue();
-        inputs.position = position.getValue();
-        inputs.velocity = velocity.getValue();
+        canCoderInputs.connected = encoder.isConnected();
+        canCoderInputs.absolutePosition = absolutePosition.getValue();
+        canCoderInputs.position = position.getValue();
+        canCoderInputs.velocity = velocity.getValue();
 
-        inputs.faultHardware = hardwareFault.getValue();
-        inputs.faultBootDuringEnable = bootDuringEnable.getValue();
-        inputs.faultBadMagnet = badMagnet.getValue();
-        inputs.faultUndervoltage = undervoltage.getValue();
+        canCoderInputs.faultHardware = hardwareFault.getValue();
+        canCoderInputs.faultBootDuringEnable = bootDuringEnable.getValue();
+        canCoderInputs.faultBadMagnet = badMagnet.getValue();
+        canCoderInputs.faultUndervoltage = undervoltage.getValue();
 
-        inputs.stickyFaultHardware = stickyFaultHardware.getValue();
-        inputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
-        inputs.stickyFaultBadMagnet = stickyFaultBadMagnet.getValue();
-        inputs.stickyFaultUndervoltage = stickyFaultUndervoltage.getValue();
+        canCoderInputs.stickyFaultHardware = stickyFaultHardware.getValue();
+        canCoderInputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
+        canCoderInputs.stickyFaultBadMagnet = stickyFaultBadMagnet.getValue();
+        canCoderInputs.stickyFaultUndervoltage = stickyFaultUndervoltage.getValue();
     }
 
     @Override
-    public void applyConfigRequests(CANcoderIOConfigRequests configRequests) {
-        configRequests.magnetSensorConfigChanged = false;
+    public void applyConfigRequests(ConfigRequests configRequests) {
+        CANcoderIOConfigRequests canCoderConfigRequests = (CANcoderIOConfigRequests) configRequests;
+        CANcoderConfig canCoderConfig = (CANcoderConfig) canCoderConfigRequests.getConfig();
 
-        vendorConfig.MagnetSensor.MagnetOffset = configRequests.config.magnetOffset.in(Rotations);
+        vendorConfig.MagnetSensor.MagnetOffset = canCoderConfig.magnetOffset.in(Rotations);
         vendorConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 
-            configRequests.config.absoluteSensorDiscontinuityPoint.in(Rotations);
-        vendorConfig.MagnetSensor.SensorDirection = configRequests.config.sensorDirectionInverted 
+            canCoderConfig.absoluteSensorDiscontinuityPoint.in(Rotations);
+        vendorConfig.MagnetSensor.SensorDirection = canCoderConfig.sensorDirectionInverted 
             ? SensorDirectionValue.CounterClockwise_Positive 
             : SensorDirectionValue.Clockwise_Positive;
 

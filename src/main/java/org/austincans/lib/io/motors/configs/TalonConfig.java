@@ -1,5 +1,6 @@
 package org.austincans.lib.io.motors.configs;
 
+import org.austincans.lib.io.Config;
 import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;
 
@@ -7,7 +8,7 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 
-public abstract class TalonConfig {
+public abstract class TalonConfig implements Config {
     public MotorOutputConfig motorOutputConfig = new MotorOutputConfig();
     public SoftLimitConfig softLimitConfig = new SoftLimitConfig();
     public ControlConfig slot0Config = new ControlConfig();

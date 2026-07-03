@@ -18,13 +18,15 @@ package org.austincans.lib.io.sensors.gyros;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
 
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-public class CanandgyroIO implements GyroIO<GyroIO.GyroIOInputs> {
+public class CanandgyroIO extends AbstractGyroIO {
   private final Canandgyro gyro;
 
   protected CanandgyroIO(int deviceId, Frequency odometryFrequency) {
@@ -41,13 +43,31 @@ public class CanandgyroIO implements GyroIO<GyroIO.GyroIOInputs> {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = gyro.isConnected();
-    inputs.yawPosition = Rotations.of(gyro.getYaw());
-    inputs.yawVelocity = RotationsPerSecond.of(gyro.getAngularVelocityYaw());
-    inputs.pitchPosition = Rotations.of(gyro.getPitch());
-    inputs.pitchVelocity = (RotationsPerSecond.of(gyro.getAngularVelocityPitch()));
-    inputs.rollPosition = Rotations.of(gyro.getRoll());
-    inputs.rollVelocity = RotationsPerSecond.of(gyro.getAngularVelocityRoll());
+  protected boolean isConnected() {
+    return gyro.isConnected();
+  }
+  @Override
+  protected Angle getYawPosition() {
+    return Rotations.of(gyro.getYaw());
+  }
+  @Override
+  protected AngularVelocity getYawVelocity() {
+    return RotationsPerSecond.of(gyro.getAngularVelocityYaw());
+  }
+  @Override
+  protected Angle getPitchPosition() {
+    return Rotations.of(gyro.getPitch());
+  }
+  @Override
+  protected AngularVelocity getPitchVelocity() {
+    return RotationsPerSecond.of(gyro.getAngularVelocityPitch());
+  }
+  @Override
+  protected Angle getRollPosition() {
+    return Rotations.of(gyro.getRoll());
+  }
+  @Override
+  protected AngularVelocity getRollVelocity() {
+    return RotationsPerSecond.of(gyro.getAngularVelocityRoll());
   }
 }

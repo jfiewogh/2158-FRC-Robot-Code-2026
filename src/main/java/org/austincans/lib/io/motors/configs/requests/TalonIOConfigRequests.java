@@ -6,7 +6,7 @@ import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
 
-public class TalonIOConfigRequests<TalonConfigType extends TalonConfig> extends ConfigRequests<TalonConfigType> {
+public class TalonIOConfigRequests extends ConfigRequests {
     public boolean softLimitConfigChanged;
     public boolean motorOutputConfigChanged;
     public boolean slot0ConfigChanged;
@@ -17,35 +17,43 @@ public class TalonIOConfigRequests<TalonConfigType extends TalonConfig> extends 
     public boolean currentLimitsConfigChanged;
 
     public void setSoftLimitConfig(SoftLimitConfig softLimitConfig) {
-        configChanged |= softLimitConfigChanged = !config.softLimitConfig.equals(softLimitConfig);
-        config.softLimitConfig = softLimitConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= softLimitConfigChanged = !talonConfig.softLimitConfig.equals(softLimitConfig);
+        talonConfig.softLimitConfig = softLimitConfig;
     }
     public void setMotorOutputConfig(MotorOutputConfig motorOutputConfig) {
-        configChanged |= motorOutputConfigChanged = !config.motorOutputConfig.equals(motorOutputConfig);
-        config.motorOutputConfig = motorOutputConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= motorOutputConfigChanged = !talonConfig.motorOutputConfig.equals(motorOutputConfig);
+        talonConfig.motorOutputConfig = motorOutputConfig;
     }
     public void setSlot0Config(ControlConfig slotConfig) {
-        configChanged |= slot0ConfigChanged = !config.slot0Config.equals(slotConfig);
-        config.slot0Config = slotConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= slot0ConfigChanged = !talonConfig.slot0Config.equals(slotConfig);
+        talonConfig.slot0Config = slotConfig;
     }
     public void setSlot1Config(ControlConfig slotConfig) {
-        configChanged |= slot1ConfigChanged = !config.slot1Config.equals(slotConfig);
-        config.slot1Config = slotConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= slot1ConfigChanged = !talonConfig.slot1Config.equals(slotConfig);
+        talonConfig.slot1Config = slotConfig;
     }
     public void setSlot2Config(ControlConfig slotConfig) {
-        configChanged |= slot2ConfigChanged = !config.slot2Config.equals(slotConfig);
-        config.slot2Config = slotConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= slot2ConfigChanged = !talonConfig.slot2Config.equals(slotConfig);
+        talonConfig.slot2Config = slotConfig;
     }
     public void setClosedLoopGeneralConfig(ClosedLoopGeneralConfig closedLoopGeneralConfig) {
-        configChanged |= closedLoopGeneralConfigChanged = !config.closedLoopGeneralConfig.equals(config.closedLoopGeneralConfig);
-        config.closedLoopGeneralConfig = closedLoopGeneralConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= closedLoopGeneralConfigChanged = !talonConfig.closedLoopGeneralConfig.equals(closedLoopGeneralConfig);
+        talonConfig.closedLoopGeneralConfig = closedLoopGeneralConfig;
     }
     public void setMotionMagicConfig(MotionMagicConfig motionMagicConfig) {
-        configChanged |= motionMagicConfigChanged = !config.motionMagicConfig.equals(motionMagicConfig);
-        config.motionMagicConfig = motionMagicConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= motionMagicConfigChanged = !talonConfig.motionMagicConfig.equals(motionMagicConfig);
+        talonConfig.motionMagicConfig = motionMagicConfig;
     }
     public void setCurrentLimitsConfig(CurrentLimitsConfig currentLimitsConfig) {
-        configChanged |= currentLimitsConfigChanged |= !config.currentLimitsConfig.equals(currentLimitsConfig);
-        config.currentLimitsConfig = currentLimitsConfig;
+        TalonConfig talonConfig = (TalonConfig) config;
+        configChanged |= currentLimitsConfigChanged |= !talonConfig.currentLimitsConfig.equals(currentLimitsConfig);
+        talonConfig.currentLimitsConfig = currentLimitsConfig;
     }
 }

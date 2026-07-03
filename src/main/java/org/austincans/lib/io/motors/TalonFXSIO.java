@@ -4,9 +4,13 @@ import org.austincans.lib.io.motors.configs.TalonFXSConfig.ExternalFeedbackConfi
 import org.austincans.lib.io.motors.configs.TalonFXSConfig.MotorArrangement;
 import org.austincans.lib.io.motors.configs.requests.TalonFXSIOConfigRequests;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
+import org.austincans.lib.io.motors.outputs.control.ControlSlot;
+import org.austincans.lib.io.motors.outputs.control.PositionControlType;
 import org.austincans.lib.io.motors.outputs.control.TalonControlSlot;
 import org.austincans.lib.io.motors.outputs.control.TalonPositionControlType;
 import org.austincans.lib.io.motors.outputs.control.TalonVelocityControlType;
+import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
+import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig;
 
 import com.ctre.phoenix6.CANBus;
@@ -22,7 +26,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig> {
+public class TalonFXSIO extends TalonIO {
     private final TalonFXS motor;
 
     private final TalonFXSConfiguration vendorConfig = new TalonFXSConfiguration();
@@ -60,55 +64,56 @@ public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig
     }
 
     @Override
-    public void applyConfigRequests(TalonFXSIOConfigRequests configRequests) {
+    public void applyConfigRequests(ConfigRequests configRequests) {
         if (!configRequests.configChanged()) {
             return;
         }
 
-        TalonFXSConfig config = configRequests.getConfig();
+        TalonFXSIOConfigRequests talonFXSConfigRequests = (TalonFXSIOConfigRequests) configRequests;
+        TalonFXSConfig config = (TalonFXSConfig) talonFXSConfigRequests.getConfig();
 
         int changeCount = getTrueCount(
-            configRequests.motorOutputConfigChanged, 
-            configRequests.softLimitConfigChanged,
-            configRequests.slot0ConfigChanged,
-            configRequests.slot1ConfigChanged,
-            configRequests.slot2ConfigChanged,
-            configRequests.externalFeedbackConfigChanged,
-            configRequests.closedLoopGeneralConfigChanged,
-            configRequests.motionMagicConfigChanged,
-            configRequests.currentLimitsConfigChanged
+            talonFXSConfigRequests.motorOutputConfigChanged, 
+            talonFXSConfigRequests.softLimitConfigChanged,
+            talonFXSConfigRequests.slot0ConfigChanged,
+            talonFXSConfigRequests.slot1ConfigChanged,
+            talonFXSConfigRequests.slot2ConfigChanged,
+            talonFXSConfigRequests.externalFeedbackConfigChanged,
+            talonFXSConfigRequests.closedLoopGeneralConfigChanged,
+            talonFXSConfigRequests.motionMagicConfigChanged,
+            talonFXSConfigRequests.currentLimitsConfigChanged
         );
 
         /* Multiple Configs */
         if (changeCount > 1) {
-            configRequests.motorOutputConfigChanged = false;
+            talonFXSConfigRequests.motorOutputConfigChanged = false;
             updateMotorOutputConfigs(vendorConfig.MotorOutput, config.motorOutputConfig);
 
-            configRequests.softLimitConfigChanged = false;
+            talonFXSConfigRequests.softLimitConfigChanged = false;
             updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.softLimitConfig);
 
-            configRequests.slot0ConfigChanged = false;
+            talonFXSConfigRequests.slot0ConfigChanged = false;
             mapSlot0Config(vendorConfig.Slot0, config.slot0Config);
 
-            configRequests.slot1ConfigChanged = false;
+            talonFXSConfigRequests.slot1ConfigChanged = false;
             mapSlot1Config(vendorConfig.Slot1, config.slot1Config);
 
-            configRequests.slot2ConfigChanged = false;
+            talonFXSConfigRequests.slot2ConfigChanged = false;
             mapSlot2Config(vendorConfig.Slot2, config.slot2Config);
 
-            configRequests.externalFeedbackConfigChanged = false;
+            talonFXSConfigRequests.externalFeedbackConfigChanged = false;
             updateExternalFeedbackConfig(vendorConfig.ExternalFeedback, config.externalFeedbackConfig);
 
-            configRequests.closedLoopGeneralConfigChanged = false;
+            talonFXSConfigRequests.closedLoopGeneralConfigChanged = false;
             updateClosedLoopGeneralConfig(vendorConfig.ClosedLoopGeneral, config.closedLoopGeneralConfig);
 
-            configRequests.motionMagicConfigChanged = false;
+            talonFXSConfigRequests.motionMagicConfigChanged = false;
             updateMotionMagicConfig(vendorConfig.MotionMagic, config.motionMagicConfig);
 
-            configRequests.currentLimitsConfigChanged = false;
+            talonFXSConfigRequests.currentLimitsConfigChanged = false;
             updateCurrentLimitsConfig(vendorConfig.CurrentLimits, config.currentLimitsConfig);
 
-            configRequests.commutationConfigChanged = false;
+            talonFXSConfigRequests.commutationConfigChanged = false;
             updateCommutationConfig(vendorConfig.Commutation, config.motorArrangement);
 
             motor.getConfigurator().apply(vendorConfig);
@@ -116,56 +121,56 @@ public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig
         }
 
         /* Individual Configs */
-        if (configRequests.motorOutputConfigChanged) {
-            configRequests.motorOutputConfigChanged = false;
+        if (talonFXSConfigRequests.motorOutputConfigChanged) {
+            talonFXSConfigRequests.motorOutputConfigChanged = false;
             updateMotorOutputConfigs(vendorConfig.MotorOutput, config.motorOutputConfig);
             motor.getConfigurator().apply(vendorConfig.MotorOutput);
             return;
         }
-        if (configRequests.softLimitConfigChanged) {
-            configRequests.softLimitConfigChanged = false;
+        if (talonFXSConfigRequests.softLimitConfigChanged) {
+            talonFXSConfigRequests.softLimitConfigChanged = false;
             updateSoftLimitSwitchConfigs(vendorConfig.SoftwareLimitSwitch, config.softLimitConfig);
             motor.getConfigurator().apply(vendorConfig.SoftwareLimitSwitch);
             return;
         }
-        if (configRequests.slot0ConfigChanged) {
-            configRequests.slot0ConfigChanged = false;
+        if (talonFXSConfigRequests.slot0ConfigChanged) {
+            talonFXSConfigRequests.slot0ConfigChanged = false;
             mapSlot0Config(vendorConfig.Slot0, config.slot0Config);
             motor.getConfigurator().apply(vendorConfig.Slot0);
             return;
         }
-        if (configRequests.slot1ConfigChanged) {
-            configRequests.slot1ConfigChanged = false;
+        if (talonFXSConfigRequests.slot1ConfigChanged) {
+            talonFXSConfigRequests.slot1ConfigChanged = false;
             mapSlot1Config(vendorConfig.Slot1, config.slot1Config);
             motor.getConfigurator().apply(vendorConfig.Slot1);
             return;
         }
-        if (configRequests.slot2ConfigChanged) {
-            configRequests.slot2ConfigChanged = false;
+        if (talonFXSConfigRequests.slot2ConfigChanged) {
+            talonFXSConfigRequests.slot2ConfigChanged = false;
             mapSlot2Config(vendorConfig.Slot2, config.slot2Config);
             motor.getConfigurator().apply(vendorConfig.Slot2);
             return;
         }
-        if (configRequests.externalFeedbackConfigChanged) {
-            configRequests.externalFeedbackConfigChanged = false;
+        if (talonFXSConfigRequests.externalFeedbackConfigChanged) {
+            talonFXSConfigRequests.externalFeedbackConfigChanged = false;
             updateExternalFeedbackConfig(vendorConfig.ExternalFeedback, config.externalFeedbackConfig);
             motor.getConfigurator().apply(vendorConfig.ExternalFeedback);
             return;
         }
-        if (configRequests.closedLoopGeneralConfigChanged) {
-            configRequests.closedLoopGeneralConfigChanged = false;
+        if (talonFXSConfigRequests.closedLoopGeneralConfigChanged) {
+            talonFXSConfigRequests.closedLoopGeneralConfigChanged = false;
             updateClosedLoopGeneralConfig(vendorConfig.ClosedLoopGeneral, config.closedLoopGeneralConfig);
             motor.getConfigurator().apply(vendorConfig.ClosedLoopGeneral);
             return;
         }
-        if (configRequests.motionMagicConfigChanged) {
-            configRequests.motionMagicConfigChanged = false;
+        if (talonFXSConfigRequests.motionMagicConfigChanged) {
+            talonFXSConfigRequests.motionMagicConfigChanged = false;
             updateMotionMagicConfig(vendorConfig.MotionMagic, config.motionMagicConfig);
             motor.getConfigurator().apply(vendorConfig.MotionMagic);
             return;
         }
-        if (configRequests.currentLimitsConfigChanged) {
-            configRequests.currentLimitsConfigChanged = false;
+        if (talonFXSConfigRequests.currentLimitsConfigChanged) {
+            talonFXSConfigRequests.currentLimitsConfigChanged = false;
             updateCurrentLimitsConfig(vendorConfig.CurrentLimits, config.currentLimitsConfig);
             motor.getConfigurator().apply(vendorConfig.CurrentLimits);
             return;
@@ -219,13 +224,24 @@ public class TalonFXSIO extends TalonIO<TalonFXSIOConfigRequests, TalonFXSConfig
     }
 
     @Override
-    protected void setPosition(Angle position, TalonPositionControlType positionControlType, TalonControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
-        motor.setControl(getPositionControlRequest(positionControlType, position, slot, velocity, arbitraryFeedforward));
+    protected void setPosition(Angle position, PositionControlType positionControlType, ControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(
+            getPositionControlRequest(
+                (TalonPositionControlType) positionControlType, 
+                position, 
+                (TalonControlSlot) slot, 
+                velocity, 
+                arbitraryFeedforward));
     }
 
     @Override
-    protected void setVelocity(AngularVelocity velocity, TalonVelocityControlType velocityControlType, TalonControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
-        motor.setControl(getVelocityControlRequest(velocityControlType, velocity, slot, arbitraryFeedforward)); 
+    protected void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
+        motor.setControl(
+            getVelocityControlRequest(
+                (TalonVelocityControlType) velocityControlType, 
+                velocity, 
+                (TalonControlSlot) slot, 
+                arbitraryFeedforward)); 
     }
 
     @Override

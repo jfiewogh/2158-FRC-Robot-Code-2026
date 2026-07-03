@@ -1,5 +1,5 @@
 package org.austincans.lib.io;
 
-public interface ActuatorIO<InputsType, OutputsType> extends DeviceIO<InputsType> {
-    public void applyOutputs(OutputsType outputs);
+public interface ActuatorIO extends DeviceIO {
+    public void applyOutputs(Outputs outputs);
 }

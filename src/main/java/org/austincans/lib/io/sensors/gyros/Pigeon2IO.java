@@ -25,10 +25,12 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Frequency;
 
+import org.austincans.lib.io.Inputs;
+import org.austincans.lib.io.sensors.gyros.inputs.Pigeon2IOInputs;
 import org.austincans.lib.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
-public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
+public class Pigeon2IO implements GyroIO {
   private final Pigeon2 pigeon;
 
   private final StatusSignal<Angle> yaw;
@@ -99,44 +101,31 @@ public class Pigeon2IO implements GyroIO<Pigeon2IO.Pigeon2IOInputs> {
     };
   }
 
-  public class Pigeon2IOInputs extends GyroIO.GyroIOInputs {
-    public boolean hasCommunication;
-		public boolean faultHardware;
-		public boolean faultBootDuringEnable;
-    public boolean faultBootIntoMotion;
-		public boolean faultBootupAccelerometer;
-		public boolean faultBootupGyroscope;
-
-    public boolean stickyFaultHardware;
-    public boolean stickyFaultBootDuringEnable;
-    public boolean stickyFaultBootIntoMotion;
-    public boolean stickyFaultBootupAccelerometer;
-    public boolean stickyFaultBootupGyroscope;
-  }
-
   @Override
-  public void updateInputs(Pigeon2IOInputs inputs) {
-    inputs.connected = BaseStatusSignal.refreshAll(signals).isOK();
+  public void updateInputs(Inputs inputs) {
+    Pigeon2IOInputs pigeon2Inputs = (Pigeon2IOInputs) inputs;
+    
+    pigeon2Inputs.connected = BaseStatusSignal.refreshAll(signals).isOK();
 
-    inputs.yawPosition = yaw.getValue();
-    inputs.yawVelocity = yawVelocity.getValue();
-    inputs.pitchPosition = pitch.getValue();
-    inputs.pitchVelocity  = pitchVelocity.getValue();
-    inputs.rollPosition = roll.getValue();
-    inputs.rollVelocity = rollVelocity.getValue();
+    pigeon2Inputs.yawPosition = yaw.getValue();
+    pigeon2Inputs.yawVelocity = yawVelocity.getValue();
+    pigeon2Inputs.pitchPosition = pitch.getValue();
+    pigeon2Inputs.pitchVelocity  = pitchVelocity.getValue();
+    pigeon2Inputs.rollPosition = roll.getValue();
+    pigeon2Inputs.rollVelocity = rollVelocity.getValue();
 
-    inputs.hasCommunication = firmwareVersion.getStatus() == StatusCode.OK;
-    inputs.faultHardware = hardwareFault.getValue();
-    inputs.faultBootDuringEnable = bootDuringEnable.getValue();
-    inputs.faultBootIntoMotion = bootIntoMotion.getValue();
-    inputs.faultBootupAccelerometer = bootupAccelerometer.getValue();
-    inputs.faultBootupGyroscope = bootupGyroscope.getValue();
+    pigeon2Inputs.hasCommunication = firmwareVersion.getStatus() == StatusCode.OK;
+    pigeon2Inputs.faultHardware = hardwareFault.getValue();
+    pigeon2Inputs.faultBootDuringEnable = bootDuringEnable.getValue();
+    pigeon2Inputs.faultBootIntoMotion = bootIntoMotion.getValue();
+    pigeon2Inputs.faultBootupAccelerometer = bootupAccelerometer.getValue();
+    pigeon2Inputs.faultBootupGyroscope = bootupGyroscope.getValue();
 
-    inputs.stickyFaultHardware = stickyFaultHardware.getValue();
-    inputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
-    inputs.stickyFaultBootIntoMotion = stickyFaultBootIntoMotion.getValue();
-    inputs.stickyFaultBootupAccelerometer = stickyFaultBootupAccelerometer.getValue();
-    inputs.stickyFaultBootupGyroscope = stickyFaultBootupGyroscope.getValue();
+    pigeon2Inputs.stickyFaultHardware = stickyFaultHardware.getValue();
+    pigeon2Inputs.stickyFaultBootDuringEnable = stickyFaultBootDuringEnable.getValue();
+    pigeon2Inputs.stickyFaultBootIntoMotion = stickyFaultBootIntoMotion.getValue();
+    pigeon2Inputs.stickyFaultBootupAccelerometer = stickyFaultBootupAccelerometer.getValue();
+    pigeon2Inputs.stickyFaultBootupGyroscope = stickyFaultBootupGyroscope.getValue();
   }
 
   @Override

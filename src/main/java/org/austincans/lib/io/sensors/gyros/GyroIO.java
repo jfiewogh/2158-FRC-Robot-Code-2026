@@ -17,39 +17,4 @@ package org.austincans.lib.io.sensors.gyros;
 
 import org.austincans.lib.io.DeviceIO;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-
-public interface GyroIO<InputsType extends GyroIO.GyroIOInputs> extends DeviceIO<InputsType> {
-  public class GyroIOInputs {
-    protected boolean connected;
-    protected Angle yawPosition;
-    protected Angle pitchPosition;
-    protected Angle rollPosition;
-    protected AngularVelocity yawVelocity;
-    protected AngularVelocity pitchVelocity;
-    protected AngularVelocity rollVelocity;
-
-    public boolean connected() {
-      return connected;
-    }
-    public Angle yawPosition() {
-      return yawPosition;
-    }
-    public Angle pitchPosition() {
-      return pitchPosition;
-    }
-    public Angle rollPosition() {
-      return rollPosition;
-    }
-    public AngularVelocity yawVelocity() {
-      return yawVelocity;
-    }
-    public AngularVelocity pitchVelocity() {
-      return pitchVelocity;
-    }
-    public AngularVelocity rollVelocity() {
-      return rollVelocity;
-    }
-  }
-}
+public interface GyroIO extends DeviceIO {}

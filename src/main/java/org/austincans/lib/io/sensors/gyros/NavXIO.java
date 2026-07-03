@@ -19,11 +19,14 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 /** IO implementation for NavX. */
-public class NavXIO implements GyroIO<GyroIO.GyroIOInputs> {
+public class NavXIO extends AbstractGyroIO {
   private final AHRS navX;
 
   protected NavXIO(NavXComType comType, NavXUpdateRate updateRate) {
@@ -31,14 +34,33 @@ public class NavXIO implements GyroIO<GyroIO.GyroIOInputs> {
   }
 
   @Override
-  public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = navX.isConnected();
-    // values are flipped because navX axes are opposite direction of those used by WPILib
-    inputs.yawPosition = Degrees.of(-navX.getYaw());
-    inputs.yawVelocity = DegreesPerSecond.of(-navX.getRawGyroZ());
-    inputs.pitchPosition = Degrees.of(-navX.getPitch());
-    inputs.pitchVelocity = DegreesPerSecond.of(-navX.getRawGyroX());
-    inputs.rollPosition = Degrees.of(-navX.getRoll());
-    inputs.rollVelocity = DegreesPerSecond.of(-navX.getRawGyroY());
+  protected boolean isConnected() {
+    return navX.isConnected();
+  }
+
+  /* Values are flipped because navX axes are opposite direction of those used by WPILib */
+  @Override
+  protected Angle getYawPosition() {
+    return Degrees.of(-navX.getYaw());
+  }
+  @Override
+  protected AngularVelocity getYawVelocity() {
+    return DegreesPerSecond.of(-navX.getRawGyroZ());
+  }
+  @Override
+  protected Angle getPitchPosition() {
+    return Degrees.of(-navX.getPitch());
+  }
+  @Override
+  protected AngularVelocity getPitchVelocity() {
+    return DegreesPerSecond.of(-navX.getRawGyroX());
+  }
+  @Override
+  protected Angle getRollPosition() {
+    return Degrees.of(-navX.getRoll());
+  }
+  @Override
+  protected AngularVelocity getRollVelocity() {
+    return DegreesPerSecond.of(-navX.getRawGyroY());
   }
 }

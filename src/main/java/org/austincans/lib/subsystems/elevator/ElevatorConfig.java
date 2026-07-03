@@ -2,7 +2,7 @@ package org.austincans.lib.subsystems.elevator;
 
 import com.revrobotics.spark.config.SparkFlexConfig;
 
-/** TODO: bad code, fix */
+/* TODO: bad code, fix */
 public class ElevatorConfig {
     public SparkConfig motorConfigSpark;
     public SparkFlexConfig sparkFlexConfig;

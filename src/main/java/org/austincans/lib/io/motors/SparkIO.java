@@ -7,18 +7,21 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import org.austincans.lib.io.motors.configs.SparkConfig.ClosedLoopConfig.SlotConfig;
 import org.austincans.lib.io.motors.configs.SparkConfig.SignalsConfig;
-import org.austincans.lib.io.motors.configs.SparkConfig.SlotConfig;
-import org.austincans.lib.io.motors.configs.requests.SparkIOConfigRequests;
+import org.austincans.lib.io.ConfigRequests;
+import org.austincans.lib.io.Inputs;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SparkConfig;
-
 import org.austincans.lib.io.motors.inputs.SparkIOInputs;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
+import org.austincans.lib.io.motors.outputs.control.ControlSlot;
+import org.austincans.lib.io.motors.outputs.control.PositionControlType;
 import org.austincans.lib.io.motors.outputs.control.SparkControlSlot;
 import org.austincans.lib.io.motors.outputs.control.SparkPositionControlType;
 import org.austincans.lib.io.motors.outputs.control.SparkVelocityControlType;
+import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -39,31 +42,21 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-/*
+/**
  * To configure while deployed, use kNoResetSafeParameters and kNoPersistParameters 
  * so that you can configure only specific values while keeping existing ones.
  */
-public class SparkIO<
-    MotorType extends SparkBase, 
-    VendorConfigType extends SparkBaseConfig
-> extends AbstractMotorIO<
-    SparkIOInputs, 
-    SparkControlSlot, 
-    SparkVelocityControlType, 
-    SparkPositionControlType, 
-    SparkIOConfigRequests,
-    SparkConfig
-> {
-    protected final MotorType motor;
+public class SparkIO extends AbstractMotorIO {
+    protected final SparkBase motor;
     protected final RelativeEncoder encoder;
     protected final SparkClosedLoopController controller;
 
-    private final VendorConfigType vendorConfig;
+    private final SparkBaseConfig vendorConfig;
     private boolean initialConfigApplied = false;
 
     private final ControlConfig[] slotControlConfigs = new ControlConfig[4];
 
-    protected SparkIO(MotorType motor, VendorConfigType vendorConfig) {
+    protected SparkIO(SparkBase motor, SparkBaseConfig vendorConfig) {
         this.vendorConfig = vendorConfig;
 
         this.motor = motor;
@@ -72,25 +65,27 @@ public class SparkIO<
     }
 
     @Override
-    public void updateInputs(SparkIOInputs inputs) {
-        super.updateInputs(inputs);
+    public void updateInputs(Inputs inputs) {
+        SparkIOInputs sparkInputs = (SparkIOInputs) inputs;
+
+        super.updateInputs(sparkInputs);
 
         Faults activeFaults = motor.getFaults();
-        inputs.activeFaultMotorType = activeFaults.motorType;
-        inputs.activeFaultCan = activeFaults.can;
-        inputs.activeFaultTemperature = activeFaults.temperature;
-        inputs.activeFaultGateDriver = activeFaults.gateDriver;
-        inputs.activeFaultEscEeprom = activeFaults.escEeprom;
-        inputs.activeFaultFirmware = activeFaults.firmware;
+        sparkInputs.activeFaultMotorType = activeFaults.motorType;
+        sparkInputs.activeFaultCan = activeFaults.can;
+        sparkInputs.activeFaultTemperature = activeFaults.temperature;
+        sparkInputs.activeFaultGateDriver = activeFaults.gateDriver;
+        sparkInputs.activeFaultEscEeprom = activeFaults.escEeprom;
+        sparkInputs.activeFaultFirmware = activeFaults.firmware;
 
         Faults stickyFaults = motor.getStickyFaults();
-        inputs.stickyFaultMotorType = stickyFaults.motorType;
-        inputs.stickyFaultCan = stickyFaults.can;
-        inputs.stickyFaultTemperature = stickyFaults.temperature;
-        inputs.stickyFaultGateDriver = stickyFaults.gateDriver;
-        inputs.stickyFaultEscEeprom = stickyFaults.escEeprom;
-        inputs.stickyFaultFirmware = stickyFaults.firmware;
-        inputs.stickyFaultOther = stickyFaults.other;
+        sparkInputs.stickyFaultMotorType = stickyFaults.motorType;
+        sparkInputs.stickyFaultCan = stickyFaults.can;
+        sparkInputs.stickyFaultTemperature = stickyFaults.temperature;
+        sparkInputs.stickyFaultGateDriver = stickyFaults.gateDriver;
+        sparkInputs.stickyFaultEscEeprom = stickyFaults.escEeprom;
+        sparkInputs.stickyFaultFirmware = stickyFaults.firmware;
+        sparkInputs.stickyFaultOther = stickyFaults.other;
     }
 
     @Override
@@ -103,14 +98,22 @@ public class SparkIO<
      * https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control 
      */
     @Override
-    protected void setVelocity(AngularVelocity velocity, SparkVelocityControlType velocityControlType, SparkControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
-        setSetpoint(velocity.in(RPM), velocityControlType.get(), controlSlot, arbitraryFeedforward.getVolts());
+    protected void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+        setSetpoint(
+            velocity.in(RPM), 
+            ((SparkVelocityControlType) velocityControlType).get(), 
+            (SparkControlSlot) controlSlot, 
+            arbitraryFeedforward.getVolts());
     }
 
     @Override
-    protected void setPosition(Angle position, SparkPositionControlType positionControlType, SparkControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
-        double kV = velocity.in(RPM) * slotControlConfigs[controlSlot.getIndex()].ffConfig.kV;
-        setSetpoint(position.in(Rotations), positionControlType.get(), controlSlot, kV + arbitraryFeedforward.getVolts());
+    protected void setPosition(Angle position, PositionControlType positionControlType, ControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+        SparkControlSlot sparkControlSlot = (SparkControlSlot) controlSlot;
+        setSetpoint(
+            position.in(Rotations), 
+            ((SparkPositionControlType) positionControlType).get(), 
+            sparkControlSlot, 
+            velocity.in(RPM) * slotControlConfigs[sparkControlSlot.getIndex()].ffConfig.kV + arbitraryFeedforward.getVolts());
     }
 
     @Override
@@ -139,12 +142,12 @@ public class SparkIO<
     }
 
     @Override
-    public void applyConfigRequests(SparkIOConfigRequests configRequests) {
+    public void applyConfigRequests(ConfigRequests configRequests) {
         if (!configRequests.configChanged()) {
             return;
         }
 
-        SparkConfig config = configRequests.getConfig();
+        SparkConfig config = (SparkConfig) configRequests.getConfig();
 
         slotControlConfigs[0] = config.closedLoopConfig.slot0Config.controlConfig;
         slotControlConfigs[1] = config.closedLoopConfig.slot1Config.controlConfig;

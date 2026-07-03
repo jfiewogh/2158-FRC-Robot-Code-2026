@@ -26,8 +26,8 @@ import lombok.Setter;
 /**
  * Based on the RobotState but only including drive pose estimation.
  * Currently, deals with Pose2d.
- * TODO: Maybe update to include Pose3d.
  */
+// TODO: Maybe update to include Pose3d.
 public class SwerveState {
     // Constants
     protected static final double poseBufferSizeSec = 2.0;

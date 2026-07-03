@@ -11,49 +11,60 @@ import edu.wpi.first.units.measure.Voltage;
 import org.austincans.lib.io.motors.configs.SparkConfig;
 import org.austincans.lib.io.motors.configs.SparkConfig.*;
 
-public class SparkIOConfigRequests extends ConfigRequests<SparkConfig> {
+public class SparkIOConfigRequests extends ConfigRequests {
     public void softLimitConfig(SoftLimitConfig softLimitConfig) {
-        configChanged |= !config.softLimitConfig.equals(softLimitConfig);
-        config.softLimitConfig = softLimitConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.softLimitConfig.equals(softLimitConfig);
+        sparkConfig.softLimitConfig = softLimitConfig;
     }
     public void neutralMode(NeutralMode neutralMode) {
-        configChanged |= config.neutralMode != neutralMode;
-        config.neutralMode = neutralMode;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= sparkConfig.neutralMode != neutralMode;
+        sparkConfig.neutralMode = neutralMode;
     }
     public void inverted(boolean inverted) {
-        configChanged |= config.inverted != inverted;
-        config.inverted = inverted;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= sparkConfig.inverted != inverted;
+        sparkConfig.inverted = inverted;
     }
     public void smartCurrentStallLimit(Current smartCurrentStallLimit) {
-        configChanged |= config.smartCurrentStallLimit != smartCurrentStallLimit;
-        config.smartCurrentStallLimit = smartCurrentStallLimit;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= sparkConfig.smartCurrentStallLimit != smartCurrentStallLimit;
+        sparkConfig.smartCurrentStallLimit = smartCurrentStallLimit;
     }
     public void voltageCompensation(Voltage voltage) {
-        configChanged |= !config.voltageCompensation.isEquivalent(voltage);
-        config.voltageCompensation = voltage;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.voltageCompensation.isEquivalent(voltage);
+        sparkConfig.voltageCompensation = voltage;
     }
     public void sensorToMechanismGearbox(Gearbox gearbox) {
-        configChanged |= !config.sensorToMechanismGearbox.equals(gearbox);
-        config.sensorToMechanismGearbox = gearbox;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.sensorToMechanismGearbox.equals(gearbox);
+        sparkConfig.sensorToMechanismGearbox = gearbox;
     }
     public void encoderConfig(EncoderConfig encoderConfig) {
-        configChanged |= !config.encoderConfig.equals(encoderConfig);
-        config.encoderConfig = encoderConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.encoderConfig.equals(encoderConfig);
+        sparkConfig.encoderConfig = encoderConfig;
     }
     public void absoluteEncoderConfig(AbsoluteEncoderConfig absoluteEncoderConfig) {
-        configChanged |= !config.absoluteEncoderConfig.equals(absoluteEncoderConfig);
-        config.absoluteEncoderConfig = absoluteEncoderConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.absoluteEncoderConfig.equals(absoluteEncoderConfig);
+        sparkConfig.absoluteEncoderConfig = absoluteEncoderConfig;
     }
     public void closedLoopConfig(ClosedLoopConfig closedLoopConfig) {
-        configChanged |= !config.closedLoopConfig.equals(closedLoopConfig);
-        config.closedLoopConfig = closedLoopConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.closedLoopConfig.equals(closedLoopConfig);
+        sparkConfig.closedLoopConfig = closedLoopConfig;
     }
     public void followerConfig(FollowerConfig followerConfig) {
-        configChanged |= !config.followerConfig.equals(followerConfig);
-        config.followerConfig = followerConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.followerConfig.equals(followerConfig);
+        sparkConfig.followerConfig = followerConfig;
     }
     public void signalsConfig(SignalsConfig signalsConfig) {
-        configChanged |= !config.signalsConfig.equals(signalsConfig);
-        config.signalsConfig = signalsConfig;
+        SparkConfig sparkConfig = (SparkConfig) config;
+        configChanged |= !sparkConfig.signalsConfig.equals(signalsConfig);
+        sparkConfig.signalsConfig = signalsConfig;
     }
 }

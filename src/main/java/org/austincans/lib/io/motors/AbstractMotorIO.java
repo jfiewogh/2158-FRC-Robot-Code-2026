@@ -1,6 +1,7 @@
 package org.austincans.lib.io.motors;
 
-import org.austincans.lib.io.ConfigRequests;
+import org.austincans.lib.io.Inputs;
+import org.austincans.lib.io.Outputs;
 import org.austincans.lib.io.motors.inputs.MotorIOInputs;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
 import org.austincans.lib.io.motors.outputs.MotorIOOutputs;
@@ -14,51 +15,39 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class AbstractMotorIO<
-    InputsType extends MotorIOInputs, 
-    ControlSlotType extends ControlSlot, 
-    VelocityControlTypeType extends VelocityControlType, 
-    PositionControlTypeType extends PositionControlType, 
-    ConfigRequestsType extends ConfigRequests<ConfigType>,
-    ConfigType> 
-implements MotorIO<
-    InputsType, 
-    ControlSlotType,
-    VelocityControlTypeType, 
-    PositionControlTypeType,
-    ConfigRequestsType,
-    ConfigType> 
-{
+public abstract class AbstractMotorIO implements MotorIO {
     /** Updates inputs with newer values from motor */
     @Override
-    public void updateInputs(InputsType inputs) {
-        inputs.position = getPosition();
-        inputs.velocity = getVelocity();
-        inputs.voltage = getVoltage();
-        inputs.statorCurrent = getStatorCurrent();
-        inputs.temperature = getTemperature();
+    public void updateInputs(Inputs inputs) {
+        MotorIOInputs motorInputs = (MotorIOInputs) inputs;
+        motorInputs.position = getPosition();
+        motorInputs.velocity = getVelocity();
+        motorInputs.voltage = getVoltage();
+        motorInputs.statorCurrent = getStatorCurrent();
+        motorInputs.temperature = getTemperature();
     }
 
     /** Applies output to motor based on the output mode */
-    public final void applyOutputs(MotorIOOutputs<ControlSlotType, VelocityControlTypeType, PositionControlTypeType> outputs) {
-        switch (outputs.getMode()) {
-            case VOLTAGE -> setVoltage(outputs.getVoltage());
+    public final void applyOutputs(Outputs outputs) {
+        MotorIOOutputs motorOutputs = (MotorIOOutputs) outputs;
+        switch (motorOutputs.getMode()) {
+            case VOLTAGE -> setVoltage(motorOutputs.getVoltage());
             case VELOCITY -> setVelocity(
-                outputs.getVelocity(), outputs.getVelocityControlType(), outputs.getControlSlot(), 
-                outputs.getArbitraryFeedforward());
+                motorOutputs.getVelocity(), motorOutputs.getVelocityControlType(), motorOutputs.getControlSlot(), 
+                motorOutputs.getArbitraryFeedforward());
             case POSITION -> setPosition(
-                outputs.getPosition(), outputs.getPositionControlType(), outputs.getControlSlot(), 
-                outputs.getVelocity(), outputs.getArbitraryFeedforward());
+                motorOutputs.getPosition(), motorOutputs.getPositionControlType(), motorOutputs.getControlSlot(), 
+                motorOutputs.getVelocity(), motorOutputs.getArbitraryFeedforward());
         }
     }
 
     /* Position */
     protected abstract Angle getPosition();
-    protected abstract void setPosition(Angle position, PositionControlTypeType positionControlType, ControlSlotType slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward);
+    protected abstract void setPosition(Angle position, PositionControlType positionControlType, ControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward);
 
     /* Velocity */
     protected abstract AngularVelocity getVelocity();
-    protected abstract void setVelocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType slot, ArbitraryFeedforward arbitraryFeedforward);
+    protected abstract void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot slot, ArbitraryFeedforward arbitraryFeedforward);
 
     /* Voltage */
     protected abstract Voltage getVoltage();

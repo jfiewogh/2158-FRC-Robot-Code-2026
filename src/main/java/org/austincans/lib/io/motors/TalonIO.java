@@ -6,11 +6,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 
 import org.austincans.lib.io.motors.configs.TalonConfig.*;
-import org.austincans.lib.io.motors.configs.requests.TalonIOConfigRequests;
+import org.austincans.lib.io.Inputs;
 import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SoftLimitConfig;
-import org.austincans.lib.io.motors.configs.TalonConfig;
 import org.austincans.lib.io.motors.inputs.TalonIOInputs;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
 import org.austincans.lib.io.motors.outputs.control.TalonControlSlot;
@@ -53,16 +52,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class TalonIO<
-	TalonConfigRequestsType extends TalonIOConfigRequests<TalonConfigType>,
-	TalonConfigType extends TalonConfig>
-extends AbstractMotorIO<
-	TalonIOInputs, 
-	TalonControlSlot, 
-	TalonVelocityControlType, 
-	TalonPositionControlType, 
-	TalonConfigRequestsType, 
-	TalonConfigType> {
+public abstract class TalonIO extends AbstractMotorIO {
 
 	private final TalonSignals signals;
 	private final BaseStatusSignal[] signalsArray;
@@ -95,26 +85,28 @@ extends AbstractMotorIO<
 	}
 
 	@Override
-	public void updateInputs(TalonIOInputs inputs) {
+	public void updateInputs(Inputs inputs) {
 		BaseStatusSignal.refreshAll(signalsArray);
 
-		super.updateInputs(inputs);
-		inputs.supplyCurrent = getSupplyCurrent();
-		inputs.torqueCurrent = getTorqueCurrent();
+		TalonIOInputs talonInputs = (TalonIOInputs) inputs;
 
-		inputs.hasCommunication = signals.firmwareVersion().getStatus() == StatusCode.OK;
-		inputs.faultHardware = signals.hardwareFault().getValue();
-		inputs.faultBootDuringEnable = signals.bootDuringEnable().getValue();
-		inputs.faultDeviceTemp = signals.deviceTemp().getValue();
-		inputs.faultProcessorTemp = signals.procTemp().getValue();
+		super.updateInputs(talonInputs);
+		talonInputs.supplyCurrent = getSupplyCurrent();
+		talonInputs.torqueCurrent = getTorqueCurrent();
 
-		inputs.stickyFaultHardware = signals.stickyFaultHardware().getValue();
-		inputs.stickyFaultBootDuringEnable = signals.stickyFaultBootDuringEnable().getValue();
-		inputs.stickyFaultUndervoltage = signals.stickyFaultUndervoltage().getValue();
-		inputs.stickyFaultDeviceTemp = signals.stickyFaultDeviceTemp().getValue();
-		inputs.stickyFaultProcTemp = signals.stickyFaultProcTemp().getValue();
-		inputs.stickyFaultStatorCurrLimit = signals.stickyFaultStatorCurrLimit().getValue();
-		inputs.stickyFaultSupplyCurrLimit = signals.stickyFaultSupplyCurrLimit().getValue();
+		talonInputs.hasCommunication = signals.firmwareVersion().getStatus() == StatusCode.OK;
+		talonInputs.faultHardware = signals.hardwareFault().getValue();
+		talonInputs.faultBootDuringEnable = signals.bootDuringEnable().getValue();
+		talonInputs.faultDeviceTemp = signals.deviceTemp().getValue();
+		talonInputs.faultProcessorTemp = signals.procTemp().getValue();
+		
+		talonInputs.stickyFaultHardware = signals.stickyFaultHardware().getValue();
+		talonInputs.stickyFaultBootDuringEnable = signals.stickyFaultBootDuringEnable().getValue();
+		talonInputs.stickyFaultUndervoltage = signals.stickyFaultUndervoltage().getValue();
+		talonInputs.stickyFaultDeviceTemp = signals.stickyFaultDeviceTemp().getValue();
+		talonInputs.stickyFaultProcTemp = signals.stickyFaultProcTemp().getValue();
+		talonInputs.stickyFaultStatorCurrLimit = signals.stickyFaultStatorCurrLimit().getValue();
+		talonInputs.stickyFaultSupplyCurrLimit = signals.stickyFaultSupplyCurrLimit().getValue();
 	}
 
 	@Override

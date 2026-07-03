@@ -1,5 +1,6 @@
 package org.austincans.lib.io.motors.configs;
 
+import org.austincans.lib.io.Config;
 import org.austincans.lib.io.motors.outputs.control.SparkControlSlot;
 import org.austincans.lib.util.math.FlaggedUtil;
 import org.austincans.lib.util.math.physical.Gearbox;
@@ -15,7 +16,7 @@ import edu.wpi.first.units.measure.Voltage;
  * <li>https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/spark_swerve/src/main/java/frc/robot/subsystems/drive/ModuleIOSpark.java
  * <li>https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/kitbot_2026/src/main/java/frc/robot/subsystems/drive/DriveIOSpark.java
  */
-public class SparkConfig {
+public class SparkConfig implements Config {
     public boolean inverted;
     public NeutralMode neutralMode;
     public Current smartCurrentStallLimit;
@@ -78,27 +79,27 @@ public class SparkConfig {
                     positionContinuousWrap, other.positionContinuousWrap, 
                     positionWrappingMaxInput.isEquivalent(other.positionWrappingMaxInput) && positionWrappingMinInput.isEquivalent(other.positionWrappingMinInput));
         }
-    }
 
-    public enum FeedbackSensor {
-        PRIMARY_ENCODER,
-        ABSOLUTE_ENCODER
-    }
-
-    public static class SlotConfig {
-        public SparkControlSlot controlSlot;
-        public ControlConfig controlConfig = new ControlConfig();
-        public Angle allowedMechanismClosedLoopError;
-        public AngularVelocity maxMotionMechanismCruiseVelocity;
-        public AngularAcceleration maxMotionMechanismMaxAcceleration;
-
-        public SlotConfig(SparkControlSlot controlSlot) {
-            this.controlSlot = controlSlot;
+        public enum FeedbackSensor {
+            PRIMARY_ENCODER,
+            ABSOLUTE_ENCODER
         }
 
-        public boolean equals(SlotConfig other) {
-            return controlSlot == other.controlSlot
-                && controlConfig.equals(other.controlConfig);
+        public static class SlotConfig {
+            public SparkControlSlot controlSlot;
+            public ControlConfig controlConfig = new ControlConfig();
+            public Angle allowedMechanismClosedLoopError;
+            public AngularVelocity maxMotionMechanismCruiseVelocity;
+            public AngularAcceleration maxMotionMechanismMaxAcceleration;
+
+            public SlotConfig(SparkControlSlot controlSlot) {
+                this.controlSlot = controlSlot;
+            }
+
+            public boolean equals(SlotConfig other) {
+                return controlSlot == other.controlSlot
+                    && controlConfig.equals(other.controlConfig);
+            }
         }
     }
 

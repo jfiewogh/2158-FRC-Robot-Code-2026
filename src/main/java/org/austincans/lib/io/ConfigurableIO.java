@@ -1,5 +1,5 @@
 package org.austincans.lib.io;
 
-public interface ConfigurableIO<ConfigRequestsType> {
-    public void applyConfigRequests(ConfigRequestsType configRequests);
+public interface ConfigurableIO {
+    public void applyConfigRequests(ConfigRequests configRequests);
 }

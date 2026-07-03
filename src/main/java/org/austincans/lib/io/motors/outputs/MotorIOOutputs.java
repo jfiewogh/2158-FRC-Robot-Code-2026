@@ -2,6 +2,7 @@ package org.austincans.lib.io.motors.outputs;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
+import org.austincans.lib.io.Outputs;
 import org.austincans.lib.io.motors.outputs.control.ControlSlot;
 import org.austincans.lib.io.motors.outputs.control.PositionControlType;
 import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
@@ -10,11 +11,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
-public class MotorIOOutputs<
-    ControlSlotType extends ControlSlot, 
-    VelocityControlTypeType extends VelocityControlType, 
-    PositionControlTypeType extends PositionControlType> {
-
+public class MotorIOOutputs implements Outputs {
     public static enum MotorIOOutputMode {
         VOLTAGE,
         VELOCITY,
@@ -27,15 +24,15 @@ public class MotorIOOutputs<
     private Angle position;
     private ArbitraryFeedforward arbitraryFeedforward;
 
-    private ControlSlotType controlSlot;
-    private VelocityControlTypeType velocityControlType;
-    private PositionControlTypeType positionControlType;
+    private ControlSlot controlSlot;
+    private VelocityControlType velocityControlType;
+    private PositionControlType positionControlType;
 
-    public void voltage(Voltage voltage) {
+    public void setVoltage(Voltage voltage) {
         mode = MotorIOOutputMode.VOLTAGE;
         this.voltage = voltage;
     }
-    public void velocity(AngularVelocity velocity, VelocityControlTypeType velocityControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+    public void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
         mode = MotorIOOutputMode.VELOCITY;
         this.velocity = velocity;
         this.arbitraryFeedforward = arbitraryFeedforward;
@@ -43,7 +40,7 @@ public class MotorIOOutputs<
         this.velocityControlType = velocityControlType;
     }
 
-    public void position(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+    public void setPosition(Angle position, PositionControlType positionControlType, ControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
         mode = MotorIOOutputMode.POSITION;
         this.position = position;
         this.velocity = velocity;
@@ -51,8 +48,8 @@ public class MotorIOOutputs<
         this.controlSlot = controlSlot;
         this.positionControlType = positionControlType;
     }
-    public void position(Angle position, PositionControlTypeType positionControlType, ControlSlotType controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
-        position(position, positionControlType, controlSlot, RadiansPerSecond.of(0.0), arbitraryFeedforward);
+    public void setPosition(Angle position, PositionControlType positionControlType, ControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+        setPosition(position, positionControlType, controlSlot, RadiansPerSecond.of(0.0), arbitraryFeedforward);
     }
 
     public MotorIOOutputMode getMode() {
@@ -70,13 +67,13 @@ public class MotorIOOutputs<
     public ArbitraryFeedforward getArbitraryFeedforward() {
         return arbitraryFeedforward;
     }
-    public ControlSlotType getControlSlot() {
+    public ControlSlot getControlSlot() {
         return controlSlot;
     }
-    public VelocityControlTypeType getVelocityControlType() {
+    public VelocityControlType getVelocityControlType() {
         return velocityControlType;
     }
-    public PositionControlTypeType getPositionControlType() {
+    public PositionControlType getPositionControlType() {
         return positionControlType;
     }
 }

@@ -14,12 +14,12 @@ public class TalonFXSConfig extends TalonConfig {
                 && externalFeedbackSensorSourceId == other.externalFeedbackSensorSourceId 
                 && externalFeedbackSensorSource == other.externalFeedbackSensorSource;
         }
-    }
 
-    public enum ExternalFeedbackSensorSource {
-        COMMUTATION,
-        REMOTE_CANCODER,
-        FUSED_CANCODER
+        public enum ExternalFeedbackSensorSource {
+            COMMUTATION,
+            REMOTE_CANCODER,
+            FUSED_CANCODER
+        }
     }
 
     public enum MotorArrangement {
