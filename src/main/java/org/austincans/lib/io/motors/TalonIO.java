@@ -147,26 +147,26 @@ public abstract class TalonIO extends AbstractMotorIO {
 		return switch (velocityControlType) {
 			case DUTY_CYCLE -> velocityDutyCycle
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withFeedForward(arbitraryFeedforward.getDutyCycleOutput())
 				.withSlot(slot.get());
 			case VOLTAGE -> velocityVoltage.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withFeedForward(arbitraryFeedforward.getVoltage())
 				.withSlot(slot.get());
 			case TORQUE_CURRENT_FOC -> velocityTorqueCurrentFOC
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withFeedForward(arbitraryFeedforward.getCurrent())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_DUTY_CYCLE -> velocityMotionMagicDutyCycle
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withFeedForward(arbitraryFeedforward.getDutyCycleOutput())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_VOLTAGE -> velocityMotionMagicVoltage
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withFeedForward(arbitraryFeedforward.getVoltage())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_TORQUE_CURRENT_FOC -> velocityMotionMagicTorqueCurrentFOC
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withFeedForward(arbitraryFeedforward.getCurrent())
 				.withSlot(slot.get());
 		};
 	}
@@ -177,41 +177,41 @@ public abstract class TalonIO extends AbstractMotorIO {
 			case DUTY_CYCLE -> positionDutyCycle
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withFeedForward(arbitraryFeedforward.getDutyCycleOutput())
 				.withSlot(slot.get());
 			case VOLTAGE -> positionVoltage
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withFeedForward(arbitraryFeedforward.getVoltage())
 				.withSlot(slot.get());
 			case TORQUE_CURRENT_FOC -> positionTorqueCurrentFOC
 				.withPosition(position)
 				.withVelocity(velocity)
-				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withFeedForward(arbitraryFeedforward.getCurrent())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_DUTY_CYCLE -> positionMotionMagicDutyCycle
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withFeedForward(arbitraryFeedforward.getDutyCycleOutput())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_VOLTAGE -> positionMotionMagicVoltage
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withFeedForward(arbitraryFeedforward.getVoltage())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_TORQUE_CURRENT_FOC -> positionMotionMagicTorqueCurrentFOC
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withFeedForward(arbitraryFeedforward.getCurrent())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_DUTY_CYCLE -> positionMotionMagicExpoDutyCycle
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getDutyCycle())
+				.withFeedForward(arbitraryFeedforward.getDutyCycleOutput())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_VOLTAGE -> positionMotionMagicExpoVoltage
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getVolts())
+				.withFeedForward(arbitraryFeedforward.getVoltage())
 				.withSlot(slot.get());
 			case MOTION_MAGIC_EXPO_TORQUE_CURRENT_FOC -> positionMotionMagicExpoTorqueCurrentFOC
 				.withPosition(position)
-				.withFeedForward(arbitraryFeedforward.getCurrentAmps())
+				.withFeedForward(arbitraryFeedforward.getCurrent())
 				.withSlot(slot.get());
 		};
 	}

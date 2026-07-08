@@ -1,8 +1,5 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.swerve;
 
-import org.austincans.lib.configs.MotorConfig;
-import org.austincans.lib.configs.SwerveModuleConfig;
-import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 /* Wrapper class for ModuleIO */
-public class Module<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends MotorConfig> extends AdvancedSubsystem {
+public class Module {
     private final ModuleIO io;
     private final ModuleIORecordsAutoLogged records = new ModuleIORecordsAutoLogged();
     private final ModuleIORequestsAutoLogged requests = new ModuleIORequestsAutoLogged();

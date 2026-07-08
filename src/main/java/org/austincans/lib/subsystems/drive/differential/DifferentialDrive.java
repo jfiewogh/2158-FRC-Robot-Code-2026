@@ -1,12 +1,9 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.differential;
 
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 import org.austincans.lib.Constants;
-import org.austincans.lib.configs.DifferentialDriveConfig;
-import org.austincans.lib.configs.MotorConfig;
-import org.austincans.lib.configs.WheelConfig;
 import org.austincans.lib.io.sensors.gyros.GyroIO;
 import org.austincans.lib.util.LocalADStarAK;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -39,9 +36,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
  * https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/diff_drive/src/main/java/frc/robot/subsystems/drive/DriveConstants.java
  */
 
-// TODO: This is untested
-// TODO: This does not extend AdvancedSubsystem
-public class DifferentialDrive<MotorCnfg extends MotorConfig> extends SubsystemBase {
+public class DifferentialDrive extends SubsystemBase {
   private final DifferentialDriveIO io;
   private final DifferentialDriveIORecordsAutoLogged records = new DifferentialDriveIORecordsAutoLogged();
   private final DifferentialDriveIORequestsAutoLogged requests = new DifferentialDriveIORequestsAutoLogged();
@@ -56,7 +51,7 @@ public class DifferentialDrive<MotorCnfg extends MotorConfig> extends SubsystemB
   private double lastLeftPositionMeters = 0.0;
   private double lastRightPositionMeters = 0.0;
 
-  protected DifferentialDrive(DifferentialDriveIO io, DifferentialDriveConfig<MotorCnfg> driveConfig, DCMotor driveModuleGearbox, double driveModuleCurrentLimitAmps) {
+  protected DifferentialDrive(DifferentialDriveIO io, DifferentialDriveConfig config, DCMotor driveModuleGearbox, double driveModuleCurrentLimitAmps) {
     this.io = io;
 
     // Configure AutoBuilder for PathPlanner

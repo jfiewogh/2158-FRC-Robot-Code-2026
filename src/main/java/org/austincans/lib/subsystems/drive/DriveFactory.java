@@ -13,16 +13,18 @@ import org.austincans.lib.motors.MotorFactory;
 import org.austincans.lib.motors.SparkMaxIO;
 import org.austincans.lib.motors.TalonFXIO;
 import org.austincans.lib.sensors.gyros.GyroFactory;
+import org.austincans.lib.subsystems.drive.swerve.ModuleFactory;
+import org.austincans.lib.subsystems.drive.swerve.Swerve;
 import org.austincans.lib.util.ConfigManager;
 
 import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
-    public static Swerve<GyroConfigPigeon2> buildSwerveTalonFXPigeon2Swerve(SwerveConfig<GyroConfigPigeon2> swerveConfig) {
+    public static SwerveDrive buildSwerveTalonFXPigeon2Swerve(SwerveConfig swerveConfig) {
         SwerveModuleConfig moduleConfig = swerveConfig.moduleConfig;
         GyroConfigPigeon2 gyroConfig = swerveConfig.gyroConfig;
-        return new Swerve<>(
+        return new Swerve(
             ModuleFactory.createTalonFXCANCoder(moduleConfig),
             ModuleFactory.createTalonFXCANCoder(moduleConfig),
             ModuleFactory.createTalonFXCANCoder(moduleConfig),

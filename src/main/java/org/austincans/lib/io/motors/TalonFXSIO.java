@@ -3,13 +3,11 @@ package org.austincans.lib.io.motors;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig.ExternalFeedbackConfig;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig.MotorArrangement;
 import org.austincans.lib.io.motors.configs.requests.TalonFXSIOConfigRequests;
-import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
-import org.austincans.lib.io.motors.outputs.control.ControlSlot;
-import org.austincans.lib.io.motors.outputs.control.PositionControlType;
+import org.austincans.lib.io.motors.outputs.control.PositionControlInputs;
 import org.austincans.lib.io.motors.outputs.control.TalonControlSlot;
 import org.austincans.lib.io.motors.outputs.control.TalonPositionControlType;
 import org.austincans.lib.io.motors.outputs.control.TalonVelocityControlType;
-import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
+import org.austincans.lib.io.motors.outputs.control.VelocityControlInputs;
 import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.motors.configs.TalonFXSConfig;
 
@@ -23,7 +21,6 @@ import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 public class TalonFXSIO extends TalonIO {
@@ -224,24 +221,24 @@ public class TalonFXSIO extends TalonIO {
     }
 
     @Override
-    protected void setPosition(Angle position, PositionControlType positionControlType, ControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
+    protected void setPosition(PositionControlInputs positionControlInputs) {
         motor.setControl(
             getPositionControlRequest(
-                (TalonPositionControlType) positionControlType, 
-                position, 
-                (TalonControlSlot) slot, 
-                velocity, 
-                arbitraryFeedforward));
+                (TalonPositionControlType) positionControlInputs.getControlType(), 
+                positionControlInputs.getPosition(), 
+                (TalonControlSlot) positionControlInputs.getControlSlot(), 
+                positionControlInputs.getVelocity(), 
+                positionControlInputs.getArbitraryFeedforward()));
     }
 
     @Override
-    protected void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot slot, ArbitraryFeedforward arbitraryFeedforward) {
+    protected void setVelocity(VelocityControlInputs velocityControlInputs) {
         motor.setControl(
             getVelocityControlRequest(
-                (TalonVelocityControlType) velocityControlType, 
-                velocity, 
-                (TalonControlSlot) slot, 
-                arbitraryFeedforward)); 
+                (TalonVelocityControlType) velocityControlInputs.getControlType(), 
+                velocityControlInputs.getVelocity(), 
+                (TalonControlSlot) velocityControlInputs.getControlSlot(), 
+                velocityControlInputs.getArbitraryFeedforward())); 
     }
 
     @Override

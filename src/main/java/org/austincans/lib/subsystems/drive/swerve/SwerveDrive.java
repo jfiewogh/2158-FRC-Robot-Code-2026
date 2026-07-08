@@ -1,4 +1,4 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.swerve;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,20 +44,16 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-public class Swerve<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends MotorConfig, GyroCnfg extends GyroConfig>
-    extends AdvancedSubsystem implements Vision.VisionConsumer {
-  @AutoLogOutput
-  protected boolean velocityMode = false;
-  @AutoLogOutput
-  protected boolean brakeModeEnabled = true;
+// https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/subsystems/drive/Drive.java
 
-  private final Lock odometryLock = new ReentrantLock();
+public class SwerveDrive implements Vision.VisionConsumer {
   private final GyroIO gyroIO;
   private final GyroIORecordsAutoLogged gyroRecords = new GyroIORecordsAutoLogged();
   private final List<Module<DriveMtrCnfg, SteerMtrCnfg>> modules;
@@ -81,7 +77,7 @@ public class Swerve<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends Motor
   private final double wheelbaseMeters;
   private final double trackWidthMeters;
 
-  private final SwerveState swerveState;
+  private RobotState swerveState;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
       new ChassisSpeeds(),
@@ -112,8 +108,6 @@ public class Swerve<DriveMtrCnfg extends MotorConfig, SteerMtrCnfg extends Motor
             new Translation2d(-wheelbaseMeters / 2, -trackWidthMeters / 2)};
         kinematics = new SwerveDriveKinematics(moduleTranslations);
         swerveSetpointGenerator = new SwerveSetpointGenerator(kinematics);
-
-        swerveState = new SwerveState(kinematics);
 
         // Configure AutoBuilder for PathPlanner
         PIDConfig drivePIDConfig = swerveConfig.drivePIDConfig;

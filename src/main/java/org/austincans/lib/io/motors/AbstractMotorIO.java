@@ -3,11 +3,9 @@ package org.austincans.lib.io.motors;
 import org.austincans.lib.io.Inputs;
 import org.austincans.lib.io.Outputs;
 import org.austincans.lib.io.motors.inputs.MotorIOInputs;
-import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
 import org.austincans.lib.io.motors.outputs.MotorIOOutputs;
-import org.austincans.lib.io.motors.outputs.control.ControlSlot;
-import org.austincans.lib.io.motors.outputs.control.PositionControlType;
-import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
+import org.austincans.lib.io.motors.outputs.control.PositionControlInputs;
+import org.austincans.lib.io.motors.outputs.control.VelocityControlInputs;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -32,22 +30,18 @@ public abstract class AbstractMotorIO implements MotorIO {
         MotorIOOutputs motorOutputs = (MotorIOOutputs) outputs;
         switch (motorOutputs.getMode()) {
             case VOLTAGE -> setVoltage(motorOutputs.getVoltage());
-            case VELOCITY -> setVelocity(
-                motorOutputs.getVelocity(), motorOutputs.getVelocityControlType(), motorOutputs.getControlSlot(), 
-                motorOutputs.getArbitraryFeedforward());
-            case POSITION -> setPosition(
-                motorOutputs.getPosition(), motorOutputs.getPositionControlType(), motorOutputs.getControlSlot(), 
-                motorOutputs.getVelocity(), motorOutputs.getArbitraryFeedforward());
+            case VELOCITY -> setVelocity(motorOutputs.getVelocityControlInputs());
+            case POSITION -> setPosition(motorOutputs.getPositionControlInputs());
         }
     }
 
     /* Position */
     protected abstract Angle getPosition();
-    protected abstract void setPosition(Angle position, PositionControlType positionControlType, ControlSlot slot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward);
+    protected abstract void setPosition(PositionControlInputs positionControlInputs);
 
     /* Velocity */
     protected abstract AngularVelocity getVelocity();
-    protected abstract void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot slot, ArbitraryFeedforward arbitraryFeedforward);
+    protected abstract void setVelocity(VelocityControlInputs velocityControlInputs);
 
     /* Voltage */
     protected abstract Voltage getVoltage();

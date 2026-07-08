@@ -1,20 +1,22 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.differential;
 
 import org.austincans.lib.io.motors.inputs.MotorIOInputs;
 import org.austincans.lib.io.motors.outputs.MotorIOOutputs;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface DifferentialDriveIO {
-    @AutoLog
+public class DifferentialDriveIO {
     public class DifferentialDriveIOInputs {
-        public MotorIOInputs leftLeaderMotorRecords = new MotorIORecords();
-        public MotorIOInputs leftFollowerMotorRecords = new MotorIORecords();
-        public MotorIOInputs rightLeaderMotorRecords = new MotorIORecords();
-        public MotorIOInputs rightFollowerMotorRecords = new MotorIORecords();
+        public final MotorIOInputs leftLeaderMotorInputs;
+        public final MotorIOInputs leftFollowerMotorInputs;
+        public final MotorIOInputs rightLeaderMotorInputs;
+        public final MotorIOInputs rightFollowerMotorInputs;
+
+        public DifferentialDriveIOInputs(MotorIOInputs leftLeaderMotorInputs, MotorIOInputs) {
+
+        }
     }
 
-    @AutoLog
-    public class DifferentialDriveIORequests {
+    public class DifferentialDriveIOOutputs {
         public MotorIORequests leftLeaderMotorRequests = new MotorIORequests();
         public MotorIORequests rightLeaderMotorRequests = new MotorIORequests();
 
@@ -27,7 +29,9 @@ public interface DifferentialDriveIO {
         }
     }
 
-    public void updateRecords(DifferentialDriveIORecords records);
+    public void updateInputs(DifferentialDriveIOInputs inputs) {
+
+    }
 
     public void applyRequests(DifferentialDriveIORequests requests);
 }

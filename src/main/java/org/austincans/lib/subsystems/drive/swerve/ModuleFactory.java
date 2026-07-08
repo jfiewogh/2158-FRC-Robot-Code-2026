@@ -1,4 +1,4 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.swerve;
 
 import org.austincans.lib.configs.MotorConfigTalon;
 import org.austincans.lib.configs.SwerveModuleConfig;

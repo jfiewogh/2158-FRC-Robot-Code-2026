@@ -3,15 +3,15 @@ package org.austincans.lib.io.motors.outputs;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
 /** 
+ * This clsas is immutable to reflect 2027 WPIlib's immutable-only measure implementations.
+ * 
  * If motor requires different feedforward unit than what was set, feedforward will be zero.
  * For example, if the motor requires torque current and you call setVoltage instead of setTorqueCurrent, feedforward will be zero. 
  */
-// TODO: Make a better way of handling this. It should be based on the PositionControlType or VelocityControlType.
 public class ArbitraryFeedforward {
     public static enum FeedforwardType {
         NONE,
@@ -20,46 +20,53 @@ public class ArbitraryFeedforward {
         TORQUE_CURRENT,
     }
 
-    private FeedforwardType feedforwardType;
-    private double dutyCycle;
-    private double volts;
-    private double currentAmps;
+    private static final Voltage zeroVoltage = Volts.of(0);
+    private static final Current zeroCurrent = Amps.of(0);
 
-    public void setDutyCycle(double dutyCycle) {
-        feedforwardType = FeedforwardType.DUTY_CYCLE;
-        this.dutyCycle = MathUtil.clamp(dutyCycle, -1.0, 1.0);
-        volts = 0.0;
-        currentAmps = 0.0;
+    private FeedforwardType feedforwardType;
+    private double dutyCycleOutput;
+    private Voltage voltage;
+    private Current current;
+
+    public ArbitraryFeedforward() {
+        none();
     }
-    public void setVoltage(Voltage voltage) {
-        feedforwardType = FeedforwardType.VOLTAGE;
-        dutyCycle = 0.0;
-        volts = voltage.in(Volts);
-        currentAmps = 0.0;
-    }
-    public void setTorqueCurrent(Current current) {
-        feedforwardType = FeedforwardType.TORQUE_CURRENT;
-        dutyCycle = 0.0;
-        volts = 0.0;
-        currentAmps = current.in(Amps);
-    }
+
     public void none() {
         feedforwardType = FeedforwardType.NONE;
-        dutyCycle = 0.0;
-        volts = 0.0;
-        currentAmps = 0.0;
+        dutyCycleOutput = 0;
+        voltage = zeroVoltage;
+        current = zeroCurrent;
+    }
+    public void dutyCycle(double fractionalOutput) {
+        feedforwardType = FeedforwardType.DUTY_CYCLE;
+        dutyCycleOutput = fractionalOutput;
+        voltage = zeroVoltage;
+        current = zeroCurrent;
+    }
+    public void voltage(Voltage voltage) {
+        feedforwardType = FeedforwardType.VOLTAGE;
+        dutyCycleOutput = 0;
+        this.voltage = voltage;
+        current = zeroCurrent;
+    }
+    public void torqueCurrent(Current current) {
+        feedforwardType = FeedforwardType.TORQUE_CURRENT;
+        dutyCycleOutput = 0;
+        voltage = zeroVoltage;
+        this.current = current;
     }
 
     public FeedforwardType getFeedforwardType() {
         return feedforwardType;
     }
-    public double getDutyCycle() {
-        return dutyCycle;
+    public double getDutyCycleOutput() {
+        return dutyCycleOutput;
     }
-    public double getVolts() {
-        return volts;
+    public Voltage getVoltage() {
+        return voltage;
     }
-    public double getCurrentAmps() {
-        return currentAmps;
+    public Current getCurrent() {
+        return current;
     }
 }

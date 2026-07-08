@@ -11,17 +11,15 @@ import org.austincans.lib.io.motors.configs.SparkConfig.ClosedLoopConfig.SlotCon
 import org.austincans.lib.io.motors.configs.SparkConfig.SignalsConfig;
 import org.austincans.lib.io.ConfigRequests;
 import org.austincans.lib.io.Inputs;
-import org.austincans.lib.io.motors.configs.ControlConfig;
 import org.austincans.lib.io.motors.configs.NeutralMode;
 import org.austincans.lib.io.motors.configs.SparkConfig;
 import org.austincans.lib.io.motors.inputs.SparkIOInputs;
 import org.austincans.lib.io.motors.outputs.ArbitraryFeedforward;
-import org.austincans.lib.io.motors.outputs.control.ControlSlot;
-import org.austincans.lib.io.motors.outputs.control.PositionControlType;
+import org.austincans.lib.io.motors.outputs.control.PositionControlInputs;
 import org.austincans.lib.io.motors.outputs.control.SparkControlSlot;
 import org.austincans.lib.io.motors.outputs.control.SparkPositionControlType;
 import org.austincans.lib.io.motors.outputs.control.SparkVelocityControlType;
-import org.austincans.lib.io.motors.outputs.control.VelocityControlType;
+import org.austincans.lib.io.motors.outputs.control.VelocityControlInputs;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -53,8 +51,6 @@ public class SparkIO extends AbstractMotorIO {
 
     private final SparkBaseConfig vendorConfig;
     private boolean initialConfigApplied = false;
-
-    private final ControlConfig[] slotControlConfigs = new ControlConfig[4];
 
     protected SparkIO(SparkBase motor, SparkBaseConfig vendorConfig) {
         this.vendorConfig = vendorConfig;
@@ -98,22 +94,21 @@ public class SparkIO extends AbstractMotorIO {
      * https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control 
      */
     @Override
-    protected void setVelocity(AngularVelocity velocity, VelocityControlType velocityControlType, ControlSlot controlSlot, ArbitraryFeedforward arbitraryFeedforward) {
+    protected void setVelocity(VelocityControlInputs velocityControlInputs) {
         setSetpoint(
-            velocity.in(RPM), 
-            ((SparkVelocityControlType) velocityControlType).get(), 
-            (SparkControlSlot) controlSlot, 
-            arbitraryFeedforward.getVolts());
+            velocityControlInputs.getVelocity().in(RPM),
+            ((SparkVelocityControlType) velocityControlInputs.getControlType()).get(),
+            (SparkControlSlot) velocityControlInputs.getControlSlot(),
+            velocityControlInputs.getArbitraryFeedforward());
     }
 
     @Override
-    protected void setPosition(Angle position, PositionControlType positionControlType, ControlSlot controlSlot, AngularVelocity velocity, ArbitraryFeedforward arbitraryFeedforward) {
-        SparkControlSlot sparkControlSlot = (SparkControlSlot) controlSlot;
+    protected void setPosition(PositionControlInputs positionControlInputs) {
         setSetpoint(
-            position.in(Rotations), 
-            ((SparkPositionControlType) positionControlType).get(), 
-            sparkControlSlot, 
-            velocity.in(RPM) * slotControlConfigs[sparkControlSlot.getIndex()].ffConfig.kV + arbitraryFeedforward.getVolts());
+            positionControlInputs.getPosition().in(Rotations), 
+            ((SparkPositionControlType) positionControlInputs.getControlType()).get(), 
+            (SparkControlSlot) positionControlInputs.getControlSlot(), 
+            positionControlInputs.getArbitraryFeedforward());
     }
 
     @Override
@@ -148,11 +143,6 @@ public class SparkIO extends AbstractMotorIO {
         }
 
         SparkConfig config = (SparkConfig) configRequests.getConfig();
-
-        slotControlConfigs[0] = config.closedLoopConfig.slot0Config.controlConfig;
-        slotControlConfigs[1] = config.closedLoopConfig.slot1Config.controlConfig;
-        slotControlConfigs[2] = config.closedLoopConfig.slot2Config.controlConfig;
-        slotControlConfigs[3] = config.closedLoopConfig.slot3Config.controlConfig;
 
         vendorConfig.inverted(config.inverted);
         vendorConfig.smartCurrentLimit((int) config.smartCurrentStallLimit.in(Amps));
@@ -259,11 +249,23 @@ public class SparkIO extends AbstractMotorIO {
         motor.clearFaults();
     }
     
-    /** 
-     * Feedforward unit can be voltage or percent out, but currently, this method only works for voltage.
-     * If you need percent out for whatever reason, you can modify the parameter(s) or create another method.
-     */
-    private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot controlSlot, double feedforwardVolts) {
-        controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardVolts, ArbFFUnits.kVoltage);
+    private void setSetpoint(double setpoint, ControlType controlType, SparkControlSlot controlSlot, ArbitraryFeedforward feedforward) {
+        double feedforwardValue;
+        ArbFFUnits feedforwardUnits;
+        switch (feedforward.getFeedforwardType()) {
+            case DUTY_CYCLE -> {
+                feedforwardValue = feedforward.getDutyCycleOutput();
+                feedforwardUnits = ArbFFUnits.kPercentOut;
+            }
+            case VOLTAGE -> {
+                feedforwardValue = feedforward.getVoltage().in(Volts);
+                feedforwardUnits = ArbFFUnits.kVoltage;
+            }
+            default -> {
+                feedforwardValue = 0;
+                feedforwardUnits = ArbFFUnits.kVoltage;
+            }
+        }
+        controller.setSetpoint(setpoint, controlType, controlSlot.get(), feedforwardValue, feedforwardUnits);
     }
 }

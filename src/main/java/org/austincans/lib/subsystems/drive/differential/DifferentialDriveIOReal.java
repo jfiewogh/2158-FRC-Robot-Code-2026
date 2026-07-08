@@ -1,4 +1,4 @@
-package org.austincans.lib.subsystems.drive;
+package org.austincans.lib.subsystems.drive.differential;
 
 import org.austincans.lib.motors.MotorIO;
 

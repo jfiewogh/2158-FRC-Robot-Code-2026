@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package org.austincans.frc2026.subsystems.selfcheck;
+package org.austincans.lib.subsystems.selfcheck;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +94,7 @@ public class BatterySubsystem {
   }
 
   public void resetTotals() {
-    // Reset power and curren totals, before next loop
+    // Reset power and current totals, before next loop
     totalPower = 0.0;
     totalCurrent = 0.0;
     driveCurrent = 0.0;
