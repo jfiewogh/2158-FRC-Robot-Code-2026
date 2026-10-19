@@ -19,7 +19,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -30,6 +29,7 @@ import org.austincans.lib.io.sensors.gyros.inputs.Pigeon2IOInputs;
 import org.austincans.lib.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
+// TODO: Make this implement ConfigurableIO
 public class Pigeon2IO implements GyroIO {
   private final Pigeon2 pigeon;
 
@@ -59,8 +59,8 @@ public class Pigeon2IO implements GyroIO {
   protected Pigeon2IO(int deviceId, CANBus canBus, Frequency updateFrequency) {
     pigeon = new Pigeon2(deviceId, canBus);
 
-    Pigeon2Configuration config = new Pigeon2Configuration();
-    pigeon.getConfigurator().apply(config);
+    // Pigeon2Configuration config = new Pigeon2Configuration();
+    // pigeon.getConfigurator().apply(config);
     pigeon.getConfigurator().setYaw(0.0);
 
     yaw = pigeon.getYaw();

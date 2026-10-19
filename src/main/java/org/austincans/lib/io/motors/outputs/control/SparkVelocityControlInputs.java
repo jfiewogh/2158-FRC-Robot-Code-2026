@@ -1,31 +1,25 @@
 package org.austincans.lib.io.motors.outputs.control;
 
-import edu.wpi.first.units.measure.AngularVelocity;
+import org.austincans.lib.io.motors.outputs.DutyCycleFeedforward;
+import org.austincans.lib.io.motors.outputs.VoltageFeedforward;
+
 import edu.wpi.first.units.measure.Voltage;
 
-public class SparkVelocityControlInputs extends VelocityControlInputs {
-    public void standardWithFFDutyCycle(AngularVelocity velocity, ControlSlot controlSlot, double ffOutput) {
-        this.velocity = velocity;
-        this.controlSlot = controlSlot;
+public class SparkVelocityControlInputs extends VelocityControlFeedforward {
+    public void standardWithFFDutyCycle(double ffOutput) {
         controlType = SparkVelocityControlType.STANDARD;
-        arbitraryFeedforward.dutyCycle(ffOutput);
+        feedforward = new DutyCycleFeedforward(ffOutput);
     }
-    public void maxMotionWithFFDutyCycle(AngularVelocity velocity, ControlSlot controlSlot, double ffOutput) {
-        this.velocity = velocity;
-        this.controlSlot = controlSlot;
+    public void maxMotionWithFFDutyCycle(double ffOutput) {
         controlType = SparkVelocityControlType.MAXMOTION;
-        arbitraryFeedforward.dutyCycle(ffOutput);
+        feedforward = new DutyCycleFeedforward(ffOutput);
     }
-    public void standardWithFFVoltage(AngularVelocity velocity, ControlSlot controlSlot, Voltage ffVoltage) {
-        this.velocity = velocity;
-        this.controlSlot = controlSlot;
+    public void standardWithFFVoltage(Voltage ffVoltage) {
         controlType = SparkVelocityControlType.STANDARD;
-        arbitraryFeedforward.voltage(ffVoltage);
+        feedforward = new VoltageFeedforward(ffVoltage);
     }
-    public void maxMotionWithFFVoltage(AngularVelocity velocity, ControlSlot controlSlot, Voltage ffVoltage) {
-        this.velocity = velocity;
-        this.controlSlot = controlSlot;
+    public void maxMotionWithFFVoltage(Voltage ffVoltage) {
         controlType = SparkVelocityControlType.MAXMOTION;
-        arbitraryFeedforward.voltage(ffVoltage);
+        feedforward = new VoltageFeedforward(ffVoltage);
     }
 }

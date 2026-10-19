@@ -1,6 +1,7 @@
 package org.austincans.lib.io.motors.configs;
 
 /** Proportional-Integral-Derivative Config */
+// TODO: maybe move this out of motors/configs
 public class PIDConfig {
     public double kP;
     public double kI;

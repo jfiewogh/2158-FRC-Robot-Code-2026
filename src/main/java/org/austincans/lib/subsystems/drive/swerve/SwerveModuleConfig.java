@@ -6,6 +6,4 @@ public class SwerveModuleConfig {
     public Config driveMotorConfig;
     public Config steerMotorConfig;
     public Config absoluteEncoderConfig;
-    /** The drive speed multiplier on initialization */
-    public double driveSpeedMultiplier;
 }

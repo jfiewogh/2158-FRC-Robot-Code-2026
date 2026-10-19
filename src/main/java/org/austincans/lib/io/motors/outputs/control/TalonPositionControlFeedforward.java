@@ -5,7 +5,13 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-public class TalonPositionControlInputs extends PositionControlInputs {
+public class TalonPositionControlFeedforward extends PositionControlInputs {
+    private AngularVelocity velocity;
+
+    public AngularVelocity getVelocity() {
+        return velocity;
+    }
+
     public void dutyCycle(Angle position, ControlSlot controlSlot, AngularVelocity velocity, double ffOutput) {
         controlType = TalonPositionControlType.DUTY_CYCLE;
         this.position = position;

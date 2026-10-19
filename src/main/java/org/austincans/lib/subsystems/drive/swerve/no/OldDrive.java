@@ -1,4 +1,4 @@
-package org.austincans.lib.subsystems.drive.swerve;
+package org.austincans.lib.subsystems.drive.swerve.no;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,20 +6,14 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+
+import org.austincans.frc2026.util.swerve.SwerveSetpoint;
 import org.austincans.lib.Constants;
-import org.austincans.lib.configs.SwerveConfig;
-import org.austincans.lib.configs.SwerveModuleConfig;
-import org.austincans.lib.sensors.gyros.GyroIO;
-import org.austincans.lib.configs.GyroConfig;
-import org.austincans.lib.configs.GyroConfigPigeon2;
-import org.austincans.lib.configs.MotorConfig;
-import org.austincans.lib.configs.PIDConfig;
-import org.austincans.lib.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.lib.io.sensors.gyros.GyroIO;
+import org.austincans.lib.io.sensors.gyros.inputs.GyroIOInputs;
+import org.austincans.lib.subsystems.drive.swerve.SwerveConfig;
 import org.austincans.lib.subsystems.vision.Vision;
 import org.austincans.lib.util.LoggedTunableNumber;
-import org.austincans.lib.util.swerve.ModuleLimits;
-import org.austincans.lib.util.swerve.SwerveSetpoint;
-import org.austincans.lib.util.swerve.SwerveSetpointGenerator;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -53,10 +47,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 // https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/template_projects/sources/talonfx_swerve/src/main/java/frc/robot/subsystems/drive/Drive.java
 
-public class SwerveDrive implements Vision.VisionConsumer {
+public class OldDrive implements Vision.VisionConsumer {
   private final GyroIO gyroIO;
-  private final GyroIORecordsAutoLogged gyroRecords = new GyroIORecordsAutoLogged();
-  private final List<Module<DriveMtrCnfg, SteerMtrCnfg>> modules;
+  private final GyroIOInputs gyroInputs;
+
   private final SysIdRoutine sysId;
   private final Debouncer gyroConnectedDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
@@ -88,15 +82,8 @@ public class SwerveDrive implements Vision.VisionConsumer {
           new SwerveModuleState()
       });
 
-  public Swerve(ModuleIO frontLeft, ModuleIO frontRight, ModuleIO backLeft, ModuleIO backRight, GyroIO gyroIO, SwerveConfig<DriveMtrCnfg, SteerMtrCnfg, GyroCnfg> swerveConfig) {
+  public Swerve(ModuleIO frontLeft, ModuleIO frontRight, ModuleIO backLeft, ModuleIO backRight, GyroIO gyroIO, SwerveConfig swerveConfig) {
         this.gyroIO = gyroIO;
-
-        SwerveModuleConfig<DriveMtrCnfg, SteerMtrCnfg> moduleConfig = swerveConfig.moduleConfig;
-        modules = List.of(
-            new Module<DriveMtrCnfg, SteerMtrCnfg>(frontLeft, 0, moduleConfig),
-            new Module<DriveMtrCnfg, SteerMtrCnfg>(frontRight, 1, moduleConfig),
-            new Module<DriveMtrCnfg, SteerMtrCnfg>(backLeft, 2, moduleConfig),
-            new Module<DriveMtrCnfg, SteerMtrCnfg>(backRight, 3, moduleConfig));
 
         moduleLimitsFree = moduleConfig.moduleLimitsFree();
         wheelbaseMeters = swerveConfig.wheelbaseMeters;

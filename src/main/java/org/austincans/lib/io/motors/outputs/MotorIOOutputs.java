@@ -1,8 +1,6 @@
 package org.austincans.lib.io.motors.outputs;
 
 import org.austincans.lib.io.Outputs;
-import org.austincans.lib.io.motors.outputs.control.PositionControlInputs;
-import org.austincans.lib.io.motors.outputs.control.VelocityControlInputs;
 import edu.wpi.first.units.measure.Voltage;
 
 public class MotorIOOutputs implements Outputs {

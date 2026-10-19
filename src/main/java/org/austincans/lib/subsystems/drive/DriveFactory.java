@@ -21,7 +21,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class DriveFactory {
-    public static SwerveDrive buildSwerveTalonFXPigeon2Swerve(SwerveConfig swerveConfig) {
+    public static NewDrive buildSwerveTalonFXPigeon2Swerve(SwerveConfig swerveConfig) {
         SwerveModuleConfig moduleConfig = swerveConfig.moduleConfig;
         GyroConfigPigeon2 gyroConfig = swerveConfig.gyroConfig;
         return new Swerve(

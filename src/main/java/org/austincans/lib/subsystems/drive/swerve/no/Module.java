@@ -1,5 +1,6 @@
-package org.austincans.lib.subsystems.drive.swerve;
+package org.austincans.lib.subsystems.drive.swerve.no;
 
+import org.austincans.lib.subsystems.drive.swerve.SwerveModuleConfig;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
