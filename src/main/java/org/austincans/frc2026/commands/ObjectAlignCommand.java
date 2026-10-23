@@ -55,6 +55,6 @@ public class ObjectAlignCommand {
   }
 
   public Command alignToClosestObjectCommand(Drive drive) {
-    return Commands.run(() -> alignToClosestObject(drive));
+    return Commands.run(() -> alignToClosestObject(drive), drive);
   }
 }

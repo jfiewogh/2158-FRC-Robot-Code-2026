@@ -15,20 +15,7 @@
 
 package org.austincans.frc2026.commands;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.subsystems.drive.Drive;
-import org.austincans.frc2026.subsystems.drive.DriveConstants;
-
+/*
 public class PathCommands {
   // Create the constraints to use while pathfinding
   public static final PathConstraints pathConstraints =
@@ -41,7 +28,7 @@ public class PathCommands {
     return AutoBuilder.pathfindToPose(endPose, pathConstraints, goalEndVelocityMetersPerSec);
   }
 
-  /* Trajectory (currently unused) */
+  // Trajectory (currently unused)
 
   private static PIDController xController = new PIDController(3, 0.0, 0);
   private static PIDController yController = new PIDController(3, 0.0, 0);
@@ -76,8 +63,8 @@ public class PathCommands {
         .beforeStarting(followTrajectoryTimer::restart)
         .until(
             () ->
-                AutonCommands.getDistanceBetweenPoses(
-                        drive.getPose(), trajectory.getEndState().pose)
+                AutoCommands.getDistanceBetweenPoses(drive.getPose(), trajectory.getEndState().pose)
                     < endPathDistance);
   }
 }
+*/

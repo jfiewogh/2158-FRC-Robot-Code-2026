@@ -1,0 +1,34 @@
+ints:
+  values:
+    motorId: 0
+    encoderId: 0
+doubles:
+  values:
+    gearRatio: 0
+    armLengthMeters: 0
+    minAngleRad: 0
+    maxAngleRad: 0
+    startingAngleRad: 0
+    maxVelocityRadPerSec: 0
+    maxAccelerationRadPerSecSq: 0
+    kP: 0
+    kI: 0
+    kD: 0
+    kS: 0
+    kG: 0
+    kV: 0
+    kA: 0
+    statorCurrentLimit: 0
+    forwardSoftLimit: 0
+    reverseSoftLimit: 0
+booleans:
+  values:
+    brakeModeEnabled: true
+    motorIsBrushless: true
+    forwardSoftLimitEnabled: false
+    reverseSoftLimitEnabled: false
+strings:
+  motorCanbus: ""
+  encoderCanbus: ""
+enums:
+objects:

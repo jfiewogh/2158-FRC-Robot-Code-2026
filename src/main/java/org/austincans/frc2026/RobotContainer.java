@@ -15,23 +15,17 @@
 
 package org.austincans.frc2026;
 
-import static org.austincans.frc2026.subsystems.vision.VisionConstants.*;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
@@ -39,7 +33,6 @@ import org.austincans.frc2026.commands.AutonCommands;
 import org.austincans.frc2026.commands.DriveCommands;
 import org.austincans.frc2026.commands.LimelightHelpersCommands;
 import org.austincans.frc2026.commands.TurretCommands;
-import org.austincans.frc2026.commands.shooter.ShotCommands;
 import org.austincans.frc2026.generated.TunerConstants;
 import org.austincans.frc2026.simulation.RobotSimulation3D;
 import org.austincans.frc2026.subsystems.drive.*;
@@ -55,22 +48,12 @@ import org.austincans.frc2026.subsystems.intake.IntakeIOSim3D;
 import org.austincans.frc2026.subsystems.intake.IntakeIOSparkFlex;
 import org.austincans.frc2026.subsystems.intake.IntakeIOTalonFXS;
 import org.austincans.frc2026.subsystems.led.Led;
-import org.austincans.frc2026.subsystems.led.LedIOBlinkin;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.austincans.frc2026.subsystems.turret.Turret;
-import org.austincans.frc2026.subsystems.turret.TurretIOSim;
-import org.austincans.frc2026.subsystems.turret.TurretIOSparkFlex;
-import org.austincans.frc2026.subsystems.vision.*;
-import org.austincans.frc2026.subsystems.vision.VisionConstants.LimelightConfig;
-import org.austincans.lib.util.KeyboardHID;
-import org.ironmaple.simulation.IntakeSimulation3D;
-import org.ironmaple.simulation.MeshSimulation3D;
-import org.ironmaple.simulation.SimulatedArena3D;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation3D;
-import org.ironmaple.simulation.physics.threading.PhysicsThreadConfig;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt3D;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.austincans.frc2026.subsystems.vision.ObjectDetection;
+import org.austincans.frc2026.subsystems.vision.Vision;
+import org.austincans.frc2026.superstructure.*;
+import org.austincans.frc2026.util.HubShiftUtil;
+import org.austincans.frc2026.util.LoggedTunableNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -79,8 +62,26 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // Subsystem Enabled // only matters for real robot
+  // Maybe move this somewhere else (e.g., RobotConstants)
+  public static final boolean driveEnabled = true;
+  public static final boolean visionEnabled = true;
+  public static final boolean objectDetectionEnabled = false;
+  public static final boolean turretEnabled = true;
+  public static final boolean hoodEnabled = true;
+  public static final boolean rollerEnabled = true;
+  public static final boolean deployEnabled = true;
+  public static final boolean flywheelEnabled = true;
+  public static final boolean indexerEnabled = true;
+  public static final boolean spindexerEnabled = true;
+  public static final boolean ledEnabled = false;
+
+  // Controllers
+  private final DriverMapper driver = new DriverMapperComp();
+  private final OperatorMapper operator = new OperatorMapperTest();
+
   // Subsystems
-  private Drive drive;
+  private final DriveWrapper drive = new DriveWrapper(SubsystemFactory.buildDrive());
 
   @SuppressWarnings("unused")
   private Vision vision;
@@ -105,37 +106,24 @@ public class RobotContainer {
   /* Sim Booleans */
   private static final boolean isThreaded = false;
   // Set whether models should exist in physics engine
-  private static final boolean simulateShooterBase = false;
-  private static final boolean simulateTurret = false;
-  private static final boolean simulateHood = false;
+  private static final boolean simulateShooterBase = true;
+  private static final boolean simulateTurret = true;
+  private static final boolean simulateHood = true;
 
   private SwerveDriveSimulation3D driveSimulation;
 
-  // Controller
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(1);
-
-  private final KeyboardHID keyboardHID = new KeyboardHID();
+  // Alerts
+  private final Alert primaryDisconnected =
+      new Alert("Primary controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert secondaryDisconnected =
+      new Alert("Secondary controller disconnected (port 1).", AlertType.kWarning);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private SendableChooser<Command> autoChooser;
 
-  private IntakeSimulation3D intakeSimulation;
-
-  private DoubleSupplier leftY, leftX, rightY, rightX;
-
-  // Commands
-  private Command runIntakeCommand;
-  private Command driveAndIntakeCommand;
-  private Command driveAndScoreCommand;
-  private Command shootCommand;
-  private Command setTurnMode;
-  // auton only
-  private Command shuttleCommand;
-  private Command shootToHubCommand;
+  private LoggedTunableNumber flywheelSpeed = new LoggedTunableNumber("FlywheelVelocity", 7500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  @SuppressWarnings("unused")
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL -> {
@@ -350,7 +338,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("runIntake", Commands.none());
     }
     if (driveEnabled && flywheelEnabled && turretEnabled && hoodEnabled) {
-      shootCommand = ShotCommands.shootCommand(flywheel, turret, hood, drive);
+      shootCommand = TurretCommands.shootCommand(flywheel, turret, hood, drive);
       shootToHubCommand = TurretCommands.shootToHubCommand(flywheel, turret, hood, drive);
       shuttleCommand = TurretCommands.shuttleCommand(flywheel, turret, hood, drive);
       NamedCommands.registerCommand("shoot", shootToHubCommand);
@@ -380,14 +368,12 @@ public class RobotContainer {
     }
 
     // Set up auto routines
-    autoChooser =
-        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser("Top Auto"));
+    autoChooser = new SendableChooser<Command>();
 
     // Set up SysId routines
     autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        "Drive Wheel Radius Characterization", drive.wheelRadiusCharacterization());
+    autoChooser.addOption("Drive Simple FF Characterization", drive.feedforwardCharacterization());
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -400,22 +386,27 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Angular)",
+        "Drive SysId (Dynam ic Angular)",
         drive.sysIdDynamicAngular(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Top Auto", AutoBuilder.buildAuto("Top Auto"));
-    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("Mid Auto"));
-    autoChooser.addOption("Shuttling Auto", AutoBuilder.buildAuto("Shuttling Auto"));
+    autoChooser.addOption("Left Auto", AutoBuilder.buildAuto("LeftAuto"));
+    autoChooser.addOption("Left Auto with Depot", AutoBuilder.buildAuto("LeftAutoWithDepot"));
+    autoChooser.addOption("Mid Auto", AutoBuilder.buildAuto("MidAuto"));
+    autoChooser.addOption("Right Auto", AutoBuilder.buildAuto("RightAuto"));
+    autoChooser.addOption("Right Auto Two Cycle", AutoBuilder.buildAuto("RightAutoTwoCycle"));
 
-    // Default command, normal field-relative drive
-    if (driveEnabled) {
-      drive.setDefaultCommand(DriveCommands.driveCommand(drive, leftY, leftX, rightX, rightY));
-    }
+    autoChooser.addOption("Left Just Shoot", AutoBuilder.buildAuto("LeftJustShoot"));
+    autoChooser.addOption("Mid Just Shoot", AutoBuilder.buildAuto("MidJustShoot"));
+    autoChooser.addOption("Right Just Shoot", AutoBuilder.buildAuto("RightJustShoot"));
 
-    // Configure the button bindings
-    configureButtonBindings();
+    autoChooser.addOption("Do Nothing", AutoBuilder.buildAuto("DoNothing"));
+    autoChooser.addOption("Just Shoot", AutoBuilder.buildAuto("JustShoot"));
+
+    autoChooser.addOption("Test Auto", AutoBuilder.buildAuto("TestAuto"));
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -425,39 +416,28 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Lock to 0° when A button is held
-    // controller
-    // .a()
-    // .whileTrue(
-    // DriveCommands.joystickDriveAtAngle(
-    // drive,
-    // () -> -controller.getLeftY(),
-    // () -> -controller.getLeftX(),
-    // () -> new Rotation2d()));
+    /* Driver */
 
-    switch (Constants.controlMode) {
-      case JOYSTICK -> {
-        if (runIntakeCommand != null) {
-          driverController.leftBumper().whileTrue(runIntakeCommand);
-        }
-        if (shootCommand != null) {
-          driverController.rightBumper().whileTrue(shootCommand);
-        }
+    // Drive
+    drive.setDefaultCommand(
+        drive.driveCommand(
+            driver::getTranslationX,
+            driver::getTranslationY,
+            driver::getRotationX,
+            driver::getRotationY));
 
-        if (setTurnMode != null) {
-          driverController.b().onTrue(setTurnMode);
-        }
+    driver.getTurnModeToggleButton().onTrue(drive.setTurnModeCommand());
+    driver.getStopWithXButton().onTrue(drive.stopWithXCommand());
+    driver.getZeroPoseButton().onTrue(drive.zeroPoseCommand());
 
-        // Testing
-        if (driveAndIntakeCommand != null) {
-          operatorController.a().onTrue(driveAndIntakeCommand);
-        }
-        if (driveAndScoreCommand != null) {
-          operatorController.b().onTrue(driveAndScoreCommand);
-        }
-      }
-      case KEYBOARD -> {
-        hood.setDefaultCommand(Commands.run(() -> hood.setVelocity(keyboardHID.middleY()), hood));
+    driver.getRollerToggleButton().onTrue(roller.toggleCommand());
+
+    driver.getDeployButton().whileTrue(superstructure.deployCommand());
+    driver.getRetractButton().whileTrue(superstructure.retractCommand());
+
+    driver.getShootButton().whileTrue(superstructure.shootCommand());
+
+    /* Operator */
 
         turret.setDefaultCommand(
             Commands.run(() -> turret.setTurretVelocity(keyboardHID.middleX()), turret));
@@ -477,12 +457,9 @@ public class RobotContainer {
 
         keyboardHID.v().whileTrue(runIntakeCommand);
 
-        keyboardHID.m().whileTrue(TurretCommands.pointToHub(turret, drive));
-        keyboardHID.comma().whileTrue(shootCommand);
+        keyboardHID.m().onTrue(driveAndIntakeCommand);
 
-        // keyboardHID.m().onTrue(driveAndIntakeCommand);
-
-        // keyboardHID.comma().whileTrue(driveAndScoreCommand);
+        keyboardHID.comma().whileTrue(driveAndScoreCommand);
 
         keyboardHID.period().whileTrue(shuttleCommand);
 
@@ -513,8 +490,7 @@ public class RobotContainer {
               ? () ->
                   drive.setPose(
                       driveSimulation
-                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose
-              // during simulation
+                          .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
               : () ->
                   drive.setPose(
                       new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
@@ -529,34 +505,35 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.getSelected();
   }
 
-  public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
+  /** Update dashboard outputs. */
+  public void updateDashboardOutputs() {
+    // Publish match time
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
-    driveSimulation.setSimulationWorldPose(new Pose2d(14, 3, new Rotation2d()));
-    SimulatedArena3D.getInstance().resetFieldForAuto();
+    // Update from HubShiftUtil
+    SmartDashboard.putString(
+        "Shifts/Remaining Shift Time",
+        String.format("%.1f", Math.max(HubShiftUtil.getShiftedShiftInfo().remainingTime(), 0.0)));
+    SmartDashboard.putBoolean("Shifts/Shift Active", HubShiftUtil.getShiftedShiftInfo().active());
+    SmartDashboard.putString(
+        "Shifts/Game State", HubShiftUtil.getShiftedShiftInfo().currentShift().toString());
+    SmartDashboard.putBoolean(
+        "Shifts/Active First?",
+        DriverStation.getAlliance().orElse(Alliance.Blue) == HubShiftUtil.getFirstActiveAlliance());
+
+    // Controller disconnected alerts
+    primaryDisconnected.set(!DriverStation.isJoystickConnected(MapperConstants.driverPort));
+    secondaryDisconnected.set(!DriverStation.isJoystickConnected(MapperConstants.operatorPort));
   }
 
-  public void preloadSimulation() {
-    if (intakeSimulation != null) {
-      intakeSimulation.addGamePiecesToIntake(8);
-    }
-  }
-
-  public void updateSimulation() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-
-    SimulatedArena3D.getInstance().simulationPeriodic();
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition",
-        driveSimulation.getSimulatedDriveTrainPose3dGroundRelative());
-    Logger.recordOutput(
-        "FieldSimulation/Fuel",
-        SimulatedArena3D.getInstance().getGamePiecePosesArrayByType("Fuel"));
-    // Logger.recordOutput(
-    // "FieldSimulation/Fuel2D",
-    // SimulatedArena.getInstance().getGamePiecePosesArrayByType("Fuel"));
+  @SuppressWarnings("unused")
+  private boolean driverHasInput() {
+    return Math.abs(driver.getTranslationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getTranslationY()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationX()) >= DriveWrapper.deadband
+        || Math.abs(driver.getRotationY()) >= DriveWrapper.deadband;
   }
 }

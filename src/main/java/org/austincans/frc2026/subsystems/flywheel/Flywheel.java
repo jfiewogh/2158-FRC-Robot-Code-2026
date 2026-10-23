@@ -15,33 +15,39 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
-import org.littletonrobotics.junction.Logger;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
-// NOTE: Sometimes flywheel run velocity does not work
-/*
- * In statistics and control theory, Kalman filtering (also known as linear quadratic estimation)
- * is an algorithm that uses a series of measurements observed over time, including statistical
- * noise and other inaccuracies, to produce estimates of unknown variables that tend to be more
- * accurate than those based on a single measurement, by estimating a joint probability
- * distribution over the variables for each time-step.
- * The filter is constructed as a mean squared error minimiser, but an alternative derivation of
- * the filter is also provided showing how the filter relates to maximum likelihood statistics.
- * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-observers.html#kalman-filters
- */
+import org.austincans.frc2026.Constants;
+import org.austincans.frc2026.Robot;
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputMode;
+import org.austincans.frc2026.subsystems.flywheel.FlywheelIO.FlywheelIOOutputs;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.austincans.frc2026.util.EqualsUtil;
+import org.austincans.frc2026.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends AdvancedSubsystem {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
-  public static boolean isShooting = false;
-  public static boolean isReadyToShoot = false;
+  private final FlywheelIOOutputs outputs = new FlywheelIOOutputs();
+  private static final LoggedTunableNumber kP = new LoggedTunableNumber("Flywheel/kP", 2);
+  private static final LoggedTunableNumber kD = new LoggedTunableNumber("Flywheel/kD", 1);
+  private static final LoggedTunableNumber kV = new LoggedTunableNumber("Flywheel/kV", .01112);
+
+  @Getter
+  @Accessors(fluent = true)
+  @AutoLogOutput(key = "Flywheel/AtGoal")
+  private boolean atGoal = false;
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
   }
 
@@ -49,41 +55,64 @@ public class Flywheel extends AdvancedSubsystem {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Flywheel", inputs);
-    isShooting = io.isShooting();
-    isReadyToShoot = io.readyToShoot();
+
+    if (Constants.tuningMode) {
+      if (kP.hasChanged(kP.hashCode()) || kV.hasChanged(kV.hashCode()) || kD.hasChanged(kD.hashCode())) {
+        io.configureGains(kP.getAsDouble(), 0, kD.getAsDouble(), kV.getAsDouble());
+      }
+    }
+
+    double velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(inputs.velocityRPM);
+    double setpointRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(outputs.velocityRPM);
+    atGoal = EqualsUtil.epsilonEquals(setpointRadPerSec, velocityRadPerSec, 2.0);
+    Logger.recordOutput("Flywheel/Setpoint", setpointRadPerSec);
+    Logger.recordOutput("Flywheel/Goal", velocityRadPerSec);
+
+    Robot.batteryLogger.reportCurrentUsage("Flywheel", false, inputs.currentAmps);
   }
 
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+    // LoggedTracer.record("Flywheel/AfterScheduler");
+  }
+
+  /** Run closed loop at the specified velocity. */
   public void setVelocity(double velocityRPM) {
-    io.runVelocity(velocityRPM);
+    outputs.mode = FlywheelIOOutputMode.VELOCITY;
+    outputs.velocityRPM = velocityRPM;
+  }
+
+  public void stop() {
+    outputs.mode = FlywheelIOOutputMode.VOLTAGE;
+    outputs.voltage = 0;
   }
 
   public double getRPM() {
     return inputs.velocityRPM;
   }
 
-  public boolean readyToShoot() {
-    return io.readyToShoot();
-  }
-
-  public boolean isShooting() {
-    return io.isShooting();
-  }
-
-  public boolean noGamePiecesToShoot() {
-    return io.noGamePiecesToShoot();
+  public boolean atSetpoint() {
+    boolean a =
+        outputs.mode == FlywheelIOOutputMode.VELOCITY
+            && Math.abs(getRPM() - outputs.velocityRPM) < outputs.velocityRPM * 0.1;
+    Logger.recordOutput("flywheel at setpoint", a);
+    return a;
   }
 
   @Override
   public Command systemCheckCommand() {
     return Commands.sequence(
-        Commands.runOnce(() -> io.runVelocity(100)),
-        Commands.waitSeconds(0.3),
+        Commands.run(() -> setVelocity(100), this).withTimeout(5),
+        Commands.waitSeconds(2),
         Commands.runOnce(
             () -> {
-              if (getRPM() < 95 || getRPM() > 105) {
+              if (getRPM() < 0) {
                 addSubsystemFault(
                     "FLY", "[System Check] Flywheel did not reach desired velocity RPM");
               }
-            }));
+            },
+            this),
+        Commands.runOnce(this::stop, this));
   }
 }

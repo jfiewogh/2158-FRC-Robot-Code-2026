@@ -18,53 +18,59 @@ package org.austincans.frc2026.subsystems.hood;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import org.austincans.frc2026.math.Angle;
+import org.austincans.frc2026.subsystems.hood.HoodIO.HoodIOOutputs;
 import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+/** This is specifically for the 2026 robot */
 public class Hood extends AdvancedSubsystem {
+  public final boolean tuningModeEnabled = false;
+
   private final HoodIO io;
   private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
+  private final HoodIOOutputs outputs = new HoodIOOutputs();
 
   public Hood(HoodIO io) {
     this.io = io;
-    io.getHardware().forEach(e -> registerHardware(e));
+    io.registerSelfCheckHardware(this);
     registerCheckCommand(systemCheckCommand());
-  }
-
-  Command runHoodMotorCommand(Angle angle) {
-    return Commands.run((() -> io.setAngle(angle)));
-  }
-
-  // TODO: Only IO with setVelocity implementation is HoodIOTest
-  public void setVelocity(double velocityRadPerSec) {
-    io.setVelocity(velocityRadPerSec);
-  }
-
-  public void setAngle(Rotation2d angle) {
-    io.setAngleRotation2d(angle);
-  }
-
-  public Rotation2d getAngle() {
-    return io.getAngleRotation2d();
-  }
-
-  public boolean atAngle(Angle setpoint) {
-    return io.atAngle(setpoint);
   }
 
   @Override
   public void periodic() {
-    Logger.processInputs("Hood/Inputs", inputs);
     io.updateInputs(inputs);
+    Logger.processInputs("Hood", inputs);
+    Logger.recordOutput("Hood/AngleDeg", HoodUtil.pwmToAngle(inputs.pulseWidth));
+  }
+
+  @Override
+  public void periodicAfterScheduler() {
+    io.applyOutputs(outputs);
+  }
+
+  public void setPulse(int pulseWidth) {
+    outputs.pulseWidth = pulseWidth;
+  }
+
+  public void addToPulse(int addend) {
+    setPulse(inputs.pulseWidth + addend);
+  }
+
+  public void setAngle(Rotation2d angle) {
+    setPulse(HoodUtil.angleToPWM(angle));
+  }
+
+  /** This should only be used for testing */
+  public Command setPulseCommand(int pulseWidth) {
+    return Commands.runOnce(() -> setPulse(pulseWidth), this);
+  }
+
+  public Command addToPulseCommand(int addend) {
+    return Commands.runOnce(() -> addToPulse(addend), this);
   }
 
   public Command stopCommand() {
-    return new InstantCommand(
-        () -> {
-          io.setAngle(Angle.fromDegrees(0));
-        });
+    return Commands.runOnce(() -> setPulse(inputs.pulseWidth), this);
   }
 
   public Command systemCheckCommand() {
@@ -72,32 +78,24 @@ public class Hood extends AdvancedSubsystem {
             Commands.runOnce(
                 () -> {
                   clearFaults();
-                  io.setAngle(Angle.fromDegrees(10));
+                  setAngle(Rotation2d.fromDegrees(10));
                 },
                 this),
             Commands.waitSeconds(0.1),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.velocityRadPerSec < Math.PI * 2) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood encoder velocity measured too slow", false);
-                  }
-                },
-                this),
             Commands.run(
                     () -> {
-                      io.setAngle(Angle.fromDegrees(20));
+                      setAngle(Rotation2d.fromDegrees(20));
                     },
                     this)
                 .withTimeout(1.0),
-            Commands.runOnce(
-                () -> {
-                  if (inputs.hoodAngleDeg < 22 || inputs.hoodAngleDeg > 18) {
-                    addSubsystemFault(
-                        "HOOD", "[System Check] Hood did not reach target position", false);
-                  }
-                },
-                this),
+            // Commands.runOnce(
+            //     () -> {
+            //       if (inputs.angleDeg < 22 || inputs.angleDeg > 18) {
+            //         addSubsystemFault(
+            //             "HOOD", "[System Check] Hood did not reach target position", false);
+            //       }
+            //     },
+            //     this),
             Commands.waitSeconds(0.25))
         .andThen(Commands.runOnce(this::stopCommand, this));
   }

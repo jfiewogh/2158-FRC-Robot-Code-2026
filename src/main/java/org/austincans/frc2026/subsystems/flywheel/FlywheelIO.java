@@ -15,42 +15,35 @@
 
 package org.austincans.frc2026.subsystems.flywheel;
 
-import java.util.List;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface FlywheelIO {
   @AutoLog
   public class FlywheelIOInputs {
-    public double appliedVolts = 0;
-    public double velocityRPM = 0;
-    public double temperatureC = 0;
+    public double appliedVolts = 0.0;
+    public double velocityRPM = 0.0;
+    public double temperatureCelsius = 0.0;
+    public double currentAmps = 0.0;
   }
 
-  public default void updateInputs(FlywheelIOInputs inputs) {}
-
-  public default void runVoltage(double volts) {}
-
-  public default void runVelocity(double velocityRPM) {}
-
-  public default List<HardwareFault> checkForFaults() {
-    return List.of();
+  public static enum FlywheelIOOutputMode {
+    VELOCITY,
+    VOLTAGE
   }
 
-  public default List<SelfChecking> getHardware() {
-    return List.of();
+  public class FlywheelIOOutputs {
+    public FlywheelIOOutputMode mode = FlywheelIOOutputMode.VELOCITY;
+    public double voltage = 0.0;
+    public double velocityRPM = 0.0;
+    public double feedforwardVolts = 0.0;
   }
 
-  public default boolean readyToShoot() {
-    return false;
-  }
+  public void updateInputs(FlywheelIOInputs inputs);
 
-  public default boolean isShooting() {
-    return false;
-  }
+  public void applyOutputs(FlywheelIOOutputs outputs);
 
-  public default boolean noGamePiecesToShoot() {
-    return false;
-  }
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
+
+  public void configureGains(double kP, double kI, double kD, double kV);
 }

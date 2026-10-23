@@ -28,7 +28,7 @@ public class SubsystemFault {
 
   public SubsystemFault(String code, String description, boolean isWarning) {
     this.description = description;
-    this.timestamp = Timer.getFPGATimestamp();
+    this.timestamp = Timer.getTimestamp();
     this.isWarning = isWarning;
   }
 

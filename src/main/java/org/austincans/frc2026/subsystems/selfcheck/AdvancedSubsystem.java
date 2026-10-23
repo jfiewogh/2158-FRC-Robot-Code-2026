@@ -24,12 +24,12 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
 import org.austincans.frc2026.controllers.REVDigitController;
+import org.austincans.frc2026.util.FullSubsystem;
 
-public abstract class AdvancedSubsystem extends SubsystemBase {
+public abstract class AdvancedSubsystem extends FullSubsystem {
   public enum SystemStatus {
     OK,
     WARNING,
@@ -46,17 +46,18 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
   private final boolean checkErrors;
 
   public AdvancedSubsystem() {
+    super();
     this.statusTable = "SystemStatus/" + this.getName();
     Command systemCheck = getSystemCheckCommand();
     systemCheck.setName(getName() + "Check");
     SmartDashboard.putData(statusTable + "/SystemCheck", systemCheck);
     SmartDashboard.putBoolean(statusTable + "/CheckRan", false);
     checkErrors = RobotBase.isReal();
-
     setupCallbacks();
   }
 
   public AdvancedSubsystem(String name) {
+    super(name);
     this.setName(name);
     this.statusTable = "SystemStatus/" + name;
     Command systemCheck = getSystemCheckCommand();
@@ -64,7 +65,6 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     SmartDashboard.putData(statusTable + "/SystemCheck", systemCheck);
     SmartDashboard.putBoolean(statusTable + "/CheckRan", false);
     checkErrors = RobotBase.isReal();
-
     setupCallbacks();
   }
 
@@ -242,9 +242,17 @@ public abstract class AdvancedSubsystem extends SubsystemBase {
     }
   }
 
+  private int cycles = 0;
+
   @Override
   public void periodic() {
-    checkForFaults();
-    publishStatus();
+    // cycles++;
+    // if (cycles % 12 == 0) {
+    //   checkForFaults();
+    // }
+    // if (cycles % 50 == 0) {
+    //   publishStatus();
+    //   cycles = 0;
+    // }
   }
 }

@@ -1,0 +1,27 @@
+ints:
+  values:
+    deviceID: 0
+doubles:
+  values:
+    gearing: 0
+    armLengthMeters: 0
+    rotationalInertiaMetersSq:
+    kP: 0
+    kI: 0
+    kD: 0
+    kS: 0
+    kG: 0
+    kV: 0
+    kA: 0
+    forwardSoftLimit: 0
+    reverseSoftLimit: 0
+booleans:
+  values:
+    brakeModeEnabled: true
+    motorIsBrushless: true
+    forwardSoftLimitEnabled: false
+    reverseSoftLimitEnabled: false
+strings:
+  motorCanbus: ""
+enums:
+objects:

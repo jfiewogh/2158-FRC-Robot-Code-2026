@@ -20,17 +20,16 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.List;
 import java.util.Queue;
 import org.austincans.frc2026.generated.TunerConstants;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfCheckingPigeon2;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
 import org.austincans.frc2026.util.PhoenixUtil;
 
 /** IO implementation for Pigeon 2. */
@@ -39,7 +38,6 @@ public class GyroIOPigeon2 implements GyroIO {
       new Pigeon2(
           TunerConstants.DrivetrainConstants.Pigeon2Id,
           new CANBus(TunerConstants.DrivetrainConstants.CANBusName));
-  private SelfCheckingPigeon2 pigeonSelfChecker = new SelfCheckingPigeon2("Pigeon", pigeon);
 
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
   private final StatusSignal<Angle> pitch = pigeon.getPitch();
@@ -66,7 +64,8 @@ public class GyroIOPigeon2 implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected =
-        BaseStatusSignal.isAllGood(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity);
+        BaseStatusSignal.refreshAll(yaw, yawVelocity, pitch, pitchVelocity, roll, rollVelocity)
+            .equals(StatusCode.OK);
 
     inputs.yawPosition = Rotation2d.fromRadians(yaw.getValue().in(Radians));
     inputs.yawVelocityRadPerSec = yawVelocity.getValue().in(RadiansPerSecond);
@@ -75,20 +74,12 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.rollPosition = Rotation2d.fromRadians(roll.getValue().in(Radians));
     inputs.rollVelocityRadPerSec = rollVelocity.getValue().in(RadiansPerSecond);
 
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
-
-    inputs.imuRate = pigeon.getAngularVelocityZWorld().getValueAsDouble();
   }
 
   @Override
-  public List<HardwareFault> checkForFaults() {
-    return pigeonSelfChecker.checkForFaults();
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem) {
+    subsystem.registerHardware("Pigeon", pigeon);
   }
 }

@@ -15,9 +15,11 @@
 
 package org.austincans.frc2026.subsystems.led;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import java.util.Optional;
+import org.austincans.frc2026.subsystems.led.LedConstants.LedState;
 
 /**
  * Control REV Robotics Blinkin LED controller
@@ -26,8 +28,6 @@ import java.util.Optional;
  */
 @SuppressWarnings("unused")
 public class LedIOBlinkin implements LedIO {
-  LedState state = LedState.IDLE;
-
   public enum BlinkinPattern {
     /*
      * Fixed Palette Pattern
@@ -158,49 +158,58 @@ public class LedIOBlinkin implements LedIO {
   private Optional<Alliance> alliance;
   private Object disabledColor;
 
+  private LedState state = LedState.IDLE;
+
   public LedIOBlinkin() {
     m_blinkin = new Spark(LedConstants.blinkinID);
+    alliance = DriverStation.getAlliance();
   }
 
   @Override
   public void updateInputs(LedIOInputs inputs) {
-    inputs.state = this.state;
+    inputs.state = state;
   }
 
   @Override
-  public void setPattern(LedState state) {
-    this.state = state;
+  public void applyOutputs(LedIOOutputs outputs) {
+    state = outputs.state;
     switch (state) {
-      case READYTOSHOOT:
+      case READYTOSHOOT -> {
         m_blinkin.set(BlinkinPattern.GREEN.value);
-        break;
-      case INTAKED:
+      }
+      case INTAKED -> {
         m_blinkin.set(BlinkinPattern.RAINBOW_OCEAN_PALETTE.value);
-        break;
-      case DRIVING:
-        m_blinkin.set(BlinkinPattern.BLUE.value);
-        break;
-      case CLIMBING:
+      }
+      case DRIVING -> {
+        if (alliance.get() == Alliance.Blue) {
+          m_blinkin.set(BlinkinPattern.BLUE.value);
+        } else if (alliance.get() == Alliance.Red) {
+          m_blinkin.set(BlinkinPattern.RED.value);
+        } else {
+          m_blinkin.set(BlinkinPattern.YELLOW.value);
+        }
+      }
+      case CLIMBING -> {
         m_blinkin.set(BlinkinPattern.RAINBOW_FOREST_PALETTE.value);
-        break;
-      case SHUTTLING:
+      }
+      case SHUTTLING -> {
         m_blinkin.set(BlinkinPattern.ORANGE.value);
-        break;
-      case ALIGNED:
+      }
+      case ALIGNED -> {
         m_blinkin.set(BlinkinPattern.GOLD.value);
-        break;
-      case NONE:
+      }
+      case NONE -> {
         m_blinkin.set(BlinkinPattern.BLACK.value);
-        break;
-      case IDLE:
+      }
+      case IDLE -> {
         m_blinkin.set(BlinkinPattern.YELLOW.value);
-        break;
-      case SHOOTING:
-        m_blinkin.set(BlinkinPattern.RED.value);
-        break;
-      default:
+      }
+      case SHOOTING -> {
+        m_blinkin.set(BlinkinPattern.RAINBOW_FOREST_PALETTE.value);
+      }
+      default -> {
         m_blinkin.set(BlinkinPattern.BLACK.value);
-        break;
+      }
     }
   }
 }
