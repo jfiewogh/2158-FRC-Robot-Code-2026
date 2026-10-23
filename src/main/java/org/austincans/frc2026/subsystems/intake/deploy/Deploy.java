@@ -15,48 +15,35 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import org.austincans.frc2026.Constants;
-import org.austincans.frc2026.subsystems.intake.deploy.DeployIO.DeployIOOutputs;
-import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import java.util.List;
+import org.austincans.frc2026.subsystems.intake.IntakeIO.IntakeIOInputs;
+import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
+import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
 
-public class Deploy extends AdvancedSubsystem {
-  private final DeployIO io;
-  private final DeployIOInputsAutoLogged inputs = new DeployIOInputsAutoLogged();
-  private final DeployIOOutputs outputs = new DeployIOOutputs();
+public class Deploy {
+  private DeployIO io;
 
   public Deploy(DeployIO io) {
     this.io = io;
-    io.registerSelfCheckHardware(this);
-    registerCheckCommand(systemCheckCommand());
   }
 
-  @Override
-  public void periodic() {
-    io.updateInputs(inputs);
-    // Logger.processInputs("Intake/Deploy", inputs);
-  }
-
-  @Override
-  public void periodicAfterScheduler() {
-    io.applyOutputs(outputs);
+  public void retractCommand() {
+    io.retract();
   }
 
   public void deploy() {
-    outputs.voltage = 0.15 * Constants.maxVoltage;
+    io.deploy();
   }
 
-  public void retract() {
-    outputs.voltage = -0.15 * Constants.maxVoltage;
+  public void updateInputs(IntakeIOInputs inputs) {
+    io.updateInputs(inputs);
   }
 
-  public void stop() {
-    outputs.voltage = 0.0;
+  public List<SelfChecking> getHardware() {
+    return io.getHardware();
   }
 
-  @Override
-  protected Command systemCheckCommand() {
-    return Commands.none();
+  public List<HardwareFault> getFaults() {
+    return io.checkForFaults();
   }
 }

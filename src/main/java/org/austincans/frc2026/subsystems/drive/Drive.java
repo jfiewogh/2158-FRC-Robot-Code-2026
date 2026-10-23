@@ -154,7 +154,7 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
     AutoBuilder.configure(
         this::getPose,
         this::setPose,
-        this::getChassisSpeeds,
+        this::getRobotRelVelocities,
         (speeds, feedforwards) -> runVelocity(speeds),
         new PPHolonomicDriveController(
             new PIDConstants(3.0, 0.0, 0.0), new PIDConstants(3.0, 0.0, 0.0)),
@@ -210,6 +210,32 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.rollPosition : null),
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.pitchPosition : null),
                 Optional.ofNullable(gyroInputs.connected ? gyroInputs.yawPosition : null)));
+
+    // Log 3D robot pose
+    Logger.recordOutput(
+        "RobotState/EstimatedPose3d",
+        new Pose3d(RobotState.getInstance().getEstimatedPose())
+            .exp(
+                new Twist3d(
+                    0.0,
+                    0.0,
+                    Math.abs(gyroInputs.pitchPosition.getRadians())
+                        * DriveConstants.trackWidthX
+                        / 2.0,
+                    0.0,
+                    gyroInputs.pitchPosition.getRadians(),
+                    0.0))
+            .exp(
+                new Twist3d(
+                    0.0,
+                    0.0,
+                    Math.abs(gyroInputs.rollPosition.getRadians())
+                        * DriveConstants.trackWidthY
+                        / 2.0,
+                    gyroInputs.rollPosition.getRadians(),
+                    0.0,
+                    0.0)));
+    RobotState.getInstance().setRobotVelocity(getRobotRelVelocities());
     RobotState.getInstance().setRobotVelocity(getChassisSpeeds());
     // Update brake mode
     if (Arrays.stream(modules)
@@ -218,6 +244,30 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
                 Math.abs(module.getVelocityMetersPerSec()) > coastMetersPerSecondThreshold.get())) {
       lastMovementTimer.reset();
     }
+
+    if (DriverStation.isEnabled()) {
+      coastRequest = CoastRequest.ALWAYS_BRAKE;
+    }
+
+    switch (coastRequest) {
+      case AUTOMATIC -> {
+        if (DriverStation.isEnabled()) {
+          setBrakeMode(true);
+        } else if (lastMovementTimer.hasElapsed(coastWaitTime.get())) {
+          setBrakeMode(false);
+        }
+      }
+      case ALWAYS_BRAKE -> {
+        setBrakeMode(true);
+      }
+      case ALWAYS_COAST -> {
+        setBrakeMode(false);
+      }
+    }
+
+    // Update current setpoint if not in velocity mode
+    if (!velocityMode) {
+      driveIO.updateSetpoint(new SwerveSetpoint(getRobotRelVelocities(), getModuleStates()));
     if (DriverStation.isDisabled()) {
       if (hasStartedCoast || lastMovementTimer.hasElapsed(coastWaitTime.get())) {
         for (var module : modules) {
@@ -368,14 +418,12 @@ public class Drive extends AdvancedSubsystem implements Vision.VisionConsumer {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  public ChassisSpeeds getChassisSpeeds() {
-    return kinematics.toChassisSpeeds(getModuleStates());
+  public ChassisSpeeds getRobotRelVelocities() {
+    return driveInputs.robotRelVelocities;
   }
 
-  /** Returns the measured chassis speeds of the robot. */
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured_Field")
   public ChassisSpeeds getFieldRelVelocities() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelVelocities(), getGyroRotation());
   }
 
   /** Returns the position of each module in radians. */
