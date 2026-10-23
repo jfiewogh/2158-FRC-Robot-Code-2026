@@ -15,23 +15,24 @@
 
 package org.austincans.frc2026.subsystems.intake.deploy;
 
-import java.util.List;
-import org.austincans.frc2026.subsystems.intake.IntakeIO.IntakeIOInputs;
-import org.austincans.frc2026.subsystems.selfcheck.HardwareFault;
-import org.austincans.frc2026.subsystems.selfcheck.SelfChecking;
+import org.austincans.frc2026.subsystems.selfcheck.AdvancedSubsystem;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface DeployIO {
-  public void setVelocity(double velocityRotationsPerSec);
+  @AutoLog
+  public class DeployIOInputs {
+    public double motorVoltage = 0.0;
+    public double positionRad = 0.0;
+    public double temperatureCelsius = 0.0;
+  }
 
-  public void deploy();
+  public class DeployIOOutputs {
+    public double voltage = 0.0;
+  }
 
-  public void retract();
+  public void updateInputs(DeployIOInputs inputs);
 
-  public void stopMotors();
+  public void applyOutputs(DeployIOOutputs outputs);
 
-  public void updateInputs(IntakeIOInputs inputs);
-
-  public List<HardwareFault> checkForFaults();
-
-  public List<SelfChecking> getHardware();
+  public void registerSelfCheckHardware(AdvancedSubsystem subsystem);
 }
