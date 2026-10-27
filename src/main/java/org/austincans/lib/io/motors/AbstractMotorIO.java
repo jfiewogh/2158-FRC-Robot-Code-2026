@@ -14,15 +14,10 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public abstract class AbstractMotorIO implements MotorIO {
-    /** Updates inputs with newer values from motor */
     @Override
-    public void updateInputs(Inputs inputs) {
-        MotorIOInputs motorInputs = (MotorIOInputs) inputs;
-        motorInputs.position = getPosition();
-        motorInputs.velocity = getVelocity();
-        motorInputs.voltage = getVoltage();
-        motorInputs.statorCurrent = getStatorCurrent();
-        motorInputs.temperature = getTemperature();
+    public Inputs getInputs() {
+        return new MotorIOInputs(
+            getPosition(), getVelocity(), getVoltage(), getStatorCurrent(), getTemperature());
     }
 
     /** Applies output to motor based on the output mode */

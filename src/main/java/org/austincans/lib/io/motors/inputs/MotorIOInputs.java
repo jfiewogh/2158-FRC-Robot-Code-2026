@@ -15,10 +15,10 @@ WPIlib sim motors do not have temperature
 Bullet sim motors (hinges) likely work with torque and don't have voltage, current, or temperature
 */
 /** Values universal for all motors */
-public class MotorIOInputs implements Inputs {
-    public Angle position;
-    public AngularVelocity velocity;
-    public Voltage voltage;
-    public Current statorCurrent;
-    public Temperature temperature;
-}
+public record MotorIOInputs(
+    Angle position, 
+    AngularVelocity velocity, 
+    Voltage voltage, 
+    Current statorCurrent, 
+    Temperature temperature
+) implements Inputs {}

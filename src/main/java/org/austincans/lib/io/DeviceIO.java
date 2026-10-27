@@ -1,7 +1,8 @@
 package org.austincans.lib.io;
 
 public interface DeviceIO {
-    public void updateInputs(Inputs inputs);
+    public Inputs getInputs();
 
+    // TODO: this should be part of outputs
     public default void clearStickyFaults() {}
 }
